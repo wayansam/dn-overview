@@ -11,7 +11,7 @@ import {
 import { Button, Layout, MenuProps, Space } from "antd";
 import React from "react";
 import { TAB_LIST } from "../constants/Common.constants";
-import { useAppDispatch } from "../hooks";
+import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSelectedSideBar } from "../slice/UIState.reducer";
 
 const { Sider } = Layout;
@@ -34,6 +34,10 @@ const SideBar = () => {
     label: `nav ${index + 1}`,
   }));
 
+  const selectedSideBar = useAppSelector(
+    (state) => state.UIState.selectedSideBar
+  );
+
   return (
     <Sider
       style={{
@@ -52,7 +56,7 @@ const SideBar = () => {
         {TAB_LIST.map((item, index) => (
           <Button
             block
-            type={"primary"}
+            type={selectedSideBar === item.key ? "primary" : "default"}
             onClick={() => dispatch(setSelectedSideBar(item.key))}
           >
             {item.name}
