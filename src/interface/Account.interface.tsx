@@ -3,7 +3,7 @@ import {
   CHARACTER_3RDJOB,
   CHARACTER_CLASS,
 } from "../constants/InGame.constants";
-import { SkillJade } from "./Item.interface";
+import { Rune, SkillJade } from "./Item.interface";
 
 export interface AccountData {
   characters: CharacterInGameData[];
@@ -28,5 +28,11 @@ export interface CharacterInGameData {
   job: CHARACTER_3RDJOB;
   level: number;
   stg?: number;
-  skillJade: SkillJade[];
+  skillJade?: SkillJade[];
+  rune?: {
+    tria?: Rune;
+    circu?: Rune;
+    recta?: Rune;
+    trape?: Rune;
+  }
 }
