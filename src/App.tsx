@@ -1,13 +1,16 @@
 import { Provider } from "react-redux";
-import "./App.css";
 import MainPage from "./screen/MainPage";
 import store from "./store";
+import { NextUIProvider } from "@nextui-org/react";
+
 
 function App() {
   return (
     // <div className="App">
     <Provider store={store}>
-      <MainPage />
+      <NextUIProvider>
+        <MainPage />
+      </NextUIProvider>
     </Provider>
     // </div>
   );

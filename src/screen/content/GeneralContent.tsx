@@ -37,7 +37,7 @@ const GeneralContent = () => {
       //   key: "ign",
       render: (_, { skillJade }) => (
         <Text>
-          {skillJade.map((item) => `${item.name}(${item.level})`).toString()}
+          {skillJade?.map((item) => `${item.name}(${item.level})`).toString()}
         </Text>
       ),
     },
