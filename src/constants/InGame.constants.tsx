@@ -71,3 +71,25 @@ export enum LUNAR_JADE_RARITY {
   UNIQUE = 'Unique',
   LEGEND = 'Legend'
 }
+
+export enum LUNAR_FRAGMENT_TYPE {
+  HOLY = 'Holy',
+  CRYSTAL = 'Crystal',
+  BURNING = 'Burning',
+  PITCH = 'Pitch',
+  TAILWIND = 'Tailwind',
+  ARDENT = 'Ardent'
+}
+
+export enum EQUIPMENT {
+  HELM = 'Helm',
+  UPPER = 'Upper',
+  LOWER = 'Lower',
+  GLOVE = 'Glove',
+  SHOES = 'Shoes',
+  MAIN_WEAPON = 'Main Weapon',
+  SECOND_WEAPON = 'Second Weapon',
+  NECKLACE = 'Necklace',
+  EARRING = 'Earring',
+  RING = 'Ring'
+}

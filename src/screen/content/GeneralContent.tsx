@@ -37,7 +37,7 @@ const GeneralContent = () => {
       //   key: "ign",
       render: (_, { skillJade }) => (
         <Text>
-          {skillJade.map((item) => `${item.name}(${item.level})`).toString()}
+          {skillJade?.map((item) => `${item.name}(${item.level})`).toString()}
         </Text>
       ),
     },
@@ -74,7 +74,7 @@ const GeneralContent = () => {
     // },
   ];
 
-  return <Table columns={columns} dataSource={exampleAccount.characters} />;
+  return <Table columns={columns} dataSource={exampleAccount.characters} />
 };
 
 export default GeneralContent;
