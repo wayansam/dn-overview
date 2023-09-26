@@ -6,9 +6,11 @@ export interface SideBarTab {
 }
 
 export interface LunarJadeCalculator {
+  key: string;
   equipment: EQUIPMENT
   min: number
   max: number
+  defaultValue: number;
   from: LUNAR_JADE_RARITY
   to: LUNAR_JADE_RARITY
 }
