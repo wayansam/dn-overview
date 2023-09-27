@@ -1,4 +1,4 @@
-import { theme, Collapse, Table, Typography, Form, Input, InputNumber } from "antd";
+import { theme, Collapse, Table, Typography, Form, Input, InputNumber, Select, Space } from "antd";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import type { CollapseProps, InputRef } from 'antd';
 import { LunarJadeCraftAmountTable, LunarJadeCraftMaterialList } from "../../data/lunarData";
@@ -11,6 +11,14 @@ import { LunarJadeCalculator } from "../../interface/Common.interface";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import type { FormInstance } from 'antd/es/form';
 const { Text } = Typography;
+const { Option } = Select;
+
+enum TAB {
+  EQ = 'Equipment',
+  QT = 'Quantity',
+  FR = 'From',
+  TO = 'To'
+}
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -29,6 +37,22 @@ const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
   );
 };
 
+interface optItem {
+  value: LUNAR_JADE_RARITY;
+  label: LUNAR_JADE_RARITY;
+  rateValue: number
+}
+
+const opt: optItem[] = [
+  { value: LUNAR_JADE_RARITY.CRAFT, label: LUNAR_JADE_RARITY.CRAFT, rateValue: 1 },
+  { value: LUNAR_JADE_RARITY.NORMAL, label: LUNAR_JADE_RARITY.NORMAL, rateValue: 2 },
+  { value: LUNAR_JADE_RARITY.MAGIC, label: LUNAR_JADE_RARITY.MAGIC, rateValue: 3 },
+  { value: LUNAR_JADE_RARITY.RARE, label: LUNAR_JADE_RARITY.RARE, rateValue: 4 },
+  { value: LUNAR_JADE_RARITY.EPIC, label: LUNAR_JADE_RARITY.EPIC, rateValue: 5 },
+  { value: LUNAR_JADE_RARITY.UNIQUE, label: LUNAR_JADE_RARITY.UNIQUE, rateValue: 6 },
+  { value: LUNAR_JADE_RARITY.LEGEND, label: LUNAR_JADE_RARITY.LEGEND, rateValue: 7 },
+]
+
 interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
@@ -37,6 +61,7 @@ interface EditableCellProps {
   record: LunarJadeCalculator;
   handleSave: (record: LunarJadeCalculator) => void;
 }
+
 
 const EditableCell: React.FC<EditableCellProps> = ({
   title,
@@ -48,53 +73,104 @@ const EditableCell: React.FC<EditableCellProps> = ({
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false);
-  const inputRef = useRef<InputRef>(null);
+  const [inputNumb, setInputNumb] = useState<number>(0);
+  const [selectItem, setSelectItem] = useState<LUNAR_JADE_RARITY>(LUNAR_JADE_RARITY.CRAFT);
   const form = useContext(EditableContext)!;
 
 
+
   useEffect(() => {
-    if (editing) {
-      inputRef.current!.focus();
+    if (record?.defaultValue && title === TAB.QT) {
+      setInputNumb(record.defaultValue)
     }
-  }, [editing]);
+    if (record?.from && title === TAB.FR) {
+      setSelectItem(record.from)
+    }
+    if (record?.to && title === TAB.TO) {
+      setSelectItem(record.to)
+    }
+  }, [record, title])
+
+
 
   const toggleEdit = () => {
     setEditing(!editing);
     form.setFieldsValue({ [dataIndex]: record[dataIndex] });
   };
 
-  const save = async () => {
-    try {
-      const values = await form.validateFields();
 
-      toggleEdit();
-      handleSave({ ...record, ...values });
-    } catch (errInfo) {
-      console.log('Save failed:', errInfo);
+
+  const onChange = (value: number | null) => {
+    if (typeof value === 'number') {
+      setInputNumb(value)
     }
   };
 
-  let childNode = children;
+  const saveInput = () => {
+    toggleEdit();
+    handleSave({ ...record, defaultValue: inputNumb });
+  }
 
+  const handleChange = (value: LUNAR_JADE_RARITY) => {
+
+    setSelectItem(value)
+  };
+
+  const saveSelect = () => {
+    toggleEdit();
+    if (title === TAB.FR) {
+      handleSave({ ...record, from: selectItem });
+    }
+    if (title === TAB.TO) {
+      handleSave({ ...record, to: selectItem });
+    }
+  }
+
+  let childNode = children;
+  const findFr = opt.find(item => item.value === record?.from)
+  const findTo = opt.find(item => item.value === record?.to)
   if (editable) {
-    console.log({ title, record });
 
     childNode = editing ? (
-      <Form.Item
-        style={{ margin: 0 }}
-        name={dataIndex.toString()}
-        rules={[
-          {
-            required: true,
-            message: `${title} is required.`,
-          },
-        ]}
-      >
-        {/* <Input ref={inputRef} onPressEnter={save} onBlur={save} /> */}
-        <InputNumber min={record.min} max={record.max} defaultValue={record.defaultValue} ref={inputRef} onPressEnter={save} onBlur={save} />
-      </Form.Item>
+      <>
+
+        {title === TAB.QT &&
+          <InputNumber min={record.min} max={record.max} defaultValue={inputNumb} onChange={onChange} onBlur={saveInput} autoFocus />}
+        {(title === TAB.FR) && <Select
+          defaultValue={selectItem}
+          style={{ width: 120 }}
+          onChange={handleChange}
+          // options={opt}
+          onBlur={saveSelect}
+          autoFocus
+        >{opt.map(item => {
+
+          return (<Option value={item.value} label={item.label} key={item.value} disabled={(findTo?.rateValue ?? 0) <= item.rateValue}>
+            <Space>
+              {item.label}
+            </Space>
+          </Option>
+          )
+        })}</Select>}
+        {(title === TAB.TO) && <Select
+          defaultValue={selectItem}
+          style={{ width: 120 }}
+          onChange={handleChange}
+          // options={opt}
+          onBlur={saveSelect}
+          autoFocus
+        >{opt.map(item => {
+
+          return (<Option value={item.value} label={item.label} key={item.value} disabled={(findFr?.rateValue ?? 8) >= item.rateValue}>
+            <Space>
+              {item.label}
+            </Space>
+          </Option>
+          )
+        })}</Select>}
+      </>
     ) : (
-      <div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={toggleEdit}>
+      <div className="editable-cell-value-wrap" style={{ paddingRight: 24 }} onClick={toggleEdit} >
         {children}
       </div>
     );
@@ -145,20 +221,20 @@ const LunarJadeCalculatorContent = () => {
 
   const columnsCalculator: (ColumnsType[number] & { editable?: boolean; dataIndex: string })[] = [
     {
-      title: 'Equipment',
+      title: TAB.EQ,
       dataIndex: 'equipment',
     },
     {
-      title: 'Quantity',
+      title: TAB.QT,
       dataIndex: 'defaultValue',
       editable: true
     },
     {
-      title: 'From',
+      title: TAB.FR,
       dataIndex: 'from', editable: true
     },
     {
-      title: 'To',
+      title: TAB.TO,
       dataIndex: 'to', editable: true
     },
   ];
@@ -193,6 +269,7 @@ const LunarJadeCalculatorContent = () => {
         bordered
         dataSource={dataSource}
         columns={columns as ColumnTypes}
+        pagination={false}
       />
     </div>
   }

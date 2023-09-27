@@ -9,7 +9,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         max: 1,
         defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '2',
@@ -17,7 +17,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '3',
@@ -25,7 +25,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '4',
@@ -33,7 +33,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '5',
@@ -41,7 +41,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '6',
@@ -49,7 +49,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '7',
@@ -57,7 +57,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 1, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '8',
@@ -65,7 +65,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 2, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '9',
@@ -73,7 +73,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 2, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
     {
         key: '10',
@@ -81,6 +81,6 @@ export const dataCalculator: LunarJadeCalculator[] = [
         min: 0,
         max: 4, defaultValue: 0,
         from: LUNAR_JADE_RARITY.CRAFT,
-        to: LUNAR_JADE_RARITY.CRAFT,
+        to: LUNAR_JADE_RARITY.NORMAL,
     },
 ]
