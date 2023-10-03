@@ -260,52 +260,50 @@ const LunarJadeCalculatorContent = () => {
     };
   });
 
+  const tableResource: TableResource[] = useMemo(() => {
+    let temp: TableResource[] = []
+    selectedRowKeys.map(item => {
+      const found = dataSource.find(dt => dt.key === item);
+
+      if (found) {
+        const { equipment, from, to, defaultValue } = found;
+        let adding = false;
+        let total = 0;
+        LunarJadeCraftAmountTable.map(item => {
+          if (adding) {
+            total += item.quantity
+          }
+          if (item.rarity === from) {
+            adding = true
+          }
+          if (item.rarity === to) {
+            adding = false
+          }
+
+        })
+
+        const foundMat = LunarJadeCraftMaterialList.find(mat => mat.equipmentType === equipment)
+        if (foundMat) {
+          foundMat.lunarFragment.map(frag => {
+            const foundTempMat = temp.findIndex(tmp => tmp.lunarFragment.type === frag.type);
+            if (foundTempMat === -1) {
+              temp.push({ lunarFragment: frag, amount: total * defaultValue })
+            } else {
+              const old = temp[foundTempMat]
+              temp[foundTempMat] = ({ ...old, amount: old.amount + (total * defaultValue) })
+            }
+          })
+        }
+      }
+
+    })
+    return temp
+  }, [
+    selectedRowKeys, dataSource
+  ]);
+
   const getCalculator = () => {
     console.log({ selectedRowKeys, dataSource });
-
-    const tableResource: TableResource[] = useMemo(() => {
-      let temp: TableResource[] = []
-      selectedRowKeys.map(item => {
-        const found = dataSource.find(dt => dt.key === item);
-
-        if (found) {
-          const { equipment, from, to, defaultValue } = found;
-          let adding = false;
-          let total = 0;
-          LunarJadeCraftAmountTable.map(item => {
-            if (adding) {
-              total += item.quantity
-            }
-            if (item.rarity === from) {
-              adding = true
-            }
-            if (item.rarity === to) {
-              adding = false
-            }
-
-          })
-
-          const foundMat = LunarJadeCraftMaterialList.find(mat => mat.equipmentType === equipment)
-          if (foundMat) {
-            foundMat.lunarFragment.map(frag => {
-              const foundTempMat = temp.findIndex(tmp => tmp.lunarFragment.type === frag.type);
-              if (foundTempMat === -1) {
-                temp.push({ lunarFragment: frag, amount: total * defaultValue })
-              } else {
-                const old = temp[foundTempMat]
-                temp[foundTempMat] = ({ ...old, amount: old.amount + (total * defaultValue) })
-              }
-            })
-          }
-        }
-
-      })
-      return temp
-    }, [
-      selectedRowKeys, dataSource
-    ]);
-
-
 
     const columnsResource: ColumnsType<TableResource> = [
       {
