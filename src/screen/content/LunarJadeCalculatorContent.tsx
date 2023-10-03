@@ -1,8 +1,8 @@
 import { theme, Collapse, Table, Typography, Form, Input, InputNumber, Select, Space } from "antd";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { CollapseProps, InputRef } from 'antd';
 import { LunarJadeCraftAmountTable, LunarJadeCraftMaterialList } from "../../data/lunarData";
-import { LunarJadeCraftAmount, LunarJadeCraftMaterial } from "../../interface/Item.interface";
+import { LunarFragmentData, LunarJadeCraftAmount, LunarJadeCraftMaterial } from "../../interface/Item.interface";
 import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { getColor } from "../../utils/common.util";
@@ -13,6 +13,10 @@ import type { FormInstance } from 'antd/es/form';
 const { Text } = Typography;
 const { Option } = Select;
 
+interface TableResource {
+  lunarFragment: LunarFragmentData;
+  amount: number;
+}
 enum TAB {
   EQ = 'Equipment',
   QT = 'Quantity',
@@ -257,6 +261,69 @@ const LunarJadeCalculatorContent = () => {
   });
 
   const getCalculator = () => {
+    console.log({ selectedRowKeys, dataSource });
+
+    const tableResource: TableResource[] = useMemo(() => {
+      let temp: TableResource[] = []
+      selectedRowKeys.map(item => {
+        const found = dataSource.find(dt => dt.key === item);
+
+        if (found) {
+          const { equipment, from, to, defaultValue } = found;
+          let adding = false;
+          let total = 0;
+          LunarJadeCraftAmountTable.map(item => {
+            if (adding) {
+              total += item.quantity
+            }
+            if (item.rarity === from) {
+              adding = true
+            }
+            if (item.rarity === to) {
+              adding = false
+            }
+
+          })
+
+          const foundMat = LunarJadeCraftMaterialList.find(mat => mat.equipmentType === equipment)
+          if (foundMat) {
+            foundMat.lunarFragment.map(frag => {
+              const foundTempMat = temp.findIndex(tmp => tmp.lunarFragment.type === frag.type);
+              if (foundTempMat === -1) {
+                temp.push({ lunarFragment: frag, amount: total * defaultValue })
+              } else {
+                const old = temp[foundTempMat]
+                temp[foundTempMat] = ({ ...old, amount: old.amount + (total * defaultValue) })
+              }
+            })
+          }
+        }
+
+      })
+      return temp
+    }, [
+      selectedRowKeys, dataSource
+    ]);
+
+
+
+    const columnsResource: ColumnsType<TableResource> = [
+      {
+        title: 'Fragment Mat',
+        dataIndex: 'lunarFragment',
+        render: (_, { lunarFragment }) => (
+          <div>
+            <Text style={{ color: lunarFragment.color, marginRight: 5 }}>{lunarFragment.type}</Text>
+          </div>
+        )
+      },
+      {
+        title: 'Amount',
+        dataIndex: 'amount',
+        width: 150
+      },
+    ]
+
     return <div>
       <Table
         rowSelection={{
@@ -271,6 +338,7 @@ const LunarJadeCalculatorContent = () => {
         columns={columns as ColumnTypes}
         pagination={false}
       />
+      <Table size={'small'} dataSource={tableResource} columns={columnsResource} pagination={false} bordered />
     </div>
   }
 
