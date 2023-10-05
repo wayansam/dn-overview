@@ -1,9 +1,9 @@
-import { theme, Collapse, Table, Typography, Form, Input, InputNumber, Select, Space } from "antd";
+import { theme, Collapse, Table, Typography, Form, Input, InputNumber, Select, Space, Divider, Radio } from "antd";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { CollapseProps, InputRef } from 'antd';
 import { LunarJadeCraftAmountTable, LunarJadeCraftMaterialList } from "../../data/lunarData";
 import { LunarFragmentData, LunarJadeCraftAmount, LunarJadeCraftMaterial } from "../../interface/Item.interface";
-import { ColumnsType } from "antd/es/table";
+import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { getColor } from "../../utils/common.util";
 import { EQUIPMENT, LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
@@ -139,10 +139,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
       <>
 
         {title === TAB.QT &&
-          <InputNumber min={record.min} max={record.max} defaultValue={inputNumb} onChange={onChange} onBlur={saveInput} autoFocus />}
+          <InputNumber
+            min={record.min} max={record.max} defaultValue={inputNumb} onChange={onChange} onBlur={saveInput} autoFocus size="small" style={{ width: 60 }} />}
         {(title === TAB.FR) && <Select
           defaultValue={selectItem}
-          style={{ width: 120 }}
+          style={{ width: 80 }}
           onChange={handleChange}
           // options={opt}
           onBlur={saveSelect}
@@ -184,7 +185,8 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 type EditableTableProps = Parameters<typeof Table>[0];
-type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
+// type ColumnTypes = Exclude<EditableTableProps['columns'], undefined>;
+type ColumnTypes = (ColumnGroupType<LunarJadeCalculator> | ColumnType<LunarJadeCalculator>)[]
 
 const LunarJadeCalculatorContent = () => {
   const {
@@ -192,6 +194,7 @@ const LunarJadeCalculatorContent = () => {
   } = theme.useToken();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<LunarJadeCalculator[]>(dataCalculator)
+  const [qtVal, setQtVal] = useState<string>('min')
 
   const onSelectChange = (newSelectedRowKeys: React.Key[], selectedRows: LunarJadeCalculator[]
   ) => {
@@ -223,7 +226,7 @@ const LunarJadeCalculatorContent = () => {
     },
   };
 
-  const columnsCalculator: (ColumnsType[number] & { editable?: boolean; dataIndex: string })[] = [
+  const columnsCalculator: (ColumnTypes[number] & { editable?: boolean; dataIndex: string })[] = [
     {
       title: TAB.EQ,
       dataIndex: 'equipment',
@@ -235,11 +238,13 @@ const LunarJadeCalculatorContent = () => {
     },
     {
       title: TAB.FR,
-      dataIndex: 'from', editable: true
+      dataIndex: 'from',
+      editable: true
     },
     {
       title: TAB.TO,
-      dataIndex: 'to', editable: true
+      dataIndex: 'to',
+      editable: true
     },
   ];
 
@@ -302,41 +307,69 @@ const LunarJadeCalculatorContent = () => {
     selectedRowKeys, dataSource
   ]);
 
+  const columnsResource: ColumnsType<TableResource> = [
+    {
+      title: 'Fragment Mat',
+      dataIndex: 'lunarFragment',
+      render: (_, { lunarFragment }) => (
+        <div>
+          <Text style={{ color: lunarFragment.color, marginRight: 5 }}>{lunarFragment.type}</Text>
+        </div>
+      )
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      width: 150
+    },
+  ]
+
+  const setQuantityValue = (qt: string) => {
+    console.log({ qt });
+
+    setQtVal(qt)
+    const newData = dataSource.map((item) => ({ ...item, defaultValue: qt === 'min' ? item.min : item.max }))
+    setDataSource(newData)
+  }
+
   const getCalculator = () => {
     console.log({ selectedRowKeys, dataSource });
+    return <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+      <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <Table
+          rowSelection={{
+            type: 'checkbox',
+            ...rowSelection
+          }}
+          // columns={columnsCalculator}
+          components={components}
+          rowClassName={() => 'editable-row'}
+          bordered
+          dataSource={dataSource}
+          columns={columns as ColumnTypes}
+          pagination={false}
+        />
+      </div>
+      <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <Divider orientation="left">Settings</Divider>
+        <>
+          Quantity
+          <Divider type="vertical" />
+          <Radio.Group
+            value={qtVal}
+            onChange={(e) => {
+              console.log({ e });
 
-    const columnsResource: ColumnsType<TableResource> = [
-      {
-        title: 'Fragment Mat',
-        dataIndex: 'lunarFragment',
-        render: (_, { lunarFragment }) => (
-          <div>
-            <Text style={{ color: lunarFragment.color, marginRight: 5 }}>{lunarFragment.type}</Text>
-          </div>
-        )
-      },
-      {
-        title: 'Amount',
-        dataIndex: 'amount',
-        width: 150
-      },
-    ]
-
-    return <div>
-      <Table
-        rowSelection={{
-          type: 'checkbox',
-          ...rowSelection
-        }}
-        // columns={columnsCalculator}
-        components={components}
-        rowClassName={() => 'editable-row'}
-        bordered
-        dataSource={dataSource}
-        columns={columns as ColumnTypes}
-        pagination={false}
-      />
-      <Table size={'small'} dataSource={tableResource} columns={columnsResource} pagination={false} bordered />
+              setQuantityValue(e.target.value)
+            }}
+          >
+            <Radio.Button value="min" onClick={() => setQuantityValue('min')}>Min</Radio.Button>
+            <Radio.Button value="max" onClick={() => setQuantityValue('max')}>Max</Radio.Button>
+          </Radio.Group>
+        </>
+        <Divider orientation="left">Material List</Divider>
+        <Table size={'small'} dataSource={tableResource} columns={columnsResource} pagination={false} bordered />
+      </div >
     </div>
   }
 
