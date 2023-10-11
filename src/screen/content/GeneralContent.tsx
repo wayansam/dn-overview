@@ -74,11 +74,13 @@ const GeneralContent = () => {
     // },
   ];
 
-  return <Table
-    columns={columns}
-    // dataSource={exampleAccount.characters}
-    dataSource={[]}
-  />
+  return (
+    <Table
+      columns={columns}
+      // dataSource={exampleAccount.characters}
+      dataSource={[]}
+    />
+  );
 };
 
 export default GeneralContent;

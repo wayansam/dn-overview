@@ -1,5 +1,13 @@
 import { LUNAR_FRAGMENT_TYPE_COLOR } from "../constants/InGame.color.constants";
-import { EQUIPMENT, LUNAR_FRAGMENT_TYPE, LUNAR_JADE_RARITY, RUNE_GRADE, RUNE_SHAPE, RUNE_STAT_TYPE, SKILL_JADE } from "../constants/InGame.constants";
+import {
+  EQUIPMENT,
+  LUNAR_FRAGMENT_TYPE,
+  LUNAR_JADE_RARITY,
+  RUNE_GRADE,
+  RUNE_SHAPE,
+  RUNE_STAT_TYPE,
+  SKILL_JADE,
+} from "../constants/InGame.constants";
 
 export interface SkillJade {
   name: SKILL_JADE;
@@ -39,5 +47,5 @@ export interface LunarFragment {
 }
 export interface LunarJadeCraftMaterial {
   equipmentType: EQUIPMENT;
-  lunarFragment: Array<LunarFragmentData>
+  lunarFragment: Array<LunarFragmentData>;
 }

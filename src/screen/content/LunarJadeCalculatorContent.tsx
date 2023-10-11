@@ -32,7 +32,6 @@ import { LunarJadeCalculator } from "../../interface/Common.interface";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import type { FormInstance } from "antd/es/form";
 
-
 const { Text } = Typography;
 const { Option } = Select;
 
@@ -206,6 +205,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                 ? "error"
                 : undefined
             }
+            size="small"
           >
             {equipmentCraftOpt.map((item) => {
               return (
@@ -224,7 +224,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
         {title === TAB.TO && (
           <Select
             defaultValue={selectItem}
-            style={{ width: 120 }}
+            style={{ width: 80 }}
             onChange={handleChange}
             // options={opt}
             onBlur={saveSelect}
@@ -234,6 +234,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                 ? "error"
                 : undefined
             }
+            size="small"
           >
             {equipmentCraftOpt.map((item) => {
               return (
@@ -260,6 +261,14 @@ const EditableCell: React.FC<EditableCellProps> = ({
             (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
               : "black",
+          minWidth:
+            title === TAB.FR || title === TAB.TO
+              ? 80
+              : title === TAB.QT
+              ? 60
+              : undefined,
+          paddingTop: 1,
+          paddingBottom: 1,
         }}
         onClick={toggleEdit}
       >
@@ -286,6 +295,12 @@ const LunarJadeCalculatorContent = () => {
   const [dataSource, setDataSource] =
     useState<LunarJadeCalculator[]>(dataCalculator);
   const [qtVal, setQtVal] = useState<string>("min");
+  const [selectFrom, setSelectFrom] = useState<LUNAR_JADE_RARITY>(
+    LUNAR_JADE_RARITY.CRAFT
+  );
+  const [selectTo, setSelectTo] = useState<LUNAR_JADE_RARITY>(
+    LUNAR_JADE_RARITY.NORMAL
+  );
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -368,8 +383,12 @@ const LunarJadeCalculatorContent = () => {
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
       if (found) {
-        const findFr = equipmentCraftOpt.find((item) => item.value === found.from);
-        const findTo = equipmentCraftOpt.find((item) => item.value === found.to);
+        const findFr = equipmentCraftOpt.find(
+          (item) => item.value === found.from
+        );
+        const findTo = equipmentCraftOpt.find(
+          (item) => item.value === found.to
+        );
         if ((findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)) {
           flag = true;
         }
@@ -459,6 +478,15 @@ const LunarJadeCalculatorContent = () => {
     setDataSource(newData);
   };
 
+  useEffect(() => {
+    const newData = dataSource.map((item) => ({
+      ...item,
+      from: selectFrom,
+      to: selectTo,
+    }));
+    setDataSource(newData);
+  }, [selectFrom, selectTo]);
+
   const getCalculator = () => {
     console.log({ selectedRowKeys, dataSource });
     return (
@@ -490,7 +518,7 @@ const LunarJadeCalculatorContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
-          <>
+          <div style={{ marginBottom: 4 }}>
             Quantity
             <Divider type="vertical" />
             <Radio.Group
@@ -508,9 +536,32 @@ const LunarJadeCalculatorContent = () => {
                 Max
               </Radio.Button>
             </Radio.Group>
-          </>
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            From
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectFrom}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectFrom(val);
+              }}
+              options={equipmentCraftOpt}
+            />
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            To
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectTo}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectTo(val);
+              }}
+              options={equipmentCraftOpt}
+            />
+          </div>
           <Divider orientation="left">Material List</Divider>
-
           <Table
             size={"small"}
             dataSource={tableResource}

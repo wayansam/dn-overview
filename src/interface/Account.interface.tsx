@@ -34,5 +34,5 @@ export interface CharacterInGameData {
     circu?: Rune;
     recta?: Rune;
     trape?: Rune;
-  }
+  };
 }
