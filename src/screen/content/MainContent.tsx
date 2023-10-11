@@ -1,9 +1,11 @@
-import { Layout, theme } from "antd";
-import { useMemo } from "react";
+import { Drawer, FloatButton, Layout, theme } from "antd";
+import { useMemo, useState } from "react";
 import { TAB_LIST } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import GeneralContent from "./GeneralContent";
 import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import DrawerContent from "./DrawerContent";
 
 const { Content } = Layout;
 
@@ -11,6 +13,8 @@ const MainContent = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  const [open, setOpen] = useState(false);
 
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
@@ -39,6 +43,20 @@ const MainContent = () => {
       >
         {content}
       </div>
+      <FloatButton
+        icon={<QuestionCircleOutlined />}
+        type="primary"
+        style={{ right: 24 }}
+        onClick={() => setOpen(true)}
+      />
+      <Drawer
+        title="Help"
+        placement="right"
+        onClose={() => setOpen(false)}
+        open={open}
+      >
+        <DrawerContent />
+      </Drawer>
     </Content>
   );
 };
