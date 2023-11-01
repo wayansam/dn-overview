@@ -14,3 +14,12 @@ export interface LunarJadeCalculator {
   from: LUNAR_JADE_RARITY;
   to: LUNAR_JADE_RARITY;
 }
+
+export interface AncientCalculator {
+  key: string;
+  equipment: EQUIPMENT;
+  min: number;
+  max: number;
+  from: number;
+  to: number;
+}

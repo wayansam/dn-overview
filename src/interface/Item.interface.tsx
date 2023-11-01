@@ -49,3 +49,11 @@ export interface LunarJadeCraftMaterial {
   equipmentType: EQUIPMENT;
   lunarFragment: Array<LunarFragmentData>;
 }
+
+export interface AncientArmorCraftMaterial {
+  encLevel: number;
+  eqTypeFragment: number;
+  ancKnowledge: number;
+  ancInsignia: number;
+  gold: number;
+}

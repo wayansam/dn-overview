@@ -488,7 +488,6 @@ const LunarJadeCalculatorContent = () => {
   }, [selectFrom, selectTo]);
 
   const getCalculator = () => {
-    console.log({ selectedRowKeys, dataSource });
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10 }}>
