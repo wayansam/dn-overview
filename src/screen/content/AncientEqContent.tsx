@@ -9,7 +9,10 @@ import {
   Table,
 } from "antd";
 import Title from "antd/es/typography/Title";
-import { AncientArmorCraftMaterialTable } from "../../data/AncientData";
+import {
+  AncientArmorCraftMaterialTable,
+  AncientWeaponT2CraftMaterialTable,
+} from "../../data/AncientData";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -21,15 +24,22 @@ import { EQUIPMENT } from "../../constants/InGame.constants";
 const { Option } = Select;
 
 interface TableMaterialList {
-  helmFragment: number;
-  upperFragment: number;
-  lowerFragment: number;
-  glovesFragment: number;
-  shoesFragment: number;
-  ancKnowledge: number;
-  ancInsignia: number;
-  gold: number;
+  "Helm Fragment": number;
+  "Upper Fragment": number;
+  "Lower Fragment": number;
+  "Gloves Fragment": number;
+  "Shoes Fragment": number;
+  "Otherworldly Ancien Weapon Fragment": number;
+  "Ancient Knowledge": number;
+  "Ancient Insignia": number;
+  Gold: number;
 }
+
+const opt = (start: number, end: number) =>
+  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
+    label: item,
+    value: item,
+  }));
 
 interface TableResource {
   mats: string;
@@ -115,17 +125,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
   const findFr = record?.from ?? 0;
   const findTo = record?.to ?? 0;
 
-  const opt = useCallback(
-    (start: number, end: number) =>
-      Array.from({ length: end + 1 - start }, (_, k) => k + start).map(
-        (item) => ({
-          label: item,
-          value: item,
-        })
-      ),
-    []
-  );
-
   if (editable) {
     childNode = editing ? (
       <>
@@ -186,6 +185,8 @@ const AncientEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
     useState<AncientCalculator[]>(dataAncCalculator);
+  const [selectFrom, setSelectFrom] = useState<number>(0);
+  const [selectTo, setSelectTo] = useState<number>(20);
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -268,14 +269,15 @@ const AncientEqContent = () => {
 
   const tableResource: TableMaterialList = useMemo(() => {
     let temp: TableMaterialList = {
-      helmFragment: 0,
-      upperFragment: 0,
-      lowerFragment: 0,
-      glovesFragment: 0,
-      shoesFragment: 0,
-      ancKnowledge: 0,
-      ancInsignia: 0,
-      gold: 0,
+      "Helm Fragment": 0,
+      "Upper Fragment": 0,
+      "Lower Fragment": 0,
+      "Gloves Fragment": 0,
+      "Shoes Fragment": 0,
+      "Otherworldly Ancien Weapon Fragment": 0,
+      "Ancient Knowledge": 0,
+      "Ancient Insignia": 0,
+      Gold: 0,
     };
     if (invalidDtSrc) {
       return temp;
@@ -285,7 +287,24 @@ const AncientEqContent = () => {
 
       if (found) {
         const { equipment, from, to, max, min } = found;
-        const tempSlice = AncientArmorCraftMaterialTable.slice(from, to);
+        let tempSlice: AncientArmorCraftMaterial[] = [];
+        switch (equipment) {
+          case EQUIPMENT.HELM:
+          case EQUIPMENT.UPPER:
+          case EQUIPMENT.LOWER:
+          case EQUIPMENT.GLOVE:
+          case EQUIPMENT.SHOES:
+            tempSlice = AncientArmorCraftMaterialTable.slice(from, to);
+            break;
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
+            tempSlice = AncientWeaponT2CraftMaterialTable.slice(from, to);
+            break;
+
+          default:
+            break;
+        }
+
         // const sumWithInitial = temp.reduce(
         //   (accumulator, currentValue) => accumulator + currentValue,
         //   initialValue
@@ -303,24 +322,28 @@ const AncientEqContent = () => {
           tempGold += slicedItem.gold;
         });
 
-        temp.ancKnowledge += tempAncKnowledge;
-        temp.ancInsignia += tempAncInsignia;
-        temp.gold += tempGold;
+        temp["Ancient Knowledge"] += tempAncKnowledge;
+        temp["Ancient Insignia"] += tempAncInsignia;
+        temp["Gold"] += tempGold;
         switch (equipment) {
           case EQUIPMENT.HELM:
-            temp.helmFragment += tempFragment;
+            temp["Helm Fragment"] += tempFragment;
             break;
           case EQUIPMENT.UPPER:
-            temp.upperFragment += tempFragment;
+            temp["Upper Fragment"] += tempFragment;
             break;
           case EQUIPMENT.LOWER:
-            temp.lowerFragment += tempFragment;
+            temp["Lower Fragment"] += tempFragment;
             break;
           case EQUIPMENT.GLOVE:
-            temp.glovesFragment += tempFragment;
+            temp["Gloves Fragment"] += tempFragment;
             break;
           case EQUIPMENT.SHOES:
-            temp.shoesFragment += tempFragment;
+            temp["Shoes Fragment"] += tempFragment;
+            break;
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
+            temp["Otherworldly Ancien Weapon Fragment"] += tempFragment;
             break;
 
           default:
@@ -361,6 +384,15 @@ const AncientEqContent = () => {
     },
   ];
 
+  useEffect(() => {
+    const newData = dataSource.map((item) => ({
+      ...item,
+      from: selectFrom,
+      to: selectTo,
+    }));
+    setDataSource(newData);
+  }, [selectFrom, selectTo]);
+
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -380,6 +412,30 @@ const AncientEqContent = () => {
         </div>
         <div style={{ marginRight: 10, marginBottom: 10 }}>
           <Divider orientation="left">Settings</Divider>
+          <div style={{ marginBottom: 4 }}>
+            From
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectFrom}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectFrom(val);
+              }}
+              options={opt(0, 20)}
+            />
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            To
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectTo}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectTo(val);
+              }}
+              options={opt(0, 20)}
+            />
+          </div>
           <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
@@ -424,14 +480,16 @@ const AncientEqContent = () => {
       key: "1",
       label: "Armor Craft Reference",
       children: (
-        <div>
-          <Table
-            size={"small"}
-            dataSource={AncientArmorCraftMaterialTable}
-            columns={columnsArmor}
-            pagination={false}
-            bordered
-          />
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={{ width: 250, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={AncientArmorCraftMaterialTable}
+              columns={columnsArmor}
+              pagination={false}
+              bordered
+            />
+          </div>
         </div>
       ),
     },
@@ -473,22 +531,7 @@ const AncientEqContent = () => {
   ];
   return (
     <div>
-      <Collapse
-        items={items}
-        size="small"
-        defaultActiveKey={["4"]}
-        // onChange={onChange}
-      />
-      {/* <p>long content</p>
-      {
-        // indicates very long content
-        Array.from({ length: 100 }, (_, index) => (
-          <React.Fragment key={index}>
-            {index % 20 === 0 && index ? "more" : "..."}
-            <br />
-          </React.Fragment>
-        ))
-      } */}
+      <Collapse items={items} size="small" defaultActiveKey={["4"]} />
     </div>
   );
 };
