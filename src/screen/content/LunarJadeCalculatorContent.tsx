@@ -1,36 +1,34 @@
+import type { CollapseProps } from "antd";
 import {
-  theme,
+  Alert,
   Collapse,
-  Table,
-  Typography,
+  Divider,
   Form,
-  Input,
   InputNumber,
+  Radio,
   Select,
   Space,
-  Divider,
-  Radio,
-  Alert,
-  FloatButton,
+  Table,
+  Typography,
+  theme,
 } from "antd";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { CollapseProps, InputRef } from "antd";
+import type { FormInstance } from "antd/es/form";
+import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
+import Title from "antd/es/typography/Title";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
+import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
   LunarJadeCraftAmountTable,
   LunarJadeCraftMaterialList,
 } from "../../data/lunarData";
+import { LunarJadeCalculator } from "../../interface/Common.interface";
 import {
   LunarFragmentData,
   LunarJadeCraftAmount,
   LunarJadeCraftMaterial,
 } from "../../interface/Item.interface";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
 import { getColor } from "../../utils/common.util";
-import { EQUIPMENT, LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
-import { LunarJadeCalculator } from "../../interface/Common.interface";
-import { dataCalculator } from "../../data/lunarCalculatorData";
-import type { FormInstance } from "antd/es/form";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -382,7 +380,7 @@ const LunarJadeCalculatorContent = () => {
     let flag = false;
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
-      if (found) {
+      if (!flag && found) {
         const findFr = equipmentCraftOpt.find(
           (item) => item.value === found.from
         );

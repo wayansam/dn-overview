@@ -1,8 +1,5 @@
-import { EQUIPMENT, LUNAR_JADE_RARITY } from "../constants/InGame.constants";
-import {
-  AncientCalculator,
-  LunarJadeCalculator,
-} from "../interface/Common.interface";
+import { EQUIPMENT } from "../constants/InGame.constants";
+import { AncientCalculator } from "../interface/Common.interface";
 
 export const dataAncCalculator: AncientCalculator[] = [
   {
@@ -61,25 +58,36 @@ export const dataAncCalculator: AncientCalculator[] = [
     from: 0,
     to: 20,
   },
-  // {
-  //   key: "8",
-  //   equipment: EQUIPMENT.NECKLACE,
-  //   min: 1,
-  //   max: 20,
-  //   defaultValue: 1,
-  // },
-  // {
-  //   key: "9",
-  //   equipment: EQUIPMENT.EARRING,
-  //   min: 1,
-  //   max: 20,
-  //   defaultValue: 1,
-  // },
-  // {
-  //   key: "10",
-  //   equipment: EQUIPMENT.RING,
-  //   min: 1,
-  //   max: 20,
-  //   defaultValue: 1,
-  // },
+  {
+    key: "8",
+    equipment: EQUIPMENT.NECKLACE,
+    min: 1,
+    max: 20,
+    from: 0,
+    to: 20,
+  },
+  {
+    key: "9",
+    equipment: EQUIPMENT.EARRING,
+    min: 1,
+    max: 20,
+    from: 0,
+    to: 20,
+  },
+  {
+    key: "10",
+    equipment: EQUIPMENT.RING,
+    min: 1,
+    max: 20,
+    from: 0,
+    to: 20,
+  },
+  {
+    key: "11",
+    equipment: EQUIPMENT.RING,
+    min: 1,
+    max: 20,
+    from: 0,
+    to: 20,
+  },
 ];

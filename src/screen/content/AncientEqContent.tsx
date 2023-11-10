@@ -1,27 +1,24 @@
 import {
+  Alert,
   Collapse,
   CollapseProps,
   Divider,
   Form,
   FormInstance,
   Select,
-  Space,
   Table,
 } from "antd";
-import Title from "antd/es/typography/Title";
+import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { EQUIPMENT } from "../../constants/InGame.constants";
+import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
+  AncientAccessoryCraftMaterialTable,
   AncientArmorCraftMaterialTable,
   AncientWeaponT2CraftMaterialTable,
 } from "../../data/AncientData";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { AncientCalculator } from "../../interface/Common.interface";
-import { dataAncCalculator } from "../../data/AncientCalculatorData";
-import React from "react";
-import { EQUIPMENT } from "../../constants/InGame.constants";
-
-const { Option } = Select;
+import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -29,7 +26,8 @@ interface TableMaterialList {
   "Lower Fragment": number;
   "Gloves Fragment": number;
   "Shoes Fragment": number;
-  "Otherworldly Ancien Weapon Fragment": number;
+  "Otherworldly Ancient Weapon Fragment": number;
+  "Unknown Ancient Accessory Fragment": number;
   "Ancient Knowledge": number;
   "Ancient Insignia": number;
   Gold: number;
@@ -258,8 +256,27 @@ const AncientEqContent = () => {
     let flag = false;
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
-      if (found) {
+      if (!flag && found) {
         if (found.to <= found.from) {
+          flag = true;
+        }
+      }
+    });
+    return flag;
+  }, [selectedRowKeys, dataSource]);
+
+  const showWarningAcc = useMemo(() => {
+    let flag = false;
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (
+        !flag &&
+        found &&
+        (found.equipment === EQUIPMENT.NECKLACE ||
+          found.equipment === EQUIPMENT.EARRING ||
+          found.equipment === EQUIPMENT.RING)
+      ) {
+        if (found.from > 10 || found.to > 10) {
           flag = true;
         }
       }
@@ -274,7 +291,8 @@ const AncientEqContent = () => {
       "Lower Fragment": 0,
       "Gloves Fragment": 0,
       "Shoes Fragment": 0,
-      "Otherworldly Ancien Weapon Fragment": 0,
+      "Otherworldly Ancient Weapon Fragment": 0,
+      "Unknown Ancient Accessory Fragment": 0,
       "Ancient Knowledge": 0,
       "Ancient Insignia": 0,
       Gold: 0,
@@ -299,6 +317,11 @@ const AncientEqContent = () => {
           case EQUIPMENT.MAIN_WEAPON:
           case EQUIPMENT.SECOND_WEAPON:
             tempSlice = AncientWeaponT2CraftMaterialTable.slice(from, to);
+            break;
+          case EQUIPMENT.NECKLACE:
+          case EQUIPMENT.EARRING:
+          case EQUIPMENT.RING:
+            tempSlice = AncientAccessoryCraftMaterialTable.slice(from, to);
             break;
 
           default:
@@ -343,7 +366,12 @@ const AncientEqContent = () => {
             break;
           case EQUIPMENT.MAIN_WEAPON:
           case EQUIPMENT.SECOND_WEAPON:
-            temp["Otherworldly Ancien Weapon Fragment"] += tempFragment;
+            temp["Otherworldly Ancient Weapon Fragment"] += tempFragment;
+            break;
+          case EQUIPMENT.NECKLACE:
+          case EQUIPMENT.EARRING:
+          case EQUIPMENT.RING:
+            temp["Unknown Ancient Accessory Fragment"] += tempFragment;
             break;
 
           default:
@@ -411,6 +439,24 @@ const AncientEqContent = () => {
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10 }}>
+          {invalidDtSrc && (
+            <div>
+              <Alert
+                banner
+                message="From cannot exceed the To option"
+                type="error"
+              />
+            </div>
+          )}
+          {showWarningAcc && (
+            <div>
+              <Alert
+                banner
+                message="From +11 onward, your accessory might break"
+                type="warning"
+              />
+            </div>
+          )}
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             From
@@ -475,6 +521,50 @@ const AncientEqContent = () => {
       dataIndex: "gold",
     },
   ];
+  const columnsWeapon: ColumnsType<AncientArmorCraftMaterial> = [
+    {
+      title: "Enhancement",
+      dataIndex: "encLevel",
+    },
+    {
+      title: "Otherworldly A. Weapon Fragment",
+      dataIndex: "eqTypeFragment",
+    },
+    {
+      title: "A. Knowledge",
+      dataIndex: "ancKnowledge",
+    },
+    {
+      title: "A. Insignia",
+      dataIndex: "ancInsignia",
+    },
+    {
+      title: "Gold",
+      dataIndex: "gold",
+    },
+  ];
+  const columnsAccessory: ColumnsType<AncientArmorCraftMaterial> = [
+    {
+      title: "Enhancement",
+      dataIndex: "encLevel",
+    },
+    {
+      title: "Unknown Ancient Accessory Fragment",
+      dataIndex: "eqTypeFragment",
+    },
+    {
+      title: "A. Knowledge",
+      dataIndex: "ancKnowledge",
+    },
+    {
+      title: "A. Insignia",
+      dataIndex: "ancInsignia",
+    },
+    {
+      title: "Gold",
+      dataIndex: "gold",
+    },
+  ];
   const items: CollapseProps["items"] = [
     {
       key: "1",
@@ -497,14 +587,16 @@ const AncientEqContent = () => {
       key: "2",
       label: "Weapon Craft Reference",
       children: (
-        <div>
-          {/* <Table
-            size={"small"}
-            dataSource={AncientArmorCraftMaterialTable}
-            columns={columnsArmor}
-            pagination={false}
-            bordered
-          /> */}
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={{ width: 250, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={AncientWeaponT2CraftMaterialTable}
+              columns={columnsWeapon}
+              pagination={false}
+              bordered
+            />
+          </div>
         </div>
       ),
     },
@@ -512,14 +604,16 @@ const AncientEqContent = () => {
       key: "3",
       label: "Accessories Craft Reference",
       children: (
-        <div>
-          {/* <Table
-            size={"small"}
-            dataSource={AncientArmorCraftMaterialTable}
-            columns={columnsArmor}
-            pagination={false}
-            bordered
-          /> */}
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <div style={{ width: 250, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={AncientAccessoryCraftMaterialTable}
+              columns={columnsAccessory}
+              pagination={false}
+              bordered
+            />
+          </div>
         </div>
       ),
     },
