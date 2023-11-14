@@ -47,6 +47,9 @@ const MainContent = () => {
         style={{
           padding: 24,
           background: colorBgContainer,
+          borderRadius: 24,
+          boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.1)",
+          marginBottom: 20,
         }}
       >
         {content}

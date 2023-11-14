@@ -22,7 +22,14 @@ const MainPage = () => {
     <Layout hasSider>
       <SideBar />
       <Layout className="site-layout" style={{ marginLeft: 200 }}>
-        <Header style={{ padding: 0, background: colorBgContainer }}>
+        <Header
+          style={{
+            padding: 0,
+            background: colorBgContainer,
+            paddingLeft: 20,
+            boxShadow: "5px 5px 5px 0px rgba(200,200,200,0.1)",
+          }}
+        >
           <Title level={3}>{headerText?.name}</Title>
         </Header>
         <MainContent />
