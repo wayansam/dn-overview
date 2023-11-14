@@ -57,3 +57,10 @@ export interface AncientArmorCraftMaterial {
   ancInsignia: number;
   gold: number;
 }
+
+export interface SkillJadeEnhanceMaterial {
+  encLevel: number;
+  lowerFragment: number;
+  higherFragment: number;
+  gold: number;
+}

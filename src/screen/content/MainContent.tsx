@@ -7,6 +7,7 @@ import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import DrawerContent from "./DrawerContent";
 import AncientEqContent from "./AncientEqContent";
+import SkillJadeContent from "./SkillJadeContent";
 
 const { Content } = Layout;
 
@@ -31,6 +32,9 @@ const MainContent = () => {
 
       case TAB_LIST[2].key:
         return <AncientEqContent />;
+
+      case TAB_LIST[3].key:
+        return <SkillJadeContent />;
 
       default:
         return;
