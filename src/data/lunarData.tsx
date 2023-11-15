@@ -13,13 +13,55 @@ import {
 } from "../interface/Item.interface";
 
 export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
-  { rarity: LUNAR_JADE_RARITY.CRAFT, quantity: 0 },
-  { rarity: LUNAR_JADE_RARITY.NORMAL, quantity: 100 },
-  { rarity: LUNAR_JADE_RARITY.MAGIC, quantity: 300 },
-  { rarity: LUNAR_JADE_RARITY.RARE, quantity: 1500 },
-  { rarity: LUNAR_JADE_RARITY.EPIC, quantity: 6300 },
-  { rarity: LUNAR_JADE_RARITY.UNIQUE, quantity: 25500 },
-  { rarity: LUNAR_JADE_RARITY.LEGEND, quantity: 102300 },
+  {
+    rarity: LUNAR_JADE_RARITY.CRAFT,
+    quantity: 0,
+    quantityHg: 0,
+    stigmata: 0,
+    gold: 0,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.NORMAL,
+    quantity: 100,
+    quantityHg: 0,
+    stigmata: 0,
+    gold: 100,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.MAGIC,
+    quantity: 300,
+    quantityHg: 0,
+    stigmata: 0,
+    gold: 1000,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.RARE,
+    quantity: 0,
+    quantityHg: 15,
+    stigmata: 4,
+    gold: 1000,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.EPIC,
+    quantity: 0,
+    quantityHg: 63,
+    stigmata: 16,
+    gold: 3000,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.UNIQUE,
+    quantity: 0,
+    quantityHg: 255,
+    stigmata: 64,
+    gold: 5000,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.LEGEND,
+    quantity: 0,
+    quantityHg: 1023,
+    stigmata: 256,
+    gold: 10000,
+  },
 ];
 
 export const LunarFragmentList: LunarFragment = {

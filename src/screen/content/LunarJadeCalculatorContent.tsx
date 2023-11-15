@@ -16,7 +16,7 @@ import type { FormInstance } from "antd/es/form";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
+import { EQUIPMENT, LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
   LunarJadeCraftAmountTable,
@@ -35,7 +35,8 @@ const { Option } = Select;
 
 interface TableResource {
   lunarFragment: LunarFragmentData;
-  amount: number;
+  amountFragment: number;
+  amountHGFragment: number;
 }
 enum TAB {
   EQ = "Equipment",
@@ -304,10 +305,6 @@ const LunarJadeCalculatorContent = () => {
     newSelectedRowKeys: React.Key[],
     selectedRows: LunarJadeCalculator[]
   ) => {
-    console.log("selectedRowKeys changed: ", {
-      newSelectedRowKeys,
-      selectedRows,
-    });
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
@@ -406,10 +403,13 @@ const LunarJadeCalculatorContent = () => {
       if (found) {
         const { equipment, from, to, defaultValue } = found;
         let adding = false;
-        let total = 0;
+        let totalF = 0;
+        let totalHGF = 0;
+
         LunarJadeCraftAmountTable.map((item) => {
           if (adding) {
-            total += item.quantity;
+            totalF += item.quantity;
+            totalHGF += item.quantityHg;
           }
           if (item.rarity === from) {
             adding = true;
@@ -430,13 +430,16 @@ const LunarJadeCalculatorContent = () => {
             if (foundTempMat === -1) {
               temp.push({
                 lunarFragment: frag,
-                amount: total * defaultValue,
+                amountFragment: totalF * defaultValue,
+                amountHGFragment: totalHGF * defaultValue,
               });
             } else {
               const old = temp[foundTempMat];
               temp[foundTempMat] = {
                 ...old,
-                amount: old.amount + total * defaultValue,
+                amountFragment: old.amountFragment + totalF * defaultValue,
+                amountHGFragment:
+                  old.amountHGFragment + totalHGF * defaultValue,
               };
             }
           });
@@ -444,6 +447,64 @@ const LunarJadeCalculatorContent = () => {
       }
     });
     return temp;
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
+  const resourceGold = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    let tempGold = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotal = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotal += item.gold;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+        tempGold += tempTotal * defaultValue;
+      }
+    });
+    return tempGold;
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
+  const resourceStigmata = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    let tempStigmata = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotal = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotal += item.stigmata;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+        tempStigmata += tempTotal * defaultValue;
+      }
+    });
+    return tempStigmata;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const columnsResource: ColumnsType<TableResource> = [
@@ -459,21 +520,45 @@ const LunarJadeCalculatorContent = () => {
       ),
     },
     {
-      title: "Amount",
-      dataIndex: "amount",
+      title: "Fragment",
+      dataIndex: "amountFragment",
+      width: 150,
+    },
+    {
+      title: "High Grade Fragment",
+      dataIndex: "amountHGFragment",
       width: 150,
     },
   ];
 
   const setQuantityValue = (qt: string) => {
-    console.log({ qt });
-
     setQtVal(qt);
-    const newData = dataSource.map((item) => ({
-      ...item,
-      defaultValue: qt === "min" ? item.min : item.max,
-    }));
-    setDataSource(newData);
+    switch (qt) {
+      case "min":
+        const newDataMin = dataSource.map((item) => ({
+          ...item,
+          defaultValue: item.min,
+        }));
+        setDataSource(newDataMin);
+        break;
+      case "mid":
+        const newDataMid = dataSource.map((item) => ({
+          ...item,
+          defaultValue: item.equipment === EQUIPMENT.RING ? 2 : 1,
+        }));
+        setDataSource(newDataMid);
+        break;
+      case "max":
+        const newDataMax = dataSource.map((item) => ({
+          ...item,
+          defaultValue: item.max,
+        }));
+        setDataSource(newDataMax);
+        break;
+
+      default:
+        break;
+    }
   };
 
   useEffect(() => {
@@ -521,13 +606,14 @@ const LunarJadeCalculatorContent = () => {
             <Radio.Group
               value={qtVal}
               onChange={(e) => {
-                console.log({ e });
-
                 setQuantityValue(e.target.value);
               }}
             >
               <Radio.Button value="min" onClick={() => setQuantityValue("min")}>
                 Min
+              </Radio.Button>
+              <Radio.Button value="mid" onClick={() => setQuantityValue("mid")}>
+                Mid
               </Radio.Button>
               <Radio.Button value="max" onClick={() => setQuantityValue("max")}>
                 Max
@@ -559,6 +645,8 @@ const LunarJadeCalculatorContent = () => {
             />
           </div>
           <Divider orientation="left">Material List</Divider>
+          <div>Gold: {resourceGold}</div>
+          <div>Stigmata: {resourceStigmata}</div>
           <Table
             size={"small"}
             dataSource={tableResource}
@@ -583,8 +671,20 @@ const LunarJadeCalculatorContent = () => {
       ),
     },
     {
-      title: "Amount",
+      title: "Fragment",
       dataIndex: "quantity",
+    },
+    {
+      title: "High Grade Fragment",
+      dataIndex: "quantityHg",
+    },
+    {
+      title: "Stigmata",
+      dataIndex: "stigmata",
+    },
+    {
+      title: "Gold",
+      dataIndex: "gold",
     },
   ];
 
@@ -614,8 +714,10 @@ const LunarJadeCalculatorContent = () => {
       key: "1",
       label: "Craft Reference",
       children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 200, marginRight: 10 }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ width: 400, marginRight: 30 }}>
             <Title level={5}>{"Lunar Fragment Amount"}</Title>
             <Table
               size={"small"}
@@ -645,34 +747,9 @@ const LunarJadeCalculatorContent = () => {
     },
   ];
 
-  const onChange = (key: string | string[]) => {
-    console.log(key);
-  };
-
   return (
-    <div
-      style={
-        {
-          // textAlign: "center",
-        }
-      }
-    >
-      <Collapse
-        items={items}
-        size="small"
-        defaultActiveKey={["2"]}
-        onChange={onChange}
-      />
-      {/* <p>long content</p>
-      {
-        // indicates very long content
-        Array.from({ length: 100 }, (_, index) => (
-          <React.Fragment key={index}>
-            {index % 20 === 0 && index ? "more" : "..."}
-            <br />
-          </React.Fragment>
-        ))
-      } */}
+    <div>
+      <Collapse items={items} size="small" defaultActiveKey={["2"]} />
     </div>
   );
 };

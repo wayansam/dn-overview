@@ -30,6 +30,9 @@ export interface Rune {
 export interface LunarJadeCraftAmount {
   rarity: LUNAR_JADE_RARITY;
   quantity: number;
+  quantityHg: number;
+  stigmata: number;
+  gold: number;
 }
 
 export interface LunarFragmentData {
