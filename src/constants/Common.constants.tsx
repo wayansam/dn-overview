@@ -17,4 +17,8 @@ export const TAB_LIST: SideBarTab[] = [
     key: "SKILL_JADE",
     name: "Skill Jade",
   },
+  {
+    key: "EROSION_JADE",
+    name: "Erosion Jade",
+  },
 ];

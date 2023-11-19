@@ -8,6 +8,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import DrawerContent from "./DrawerContent";
 import AncientEqContent from "./AncientEqContent";
 import SkillJadeContent from "./SkillJadeContent";
+import ErosionJadeContent from "./ErosionJadeContent";
 
 const { Content } = Layout;
 
@@ -35,6 +36,9 @@ const MainContent = () => {
 
       case TAB_LIST[3].key:
         return <SkillJadeContent />;
+
+      case TAB_LIST[4].key:
+        return <ErosionJadeContent />;
 
       default:
         return;

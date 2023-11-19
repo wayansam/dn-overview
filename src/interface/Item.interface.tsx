@@ -67,3 +67,10 @@ export interface SkillJadeEnhanceMaterial {
   higherFragment: number;
   gold: number;
 }
+
+export interface ErosionConquerorJadeMaterial {
+  encLevel: number;
+  erosionFragment: number;
+  goldLotusCrown: number;
+  gold: number;
+}
