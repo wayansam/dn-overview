@@ -98,8 +98,8 @@ const SkillJadeContent = () => {
       tempGold += slicedItem.gold;
     });
     const temp: DreamyTableMaterialList = {
-      "Dreamy Core": tempHFrag,
-      "High Purity Dreamy Core": tempLFrag,
+      "Dreamy Core": tempLFrag,
+      "High Purity Dreamy Core": tempHFrag,
       Gold: tempGold,
     };
     return temp;
@@ -164,8 +164,8 @@ const SkillJadeContent = () => {
       tempGold += slicedItem.gold;
     });
     const temp: BloodMoonTableMaterialList = {
-      "Blood Moon Core": tempHFrag,
-      "High Purity Blood Moon Core": tempLFrag,
+      "Blood Moon Core": tempLFrag,
+      "High Purity Blood Moon Core": tempHFrag,
       Gold: tempGold,
     };
     return temp;
@@ -230,8 +230,8 @@ const SkillJadeContent = () => {
       tempGold += slicedItem.gold;
     });
     const temp: VerdureTableMaterialList = {
-      "Verdure Core": tempHFrag,
-      "High Purity Verdure Core": tempLFrag,
+      "Verdure Core": tempLFrag,
+      "High Purity Verdure Core": tempHFrag,
       Gold: tempGold,
     };
     return temp;
@@ -296,8 +296,8 @@ const SkillJadeContent = () => {
       tempGold += slicedItem.gold;
     });
     const temp: AncientTableMaterialList = {
-      "Ancient Broken Dragon Jade Fragments": tempHFrag,
-      "Ancient Dragon Jade Fragments": tempLFrag,
+      "Ancient Broken Dragon Jade Fragments": tempLFrag,
+      "Ancient Dragon Jade Fragments": tempHFrag,
       Gold: tempGold,
     };
     return temp;
