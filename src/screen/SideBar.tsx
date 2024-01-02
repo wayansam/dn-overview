@@ -19,35 +19,14 @@ const { Sider } = Layout;
 const SideBar = () => {
   const dispatch = useAppDispatch();
 
-  const items2: MenuProps["items"] = [
-    UserOutlined,
-    VideoCameraOutlined,
-    UploadOutlined,
-    BarChartOutlined,
-    CloudOutlined,
-    AppstoreOutlined,
-    TeamOutlined,
-    ShopOutlined,
-  ].map((icon, index) => ({
-    key: `hehe ${String(index + 1)}`,
-    icon: React.createElement(icon),
-    label: `nav ${index + 1}`,
-  }));
-
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
   );
 
   return (
     <Sider
-      style={{
-        overflow: "auto",
-        height: "100vh",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-      }}
+      breakpoint="md"
+      collapsedWidth="0"
     >
       <Space
         direction="vertical"

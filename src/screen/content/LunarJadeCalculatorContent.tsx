@@ -390,7 +390,7 @@ const LunarJadeCalculatorContent = () => {
       }
     });
     return flag;
-  }, [selectedRowKeys, dataSource, equipmentCraftOpt]);
+  }, [selectedRowKeys, dataSource]);
 
   const tableResource: TableResource[] = useMemo(() => {
     let temp: TableResource[] = [];
@@ -568,7 +568,7 @@ const LunarJadeCalculatorContent = () => {
       to: selectTo,
     }));
     setDataSource(newData);
-  }, [selectFrom, selectTo]);
+  }, [selectFrom, selectTo, dataSource]);
 
   const getCalculator = () => {
     return (

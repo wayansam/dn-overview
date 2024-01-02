@@ -1,4 +1,4 @@
-import { Drawer, FloatButton, Layout, theme } from "antd";
+import { Drawer, FloatButton, theme } from "antd";
 import { useMemo, useState } from "react";
 import { TAB_LIST } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
@@ -9,8 +9,6 @@ import DrawerContent from "./DrawerContent";
 import AncientEqContent from "./AncientEqContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ErosionJadeContent from "./ErosionJadeContent";
-
-const { Content } = Layout;
 
 const MainContent = () => {
   const {
@@ -46,7 +44,7 @@ const MainContent = () => {
   }, [selectedSideBar]);
 
   return (
-    <Content style={{ margin: "24px 16px 0", overflow: "initial" }}>
+    <>
       <div
         style={{
           padding: 24,
@@ -72,7 +70,7 @@ const MainContent = () => {
       >
         <DrawerContent />
       </Drawer>
-    </Content>
+    </>
   );
 };
 

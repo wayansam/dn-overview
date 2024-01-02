@@ -19,9 +19,9 @@ const MainPage = () => {
   const headerText = TAB_LIST.find((item) => item.key === selectedSideBar);
 
   return (
-    <Layout hasSider>
+    <Layout >
       <SideBar />
-      <Layout className="site-layout" style={{ marginLeft: 200 }}>
+      <Layout >
         <Header
           style={{
             padding: 0,
@@ -32,7 +32,9 @@ const MainPage = () => {
         >
           <Title level={3}>{headerText?.name}</Title>
         </Header>
-        <MainContent />
+        <Content style={{ margin: "24px 16px 0" }}>
+          <MainContent />
+        </Content>
         <Footer style={{ textAlign: "center" }}>
           dn overview ©2023 Created by sam
         </Footer>
