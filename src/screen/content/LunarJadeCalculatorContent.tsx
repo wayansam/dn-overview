@@ -212,7 +212,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                  // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
+                // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -241,7 +241,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                  // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
+                // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -257,15 +257,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
           paddingRight: 24,
           color:
             (title === TAB.FR || title === TAB.TO) &&
-            (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
+              (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
               : "black",
           minWidth:
             title === TAB.FR || title === TAB.TO
               ? 80
               : title === TAB.QT
-              ? 60
-              : undefined,
+                ? 60
+                : undefined,
           paddingTop: 1,
           paddingBottom: 1,
         }}
@@ -336,26 +336,26 @@ const LunarJadeCalculatorContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.QT,
-      dataIndex: "defaultValue",
-      editable: true,
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-  ];
+      {
+        title: TAB.EQ,
+        dataIndex: "equipment",
+      },
+      {
+        title: TAB.QT,
+        dataIndex: "defaultValue",
+        editable: true,
+      },
+      {
+        title: TAB.FR,
+        dataIndex: "from",
+        editable: true,
+      },
+      {
+        title: TAB.TO,
+        dataIndex: "to",
+        editable: true,
+      },
+    ];
 
   const columns = columnsCalculator.map((col) => {
     if (!col.editable) {
@@ -600,6 +600,26 @@ const LunarJadeCalculatorContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
+          <div style={{ marginBottom: 4 }}>
+            Spesific Type
+            <Divider type="vertical" />
+            <Radio.Group
+              value={selectedRowKeys}
+              onChange={(e) => {
+                setSelectedRowKeys(e.target.value);
+              }}
+            >
+              <Radio.Button value={['1', '2', '3', '4', '5']} onClick={() => setSelectedRowKeys(['1', '2', '3', '4', '5'])}>
+                Armor
+              </Radio.Button>
+              <Radio.Button value={['6', '7']} onClick={() => setSelectedRowKeys(['6', '7'])}>
+                Weapon
+              </Radio.Button>
+              <Radio.Button value={['8', '9', '10']} onClick={() => setSelectedRowKeys(['8', '9', '10'])}>
+                Accessories
+              </Radio.Button>
+            </Radio.Group>
+          </div>
           <div style={{ marginBottom: 4 }}>
             Quantity
             <Divider type="vertical" />

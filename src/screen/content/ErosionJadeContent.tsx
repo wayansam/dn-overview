@@ -1,10 +1,10 @@
-import { Collapse, CollapseProps, Divider, Slider } from "antd";
+import { Collapse, CollapseProps, Divider, Popover, Slider, Tooltip } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { ErosionConquerorJadeMaterialTable } from "../../data/ErosionData";
 import { ErosionConquerorJadeMaterial } from "../../interface/Item.interface";
 import { useMemo, useState } from "react";
 import { SliderMarks } from "antd/es/slider";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
+import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
 
 interface TableResource {
   mats: string;
@@ -81,16 +81,27 @@ const ErosionJadeContent = () => {
       tempGLC += slicedItem.goldLotusCrown;
       tempGold += slicedItem.gold;
     });
+    if (checkedCraft) {
+      tempErFrag += 10;
+      tempGold += 10000;
+    }
+    if (checkedTier) {
+      tempErFrag += 100;
+      tempGold += 10000;
+    }
     const temp: ErosionConquerorTableMaterialList = {
       "Erosion Fragment": tempErFrag,
       "Gold Lotus Crown": tempGLC,
       Gold: tempGold,
     };
     return temp;
-  }, [erosionData]);
+  }, [erosionData, checkedCraft, checkedTier]);
 
   const onChangeCraft = (e: CheckboxChangeEvent) => {
     setCheckedCraft(e.target.checked);
+  };
+  const onChangeTier = (e: CheckboxChangeEvent) => {
+    setCheckedTier(e.target.checked);
   };
 
   const getCalc = () => {
@@ -115,8 +126,20 @@ const ErosionJadeContent = () => {
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
-            <Checkbox checked={checked} disabled={disabled} onChange={onChange}>
-              {label}
+            <Checkbox checked={checkedCraft} onChange={onChangeCraft} >
+              <Tooltip title="10 fragment, 10k gold" trigger="hover" color="blue" placement="right" >
+                Include 1st shop Mats
+              </Tooltip>
+            </Checkbox>
+
+
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            <Divider type="vertical" />
+            <Checkbox checked={checkedTier} onChange={onChangeTier} >
+              <Tooltip title="+20 tier 1, 100 fragment, 10k gold" trigger="hover" color="blue" placement="right" >
+                Include Tier 2 evolve
+              </Tooltip>
             </Checkbox>
           </div>
           <Divider orientation="left">Material List</Divider>
