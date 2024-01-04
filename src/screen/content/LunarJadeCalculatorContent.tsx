@@ -691,20 +691,41 @@ const LunarJadeCalculatorContent = () => {
       ),
     },
     {
+      title: <div>
+        <p>Fragment</p>
+        <p>High Grade Fragment</p>
+        <p>Stigmata</p>
+        <p>Gold</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { quantity, quantityHg, stigmata, gold }) => (
+        <div>
+          <p >{quantity}</p>
+          <p >{quantityHg}(hg)</p>
+          <p >{stigmata}(s)</p>
+          <p >{gold}(g)</p>
+        </div>
+      ),
+    },
+    {
       title: "Fragment",
       dataIndex: "quantity",
+      responsive: ['sm']
     },
     {
       title: "High Grade Fragment",
       dataIndex: "quantityHg",
+      responsive: ['sm']
     },
     {
       title: "Stigmata",
       dataIndex: "stigmata",
+      responsive: ['sm']
     },
     {
       title: "Gold",
       dataIndex: "gold",
+      responsive: ['sm']
     },
   ];
 

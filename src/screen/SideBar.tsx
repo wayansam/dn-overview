@@ -9,7 +9,7 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, MenuProps, Space } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { TAB_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSelectedSideBar } from "../slice/UIState.reducer";
@@ -23,10 +23,20 @@ const SideBar = () => {
     (state) => state.UIState.selectedSideBar
   );
 
+  const [isSmall, setIsSmall] = useState(false);
+
   return (
     <Sider
       breakpoint="md"
       collapsedWidth="0"
+      onBreakpoint={(broken) => {
+        setIsSmall(broken);
+        // console.log({ broken });
+      }}
+      onCollapse={(collapsed, type) => {
+        // console.log({ collapsed, type });
+      }}
+      style={isSmall ? { position: 'fixed', zIndex: 100, height: '100%' } : undefined}
     >
       <Space
         direction="vertical"
