@@ -568,7 +568,7 @@ const LunarJadeCalculatorContent = () => {
       to: selectTo,
     }));
     setDataSource(newData);
-  }, [selectFrom, selectTo, dataSource]);
+  }, [selectFrom, selectTo]);
 
   const getCalculator = () => {
     return (
