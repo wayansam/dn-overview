@@ -75,11 +75,13 @@ const GeneralContent = () => {
   ];
 
   return (
-    <Table
-      columns={columns}
-      // dataSource={exampleAccount.characters}
-      dataSource={[]}
-    />
+    <div style={{ overflowX: 'auto' }}>
+      <Table
+        columns={columns}
+        // dataSource={exampleAccount.characters}
+        dataSource={[]}
+      />
+    </div>
   );
 };
 

@@ -573,7 +573,7 @@ const LunarJadeCalculatorContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
           <Table
             rowSelection={{
               type: "checkbox",
@@ -588,7 +588,7 @@ const LunarJadeCalculatorContent = () => {
             pagination={false}
           />
         </div>
-        <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
           {invalidDtSrc && (
             <div>
               <Alert
