@@ -526,20 +526,41 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
+      title: <div>
+        <p>Eq. Fragment</p>
+        <p>A. Knowledge</p>
+        <p>A. Insignia</p>
+        <p>Gold</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
+        <div>
+          <p >{eqTypeFragment}(Fragment)</p>
+          <p >{ancKnowledge}(Know)</p>
+          <p >{ancInsignia}(Ins)</p>
+          <p >{gold}(g)</p>
+        </div>
+      ),
+    },
+    {
       title: "Eq. Fragment",
       dataIndex: "eqTypeFragment",
+      responsive: ['sm']
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
+      responsive: ['sm']
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
+      responsive: ['sm']
     },
     {
       title: "Gold",
       dataIndex: "gold",
+      responsive: ['sm']
     },
   ];
   const columnsWeapon: ColumnsType<AncientArmorCraftMaterial> = [
@@ -548,20 +569,41 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
+      title: <div>
+        <p>Otherworldly A. Weapon Fragment</p>
+        <p>A. Knowledge</p>
+        <p>A. Insignia</p>
+        <p>Gold</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
+        <div>
+          <p >{eqTypeFragment}(Fragment)</p>
+          <p >{ancKnowledge}(Know)</p>
+          <p >{ancInsignia}(Ins)</p>
+          <p >{gold}(g)</p>
+        </div>
+      ),
+    },
+    {
       title: "Otherworldly A. Weapon Fragment",
       dataIndex: "eqTypeFragment",
+      responsive: ['sm']
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
+      responsive: ['sm']
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
+      responsive: ['sm']
     },
     {
       title: "Gold",
       dataIndex: "gold",
+      responsive: ['sm']
     },
   ];
   const columnsAccessory: ColumnsType<AncientArmorCraftMaterial> = [
@@ -570,20 +612,41 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
+      title: <div>
+        <p>Unknown Ancient Accessory Fragment</p>
+        <p>A. Knowledge</p>
+        <p>A. Insignia</p>
+        <p>Gold</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
+        <div>
+          <p >{eqTypeFragment}(Fragment)</p>
+          <p >{ancKnowledge}(Know)</p>
+          <p >{ancInsignia}(Ins)</p>
+          <p >{gold}(g)</p>
+        </div>
+      ),
+    },
+    {
       title: "Unknown Ancient Accessory Fragment",
       dataIndex: "eqTypeFragment",
+      responsive: ['sm']
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
+      responsive: ['sm']
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
+      responsive: ['sm']
     },
     {
       title: "Gold",
       dataIndex: "gold",
+      responsive: ['sm']
     },
   ];
   const items: CollapseProps["items"] = [

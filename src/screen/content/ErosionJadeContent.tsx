@@ -54,16 +54,34 @@ const ErosionJadeContent = () => {
       dataIndex: "encLevel",
     },
     {
+      title: <div>
+        <p>Erosion Fragment</p>
+        <p>Gold Lotus Crown</p>
+        <p>Gold</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { erosionFragment, goldLotusCrown, gold }) => (
+        <div>
+          <p >{erosionFragment}(Fragment)</p>
+          <p >{goldLotusCrown}(Crown)</p>
+          <p >{gold}(g)</p>
+        </div>
+      ),
+    },
+    {
       title: "Erosion Fragment",
       dataIndex: "erosionFragment",
+      responsive: ['sm']
     },
     {
       title: "Gold Lotus Crown",
       dataIndex: "goldLotusCrown",
+      responsive: ['sm']
     },
     {
       title: "Gold",
       dataIndex: "gold",
+      responsive: ['sm']
     },
   ];
 
