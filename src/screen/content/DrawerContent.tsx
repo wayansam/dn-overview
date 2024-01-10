@@ -1,20 +1,58 @@
 import { Collapse, CollapseProps, Divider, theme } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { CSSProperties } from "react";
+import { CSSProperties, useMemo } from "react";
 import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
+import { TAB_KEY } from "../../constants/Common.constants";
+import { useAppSelector } from "../../hooks";
 
-const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
-  panelStyle
-) => [
+const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items"] = (
+  panelStyle, key
+) => {
+  const listHelp = [
     {
-      key: "1",
-      label: "General",
-      children: <p>You can find each page functionality description here</p>,
+      key: TAB_KEY.eqAncient,
+      label: TAB_KEY.eqAncient,
+      children: (
+        <div>
+          <p>
+            <b>
+              For the mentioned weapon is Tier 2 Ancient Weapon, so you at least need to have +0 tier 2 ancient weapon first.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Craft Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment. &#40;
+            0 to 20 &#41;
+          </p>
+          <p>
+            Calculated material only shown when you input the correct
+            From, To and select the equipment.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab From, and To, but remember your custom input will be override by The Settings if you change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings, then adjust things you needed.
+            </i>
+          </p>
+        </div>
+      ),
       style: panelStyle,
     },
     {
-      key: "2",
-      label: "Lunar Jade Calculator",
+      key: TAB_KEY.jadeLunar,
+      label: TAB_KEY.jadeLunar,
       children: (
         <div>
           <p>
@@ -58,49 +96,8 @@ const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
       style: panelStyle,
     },
     {
-      key: "3",
-      label: "Ancient Equipment",
-      children: (
-        <div>
-          <p>
-            <b>
-              For the mentioned weapon is Tier 2 Ancient Weapon, so you at least need to have +0 tier 2 ancient weapon first.
-            </b>
-          </p>
-          <p>
-            To use the calculator, please select the equipment you want to
-            calculate.
-          </p>
-          <p>
-            You can always open Craft Reference if you are not sure about the
-            number.
-          </p>
-          <p>
-            Select the From &#38; To option in correct progression of the
-            equipment. &#40;
-            0 to 20 &#41;
-          </p>
-          <p>
-            Calculated material only shown when you input the correct
-            From, To and select the equipment.
-          </p>
-          <p>
-            <i>
-              You can always custom input everything in tab From, and To, but remember your custom input will be override by The Settings if you change it.
-            </i>
-          </p>
-          <p>
-            <i>
-              Best way to do this is setup everything in common from settings, then adjust things you needed.
-            </i>
-          </p>
-        </div>
-      ),
-      style: panelStyle,
-    },
-    {
-      key: "4",
-      label: "Skill Jade",
+      key: TAB_KEY.jadeSkill,
+      label: TAB_KEY.jadeSkill,
       children: (
         <div>
           <p>
@@ -116,8 +113,8 @@ const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
       style: panelStyle,
     },
     {
-      key: "5",
-      label: "Erosion Jade",
+      key: TAB_KEY.jadeErosion,
+      label: TAB_KEY.jadeErosion,
       children: (
         <div>
           <p>
@@ -141,7 +138,18 @@ const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
         </div>
       ),
       style: panelStyle,
+    }
+
+  ]
+
+  return [
+    {
+      key: TAB_KEY.mainGeneral,
+      label: TAB_KEY.mainGeneral,
+      children: <p>You can find each page functionality description here</p>,
+      style: panelStyle,
     },
+    ...listHelp.filter((item) => item.key === key),
     {
       key: "Last",
       label: "About Us",
@@ -153,10 +161,15 @@ const getItems: (panelStyle: CSSProperties) => CollapseProps["items"] = (
       ),
       style: panelStyle,
     },
-  ];
+  ]
+};
 
 const DrawerContent = () => {
   const { token } = theme.useToken();
+
+  const selectedSideBar = useAppSelector(
+    (state) => state.UIState.selectedSideBar
+  );
 
   const panelStyle: React.CSSProperties = {
     marginBottom: 24,
@@ -169,12 +182,12 @@ const DrawerContent = () => {
     <div>
       <Collapse
         bordered={false}
-        defaultActiveKey={["1"]}
+        activeKey={[TAB_KEY.mainGeneral, selectedSideBar.key, 'Last']}
         expandIcon={({ isActive }) => (
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}
         style={{ background: token.colorBgContainer }}
-        items={getItems(panelStyle)}
+        items={getItems(panelStyle, selectedSideBar.key)}
       />
     </div>
   );

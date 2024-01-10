@@ -1,12 +1,13 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TAB_LIST } from "../constants/Common.constants";
+import { TAB_GROUP_LIST } from "../constants/Common.constants";
+import { SideBarTab } from "../interface/Common.interface";
 
 interface UIState {
-  selectedSideBar: string;
+  selectedSideBar: SideBarTab;
 }
 
 const initialState: UIState = {
-  selectedSideBar: TAB_LIST[0].key,
+  selectedSideBar: TAB_GROUP_LIST[0].children[0],
 };
 
 const UIStateSlice = createSlice({

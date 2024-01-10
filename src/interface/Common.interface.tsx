@@ -5,6 +5,12 @@ export interface SideBarTab {
   name: string;
 }
 
+export interface SideBarGroupTab {
+  key: string;
+  name: string;
+  children: SideBarTab[];
+}
+
 export interface LunarJadeCalculator {
   key: string;
   equipment: EQUIPMENT;

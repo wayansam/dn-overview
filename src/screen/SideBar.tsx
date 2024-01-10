@@ -8,9 +8,9 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import { Button, Layout, MenuProps, Space } from "antd";
+import { Button, Divider, Layout, MenuProps, Space } from "antd";
 import React, { useState } from "react";
-import { TAB_LIST } from "../constants/Common.constants";
+import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSelectedSideBar } from "../slice/UIState.reducer";
 
@@ -42,14 +42,19 @@ const SideBar = () => {
         direction="vertical"
         style={{ width: "100%", padding: "10px", borderWidth: 1 }}
       >
-        {TAB_LIST.map((item, index) => (
-          <Button
-            block
-            type={selectedSideBar === item.key ? "primary" : "default"}
-            onClick={() => dispatch(setSelectedSideBar(item.key))}
-          >
-            {item.name}
-          </Button>
+        {TAB_GROUP_LIST.map((group) => (
+          <>
+            <Divider style={{ color: 'white', margin: 0, borderBlockStart: 'white' }} orientation={'left'} >{group.name}</Divider>
+            {group.children.map((item) => (
+              <Button
+                block
+                type={selectedSideBar.key === item.key ? "primary" : "default"}
+                onClick={() => dispatch(setSelectedSideBar(item))}
+              >
+                {item.name}
+              </Button>
+            ))}
+          </>
         ))}
       </Space>
     </Sider>

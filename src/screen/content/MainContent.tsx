@@ -1,6 +1,6 @@
 import { Drawer, FloatButton, theme } from "antd";
 import { useMemo, useState } from "react";
-import { TAB_LIST } from "../../constants/Common.constants";
+import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import GeneralContent from "./GeneralContent";
 import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
@@ -22,20 +22,20 @@ const MainContent = () => {
   );
 
   const content = useMemo(() => {
-    switch (selectedSideBar) {
-      case TAB_LIST[0].key:
+    switch (selectedSideBar.key) {
+      case TAB_KEY.mainGeneral:
         return <GeneralContent />;
 
-      case TAB_LIST[1].key:
-        return <LunarJadeCalculatorContent />;
-
-      case TAB_LIST[2].key:
+      case TAB_KEY.eqAncient:
         return <AncientEqContent />;
 
-      case TAB_LIST[3].key:
+      case TAB_KEY.jadeLunar:
+        return <LunarJadeCalculatorContent />;
+
+      case TAB_KEY.jadeSkill:
         return <SkillJadeContent />;
 
-      case TAB_LIST[4].key:
+      case TAB_KEY.jadeErosion:
         return <ErosionJadeContent />;
 
       default:

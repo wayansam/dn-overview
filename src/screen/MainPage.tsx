@@ -1,6 +1,5 @@
 import { Layout, theme } from "antd";
 import Title from "antd/es/typography/Title";
-import { TAB_LIST } from "../constants/Common.constants";
 import { useAppSelector } from "../hooks";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
@@ -16,10 +15,8 @@ const MainPage = () => {
     (state) => state.UIState.selectedSideBar
   );
 
-  const headerText = TAB_LIST.find((item) => item.key === selectedSideBar);
-
   return (
-    <Layout >
+    <Layout hasSider style={{ height: '100vh' }}>
       <SideBar />
       <Layout >
         <Header
@@ -28,14 +25,20 @@ const MainPage = () => {
             background: colorBgContainer,
             paddingLeft: 20,
             boxShadow: "5px 5px 5px 0px rgba(200,200,200,0.1)",
+            zIndex: 2
           }}
         >
-          <Title level={3}>{headerText?.name}</Title>
+          <Title level={3}>{selectedSideBar.name}</Title>
         </Header>
-        <Content style={{ margin: "24px 16px 0" }}>
+        <Content style={{ padding: "24px 16px 0", overflow: 'auto' }}>
           <MainContent />
         </Content>
-        <Footer style={{ textAlign: "center" }}>
+        <Footer style={{
+          textAlign: "center",
+          boxShadow: "5px -5px 5px 0px rgba(200,200,200,0.1)",
+          padding: '6px 50px',
+          zIndex: 2
+        }}>
           dn overview ©2023 Created by sam
         </Footer>
       </Layout>
