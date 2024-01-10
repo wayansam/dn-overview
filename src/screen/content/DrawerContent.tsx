@@ -138,6 +138,23 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
         </div>
       ),
       style: panelStyle,
+    },
+    {
+      key: TAB_KEY.eqNamedEOD,
+      label: TAB_KEY.eqNamedEOD,
+      children: (
+        <div>
+          <p>
+            To use the calculator, please drag the pointer.
+          </p>
+          <p>
+            <i>
+              Materials needed to craft one weapon are 10 Guide Star, 80 Twilight Essence and 25 Gold.
+            </i>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
     }
 
   ]
