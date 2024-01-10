@@ -9,6 +9,7 @@ import DrawerContent from "./DrawerContent";
 import AncientEqContent from "./AncientEqContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ErosionJadeContent from "./ErosionJadeContent";
+import NamedEODEqContent from "./NamedEODEqContent";
 
 const MainContent = () => {
   const {
@@ -28,6 +29,9 @@ const MainContent = () => {
 
       case TAB_KEY.eqAncient:
         return <AncientEqContent />;
+
+      case TAB_KEY.eqNamedEOD:
+        return <NamedEODEqContent />;
 
       case TAB_KEY.jadeLunar:
         return <LunarJadeCalculatorContent />;

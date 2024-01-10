@@ -2,8 +2,9 @@ import { SideBarGroupTab, SideBarTab } from "../interface/Common.interface";
 
 export const TAB_KEY = {
   mainGeneral: "General",
-  eqAncient: "Ancient Equipment",
-  jadeLunar: "Lunar Jade Calculator",
+  eqAncient: "Ancient",
+  eqNamedEOD: "Named EOD",
+  jadeLunar: "Lunar Jade",
   jadeSkill: "Skill Jade",
   jadeErosion: "Erosion Jade",
 }
@@ -27,6 +28,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.eqAncient,
         name: TAB_KEY.eqAncient,
+      },
+      {
+        key: TAB_KEY.eqNamedEOD,
+        name: TAB_KEY.eqNamedEOD,
       },
     ]
   },

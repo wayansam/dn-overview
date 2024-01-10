@@ -74,3 +74,9 @@ export interface ErosionConquerorJadeMaterial {
   goldLotusCrown: number;
   gold: number;
 }
+export interface NamedEODMaterial {
+  encLevel: number;
+  guideStar: number;
+  twilightEssence: number;
+  gold: number;
+}
