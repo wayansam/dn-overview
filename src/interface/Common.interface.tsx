@@ -29,3 +29,13 @@ export interface AncientCalculator {
   from: number;
   to: number;
 }
+
+export interface KilosCalculator {
+  key: string;
+  equipment: EQUIPMENT;
+  min: number;
+  max: number;
+  from: number;
+  to: number;
+  evoTier2: boolean;
+}

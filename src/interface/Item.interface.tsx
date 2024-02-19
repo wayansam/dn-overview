@@ -80,3 +80,12 @@ export interface NamedEODMaterial {
   twilightEssence: number;
   gold: number;
 }
+
+export interface KilosArmorCraftMaterial {
+  encLevel: number;
+  eqTypeFragment: number;
+  joySorrow: number;
+  joySorrowHG: number;
+  threadIntelect: number;
+  gold: number;
+}
