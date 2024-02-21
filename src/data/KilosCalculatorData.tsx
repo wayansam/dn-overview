@@ -1,7 +1,7 @@
 import { EQUIPMENT } from "../constants/InGame.constants";
 import { KilosCalculator } from "../interface/Common.interface";
 
-export const dataAncCalculator: KilosCalculator[] = [
+export const dataKilosCalculator: KilosCalculator[] = [
   {
     key: "1",
     equipment: EQUIPMENT.HELM,

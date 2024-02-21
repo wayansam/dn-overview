@@ -10,6 +10,7 @@ import AncientEqContent from "./AncientEqContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ErosionJadeContent from "./ErosionJadeContent";
 import NamedEODEqContent from "./NamedEODEqContent";
+import KilosEqContent from "./KilosEqContent";
 
 const MainContent = () => {
   const {
@@ -29,6 +30,9 @@ const MainContent = () => {
 
       case TAB_KEY.eqAncient:
         return <AncientEqContent />;
+
+      case TAB_KEY.eqKilos:
+        return <KilosEqContent />;
 
       case TAB_KEY.eqNamedEOD:
         return <NamedEODEqContent />;
