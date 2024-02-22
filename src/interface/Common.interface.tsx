@@ -38,4 +38,5 @@ export interface KilosCalculator {
   from: number;
   to: number;
   evoTier2: boolean;
+  craft: boolean;
 }

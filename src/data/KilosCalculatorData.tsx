@@ -10,6 +10,7 @@ export const dataKilosCalculator: KilosCalculator[] = [
     from: 0,
     to: 20,
     evoTier2: false,
+    craft: false,
   },
   {
     key: "2",
@@ -19,6 +20,7 @@ export const dataKilosCalculator: KilosCalculator[] = [
     from: 0,
     to: 20,
     evoTier2: false,
+    craft: false,
   },
   {
     key: "3",
@@ -28,6 +30,7 @@ export const dataKilosCalculator: KilosCalculator[] = [
     from: 0,
     to: 20,
     evoTier2: false,
+    craft: false,
   },
   {
     key: "4",
@@ -37,6 +40,7 @@ export const dataKilosCalculator: KilosCalculator[] = [
     from: 0,
     to: 20,
     evoTier2: false,
+    craft: false,
   },
   {
     key: "5",
@@ -46,5 +50,6 @@ export const dataKilosCalculator: KilosCalculator[] = [
     from: 0,
     to: 20,
     evoTier2: false,
+    craft: false,
   },
 ];

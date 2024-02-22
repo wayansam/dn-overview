@@ -11,7 +11,7 @@ export const KilosT1ArmorCraftMaterial: KilosArmorCraftMaterial = {
 
 export const NeedleOfIntelectCraftMaterial: KilosArmorCraftMaterial = {
   encLevel: 0,
-  eqTypeFragment: 10,
+  eqTypeFragment: 0,
   joySorrow: 300,
   joySorrowHG: 0,
   threadIntelect: 2600,
