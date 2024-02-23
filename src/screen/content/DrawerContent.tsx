@@ -1,13 +1,14 @@
-import { Collapse, CollapseProps, Divider, theme } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
-import { CSSProperties, useMemo } from "react";
-import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
+import { Collapse, CollapseProps, theme } from "antd";
+import { CSSProperties } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
+import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
 
-const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items"] = (
-  panelStyle, key
-) => {
+const getItems: (
+  panelStyle: CSSProperties,
+  key: string
+) => CollapseProps["items"] = (panelStyle, key) => {
   const listHelp = [
     {
       key: TAB_KEY.eqAncient,
@@ -16,7 +17,8 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
         <div>
           <p>
             <b>
-              For the mentioned weapon is Tier 2 Ancient Weapon, so you at least need to have +0 tier 2 ancient weapon first.
+              For the mentioned weapon is Tier 2 Ancient Weapon, so you at least
+              need to have +0 tier 2 ancient weapon first.
             </b>
           </p>
           <p>
@@ -29,21 +31,23 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
           </p>
           <p>
             Select the From &#38; To option in correct progression of the
-            equipment. &#40;
-            0 to 20 &#41;
+            equipment. &#40; 0 to 20 &#41;
           </p>
           <p>
-            Calculated material only shown when you input the correct
-            From, To and select the equipment.
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
           </p>
           <p>
             <i>
-              You can always custom input everything in tab From, and To, but remember your custom input will be override by The Settings if you change it.
+              You can always custom input everything in tab From, and To, but
+              remember your custom input will be override by The Settings if you
+              change it.
             </i>
           </p>
           <p>
             <i>
-              Best way to do this is setup everything in common from settings, then adjust things you needed.
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
             </i>
           </p>
         </div>
@@ -57,7 +61,8 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
         <div>
           <p>
             <b>
-              The Max settings for armor is only available with tier 2 Ancient Armor where you can put additional attack jade in it.
+              The Max settings for armor is only available with tier 2 Ancient
+              Armor where you can put additional attack jade in it.
             </b>
           </p>
           <p>
@@ -83,12 +88,15 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
           </p>
           <p>
             <i>
-              You can always custom input everything in tab Quantity, From, and To, but remember your custom input will be override by The Settings if you change it.
+              You can always custom input everything in tab Quantity, From, and
+              To, but remember your custom input will be override by The
+              Settings if you change it.
             </i>
           </p>
           <p>
             <i>
-              Best way to do this is setup everything in common from settings, then adjust things you needed.
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
             </i>
           </p>
         </div>
@@ -102,12 +110,11 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
         <div>
           <p>
             <b>
-              After +10, all jade enhancement will have probability to fail, proceed with caution.
+              After +10, all jade enhancement will have probability to fail,
+              proceed with caution.
             </b>
           </p>
-          <p>
-            To use the calculator, please drag the pointer.
-          </p>
+          <p>To use the calculator, please drag the pointer.</p>
         </div>
       ),
       style: panelStyle,
@@ -118,21 +125,19 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
       children: (
         <div>
           <p>
-            <b>
-              This calculator only calculated Tier 1 Jade.
-            </b>
+            <b>This calculator only calculated Tier 1 Jade.</b>
           </p>
-          <p>
-            To use the calculator, please drag the pointer.
-          </p>
+          <p>To use the calculator, please drag the pointer.</p>
           <p>
             <i>
-              After Tier 2, all jade enhancement will have probability to fail, proceed with caution.
+              After Tier 2, all jade enhancement will have probability to fail,
+              proceed with caution.
             </i>
           </p>
           <p>
             <i>
-              Materials needed from +0 to +20 is the same, which is 10 Concentrated Erosion Fragment, 300 Gold Lotus Crown and 5000 Gold.
+              Materials needed from +0 to +20 is the same, which is 10
+              Concentrated Erosion Fragment, 300 Gold Lotus Crown and 5000 Gold.
             </i>
           </p>
         </div>
@@ -144,20 +149,67 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
       label: TAB_KEY.eqNamedEOD,
       children: (
         <div>
-          <p>
-            To use the calculator, please drag the pointer.
-          </p>
+          <p>To use the calculator, please drag the pointer.</p>
           <p>
             <i>
-              Materials needed to craft one weapon are 10 Guide Star, 80 Twilight Essence and 25 Gold.
+              Materials needed to craft one weapon are 10 Guide Star, 80
+              Twilight Essence and 25 Gold.
             </i>
           </p>
         </div>
       ),
       style: panelStyle,
-    }
-
-  ]
+    },
+    {
+      key: TAB_KEY.eqKilos,
+      label: TAB_KEY.eqKilos,
+      children: (
+        <div>
+          <p>
+            <b>
+              If you want to only calculate tier 2, please put Tier 1 +20 in
+              'From' tab as Tier 2 +0 placeholder.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Craft Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment. &#40; 0 to 20 in each Tier&#41;
+          </p>
+          <p>
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
+          </p>
+          <p>
+            Please check the 'Evo Tier 2' tab if you want to evolve Tier 1 Kilos
+            to Tier 2. Check the 'Change Needle to Craft mats' in setting if you
+            want to craft it.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab From, and To, but
+              remember your custom input will be override by The Settings if you
+              change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
+            </i>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+  ];
 
   return [
     {
@@ -178,7 +230,7 @@ const getItems: (panelStyle: CSSProperties, key: string) => CollapseProps["items
       ),
       style: panelStyle,
     },
-  ]
+  ];
 };
 
 const DrawerContent = () => {
@@ -199,7 +251,7 @@ const DrawerContent = () => {
     <div>
       <Collapse
         bordered={false}
-        activeKey={[TAB_KEY.mainGeneral, selectedSideBar.key, 'Last']}
+        activeKey={[TAB_KEY.mainGeneral, selectedSideBar.key, "Last"]}
         expandIcon={({ isActive }) => (
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}

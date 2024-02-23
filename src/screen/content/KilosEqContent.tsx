@@ -1,23 +1,19 @@
 import {
   Alert,
+  Checkbox,
   Collapse,
   CollapseProps,
   Divider,
   Form,
   FormInstance,
-  Radio,
   Select,
-  Table,
-  Checkbox,
-  Tag,
   Switch,
+  Table,
   Tooltip,
 } from "antd";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import { KilosCalculator } from "../../interface/Common.interface";
-import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
   KilosT1ArmorCraftMaterial,
@@ -25,6 +21,8 @@ import {
   KilosT2ArmorEnhanceMaterialTable,
   NeedleOfIntelectCraftMaterial,
 } from "../../data/KilosData";
+import { KilosCalculator } from "../../interface/Common.interface";
+import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -111,11 +109,11 @@ const EditableCell: React.FC<EditableCellProps> = ({
     if (record?.to && title === TAB.TO) {
       setSelectItem(record.to);
     }
-    if (record?.evoTier2 && title === TAB.EVO2) {
-      setEvoItem(record.evoTier2);
+    if (title === TAB.EVO2) {
+      setEvoItem(record?.evoTier2);
     }
-    if (record?.craft && title === TAB.CR) {
-      setCraftItem(record.craft);
+    if (title === TAB.CR) {
+      setCraftItem(record?.craft);
     }
   }, [record, title]);
 
@@ -136,12 +134,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
     if (title === TAB.TO) {
       handleSave({ ...record, to: selectItem });
     }
-    // if (title === TAB.EVO2) {
-    //   handleSave({ ...record, evoTier2: evoItem });
-    // }
-    // if (title === TAB.CR) {
-    //   handleSave({ ...record, craft: craftItem });
-    // }
   };
 
   let childNode = children;
@@ -154,29 +146,9 @@ const EditableCell: React.FC<EditableCellProps> = ({
       if (typeof cust[1] === "number") {
         return getLabel(cust[1]);
       }
-      // if (typeof cust[1] === "boolean") {
-      //   return cust[1] ? (
-      //     <Tag color="green">Yes</Tag>
-      //   ) : (
-      //     <Tag color="red">No</Tag>
-      //   );
-      // }
     }
     return cust;
   };
-
-  // if (title === TAB.CR) {
-  //   childNode = (
-  //     <div onBlur={saveSelect}>
-  //       <Checkbox
-  //         onChange={(e) => setCraftItem(e.target.checked)}
-  //         checked={craftItem}
-  //       >
-  //         {/* Craft */}
-  //       </Checkbox>
-  //     </div>
-  //   );
-  // }
 
   if (editable) {
     switch (title) {
@@ -272,6 +244,8 @@ const KilosEqContent = () => {
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
   const [checkedChange, setCheckedChange] = useState(false);
+  const [checkedCraft, setCheckedCraft] = useState(false);
+  const [checkedEvo, setCheckedEvo] = useState(false);
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -320,6 +294,11 @@ const KilosEqContent = () => {
       dataIndex: "evoTier2",
       editable: true,
     },
+  ];
+
+  const encTable = [
+    ...KilosT1ArmorEnhanceMaterialTable,
+    ...KilosT2ArmorEnhanceMaterialTable,
   ];
 
   const handleSave = (row: KilosCalculator) => {
@@ -391,17 +370,12 @@ const KilosEqContent = () => {
           case EQUIPMENT.LOWER:
           case EQUIPMENT.GLOVE:
           case EQUIPMENT.SHOES:
-            tempSlice = KilosT1ArmorEnhanceMaterialTable.slice(from, to);
+            tempSlice = encTable.slice(from, to);
             break;
 
           default:
             break;
         }
-
-        // const sumWithInitial = temp.reduce(
-        //   (accumulator, currentValue) => accumulator + currentValue,
-        //   initialValue
-        // );
 
         let tempFragment = 0;
         let tempJoySorrow = 0;
@@ -477,9 +451,11 @@ const KilosEqContent = () => {
       ...item,
       from: selectFrom,
       to: selectTo,
+      craft: checkedCraft,
+      evoTier2: checkedEvo,
     }));
     setDataSource(newData);
-  }, [selectFrom, selectTo]);
+  }, [selectFrom, selectTo, checkedCraft, checkedEvo]);
 
   const getCalculator = () => {
     return (
@@ -518,7 +494,7 @@ const KilosEqContent = () => {
               onChange={(val) => {
                 setSelectFrom(val);
               }}
-              options={opt(0, 20)}
+              options={opt(0, encTable.length)}
             />
           </div>
           <div style={{ marginBottom: 4 }}>
@@ -530,8 +506,30 @@ const KilosEqContent = () => {
               onChange={(val) => {
                 setSelectTo(val);
               }}
-              options={opt(0, 20)}
+              options={opt(0, encTable.length)}
             />
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            <Divider type="vertical" />
+            <Checkbox
+              checked={checkedCraft}
+              onChange={(e) => {
+                setCheckedCraft(e.target.checked);
+              }}
+            >
+              Include Craft mats
+            </Checkbox>
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            <Divider type="vertical" />
+            <Checkbox
+              checked={checkedEvo}
+              onChange={(e) => {
+                setCheckedEvo(e.target.checked);
+              }}
+            >
+              Include Evo mats
+            </Checkbox>
           </div>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
@@ -554,7 +552,6 @@ const KilosEqContent = () => {
           <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
-            // dataSource={tableResource}
             dataSource={Object.entries(tableResource).map(([key, value]) => ({
               mats: key,
               amount: value,
