@@ -33,6 +33,18 @@ export interface LunarJadeCraftAmount {
   quantityHg: number;
   stigmata: number;
   gold: number;
+  tigerIntactOrb: number;
+  concentratedDimensionalEnergy: number;
+}
+
+export interface TigerIntactOrbCraftMats {
+  tigerIntactOrb: number;
+  gold: number;
+}
+export interface ConcentratedDimensionalEnergyCraftMats {
+  tigerIntactOrb: number;
+  dimensionalEnergy: number;
+  gold: number;
 }
 
 export interface LunarFragmentData {

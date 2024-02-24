@@ -4,13 +4,25 @@ import {
   LUNAR_FRAGMENT_TYPE,
   LUNAR_JADE_RARITY,
 } from "../constants/InGame.constants";
-import { LunarJadeCalculator } from "../interface/Common.interface";
 import {
+  ConcentratedDimensionalEnergyCraftMats,
   LunarFragment,
-  LunarFragmentData,
   LunarJadeCraftAmount,
   LunarJadeCraftMaterial,
+  TigerIntactOrbCraftMats,
 } from "../interface/Item.interface";
+
+export const tigerIntactOrbCraftMats: TigerIntactOrbCraftMats = {
+  tigerIntactOrb: 10,
+  gold: 10000,
+};
+
+export const concentratedDimensionalEnergyCraftMats: ConcentratedDimensionalEnergyCraftMats =
+  {
+    tigerIntactOrb: 10,
+    dimensionalEnergy: 10,
+    gold: 10000,
+  };
 
 export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
   {
@@ -19,6 +31,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 0,
     stigmata: 0,
     gold: 0,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.NORMAL,
@@ -26,6 +40,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 0,
     stigmata: 0,
     gold: 100,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.MAGIC,
@@ -33,6 +49,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 0,
     stigmata: 0,
     gold: 1000,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.RARE,
@@ -40,6 +58,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 15,
     stigmata: 4,
     gold: 1000,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.EPIC,
@@ -47,6 +67,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 63,
     stigmata: 16,
     gold: 3000,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.UNIQUE,
@@ -54,6 +76,8 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 255,
     stigmata: 64,
     gold: 5000,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 0,
   },
   {
     rarity: LUNAR_JADE_RARITY.LEGEND,
@@ -61,6 +85,17 @@ export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
     quantityHg: 1023,
     stigmata: 256,
     gold: 10000,
+    tigerIntactOrb: 1,
+    concentratedDimensionalEnergy: 0,
+  },
+  {
+    rarity: LUNAR_JADE_RARITY.ANCIENT,
+    quantity: 0,
+    quantityHg: 4095,
+    stigmata: 1024,
+    gold: 10000,
+    tigerIntactOrb: 0,
+    concentratedDimensionalEnergy: 1,
   },
 ];
 

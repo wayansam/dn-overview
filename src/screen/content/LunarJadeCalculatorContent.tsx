@@ -1,6 +1,7 @@
 import type { CollapseProps } from "antd";
 import {
   Alert,
+  Checkbox,
   Collapse,
   Divider,
   Form,
@@ -21,6 +22,8 @@ import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
   LunarJadeCraftAmountTable,
   LunarJadeCraftMaterialList,
+  concentratedDimensionalEnergyCraftMats,
+  tigerIntactOrbCraftMats,
 } from "../../data/lunarData";
 import { LunarJadeCalculator } from "../../interface/Common.interface";
 import {
@@ -103,6 +106,11 @@ export const equipmentCraftOpt: optItem[] = [
     value: LUNAR_JADE_RARITY.LEGEND,
     label: LUNAR_JADE_RARITY.LEGEND,
     rateValue: 7,
+  },
+  {
+    value: LUNAR_JADE_RARITY.ANCIENT,
+    label: LUNAR_JADE_RARITY.ANCIENT,
+    rateValue: 8,
   },
 ];
 
@@ -212,7 +220,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
+                  // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -241,7 +249,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
+                  // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -257,15 +265,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
           paddingRight: 24,
           color:
             (title === TAB.FR || title === TAB.TO) &&
-              (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
+            (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
               : "black",
           minWidth:
             title === TAB.FR || title === TAB.TO
               ? 80
               : title === TAB.QT
-                ? 60
-                : undefined,
+              ? 60
+              : undefined,
           paddingTop: 1,
           paddingBottom: 1,
         }}
@@ -300,6 +308,8 @@ const LunarJadeCalculatorContent = () => {
   const [selectTo, setSelectTo] = useState<LUNAR_JADE_RARITY>(
     LUNAR_JADE_RARITY.NORMAL
   );
+  const [changeOrb, setChangeOrb] = useState<boolean>(false);
+  const [changeEnergy, setChangeEnergy] = useState<boolean>(false);
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -336,26 +346,26 @@ const LunarJadeCalculatorContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-      {
-        title: TAB.EQ,
-        dataIndex: "equipment",
-      },
-      {
-        title: TAB.QT,
-        dataIndex: "defaultValue",
-        editable: true,
-      },
-      {
-        title: TAB.FR,
-        dataIndex: "from",
-        editable: true,
-      },
-      {
-        title: TAB.TO,
-        dataIndex: "to",
-        editable: true,
-      },
-    ];
+    {
+      title: TAB.EQ,
+      dataIndex: "equipment",
+    },
+    {
+      title: TAB.QT,
+      dataIndex: "defaultValue",
+      editable: true,
+    },
+    {
+      title: TAB.FR,
+      dataIndex: "from",
+      editable: true,
+    },
+    {
+      title: TAB.TO,
+      dataIndex: "to",
+      editable: true,
+    },
+  ];
 
   const columns = columnsCalculator.map((col) => {
     if (!col.editable) {
@@ -473,10 +483,19 @@ const LunarJadeCalculatorContent = () => {
           }
         });
         tempGold += tempTotal * defaultValue;
+
+        if (changeOrb) {
+          tempGold += defaultValue * tigerIntactOrbCraftMats.gold;
+        }
+
+        if (changeEnergy) {
+          tempGold +=
+            defaultValue * concentratedDimensionalEnergyCraftMats.gold;
+        }
       }
     });
     return tempGold;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  }, [selectedRowKeys, dataSource, invalidDtSrc, changeOrb, changeEnergy]);
 
   const resourceStigmata = useMemo(() => {
     if (invalidDtSrc) {
@@ -506,6 +525,153 @@ const LunarJadeCalculatorContent = () => {
     });
     return tempStigmata;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
+  const resourceOrb = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    if (changeOrb) {
+      return 0;
+    }
+    let tempOrb = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotal = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotal += item.tigerIntactOrb;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+        tempOrb += tempTotal * defaultValue;
+      }
+    });
+    return tempOrb;
+  }, [selectedRowKeys, dataSource, invalidDtSrc, changeOrb]);
+
+  const resourceConcEnergy = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    if (changeEnergy) {
+      return 0;
+    }
+    let tempEnergy = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotal = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotal += item.concentratedDimensionalEnergy;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+        tempEnergy += tempTotal * defaultValue;
+      }
+    });
+    return tempEnergy;
+  }, [selectedRowKeys, dataSource, invalidDtSrc, changeEnergy]);
+
+  const resourceBrokenOrb = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    if (!changeOrb && !changeEnergy) {
+      return 0;
+    }
+    let tempBrknOrb = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotalOrb = 0;
+        let tempTotalEnergy = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotalOrb += item.tigerIntactOrb;
+            tempTotalEnergy += item.concentratedDimensionalEnergy;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+        if (changeOrb) {
+          tempBrknOrb +=
+            tempTotalOrb *
+            defaultValue *
+            tigerIntactOrbCraftMats.tigerIntactOrb;
+        }
+        if (changeEnergy) {
+          tempBrknOrb +=
+            tempTotalEnergy *
+            defaultValue *
+            concentratedDimensionalEnergyCraftMats.tigerIntactOrb;
+        }
+      }
+    });
+    return tempBrknOrb;
+  }, [selectedRowKeys, dataSource, invalidDtSrc, changeOrb, changeEnergy]);
+
+  const resourceDimensionalEnergy = useMemo(() => {
+    if (invalidDtSrc) {
+      return "-";
+    }
+    if (!changeEnergy) {
+      return 0;
+    }
+    let tempDimEnergy = 0;
+    selectedRowKeys.map((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { from, to, defaultValue } = found;
+        let adding = false;
+        let tempTotalEnergy = 0;
+        LunarJadeCraftAmountTable.map((item) => {
+          if (adding) {
+            tempTotalEnergy += item.concentratedDimensionalEnergy;
+          }
+          if (item.rarity === from) {
+            adding = true;
+          }
+          if (item.rarity === to) {
+            adding = false;
+          }
+        });
+
+        if (changeEnergy) {
+          tempDimEnergy +=
+            tempTotalEnergy *
+            defaultValue *
+            concentratedDimensionalEnergyCraftMats.dimensionalEnergy;
+        }
+      }
+    });
+    return tempDimEnergy;
+  }, [selectedRowKeys, dataSource, invalidDtSrc, changeEnergy]);
 
   const columnsResource: ColumnsType<TableResource> = [
     {
@@ -573,7 +739,7 @@ const LunarJadeCalculatorContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <Table
             rowSelection={{
               type: "checkbox",
@@ -588,7 +754,7 @@ const LunarJadeCalculatorContent = () => {
             pagination={false}
           />
         </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -609,13 +775,22 @@ const LunarJadeCalculatorContent = () => {
                 setSelectedRowKeys(e.target.value);
               }}
             >
-              <Radio.Button value={['1', '2', '3', '4', '5']} onClick={() => setSelectedRowKeys(['1', '2', '3', '4', '5'])}>
+              <Radio.Button
+                value={["1", "2", "3", "4", "5"]}
+                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
+              >
                 Armor
               </Radio.Button>
-              <Radio.Button value={['6', '7']} onClick={() => setSelectedRowKeys(['6', '7'])}>
+              <Radio.Button
+                value={["6", "7"]}
+                onClick={() => setSelectedRowKeys(["6", "7"])}
+              >
                 Weapon
               </Radio.Button>
-              <Radio.Button value={['8', '9', '10']} onClick={() => setSelectedRowKeys(['8', '9', '10'])}>
+              <Radio.Button
+                value={["8", "9", "10"]}
+                onClick={() => setSelectedRowKeys(["8", "9", "10"])}
+              >
                 Accessories
               </Radio.Button>
             </Radio.Group>
@@ -664,9 +839,35 @@ const LunarJadeCalculatorContent = () => {
               options={equipmentCraftOpt}
             />
           </div>
+          <div style={{ marginBottom: 4 }}>
+            <Divider type="vertical" />
+            <Checkbox
+              checked={changeOrb}
+              onChange={(e) => {
+                setChangeOrb(e.target.checked);
+              }}
+            >
+              Change Tiger Orb to Mats
+            </Checkbox>
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            <Divider type="vertical" />
+            <Checkbox
+              checked={changeEnergy}
+              onChange={(e) => {
+                setChangeEnergy(e.target.checked);
+              }}
+            >
+              Change Conc. Dim. Energy to Mats
+            </Checkbox>
+          </div>
           <Divider orientation="left">Material List</Divider>
           <div>Gold: {resourceGold}</div>
           <div>Stigmata: {resourceStigmata}</div>
+          <div>Tiger Orb: {resourceOrb}</div>
+          <div>Conc. Dim. Energy: {resourceConcEnergy}</div>
+          <div>Broken Orb: {resourceBrokenOrb}</div>
+          <div>Dimensional Energy: {resourceDimensionalEnergy}</div>
           <Table
             size={"small"}
             dataSource={tableResource}
@@ -683,7 +884,7 @@ const LunarJadeCalculatorContent = () => {
     {
       title: "Stage Rarity",
       dataIndex: "rarity",
-      width: 100,
+      width: 150,
       render: (_, { rarity }) => (
         <div>
           <Text style={{ color: getColor(rarity) }}>{rarity}</Text>
@@ -691,41 +892,67 @@ const LunarJadeCalculatorContent = () => {
       ),
     },
     {
-      title: <div>
-        <p>Fragment</p>
-        <p>High Grade Fragment</p>
-        <p>Stigmata</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
-      render: (_, { quantity, quantityHg, stigmata, gold }) => (
+      title: (
         <div>
-          <p >{quantity}</p>
-          <p >{quantityHg}(hg)</p>
-          <p >{stigmata}(s)</p>
-          <p >{gold}(g)</p>
+          <p>Fragment</p>
+          <p>High Grade Fragment</p>
+          <p>Stigmata</p>
+          <p>Gold</p>
+          <p>Tiger Intact Orb</p>
+          <p>Conc. Dim. Energy</p>
+        </div>
+      ),
+      responsive: ["xs"],
+      render: (
+        _,
+        {
+          quantity,
+          quantityHg,
+          stigmata,
+          gold,
+          tigerIntactOrb,
+          concentratedDimensionalEnergy,
+        }
+      ) => (
+        <div>
+          <p>{quantity}</p>
+          <p>{quantityHg}(hg)</p>
+          <p>{stigmata}(s)</p>
+          <p>{gold}(g)</p>
+          <p>{tigerIntactOrb}(Orb)</p>
+          <p>{concentratedDimensionalEnergy}(Dim)</p>
         </div>
       ),
     },
     {
       title: "Fragment",
       dataIndex: "quantity",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "High Grade Fragment",
       dataIndex: "quantityHg",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Stigmata",
       dataIndex: "stigmata",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
+    },
+    {
+      title: "Tiger Intact Orb",
+      dataIndex: "tigerIntactOrb",
+      responsive: ["sm"],
+    },
+    {
+      title: "Conc. Dim. Energy",
+      dataIndex: "concentratedDimensionalEnergy",
+      responsive: ["sm"],
     },
   ];
 
@@ -758,7 +985,7 @@ const LunarJadeCalculatorContent = () => {
         <div
           style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
         >
-          <div style={{ width: 400, marginRight: 30 }}>
+          <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Lunar Fragment Amount"}</Title>
             <Table
               size={"small"}

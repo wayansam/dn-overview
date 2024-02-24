@@ -15,4 +15,5 @@ export enum LUNAR_JADE_RARITY_COLOR {
   EPIC = "#c8cf00",
   UNIQUE = "#9b00b3",
   LEGEND = "#b30424",
+  ANCIENT = "#12c4c2",
 }

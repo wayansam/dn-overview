@@ -70,6 +70,7 @@ export enum LUNAR_JADE_RARITY {
   EPIC = "Epic",
   UNIQUE = "Unique",
   LEGEND = "Legend",
+  ANCIENT = "Ancient",
 }
 
 export enum LUNAR_FRAGMENT_TYPE {
