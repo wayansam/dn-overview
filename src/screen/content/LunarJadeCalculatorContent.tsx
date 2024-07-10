@@ -220,7 +220,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                  // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
+                // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -249,7 +249,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                  // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
+                // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -265,15 +265,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
           paddingRight: 24,
           color:
             (title === TAB.FR || title === TAB.TO) &&
-            (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
+              (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
               : "black",
           minWidth:
             title === TAB.FR || title === TAB.TO
               ? 80
               : title === TAB.QT
-              ? 60
-              : undefined,
+                ? 60
+                : undefined,
           paddingTop: 1,
           paddingBottom: 1,
         }}
@@ -346,26 +346,26 @@ const LunarJadeCalculatorContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.QT,
-      dataIndex: "defaultValue",
-      editable: true,
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-  ];
+      {
+        title: TAB.EQ,
+        dataIndex: "equipment",
+      },
+      {
+        title: TAB.QT,
+        dataIndex: "defaultValue",
+        editable: true,
+      },
+      {
+        title: TAB.FR,
+        dataIndex: "from",
+        editable: true,
+      },
+      {
+        title: TAB.TO,
+        dataIndex: "to",
+        editable: true,
+      },
+    ];
 
   const columns = columnsCalculator.map((col) => {
     if (!col.editable) {
@@ -471,9 +471,13 @@ const LunarJadeCalculatorContent = () => {
         const { from, to, defaultValue } = found;
         let adding = false;
         let tempTotal = 0;
+        let tempTotalI = 0;
+        let tempTotalE = 0;
         LunarJadeCraftAmountTable.map((item) => {
           if (adding) {
             tempTotal += item.gold;
+            tempTotalI += item.tigerIntactOrb;
+            tempTotalE += item.concentratedDimensionalEnergy;
           }
           if (item.rarity === from) {
             adding = true;
@@ -485,12 +489,12 @@ const LunarJadeCalculatorContent = () => {
         tempGold += tempTotal * defaultValue;
 
         if (changeOrb) {
-          tempGold += defaultValue * tigerIntactOrbCraftMats.gold;
+          tempGold += defaultValue * tempTotalI * tigerIntactOrbCraftMats.gold;
         }
 
         if (changeEnergy) {
           tempGold +=
-            defaultValue * concentratedDimensionalEnergyCraftMats.gold;
+            defaultValue * tempTotalE * concentratedDimensionalEnergyCraftMats.gold;
         }
       }
     });
