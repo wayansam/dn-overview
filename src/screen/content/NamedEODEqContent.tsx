@@ -1,10 +1,12 @@
-import { Collapse, CollapseProps, Divider, Slider, Tooltip } from "antd";
+import { Card, Collapse, CollapseProps, Divider, Select, Slider, Tooltip } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
 import { NamedEODMaterial } from "../../interface/Item.interface";
 import { useMemo, useState } from "react";
 import { SliderMarks } from "antd/es/slider";
 import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
-import { NamedEODMaterialTable } from "../../data/NamedEODData";
+import { NamedEODMainStatTable, NamedEODMaterialTable, NamedEODSecondStatTable } from "../../data/NamedEODData";
+import { NamedEODStat } from "../../interface/ItemStat.interface";
+import Title from "antd/es/typography/Title";
 
 interface TableResource {
   mats: string;
@@ -43,6 +45,7 @@ interface NamedEODTableMaterialList {
 const NamedEODEqContent = () => {
   const [namedEODData, setNamedEODData] = useState([0, 5]);
   const [checkedCraft, setCheckedCraft] = useState(false);
+  const [selectedStat, setSelectedStat] = useState(0);
 
   const columnsResource: ColumnsType<TableResource> = [
     { title: "Materials", dataIndex: "mats" },
@@ -89,6 +92,56 @@ const NamedEODEqContent = () => {
       responsive: ['sm']
     },
   ];
+  const columnsStats: ColumnsType<NamedEODStat> = [
+    {
+      title: "Enhancement",
+      dataIndex: "encLevel",
+    },
+    {
+      title: <div>
+        <p>Attack</p>
+        <p>Attack Percentage</p>
+        <p>Critical</p>
+        <p>Critical Damage</p>
+      </div>,
+      responsive: ['xs'],
+      render: (_, { minAttack, maxAttack, attackPercent, critical, criticalDamage }) => (
+        <div>
+          <p >ATK {minAttack}-{maxAttack}</p>
+          <p >ATK {attackPercent}%</p>
+          <p >CRT {critical}</p>
+          <p >CDM {criticalDamage}</p>
+        </div>
+      ),
+    },
+    {
+      title: "Attack",
+      responsive: ['sm'],
+      render: (_, { minAttack, maxAttack }) => (
+        <div>
+          <p >ATK {minAttack}-{maxAttack}</p>
+        </div>
+      ),
+    },
+    {
+      title: "Attack Percentage",
+      responsive: ['sm'], render: (_, { attackPercent }) => (
+        <div>
+          <p >ATK {attackPercent}%</p>
+        </div>
+      ),
+    },
+    {
+      title: "Critical",
+      dataIndex: "critical",
+      responsive: ['sm']
+    },
+    {
+      title: "Critical Damage",
+      dataIndex: "criticalDamage",
+      responsive: ['sm']
+    },
+  ];
 
   const ancDataSource: NamedEODTableMaterialList = useMemo(() => {
     const tempSlice = NamedEODMaterialTable.slice(
@@ -116,6 +169,38 @@ const NamedEODEqContent = () => {
     };
     return temp;
   }, [namedEODData, checkedCraft]);
+
+  const getStatDiff = (arr: NamedEODStat[], min: number, max: number) => {
+    const dt1 = arr.length > min ? arr[min] : undefined;
+    const dt2 = arr.length > max ? arr[max] : undefined;
+    if (!dt1 || !dt2) {
+      return {
+        encLevel: 0,
+        minAttack: 0,
+        maxAttack: 0,
+        attackPercent: 0,
+        critical: 0,
+        criticalDamage: 0,
+      }
+    }
+    return {
+      encLevel: 0,
+      minAttack: dt2.minAttack - dt1.minAttack,
+      maxAttack: dt2.maxAttack - dt1.maxAttack,
+      attackPercent: dt2.attackPercent - dt1.attackPercent,
+      critical: dt2.critical - dt1.critical,
+      criticalDamage: dt2.criticalDamage - dt1.criticalDamage,
+    }
+  }
+
+  const statRange: NamedEODStat | undefined = useMemo(() => {
+    if (selectedStat === 1) {
+      return getStatDiff(NamedEODMainStatTable, namedEODData[0], namedEODData[1])
+    } else if (selectedStat === 2) {
+      return getStatDiff(NamedEODSecondStatTable, namedEODData[0], namedEODData[1])
+    }
+    return
+  }, [selectedStat, namedEODData, NamedEODMainStatTable])
 
   const onChangeCraft = (e: CheckboxChangeEvent) => {
     setCheckedCraft(e.target.checked);
@@ -150,6 +235,7 @@ const NamedEODEqContent = () => {
             </Checkbox>
           </div>
 
+
           <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
@@ -161,6 +247,29 @@ const NamedEODEqContent = () => {
             pagination={false}
             bordered
           />
+
+          <Divider orientation="left">Stat Increase</Divider>
+          <Select
+            defaultValue={selectedStat}
+            style={{ width: 120 }}
+            onChange={(val) => {
+              setSelectedStat(val);
+            }}
+            options={[{ value: 0, label: 'Select' }, { value: 1, label: 'Main' }, { value: 2, label: 'Second' }]}
+          />
+          <div style={{ marginBottom: 4 }}>
+
+            {statRange &&
+              <div>
+                <Card size="small" style={{ marginTop: 4 }}>
+                  <p >+ATK {statRange.minAttack}-{statRange.maxAttack}</p>
+                  <p >+ATK {statRange.attackPercent}%</p>
+                  <p >+CRT {statRange.critical}</p>
+                  <p >+CDM {statRange.criticalDamage}</p></Card>
+
+              </div>
+            }
+          </div>
         </div>
       </div>
     );
@@ -186,13 +295,41 @@ const NamedEODEqContent = () => {
     },
     {
       key: "2",
+      label: "Named End of Dream Stat Table",
+      children: (
+        <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+          <div style={{ width: 500, marginRight: 30 }}>
+            <Title level={5}>{"Main Weapon"}</Title>
+            <Table
+              size={"small"}
+              dataSource={NamedEODMainStatTable}
+              columns={columnsStats}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ width: 500, marginRight: 30 }}>
+            <Title level={5}>{"Second Weapon"}</Title>
+            <Table
+              size={"small"}
+              dataSource={NamedEODSecondStatTable}
+              columns={columnsStats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "3",
       label: "Named End of Dream Calculator",
       children: getCalc(),
     },
   ];
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["2"]} />
+      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
     </div>
   );
 };
