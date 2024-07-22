@@ -1,12 +1,28 @@
-import { Card, Collapse, CollapseProps, Divider, Select, Slider, Tooltip } from "antd";
-import Table, { ColumnsType } from "antd/es/table";
-import { NamedEODMaterial } from "../../interface/Item.interface";
-import { useMemo, useState } from "react";
-import { SliderMarks } from "antd/es/slider";
+import {
+  Card,
+  Collapse,
+  CollapseProps,
+  Divider,
+  Select,
+  Slider,
+  Space,
+  Tooltip,
+  Typography,
+} from "antd";
 import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
-import { NamedEODMainStatTable, NamedEODMaterialTable, NamedEODSecondStatTable } from "../../data/NamedEODData";
-import { NamedEODStat } from "../../interface/ItemStat.interface";
+import { SliderMarks } from "antd/es/slider";
+import Table, { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
+import { useMemo, useState } from "react";
+import {
+  NamedEODMainStatTable,
+  NamedEODMaterialTable,
+  NamedEODSecondStatTable,
+} from "../../data/NamedEODData";
+import { NamedEODMaterial } from "../../interface/Item.interface";
+import { NamedEODStat } from "../../interface/ItemStat.interface";
+
+const { Text } = Typography;
 
 interface TableResource {
   mats: string;
@@ -62,34 +78,36 @@ const NamedEODEqContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Guide Star</p>
-        <p>Twilight Essence</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
+      title: (
+        <div>
+          <Text>Guide Star</Text>
+          <Text>Twilight Essence</Text>
+          <Text>Gold</Text>
+        </div>
+      ),
+      responsive: ["xs"],
       render: (_, { guideStar, twilightEssence, gold }) => (
         <div>
-          <p >{guideStar}(gs)</p>
-          <p >{twilightEssence}(ess)</p>
-          <p >{gold}(g)</p>
+          <Text>{guideStar}(gs)</Text>
+          <Text>{twilightEssence}(ess)</Text>
+          <Text>{gold}(g)</Text>
         </div>
       ),
     },
     {
       title: "Guide Star",
       dataIndex: "guideStar",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Twilight Essence",
       dataIndex: "twilightEssence",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
   const columnsStats: ColumnsType<NamedEODStat> = [
@@ -98,48 +116,58 @@ const NamedEODEqContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Attack</p>
-        <p>Attack Percentage</p>
-        <p>Critical</p>
-        <p>Critical Damage</p>
-      </div>,
-      responsive: ['xs'],
-      render: (_, { minAttack, maxAttack, attackPercent, critical, criticalDamage }) => (
+      title: (
         <div>
-          <p >ATK {minAttack}-{maxAttack}</p>
-          <p >ATK {attackPercent}%</p>
-          <p >CRT {critical}</p>
-          <p >CDM {criticalDamage}</p>
+          <Text>Attack</Text>
+          <Text>Attack Percentage</Text>
+          <Text>Critical</Text>
+          <Text>Critical Damage</Text>
+        </div>
+      ),
+      responsive: ["xs"],
+      render: (
+        _,
+        { minAttack, maxAttack, attackPercent, critical, criticalDamage }
+      ) => (
+        <div>
+          <Text>
+            ATK {minAttack}-{maxAttack}
+          </Text>
+          <Text>ATK {attackPercent}%</Text>
+          <Text>CRT {critical}</Text>
+          <Text>CDM {criticalDamage}</Text>
         </div>
       ),
     },
     {
       title: "Attack",
-      responsive: ['sm'],
+      responsive: ["sm"],
       render: (_, { minAttack, maxAttack }) => (
         <div>
-          <p >ATK {minAttack}-{maxAttack}</p>
+          <Text>
+            ATK {minAttack}-{maxAttack}
+          </Text>
         </div>
       ),
     },
     {
       title: "Attack Percentage",
-      responsive: ['sm'], render: (_, { attackPercent }) => (
+      responsive: ["sm"],
+      render: (_, { attackPercent }) => (
         <div>
-          <p >ATK {attackPercent}%</p>
+          <Text>ATK {attackPercent}%</Text>
         </div>
       ),
     },
     {
       title: "Critical",
       dataIndex: "critical",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Critical Damage",
       dataIndex: "criticalDamage",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
 
@@ -181,7 +209,7 @@ const NamedEODEqContent = () => {
         attackPercent: 0,
         critical: 0,
         criticalDamage: 0,
-      }
+      };
     }
     return {
       encLevel: 0,
@@ -190,17 +218,25 @@ const NamedEODEqContent = () => {
       attackPercent: dt2.attackPercent - dt1.attackPercent,
       critical: dt2.critical - dt1.critical,
       criticalDamage: dt2.criticalDamage - dt1.criticalDamage,
-    }
-  }
+    };
+  };
 
   const statRange: NamedEODStat | undefined = useMemo(() => {
     if (selectedStat === 1) {
-      return getStatDiff(NamedEODMainStatTable, namedEODData[0], namedEODData[1])
+      return getStatDiff(
+        NamedEODMainStatTable,
+        namedEODData[0],
+        namedEODData[1]
+      );
     } else if (selectedStat === 2) {
-      return getStatDiff(NamedEODSecondStatTable, namedEODData[0], namedEODData[1])
+      return getStatDiff(
+        NamedEODSecondStatTable,
+        namedEODData[0],
+        namedEODData[1]
+      );
     }
-    return
-  }, [selectedStat, namedEODData, NamedEODMainStatTable])
+    return;
+  }, [selectedStat, namedEODData]);
 
   const onChangeCraft = (e: CheckboxChangeEvent) => {
     setCheckedCraft(e.target.checked);
@@ -228,13 +264,17 @@ const NamedEODEqContent = () => {
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
-            <Checkbox checked={checkedCraft} onChange={onChangeCraft} >
-              <Tooltip title="10 guide star, 80 Twilight Essence, 25 gold" trigger="hover" color="blue" placement="right" >
+            <Checkbox checked={checkedCraft} onChange={onChangeCraft}>
+              <Tooltip
+                title="10 guide star, 80 Twilight Essence, 25 gold"
+                trigger="hover"
+                color="blue"
+                placement="right"
+              >
                 Include Craft Mats
               </Tooltip>
             </Checkbox>
           </div>
-
 
           <Divider orientation="left">Material List</Divider>
           <Table
@@ -255,20 +295,27 @@ const NamedEODEqContent = () => {
             onChange={(val) => {
               setSelectedStat(val);
             }}
-            options={[{ value: 0, label: 'Select' }, { value: 1, label: 'Main' }, { value: 2, label: 'Second' }]}
+            options={[
+              { value: 0, label: "Select" },
+              { value: 1, label: "Main" },
+              { value: 2, label: "Second" },
+            ]}
           />
           <div style={{ marginBottom: 4 }}>
-
-            {statRange &&
+            {statRange && (
               <div>
                 <Card size="small" style={{ marginTop: 4 }}>
-                  <p >+ATK {statRange.minAttack}-{statRange.maxAttack}</p>
-                  <p >+ATK {statRange.attackPercent}%</p>
-                  <p >+CRT {statRange.critical}</p>
-                  <p >+CDM {statRange.criticalDamage}</p></Card>
-
+                  <Space direction="vertical">
+                    <Text>
+                      +ATK {statRange.minAttack}-{statRange.maxAttack}
+                    </Text>
+                    <Text>+ATK {statRange.attackPercent}%</Text>
+                    <Text>+CRT {statRange.critical}</Text>
+                    <Text>+CDM {statRange.criticalDamage}</Text>
+                  </Space>
+                </Card>
               </div>
-            }
+            )}
           </div>
         </div>
       </div>
@@ -297,7 +344,9 @@ const NamedEODEqContent = () => {
       key: "2",
       label: "Named End of Dream Stat Table",
       children: (
-        <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
           <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Main Weapon"}</Title>
             <Table

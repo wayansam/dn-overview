@@ -1,11 +1,25 @@
-import { Alert, Collapse, CollapseProps, Table } from "antd";
+import {
+  Alert,
+  Card,
+  Collapse,
+  CollapseProps,
+  Space,
+  Table,
+  Typography,
+} from "antd";
 import Slider, { SliderMarks } from "antd/es/slider";
 import { ColumnsType } from "antd/es/table";
+import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
 import {
   AncientDJSkillMaterialTable,
+  AncientDJSkillStatTable,
   DMFDJSkillMaterialTable,
+  DMFDJSkillStatTable,
 } from "../../data/SkillJadeData";
+import { SkillJadeStat } from "../../interface/ItemStat.interface";
+
+const { Text } = Typography;
 
 interface TableResource {
   mats: string;
@@ -86,6 +100,69 @@ const SkillJadeContent = () => {
     },
   ];
 
+  const getStatDiff = (arr: SkillJadeStat[], min: number, max: number) => {
+    const dt1 = arr.length > min ? arr[min] : undefined;
+    const dt2 = arr.length > max ? arr[max] : undefined;
+    if (!dt1 || !dt2) {
+      return {
+        encLevel: 0,
+        attackPercent: 0,
+        cooldownPercent: 0,
+      };
+    }
+    return {
+      encLevel: 0,
+      attackPercent: dt2.attackPercent - dt1.attackPercent,
+      cooldownPercent: dt2.cooldownPercent - dt1.cooldownPercent,
+    };
+  };
+
+  const getColumnsStats = (showCd?: boolean): ColumnsType<SkillJadeStat> => {
+    const cdData: ColumnsType<SkillJadeStat> = [
+      {
+        title: "Cooldown Decrease",
+        responsive: ["sm"],
+        render: (_, { cooldownPercent }) => (
+          <div>
+            <Text>Cd -{cooldownPercent}%</Text>
+          </div>
+        ),
+      },
+    ];
+    const dt: ColumnsType<SkillJadeStat> = [
+      {
+        title: "Enhancement",
+        dataIndex: "encLevel",
+      },
+      {
+        title: (
+          <div>
+            <Text>Attack Percentage</Text>
+            {showCd && <Text>Cooldown Decrease</Text>}
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (_, { attackPercent, cooldownPercent }) => (
+          <div>
+            <Text>ATK {attackPercent}%</Text>
+            {showCd && <Text>Cd -{cooldownPercent}%</Text>}
+          </div>
+        ),
+      },
+      {
+        title: "Attack Percentage",
+        responsive: ["sm"],
+        render: (_, { attackPercent }) => (
+          <div>
+            <Text style={{ margin: 0 }}>ATK {attackPercent}%</Text>
+          </div>
+        ),
+      },
+    ];
+
+    return showCd ? dt.concat(cdData) : dt;
+  };
+
   const dDataSource: DreamyTableMaterialList = useMemo(() => {
     const tempSlice = DMFDJSkillMaterialTable.slice(DData[0], DData[1]);
     let tempHFrag = 0;
@@ -107,6 +184,10 @@ const SkillJadeContent = () => {
 
   const showDWarning = useMemo(() => {
     return DData.some((dt) => dt > 10);
+  }, [DData]);
+
+  const statRangeD: SkillJadeStat = useMemo(() => {
+    return getStatDiff(DMFDJSkillStatTable, DData[0], DData[1]);
   }, [DData]);
 
   const getDCalc = () => {
@@ -147,6 +228,16 @@ const SkillJadeContent = () => {
             pagination={false}
             bordered
           />
+          {statRangeD && (
+            <div>
+              <Card size="small" style={{ marginTop: 4 }}>
+                <Space direction="vertical">
+                  <Text>ATK +{statRangeD.attackPercent}%</Text>
+                  <Text>Cooldown Decrease {statRangeD.cooldownPercent}%</Text>
+                </Space>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -173,6 +264,10 @@ const SkillJadeContent = () => {
 
   const showBMWarning = useMemo(() => {
     return BMData.some((dt) => dt > 10);
+  }, [BMData]);
+
+  const statRangeB: SkillJadeStat = useMemo(() => {
+    return getStatDiff(DMFDJSkillStatTable, BMData[0], BMData[1]);
   }, [BMData]);
 
   const getBMCalc = () => {
@@ -213,6 +308,16 @@ const SkillJadeContent = () => {
             pagination={false}
             bordered
           />
+          {statRangeB && (
+            <div>
+              <Card size="small" style={{ marginTop: 4 }}>
+                <Space direction="vertical">
+                  <Text>ATK +{statRangeB.attackPercent}%</Text>
+                  <Text>Cooldown Decrease {statRangeB.cooldownPercent}%</Text>
+                </Space>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -239,6 +344,10 @@ const SkillJadeContent = () => {
 
   const showVWarning = useMemo(() => {
     return VData.some((dt) => dt > 10);
+  }, [VData]);
+
+  const statRangeV: SkillJadeStat = useMemo(() => {
+    return getStatDiff(DMFDJSkillStatTable, VData[0], VData[1]);
   }, [VData]);
 
   const getVCalc = () => {
@@ -279,6 +388,16 @@ const SkillJadeContent = () => {
             pagination={false}
             bordered
           />
+          {statRangeV && (
+            <div>
+              <Card size="small" style={{ marginTop: 4 }}>
+                <Space direction="vertical">
+                  <Text>ATK +{statRangeV.attackPercent}%</Text>
+                  <Text>Cooldown Decrease {statRangeV.cooldownPercent}%</Text>
+                </Space>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -305,6 +424,10 @@ const SkillJadeContent = () => {
 
   const showAncWarning = useMemo(() => {
     return AncData.some((dt) => dt > 10);
+  }, [AncData]);
+
+  const statRangeA: SkillJadeStat = useMemo(() => {
+    return getStatDiff(AncientDJSkillStatTable, AncData[0], AncData[1]);
   }, [AncData]);
 
   const getAncCalc = () => {
@@ -345,6 +468,15 @@ const SkillJadeContent = () => {
             pagination={false}
             bordered
           />
+          {statRangeA && (
+            <div>
+              <Card size="small" style={{ marginTop: 4 }}>
+                <Space direction="vertical">
+                  <Text>ATK +{statRangeA.attackPercent}%</Text>
+                </Space>
+              </Card>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -353,21 +485,53 @@ const SkillJadeContent = () => {
   const items: CollapseProps["items"] = [
     {
       key: "1",
+      label: "Skill Jade Stat Table",
+      children: (
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ width: 500, marginRight: 30 }}>
+            <Title level={5}>
+              {"Dreamy / Blood Moon / Verdure Dragon Jade"}
+            </Title>
+            <Table
+              size={"small"}
+              dataSource={DMFDJSkillStatTable}
+              columns={getColumnsStats(true)}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ width: 500, marginRight: 30 }}>
+            <Title level={5}>{"Ancient Dragon Jade"}</Title>
+            <Table
+              size={"small"}
+              dataSource={AncientDJSkillStatTable}
+              columns={getColumnsStats()}
+              pagination={false}
+              bordered
+            />
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: "2",
       label: "Dreamy Dragon Jade",
       children: getDCalc(),
     },
     {
-      key: "2",
+      key: "3",
       label: "Blood Moon Dragon Jade",
       children: getBMCalc(),
     },
     {
-      key: "3",
+      key: "4",
       label: "Verdure Dragon Jade",
       children: getVCalc(),
     },
     {
-      key: "4",
+      key: "5",
       label: "Ancient Dragon Jade",
       children: getAncCalc(),
     },
@@ -375,7 +539,7 @@ const SkillJadeContent = () => {
 
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["4"]} />
+      <Collapse items={items} size="small" defaultActiveKey={["5"]} />
     </div>
   );
 };
