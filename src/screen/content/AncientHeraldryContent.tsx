@@ -239,7 +239,6 @@ const AncientHeraldryContent = () => {
                 // max={record.max}
                 defaultValue={inputAB}
                 onChange={onChangeAB}
-                autoFocus
                 size="middle"
                 style={{ width: 120 }}
               />
@@ -259,7 +258,6 @@ const AncientHeraldryContent = () => {
                 // max={record.max}
                 defaultValue={inputABF}
                 onChange={onChangeABF}
-                autoFocus
                 size="middle"
                 style={{ width: 120 }}
               />
