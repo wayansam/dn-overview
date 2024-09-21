@@ -1,16 +1,17 @@
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Drawer, FloatButton, theme } from "antd";
 import { useMemo, useState } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
-import GeneralContent from "./GeneralContent";
-import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import DrawerContent from "./DrawerContent";
 import AncientEqContent from "./AncientEqContent";
-import SkillJadeContent from "./SkillJadeContent";
+import AncientHeraldryContent from "./AncientHeraldryContent";
+import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./ErosionJadeContent";
-import NamedEODEqContent from "./NamedEODEqContent";
+import GeneralContent from "./GeneralContent";
 import KilosEqContent from "./KilosEqContent";
+import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
+import NamedEODEqContent from "./NamedEODEqContent";
+import SkillJadeContent from "./SkillJadeContent";
 
 const MainContent = () => {
   const {
@@ -45,6 +46,9 @@ const MainContent = () => {
 
       case TAB_KEY.jadeErosion:
         return <ErosionJadeContent />;
+
+      case TAB_KEY.heraldryAncientGoddes:
+        return <AncientHeraldryContent />;
 
       default:
         return;

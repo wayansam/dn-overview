@@ -12,3 +12,8 @@ export interface SkillJadeStat {
   attackPercent: number;
   cooldownPercent: number;
 }
+
+export interface AncientGoddesHeraStat {
+  encLevel: number;
+  attackPercent: number;
+}

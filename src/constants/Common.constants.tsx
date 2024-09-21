@@ -1,4 +1,4 @@
-import { SideBarGroupTab, SideBarTab } from "../interface/Common.interface";
+import { SideBarGroupTab } from "../interface/Common.interface";
 
 export const TAB_KEY = {
   mainGeneral: "General",
@@ -8,8 +8,8 @@ export const TAB_KEY = {
   jadeLunar: "Lunar Jade",
   jadeSkill: "Skill Jade",
   jadeErosion: "Erosion Jade",
-}
-
+  heraldryAncientGoddes: "Ancients' Goddess",
+};
 
 export const TAB_GROUP_LIST: SideBarGroupTab[] = [
   {
@@ -20,7 +20,7 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
         key: TAB_KEY.mainGeneral,
         name: TAB_KEY.mainGeneral,
       },
-    ]
+    ],
   },
   {
     key: "EQUIPMENT",
@@ -38,7 +38,7 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
         key: TAB_KEY.eqNamedEOD,
         name: TAB_KEY.eqNamedEOD,
       },
-    ]
+    ],
   },
   {
     key: "JADE",
@@ -56,7 +56,16 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
         key: TAB_KEY.jadeErosion,
         name: TAB_KEY.jadeErosion,
       },
-    ]
+    ],
   },
-
-]
+  {
+    key: "HERALDRY",
+    name: "Heraldry",
+    children: [
+      {
+        key: TAB_KEY.heraldryAncientGoddes,
+        name: TAB_KEY.heraldryAncientGoddes,
+      },
+    ],
+  },
+];

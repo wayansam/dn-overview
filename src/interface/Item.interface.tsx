@@ -101,3 +101,13 @@ export interface KilosArmorCraftMaterial {
   threadIntelect: number;
   gold: number;
 }
+
+export interface AncientGoddesHeraRequiredItem {
+  encLevel: number;
+  ab: number;
+  abFrag: number;
+}
+export interface AncientGoddesHeraDisassemblyItem {
+  encLevel: number;
+  abFrag: number;
+}
