@@ -8,7 +8,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
 } from "@ant-design/icons";
-import { Button, Divider, Layout, MenuProps, Space } from "antd";
+import { Button, Divider, Layout, MenuProps, Space, Switch, theme } from "antd";
 import React, { useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
@@ -16,8 +16,17 @@ import { setSelectedSideBar } from "../slice/UIState.reducer";
 
 const { Sider } = Layout;
 
-const SideBar = () => {
+interface SideBarProps {
+  isDarkMode: boolean;
+  setIsDarkMode: (f: boolean) => void;
+}
+
+const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
   const dispatch = useAppDispatch();
+
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
@@ -36,8 +45,9 @@ const SideBar = () => {
       onCollapse={(collapsed, type) => {
         // console.log({ collapsed, type });
       }}
-      style={isSmall ? { position: 'fixed', zIndex: 100, height: '100%' } : undefined}
+      style={isSmall ? { position: 'fixed', zIndex: 100, height: '100%', } : undefined}
     >
+
       <Space
         direction="vertical"
         style={{ width: "100%", padding: "10px", borderWidth: 1 }}
@@ -57,6 +67,17 @@ const SideBar = () => {
           </>
         ))}
       </Space>
+      <Space
+        direction="vertical"
+        style={{ width: "100%", padding: "10px", borderWidth: 1, alignItems: 'center', backgroundColor: '#ffffff44' }}
+      >
+        <Divider style={{ color: 'white', margin: 0, borderBlockStart: 'white' }} orientation={'left'} >{`Dark Mode`}</Divider>
+        <Switch
+          onChange={(e) => {
+            setIsDarkMode(e)
+          }}
+          checked={isDarkMode}
+        /></Space>
     </Sider>
   );
 };
