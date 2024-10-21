@@ -80,17 +80,17 @@ const NamedEODEqContent = () => {
     {
       title: (
         <div>
-          <Text>Guide Star</Text>
-          <Text>Twilight Essence</Text>
-          <Text>Gold</Text>
+          <p>Guide Star</p>
+          <p>Twilight Essence</p>
+          <p>Gold</p>
         </div>
       ),
       responsive: ["xs"],
       render: (_, { guideStar, twilightEssence, gold }) => (
         <div>
-          <Text>{guideStar}(gs)</Text>
-          <Text>{twilightEssence}(ess)</Text>
-          <Text>{gold}(g)</Text>
+          <p>{guideStar}(gs)</p>
+          <p>{twilightEssence}(ess)</p>
+          <p>{gold}(g)</p>
         </div>
       ),
     },
@@ -118,10 +118,10 @@ const NamedEODEqContent = () => {
     {
       title: (
         <div>
-          <Text>Attack</Text>
-          <Text>Attack Percentage</Text>
-          <Text>Critical</Text>
-          <Text>Critical Damage</Text>
+          <p>Attack</p>
+          <p>Attack Percentage</p>
+          <p>Critical</p>
+          <p>Critical Damage</p>
         </div>
       ),
       responsive: ["xs"],
@@ -130,12 +130,12 @@ const NamedEODEqContent = () => {
         { minAttack, maxAttack, attackPercent, critical, criticalDamage }
       ) => (
         <div>
-          <Text>
+          <p>
             ATK {minAttack}-{maxAttack}
-          </Text>
-          <Text>ATK {attackPercent}%</Text>
-          <Text>CRT {critical}</Text>
-          <Text>CDM {criticalDamage}</Text>
+          </p>
+          <p>ATK {attackPercent}%</p>
+          <p>CRT {critical}</p>
+          <p>CDM {criticalDamage}</p>
         </div>
       ),
     },

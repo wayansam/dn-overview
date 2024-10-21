@@ -144,8 +144,8 @@ const SkillJadeContent = () => {
         responsive: ["xs"],
         render: (_, { attackPercent, cooldownPercent }) => (
           <div>
-            <Text>ATK {attackPercent}%</Text>
-            {showCd && <Text>Cd -{cooldownPercent}%</Text>}
+            <p>ATK {attackPercent}%</p>
+            {showCd && <p>Cd -{cooldownPercent}%</p>}
           </div>
         ),
       },

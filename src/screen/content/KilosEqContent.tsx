@@ -215,7 +215,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
               color:
                 (title === TAB.FR || title === TAB.TO) && findTo <= findFr
                   ? "red"
-                  : "black",
+                  : "unset",
               minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
               paddingTop: 1,
               paddingBottom: 1,

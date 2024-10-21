@@ -220,7 +220,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
+                  // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -249,7 +249,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
+                  // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -265,15 +265,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
           paddingRight: 24,
           color:
             (title === TAB.FR || title === TAB.TO) &&
-              (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
+            (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
-              : "black",
+              : "unset",
           minWidth:
             title === TAB.FR || title === TAB.TO
               ? 80
               : title === TAB.QT
-                ? 60
-                : undefined,
+              ? 60
+              : undefined,
           paddingTop: 1,
           paddingBottom: 1,
         }}
@@ -296,7 +296,7 @@ type ColumnTypes = (
 
 const LunarJadeCalculatorContent = () => {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorText },
   } = theme.useToken();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
@@ -346,26 +346,26 @@ const LunarJadeCalculatorContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-      {
-        title: TAB.EQ,
-        dataIndex: "equipment",
-      },
-      {
-        title: TAB.QT,
-        dataIndex: "defaultValue",
-        editable: true,
-      },
-      {
-        title: TAB.FR,
-        dataIndex: "from",
-        editable: true,
-      },
-      {
-        title: TAB.TO,
-        dataIndex: "to",
-        editable: true,
-      },
-    ];
+    {
+      title: TAB.EQ,
+      dataIndex: "equipment",
+    },
+    {
+      title: TAB.QT,
+      dataIndex: "defaultValue",
+      editable: true,
+    },
+    {
+      title: TAB.FR,
+      dataIndex: "from",
+      editable: true,
+    },
+    {
+      title: TAB.TO,
+      dataIndex: "to",
+      editable: true,
+    },
+  ];
 
   const columns = columnsCalculator.map((col) => {
     if (!col.editable) {
@@ -494,7 +494,9 @@ const LunarJadeCalculatorContent = () => {
 
         if (changeEnergy) {
           tempGold +=
-            defaultValue * tempTotalE * concentratedDimensionalEnergyCraftMats.gold;
+            defaultValue *
+            tempTotalE *
+            concentratedDimensionalEnergyCraftMats.gold;
         }
       }
     });
@@ -891,7 +893,7 @@ const LunarJadeCalculatorContent = () => {
       width: 150,
       render: (_, { rarity }) => (
         <div>
-          <Text style={{ color: getColor(rarity) }}>{rarity}</Text>
+          <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
         </div>
       ),
     },

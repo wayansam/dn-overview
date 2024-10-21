@@ -115,7 +115,6 @@ const AncientHeraldryContent = () => {
     },
     {
       title: "Skill Stats",
-      responsive: ["sm"],
       render: (_, { attackPercent }) => (
         <div>
           <Text style={{ margin: 0 }}>{attackPercent}%</Text>

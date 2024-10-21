@@ -1,10 +1,10 @@
-import { Collapse, CollapseProps, Divider, Popover, Slider, Tooltip } from "antd";
+import { Collapse, CollapseProps, Divider, Slider, Tooltip } from "antd";
+import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
+import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
+import { useMemo, useState } from "react";
 import { ErosionConquerorJadeMaterialTable } from "../../data/ErosionData";
 import { ErosionConquerorJadeMaterial } from "../../interface/Item.interface";
-import { useMemo, useState } from "react";
-import { SliderMarks } from "antd/es/slider";
-import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
 
 interface TableResource {
   mats: string;
@@ -54,34 +54,36 @@ const ErosionJadeContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Erosion Fragment</p>
-        <p>Gold Lotus Crown</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
+      title: (
+        <div>
+          <p>Erosion Fragment</p>
+          <p>Gold Lotus Crown</p>
+          <p>Gold</p>
+        </div>
+      ),
+      responsive: ["xs"],
       render: (_, { erosionFragment, goldLotusCrown, gold }) => (
         <div>
-          <p >{erosionFragment}(Fragment)</p>
-          <p >{goldLotusCrown}(Crown)</p>
-          <p >{gold}(g)</p>
+          <p>{erosionFragment}(Fragment)</p>
+          <p>{goldLotusCrown}(Crown)</p>
+          <p>{gold}(g)</p>
         </div>
       ),
     },
     {
       title: "Erosion Fragment",
       dataIndex: "erosionFragment",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold Lotus Crown",
       dataIndex: "goldLotusCrown",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
 
@@ -144,18 +146,26 @@ const ErosionJadeContent = () => {
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
-            <Checkbox checked={checkedCraft} onChange={onChangeCraft} >
-              <Tooltip title="10 fragment, 10k gold" trigger="hover" color="blue" placement="right" >
+            <Checkbox checked={checkedCraft} onChange={onChangeCraft}>
+              <Tooltip
+                title="10 fragment, 10k gold"
+                trigger="hover"
+                color="blue"
+                placement="right"
+              >
                 Include 1st shop Mats
               </Tooltip>
             </Checkbox>
-
-
           </div>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
-            <Checkbox checked={checkedTier} onChange={onChangeTier} >
-              <Tooltip title="+20 tier 1, 100 fragment, 10k gold" trigger="hover" color="blue" placement="right" >
+            <Checkbox checked={checkedTier} onChange={onChangeTier}>
+              <Tooltip
+                title="+20 tier 1, 100 fragment, 10k gold"
+                trigger="hover"
+                color="blue"
+                placement="right"
+              >
                 Include Tier 2 evolve
               </Tooltip>
             </Checkbox>

@@ -1,15 +1,5 @@
-import {
-  AppstoreOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  ShopOutlined,
-  TeamOutlined,
-  UploadOutlined,
-  UserOutlined,
-  VideoCameraOutlined,
-} from "@ant-design/icons";
-import { Button, Divider, Layout, MenuProps, Space, Switch, theme } from "antd";
-import React, { useState } from "react";
+import { Button, Divider, Layout, Space, Switch, theme } from "antd";
+import { useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setSelectedSideBar } from "../slice/UIState.reducer";
@@ -45,16 +35,22 @@ const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
       onCollapse={(collapsed, type) => {
         // console.log({ collapsed, type });
       }}
-      style={isSmall ? { position: 'fixed', zIndex: 100, height: '100%', } : undefined}
+      style={
+        isSmall ? { position: "fixed", zIndex: 100, height: "100%" } : undefined
+      }
     >
-
       <Space
         direction="vertical"
         style={{ width: "100%", padding: "10px", borderWidth: 1 }}
       >
         {TAB_GROUP_LIST.map((group) => (
           <>
-            <Divider style={{ color: 'white', margin: 0, borderBlockStart: 'white' }} orientation={'left'} >{group.name}</Divider>
+            <Divider
+              style={{ color: "white", margin: 0, borderBlockStart: "white" }}
+              orientation={"left"}
+            >
+              {group.name}
+            </Divider>
             {group.children.map((item) => (
               <Button
                 block
@@ -69,15 +65,25 @@ const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
       </Space>
       <Space
         direction="vertical"
-        style={{ width: "100%", padding: "10px", borderWidth: 1, alignItems: 'center', backgroundColor: '#ffffff44' }}
+        style={{
+          width: "100%",
+          padding: "10px",
+          borderWidth: 1,
+          alignItems: "center",
+          backgroundColor: "#ffffff44",
+        }}
       >
-        <Divider style={{ color: 'white', margin: 0, borderBlockStart: 'white' }} orientation={'left'} >{`Dark Mode`}</Divider>
+        <Divider
+          style={{ color: "white", margin: 0, borderBlockStart: "white" }}
+          orientation={"left"}
+        >{`Dark Mode`}</Divider>
         <Switch
           onChange={(e) => {
-            setIsDarkMode(e)
+            setIsDarkMode(e);
           }}
           checked={isDarkMode}
-        /></Space>
+        />
+      </Space>
     </Sider>
   );
 };

@@ -160,7 +160,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
           color:
             (title === TAB.FR || title === TAB.TO) && findTo <= findFr
               ? "red"
-              : "black",
+              : "unset",
           minWidth: title === TAB.FR || title === TAB.TO ? 80 : undefined,
           paddingTop: 1,
           paddingBottom: 1,
@@ -210,21 +210,21 @@ const AncientEqContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-      {
-        title: TAB.EQ,
-        dataIndex: "equipment",
-      },
-      {
-        title: TAB.FR,
-        dataIndex: "from",
-        editable: true,
-      },
-      {
-        title: TAB.TO,
-        dataIndex: "to",
-        editable: true,
-      },
-    ];
+    {
+      title: TAB.EQ,
+      dataIndex: "equipment",
+    },
+    {
+      title: TAB.FR,
+      dataIndex: "from",
+      editable: true,
+    },
+    {
+      title: TAB.TO,
+      dataIndex: "to",
+      editable: true,
+    },
+  ];
 
   const handleSave = (row: AncientCalculator) => {
     const newData = [...dataSource];
@@ -425,7 +425,7 @@ const AncientEqContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <Table
             rowSelection={{
               type: "checkbox",
@@ -439,7 +439,7 @@ const AncientEqContent = () => {
             pagination={false}
           />
         </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: 'auto' }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -468,13 +468,22 @@ const AncientEqContent = () => {
                 setSelectedRowKeys(e.target.value);
               }}
             >
-              <Radio.Button value={['1', '2', '3', '4', '5']} onClick={() => setSelectedRowKeys(['1', '2', '3', '4', '5'])}>
+              <Radio.Button
+                value={["1", "2", "3", "4", "5"]}
+                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
+              >
                 Armor
               </Radio.Button>
-              <Radio.Button value={['6', '7']} onClick={() => setSelectedRowKeys(['6', '7'])}>
+              <Radio.Button
+                value={["6", "7"]}
+                onClick={() => setSelectedRowKeys(["6", "7"])}
+              >
                 Weapon
               </Radio.Button>
-              <Radio.Button value={['8', '9', '10', '11']} onClick={() => setSelectedRowKeys(['8', '9', '10', '11'])}>
+              <Radio.Button
+                value={["8", "9", "10", "11"]}
+                onClick={() => setSelectedRowKeys(["8", "9", "10", "11"])}
+              >
                 Accessories
               </Radio.Button>
             </Radio.Group>
@@ -526,41 +535,43 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Eq. Fragment</p>
-        <p>A. Knowledge</p>
-        <p>A. Insignia</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
+      title: (
+        <div>
+          <p>Eq. Fragment</p>
+          <p>A. Knowledge</p>
+          <p>A. Insignia</p>
+          <p>Gold</p>
+        </div>
+      ),
+      responsive: ["xs"],
       render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
         <div>
-          <p >{eqTypeFragment}(Fragment)</p>
-          <p >{ancKnowledge}(Know)</p>
-          <p >{ancInsignia}(Ins)</p>
-          <p >{gold}(g)</p>
+          <p>{eqTypeFragment}(Fragment)</p>
+          <p>{ancKnowledge}(Know)</p>
+          <p>{ancInsignia}(Ins)</p>
+          <p>{gold}(g)</p>
         </div>
       ),
     },
     {
       title: "Eq. Fragment",
       dataIndex: "eqTypeFragment",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
   const columnsWeapon: ColumnsType<AncientArmorCraftMaterial> = [
@@ -569,41 +580,43 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Otherworldly A. Weapon Fragment</p>
-        <p>A. Knowledge</p>
-        <p>A. Insignia</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
+      title: (
+        <div>
+          <p>Otherworldly A. Weapon Fragment</p>
+          <p>A. Knowledge</p>
+          <p>A. Insignia</p>
+          <p>Gold</p>
+        </div>
+      ),
+      responsive: ["xs"],
       render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
         <div>
-          <p >{eqTypeFragment}(Fragment)</p>
-          <p >{ancKnowledge}(Know)</p>
-          <p >{ancInsignia}(Ins)</p>
-          <p >{gold}(g)</p>
+          <p>{eqTypeFragment}(Fragment)</p>
+          <p>{ancKnowledge}(Know)</p>
+          <p>{ancInsignia}(Ins)</p>
+          <p>{gold}(g)</p>
         </div>
       ),
     },
     {
       title: "Otherworldly A. Weapon Fragment",
       dataIndex: "eqTypeFragment",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
   const columnsAccessory: ColumnsType<AncientArmorCraftMaterial> = [
@@ -612,41 +625,43 @@ const AncientEqContent = () => {
       dataIndex: "encLevel",
     },
     {
-      title: <div>
-        <p>Unknown Ancient Accessory Fragment</p>
-        <p>A. Knowledge</p>
-        <p>A. Insignia</p>
-        <p>Gold</p>
-      </div>,
-      responsive: ['xs'],
+      title: (
+        <div>
+          <p>Unknown Ancient Accessory Fragment</p>
+          <p>A. Knowledge</p>
+          <p>A. Insignia</p>
+          <p>Gold</p>
+        </div>
+      ),
+      responsive: ["xs"],
       render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
         <div>
-          <p >{eqTypeFragment}(Fragment)</p>
-          <p >{ancKnowledge}(Know)</p>
-          <p >{ancInsignia}(Ins)</p>
-          <p >{gold}(g)</p>
+          <p>{eqTypeFragment}(Fragment)</p>
+          <p>{ancKnowledge}(Know)</p>
+          <p>{ancInsignia}(Ins)</p>
+          <p>{gold}(g)</p>
         </div>
       ),
     },
     {
       title: "Unknown Ancient Accessory Fragment",
       dataIndex: "eqTypeFragment",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Knowledge",
       dataIndex: "ancKnowledge",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "A. Insignia",
       dataIndex: "ancInsignia",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
     {
       title: "Gold",
       dataIndex: "gold",
-      responsive: ['sm']
+      responsive: ["sm"],
     },
   ];
   const items: CollapseProps["items"] = [

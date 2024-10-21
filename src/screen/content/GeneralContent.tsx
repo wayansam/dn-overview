@@ -1,7 +1,6 @@
 import { Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { CharacterInGameData } from "../../interface/Account.interface";
-import { exampleAccount } from "../../mocks/example.mock";
 const { Text } = Typography;
 const GeneralContent = () => {
   interface DataType {
@@ -75,7 +74,7 @@ const GeneralContent = () => {
   ];
 
   return (
-    <div style={{ overflowX: 'auto' }}>
+    <div style={{ overflowX: "auto" }}>
       <Table
         columns={columns}
         // dataSource={exampleAccount.characters}

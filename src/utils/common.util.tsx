@@ -1,7 +1,7 @@
 import { LUNAR_JADE_RARITY_COLOR } from "../constants/InGame.color.constants";
 import { LUNAR_JADE_RARITY } from "../constants/InGame.constants";
 
-export const getColor = (type: LUNAR_JADE_RARITY) => {
+export const getColor = (type: LUNAR_JADE_RARITY, custom?: string) => {
   switch (type) {
     case LUNAR_JADE_RARITY.NORMAL:
       return LUNAR_JADE_RARITY_COLOR.NORMAL;
@@ -19,6 +19,6 @@ export const getColor = (type: LUNAR_JADE_RARITY) => {
       return LUNAR_JADE_RARITY_COLOR.ANCIENT;
 
     default:
-      return LUNAR_JADE_RARITY_COLOR.CRAFT;
+      return custom ?? LUNAR_JADE_RARITY_COLOR.CRAFT;
   }
 };
