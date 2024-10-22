@@ -274,7 +274,9 @@ const DrawerContent = () => {
   );
 
   const panelStyle: React.CSSProperties = {
-    marginBottom: 24,
+    marginRight: 8,
+    marginLeft: 8,
+    margin: 12,
     background: token.colorFillAlter,
     borderRadius: token.borderRadiusLG,
     border: "none",
@@ -288,7 +290,10 @@ const DrawerContent = () => {
         expandIcon={({ isActive }) => (
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}
-        style={{ background: token.colorBgContainer }}
+        style={{
+          paddingTop: 4,
+          paddingBottom: 4,
+        }}
         items={getItems(panelStyle, selectedSideBar.key)}
       />
     </div>

@@ -1,6 +1,7 @@
 import { ConfigProvider, Layout, theme } from "antd";
 import Title from "antd/es/typography/Title";
 import { useState } from "react";
+import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppSelector } from "../hooks";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
@@ -8,14 +9,14 @@ import MainContent from "./content/MainContent";
 const { Header, Content, Footer } = Layout;
 
 const MainPage = () => {
+  const dm = localStorage.getItem(LS_KEYS.dark_mode);
   const { defaultAlgorithm, darkAlgorithm } = theme;
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(dm === "true");
 
   const {
     token: { colorBgContainer, colorText },
   } = theme.useToken();
   const { token } = theme.useToken();
-  // console.log({ isDarkMode, token });
 
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
@@ -28,7 +29,13 @@ const MainPage = () => {
       }}
     >
       <Layout hasSider style={{ height: "100vh" }}>
-        <SideBar isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <SideBar
+          isDarkMode={isDarkMode}
+          setIsDarkMode={(flag) => {
+            localStorage.setItem(LS_KEYS.dark_mode, JSON.stringify(flag));
+            setIsDarkMode(flag);
+          }}
+        />
         <Layout>
           <Header
             style={{
