@@ -36,54 +36,74 @@ const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
         // console.log({ collapsed, type });
       }}
       style={
-        isSmall ? { position: "fixed", zIndex: 100, height: "100%" } : undefined
+        isSmall
+          ? {
+              position: "fixed",
+              zIndex: 100,
+              height: "100%",
+            }
+          : undefined
       }
     >
-      <Space
-        direction="vertical"
-        style={{ width: "100%", padding: "10px", borderWidth: 1 }}
-      >
-        {TAB_GROUP_LIST.map((group) => (
-          <>
-            <Divider
-              style={{ color: "white", margin: 0, borderBlockStart: "white" }}
-              orientation={"left"}
-            >
-              {group.name}
-            </Divider>
-            {group.children.map((item) => (
-              <Button
-                block
-                type={selectedSideBar.key === item.key ? "primary" : "default"}
-                onClick={() => dispatch(setSelectedSideBar(item))}
-              >
-                {item.name}
-              </Button>
-            ))}
-          </>
-        ))}
-      </Space>
-      <Space
-        direction="vertical"
+      <div
         style={{
-          width: "100%",
-          padding: "10px",
-          borderWidth: 1,
-          alignItems: "center",
-          backgroundColor: "#ffffff44",
+          height: "100%",
+          overflowY: "auto",
         }}
       >
-        <Divider
-          style={{ color: "white", margin: 0, borderBlockStart: "white" }}
-          orientation={"left"}
-        >{`Dark Mode`}</Divider>
-        <Switch
-          onChange={(e) => {
-            setIsDarkMode(e);
+        <Space
+          direction="vertical"
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderWidth: 1,
           }}
-          checked={isDarkMode}
-        />
-      </Space>
+        >
+          {TAB_GROUP_LIST.map((group) => (
+            <>
+              <Divider
+                style={{ color: "white", margin: 0, borderBlockStart: "white" }}
+                orientation={"left"}
+              >
+                {group.name}
+              </Divider>
+              {group.children.map((item) => (
+                <Button
+                  block
+                  type={
+                    selectedSideBar.key === item.key ? "primary" : "default"
+                  }
+                  onClick={() => dispatch(setSelectedSideBar(item))}
+                >
+                  {item.name}
+                </Button>
+              ))}
+            </>
+          ))}
+        </Space>
+
+        <Space
+          direction="vertical"
+          style={{
+            width: "100%",
+            padding: "10px",
+            borderWidth: 1,
+            alignItems: "center",
+            backgroundColor: "#ffffff44",
+          }}
+        >
+          <Divider
+            style={{ color: "white", margin: 0, borderBlockStart: "white" }}
+            orientation={"left"}
+          >{`Dark Mode`}</Divider>
+          <Switch
+            onChange={(e) => {
+              setIsDarkMode(e);
+            }}
+            checked={isDarkMode}
+          />
+        </Space>
+      </div>
     </Sider>
   );
 };
