@@ -28,7 +28,15 @@ const MainPage = () => {
         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
       }}
     >
-      <Layout hasSider style={{ height: "100vh" }}>
+      <Layout
+        hasSider
+        style={{
+          height: "100vh",
+          scrollbarColor: isDarkMode
+            ? `rgba(200,200,200,0.3) ${colorText}`
+            : `rgba(200,200,200,0.9) ${colorBgContainer}`,
+        }}
+      >
         <SideBar
           isDarkMode={isDarkMode}
           setIsDarkMode={(flag) => {
