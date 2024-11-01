@@ -1,8 +1,8 @@
 import { LUNAR_FRAGMENT_TYPE_COLOR } from "../constants/InGame.color.constants";
 import {
   EQUIPMENT,
+  ITEM_RARITY,
   LUNAR_FRAGMENT_TYPE,
-  LUNAR_JADE_RARITY,
   RUNE_GRADE,
   RUNE_SHAPE,
   RUNE_STAT_TYPE,
@@ -28,7 +28,7 @@ export interface Rune {
 }
 
 export interface LunarJadeCraftAmount {
-  rarity: LUNAR_JADE_RARITY;
+  rarity: ITEM_RARITY;
   quantity: number;
   quantityHg: number;
   stigmata: number;

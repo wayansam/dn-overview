@@ -9,6 +9,7 @@ export const TAB_KEY = {
   jadeSkill: "Skill Jade",
   jadeErosion: "Erosion Jade",
   heraldryAncientGoddes: "Ancients' Goddess",
+  talismanBlackDragon: "Black Dragon's",
 };
 
 export const TAB_GROUP_LIST: SideBarGroupTab[] = [
@@ -65,6 +66,16 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.heraldryAncientGoddes,
         name: TAB_KEY.heraldryAncientGoddes,
+      },
+    ],
+  },
+  {
+    key: "TALISMAN",
+    name: "Talisman",
+    children: [
+      {
+        key: TAB_KEY.talismanBlackDragon,
+        name: TAB_KEY.talismanBlackDragon,
       },
     ],
   },

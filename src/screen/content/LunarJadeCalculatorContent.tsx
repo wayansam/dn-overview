@@ -17,7 +17,7 @@ import type { FormInstance } from "antd/es/form";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { EQUIPMENT, LUNAR_JADE_RARITY } from "../../constants/InGame.constants";
+import { EQUIPMENT, ITEM_RARITY } from "../../constants/InGame.constants";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
   LunarJadeCraftAmountTable,
@@ -66,50 +66,50 @@ const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
 };
 
 interface optItem {
-  value: LUNAR_JADE_RARITY;
-  label: LUNAR_JADE_RARITY;
+  value: ITEM_RARITY;
+  label: ITEM_RARITY;
   rateValue: number;
 }
 
 export const equipmentCraftOpt: optItem[] = [
   {
-    value: LUNAR_JADE_RARITY.CRAFT,
-    label: LUNAR_JADE_RARITY.CRAFT,
+    value: ITEM_RARITY.CRAFT,
+    label: ITEM_RARITY.CRAFT,
     rateValue: 1,
   },
   {
-    value: LUNAR_JADE_RARITY.NORMAL,
-    label: LUNAR_JADE_RARITY.NORMAL,
+    value: ITEM_RARITY.NORMAL,
+    label: ITEM_RARITY.NORMAL,
     rateValue: 2,
   },
   {
-    value: LUNAR_JADE_RARITY.MAGIC,
-    label: LUNAR_JADE_RARITY.MAGIC,
+    value: ITEM_RARITY.MAGIC,
+    label: ITEM_RARITY.MAGIC,
     rateValue: 3,
   },
   {
-    value: LUNAR_JADE_RARITY.RARE,
-    label: LUNAR_JADE_RARITY.RARE,
+    value: ITEM_RARITY.RARE,
+    label: ITEM_RARITY.RARE,
     rateValue: 4,
   },
   {
-    value: LUNAR_JADE_RARITY.EPIC,
-    label: LUNAR_JADE_RARITY.EPIC,
+    value: ITEM_RARITY.EPIC,
+    label: ITEM_RARITY.EPIC,
     rateValue: 5,
   },
   {
-    value: LUNAR_JADE_RARITY.UNIQUE,
-    label: LUNAR_JADE_RARITY.UNIQUE,
+    value: ITEM_RARITY.UNIQUE,
+    label: ITEM_RARITY.UNIQUE,
     rateValue: 6,
   },
   {
-    value: LUNAR_JADE_RARITY.LEGEND,
-    label: LUNAR_JADE_RARITY.LEGEND,
+    value: ITEM_RARITY.LEGEND,
+    label: ITEM_RARITY.LEGEND,
     rateValue: 7,
   },
   {
-    value: LUNAR_JADE_RARITY.ANCIENT,
-    label: LUNAR_JADE_RARITY.ANCIENT,
+    value: ITEM_RARITY.ANCIENT,
+    label: ITEM_RARITY.ANCIENT,
     rateValue: 8,
   },
 ];
@@ -134,9 +134,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [inputNumb, setInputNumb] = useState<number>(0);
-  const [selectItem, setSelectItem] = useState<LUNAR_JADE_RARITY>(
-    LUNAR_JADE_RARITY.CRAFT
-  );
+  const [selectItem, setSelectItem] = useState<ITEM_RARITY>(ITEM_RARITY.CRAFT);
   const form = useContext(EditableContext)!;
 
   useEffect(() => {
@@ -167,7 +165,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
     handleSave({ ...record, defaultValue: inputNumb });
   };
 
-  const handleChange = (value: LUNAR_JADE_RARITY) => {
+  const handleChange = (value: ITEM_RARITY) => {
     setSelectItem(value);
   };
 
@@ -302,12 +300,8 @@ const LunarJadeCalculatorContent = () => {
   const [dataSource, setDataSource] =
     useState<LunarJadeCalculator[]>(dataCalculator);
   const [qtVal, setQtVal] = useState<string>("min");
-  const [selectFrom, setSelectFrom] = useState<LUNAR_JADE_RARITY>(
-    LUNAR_JADE_RARITY.CRAFT
-  );
-  const [selectTo, setSelectTo] = useState<LUNAR_JADE_RARITY>(
-    LUNAR_JADE_RARITY.NORMAL
-  );
+  const [selectFrom, setSelectFrom] = useState<ITEM_RARITY>(ITEM_RARITY.CRAFT);
+  const [selectTo, setSelectTo] = useState<ITEM_RARITY>(ITEM_RARITY.NORMAL);
   const [changeOrb, setChangeOrb] = useState<boolean>(false);
   const [changeEnergy, setChangeEnergy] = useState<boolean>(false);
 

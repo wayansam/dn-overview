@@ -62,7 +62,7 @@ export enum RUNE_STAT_TYPE {
   STAT = "status",
 }
 
-export enum LUNAR_JADE_RARITY {
+export enum ITEM_RARITY {
   CRAFT = "Craft",
   NORMAL = "Normal",
   MAGIC = "Magic",

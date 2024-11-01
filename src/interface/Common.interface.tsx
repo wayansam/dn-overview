@@ -1,4 +1,4 @@
-import { EQUIPMENT, LUNAR_JADE_RARITY } from "../constants/InGame.constants";
+import { EQUIPMENT, ITEM_RARITY } from "../constants/InGame.constants";
 
 export interface SideBarTab {
   key: string;
@@ -17,8 +17,8 @@ export interface LunarJadeCalculator {
   min: number;
   max: number;
   defaultValue: number;
-  from: LUNAR_JADE_RARITY;
-  to: LUNAR_JADE_RARITY;
+  from: ITEM_RARITY;
+  to: ITEM_RARITY;
 }
 
 export interface AncientCalculator {

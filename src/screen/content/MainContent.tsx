@@ -5,6 +5,7 @@ import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import AncientEqContent from "./AncientEqContent";
 import AncientHeraldryContent from "./AncientHeraldryContent";
+import BlackDragonTalismanContent from "./BlackDragonTalisman";
 import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./ErosionJadeContent";
 import GeneralContent from "./GeneralContent";
@@ -49,6 +50,9 @@ const MainContent = () => {
 
       case TAB_KEY.heraldryAncientGoddes:
         return <AncientHeraldryContent />;
+
+      case TAB_KEY.talismanBlackDragon:
+        return <BlackDragonTalismanContent />;
 
       default:
         return;

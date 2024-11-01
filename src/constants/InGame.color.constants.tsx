@@ -7,7 +7,7 @@ export enum LUNAR_FRAGMENT_TYPE_COLOR {
   ARDENT = "#a63e26",
 }
 
-export enum LUNAR_JADE_RARITY_COLOR {
+export enum ITEM_RARITY_COLOR {
   CRAFT = "#000000",
   NORMAL = "#969696",
   MAGIC = "#198f04",
