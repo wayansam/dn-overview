@@ -4,7 +4,6 @@ import {
   Collapse,
   CollapseProps,
   Divider,
-  InputNumber,
   Slider,
   Space,
   Typography,
@@ -12,6 +11,7 @@ import {
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
 import {
   AncientGoddesHeraDisassemblyItemTable,
   AncientGoddesHeraRequiredItemTable,
@@ -53,8 +53,6 @@ interface AncientGoddessHeraTableMaterialList {
 
 const AncientHeraldryContent = () => {
   const [heraldryData, setHeraldryData] = useState([0, 10]);
-  const [inputAB, setInputAB] = useState<number>(0);
-  const [inputABF, setInputABF] = useState<number>(0);
   const [convertToFrag, setConvertToFrag] = useState<boolean>(false);
 
   const columnsResource: ColumnsType<TableResource> = [
@@ -148,30 +146,6 @@ const AncientHeraldryContent = () => {
     return temp;
   }, [heraldryData, convertToFrag]);
 
-  const onChangeAB = (value: number | null) => {
-    if (!value) {
-      setInputAB(0);
-    }
-    if (typeof value === "number") {
-      setInputAB(value);
-    }
-  };
-  const onChangeABF = (value: number | null) => {
-    if (typeof value === "number") {
-      setInputABF(value);
-    }
-  };
-
-  const goldAB = useMemo(() => {
-    return inputAB * ancDataSource["Ancients' Blueprint"];
-  }, [inputAB, ancDataSource["Ancients' Blueprint"]]);
-  const goldABF = useMemo(() => {
-    return inputABF * ancDataSource["Ancients' Blueprint Fragment"];
-  }, [inputABF, ancDataSource["Ancients' Blueprint Fragment"]]);
-  const totalGold = useMemo(() => {
-    return goldAB + goldABF + ancDataSource.Gold;
-  }, [goldAB, goldABF, ancDataSource.Gold]);
-
   const statRange = useMemo(() => {
     const from = heraldryData[0];
     const to = heraldryData[1];
@@ -211,13 +185,13 @@ const AncientHeraldryContent = () => {
             bordered
           />
           <div>
-            <Card size="small" style={{ marginTop: 4 }}>
+            <Card size="small" style={{ marginTop: 4, marginBottom: 4 }}>
               <Space direction="vertical">
                 <Text>Hero Skill +{statRange}%</Text>
               </Space>
             </Card>
           </div>
-          <Divider orientation="left">Buy from Trading House</Divider>
+
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
             <Checkbox
@@ -229,48 +203,17 @@ const AncientHeraldryContent = () => {
               Change Blueprint to Fragment
             </Checkbox>
           </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Text>
-              Blueprint: {ancDataSource["Ancients' Blueprint"]} x{" "}
-              <InputNumber
-                min={0}
-                // max={record.max}
-                defaultValue={inputAB}
-                onChange={onChangeAB}
-                size="middle"
-                style={{ width: 120 }}
-              />
-            </Text>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Divider type="vertical" />
-            <Text italic>= {goldAB}</Text>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Text>
-              Blueprint Frag: {ancDataSource["Ancients' Blueprint Fragment"]} x{" "}
-              <InputNumber
-                min={0}
-                // max={record.max}
-                defaultValue={inputABF}
-                onChange={onChangeABF}
-                size="middle"
-                style={{ width: 120 }}
-              />
-            </Text>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Divider type="vertical" />
-            <Text italic>= {goldABF}</Text>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Text italic>Total Gold need: {totalGold}</Text>
-          </div>
+
+          <TradingHouseCalc
+            data={[
+              { name: "Blueprint", amt: ancDataSource["Ancients' Blueprint"] },
+              {
+                name: "Blueprint Frag",
+                amt: ancDataSource["Ancients' Blueprint Fragment"],
+              },
+            ]}
+            additionalTotal={ancDataSource.Gold}
+          />
         </div>
       </div>
     );
