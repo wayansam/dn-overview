@@ -30,24 +30,24 @@ export interface BDTalismanStat {
 }
 
 export interface BDBaofaTalismanStat extends BDTalismanStat {
-  maxHP: number;
+  maxHP?: number;
 }
 export interface BDUmbalaTalismanStat extends BDTalismanStat {
-  phyDef: number;
+  phyDef?: number;
 }
 export interface BDMelukaTalismanStat extends BDTalismanStat {
-  magDef: number;
+  magDef?: number;
 }
 export interface BDTitanionTalismanStat extends BDTalismanStat {
-  attack: number;
+  attack?: number;
 }
 export interface BDKeenTalismanStat extends BDTalismanStat {
-  attack: number;
-  critical: number;
-  criticalDamage: number;
+  attack?: number;
+  critical?: number;
+  criticalDamage?: number;
 }
 export interface BDAncientElementTalismanStat
   extends Omit<BDTalismanStat, "attackPercent"> {
-  attributePercent: number;
-  attack: number;
+  attributePercent?: number;
+  attack?: number;
 }

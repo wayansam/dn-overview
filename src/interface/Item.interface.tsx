@@ -111,3 +111,13 @@ export interface AncientGoddesHeraDisassemblyItem {
   encLevel: number;
   abFrag: number;
 }
+
+export interface BlackDragonTalismanCraftMaterial {
+  rarity: ITEM_RARITY;
+  bdMemories: number;
+  fragment: number;
+  garnet: number;
+  essence: number;
+  gold: number;
+  craftable: boolean;
+}
