@@ -18,8 +18,11 @@ import {
   BDBaofaTalismanMatsTable,
   BDBaofaTalismanStatTable,
   BDKeenTalismanStatTable,
+  BDMelukaTalismanMatsTable,
   BDMelukaTalismanStatTable,
+  BDTitanionTalismanMatsTable,
   BDTitanionTalismanStatTable,
+  BDUmbalaTalismanMatsTable,
   BDUmbalaTalismanStatTable,
 } from "../../data/BlackDragonTalismanData";
 import { BlackDragonTalismanCraftMaterial } from "../../interface/Item.interface";
@@ -49,6 +52,15 @@ interface TalismanTableMaterialList {
 interface BaofaTableMaterialList extends TalismanTableMaterialList {
   "Baofa Fragment": number;
 }
+interface UmbalaTableMaterialList extends TalismanTableMaterialList {
+  "Umbala Fragment": number;
+}
+interface MelukaTableMaterialList extends TalismanTableMaterialList {
+  "Meluka Fragment": number;
+}
+interface TitanionTableMaterialList extends TalismanTableMaterialList {
+  "Titanion Fragment": number;
+}
 
 const style: React.CSSProperties = {
   display: "inline-block",
@@ -77,6 +89,9 @@ const BlackDragonTalismanContent = () => {
 
   const defaultRange: [number, number] = [0, 5];
   const [baofaRange, setBaofaRange] = useState(defaultRange);
+  const [umbalaRange, setUmbalaRange] = useState(defaultRange);
+  const [melukaRange, setMelukaRange] = useState(defaultRange);
+  const [titanRange, setTitanRange] = useState(defaultRange);
 
   const columnsResource: ColumnsType<TableResource> = [
     { title: "Materials", dataIndex: "mats" },
@@ -427,6 +442,7 @@ const BlackDragonTalismanContent = () => {
     return { dt1, dt2 };
   }
 
+  // Baofa
   const baofaDataSource: BaofaTableMaterialList | undefined = useMemo(() => {
     const tempSlice = BDBaofaTalismanMatsTable.slice(
       baofaRange[0],
@@ -496,7 +512,7 @@ const BlackDragonTalismanContent = () => {
             <div>
               <Alert
                 banner
-                message="Legend Talisman is non craftable for this"
+                message="Legend Talisman is non craftable"
                 type="warning"
               />
             </div>
@@ -530,6 +546,7 @@ const BlackDragonTalismanContent = () => {
                 {
                   title: "MAX HP",
                   value: baofaStatDiff.maxHP,
+                  format: true,
                 },
               ]}
             />
@@ -560,6 +577,412 @@ const BlackDragonTalismanContent = () => {
     );
   };
 
+  // Umbala
+  const umbalaDataSource: UmbalaTableMaterialList | undefined = useMemo(() => {
+    const tempSlice = BDUmbalaTalismanMatsTable.slice(
+      umbalaRange[0],
+      umbalaRange[1]
+    );
+    const nonCraftable = tempSlice.map((it) => it.craftable).includes(false);
+    if (nonCraftable) {
+      return;
+    }
+    const { tempMemories, tempFrag, tempGold, tempGarnet, tempEssence } =
+      getSum(tempSlice);
+
+    const temp: UmbalaTableMaterialList = {
+      "Black Dragon Memories": tempMemories,
+      "Umbala Fragment": tempFrag,
+      Garnet: tempGarnet,
+      Essence: tempEssence,
+      Gold: tempGold,
+    };
+    return temp;
+  }, [umbalaRange]);
+
+  const umbalaStatDiff: BDUmbalaTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      BDUmbalaTalismanStatTable,
+      umbalaRange[0],
+      umbalaRange[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      name: "",
+      rarity: ITEM_RARITY.CRAFT,
+      maxHPPercent: (dt2.maxHPPercent ?? 0) - (dt1.maxHPPercent ?? 0),
+      attackPercent: (dt2.attackPercent ?? 0) - (dt1.attackPercent ?? 0),
+      fd: [],
+      craftable: true,
+      phyDef: (dt2.phyDef ?? 0) - (dt1.phyDef ?? 0),
+    };
+  }, [umbalaRange]);
+
+  const getUmbalaCalc = () => {
+    const onAfterChange = (value: [number, number]) => {
+      setUmbalaRange(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={getFilteredMarks(getMarkKey(0, 6))}
+            defaultValue={defaultRange}
+            max={6}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          <Divider orientation="left">Materials</Divider>
+          {!umbalaDataSource && (
+            <div>
+              <Alert
+                banner
+                message="Legend Talisman is non craftable"
+                type="warning"
+              />
+            </div>
+          )}
+          <Table
+            size={"small"}
+            dataSource={Object.entries(umbalaDataSource ?? {}).map(
+              ([key, value]) => ({
+                mats: key,
+                amount: value,
+              })
+            )}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+          {umbalaStatDiff && (
+            <ListingCard
+              title="Status Increase"
+              data={[
+                {
+                  title: "ATK",
+                  value: umbalaStatDiff.attackPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "MAX HP",
+                  value: umbalaStatDiff.maxHPPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "Defense",
+                  value: umbalaStatDiff.phyDef,
+                  format: true,
+                },
+              ]}
+            />
+          )}
+        </div>
+        <div>
+          {umbalaDataSource && (
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Black Dragon Memories",
+                  amt: umbalaDataSource["Black Dragon Memories"],
+                },
+                {
+                  name: "Garnet",
+                  amt: umbalaDataSource.Garnet,
+                },
+                {
+                  name: "Essence",
+                  amt: umbalaDataSource.Essence,
+                },
+              ]}
+              additionalTotal={umbalaDataSource.Gold}
+            />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Meluka
+  const melukaDataSource: MelukaTableMaterialList | undefined = useMemo(() => {
+    const tempSlice = BDMelukaTalismanMatsTable.slice(
+      melukaRange[0],
+      melukaRange[1]
+    );
+    const nonCraftable = tempSlice.map((it) => it.craftable).includes(false);
+    if (nonCraftable) {
+      return;
+    }
+    const { tempMemories, tempFrag, tempGold, tempGarnet, tempEssence } =
+      getSum(tempSlice);
+
+    const temp: MelukaTableMaterialList = {
+      "Black Dragon Memories": tempMemories,
+      "Meluka Fragment": tempFrag,
+      Garnet: tempGarnet,
+      Essence: tempEssence,
+      Gold: tempGold,
+    };
+    return temp;
+  }, [melukaRange]);
+
+  const melukaStatDiff: BDMelukaTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      BDMelukaTalismanStatTable,
+      melukaRange[0],
+      melukaRange[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      name: "",
+      rarity: ITEM_RARITY.CRAFT,
+      maxHPPercent: (dt2.maxHPPercent ?? 0) - (dt1.maxHPPercent ?? 0),
+      attackPercent: (dt2.attackPercent ?? 0) - (dt1.attackPercent ?? 0),
+      fd: [],
+      craftable: true,
+      magDef: (dt2.magDef ?? 0) - (dt1.magDef ?? 0),
+    };
+  }, [melukaRange]);
+
+  const getMelukaCalc = () => {
+    const onAfterChange = (value: [number, number]) => {
+      setMelukaRange(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={getFilteredMarks(getMarkKey(0, 6))}
+            defaultValue={defaultRange}
+            max={6}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          <Divider orientation="left">Materials</Divider>
+          {!melukaDataSource && (
+            <div>
+              <Alert
+                banner
+                message="Legend Talisman is non craftable"
+                type="warning"
+              />
+            </div>
+          )}
+          <Table
+            size={"small"}
+            dataSource={Object.entries(melukaDataSource ?? {}).map(
+              ([key, value]) => ({
+                mats: key,
+                amount: value,
+              })
+            )}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+          {melukaStatDiff && (
+            <ListingCard
+              title="Status Increase"
+              data={[
+                {
+                  title: "ATK",
+                  value: melukaStatDiff.attackPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "MAX HP",
+                  value: melukaStatDiff.maxHPPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "Magic Defense",
+                  value: melukaStatDiff.magDef,
+                  format: true,
+                },
+              ]}
+            />
+          )}
+        </div>
+        <div>
+          {melukaDataSource && (
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Black Dragon Memories",
+                  amt: melukaDataSource["Black Dragon Memories"],
+                },
+                {
+                  name: "Garnet",
+                  amt: melukaDataSource.Garnet,
+                },
+                {
+                  name: "Essence",
+                  amt: melukaDataSource.Essence,
+                },
+              ]}
+              additionalTotal={melukaDataSource.Gold}
+            />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Titanion
+  const titanionDataSource: TitanionTableMaterialList | undefined =
+    useMemo(() => {
+      const tempSlice = BDTitanionTalismanMatsTable.slice(
+        titanRange[0],
+        titanRange[1]
+      );
+      const nonCraftable = tempSlice.map((it) => it.craftable).includes(false);
+      if (nonCraftable) {
+        return;
+      }
+      const { tempMemories, tempFrag, tempGold, tempGarnet, tempEssence } =
+        getSum(tempSlice);
+
+      const temp: TitanionTableMaterialList = {
+        "Black Dragon Memories": tempMemories,
+        "Titanion Fragment": tempFrag,
+        Garnet: tempGarnet,
+        Essence: tempEssence,
+        Gold: tempGold,
+      };
+      return temp;
+    }, [titanRange]);
+
+  const titanionStatDiff: BDTitanionTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      BDTitanionTalismanStatTable,
+      titanRange[0],
+      titanRange[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      name: "",
+      rarity: ITEM_RARITY.CRAFT,
+      maxHPPercent: (dt2.maxHPPercent ?? 0) - (dt1.maxHPPercent ?? 0),
+      attackPercent: (dt2.attackPercent ?? 0) - (dt1.attackPercent ?? 0),
+      fd: [],
+      craftable: true,
+      attack: (dt2.attack ?? 0) - (dt1.attack ?? 0),
+    };
+  }, [titanRange]);
+
+  const getTitanionCalc = () => {
+    const onAfterChange = (value: [number, number]) => {
+      setTitanRange(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={getFilteredMarks(getMarkKey(0, 6))}
+            defaultValue={defaultRange}
+            max={6}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          <Divider orientation="left">Materials</Divider>
+          {!titanionDataSource && (
+            <div>
+              <Alert
+                banner
+                message="Legend Talisman is non craftable"
+                type="warning"
+              />
+            </div>
+          )}
+          <Table
+            size={"small"}
+            dataSource={Object.entries(titanionDataSource ?? {}).map(
+              ([key, value]) => ({
+                mats: key,
+                amount: value,
+              })
+            )}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+          {titanionStatDiff && (
+            <ListingCard
+              title="Status Increase"
+              data={[
+                {
+                  title: "ATK",
+                  value: titanionStatDiff.attackPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "MAX HP",
+                  value: titanionStatDiff.maxHPPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "ATK",
+                  value: titanionStatDiff.attack,
+                  format: true,
+                },
+              ]}
+            />
+          )}
+        </div>
+        <div>
+          {titanionDataSource && (
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Black Dragon Memories",
+                  amt: titanionDataSource["Black Dragon Memories"],
+                },
+                {
+                  name: "Garnet",
+                  amt: titanionDataSource.Garnet,
+                },
+                {
+                  name: "Essence",
+                  amt: titanionDataSource.Essence,
+                },
+              ]}
+              additionalTotal={titanionDataSource.Gold}
+            />
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const items: CollapseProps["items"] = [
     {
       key: "1",
@@ -570,6 +993,21 @@ const BlackDragonTalismanContent = () => {
       key: "2",
       label: "Baofa",
       children: getBaofaCalc(),
+    },
+    {
+      key: "3",
+      label: "Umbala",
+      children: getUmbalaCalc(),
+    },
+    {
+      key: "4",
+      label: "Meluka",
+      children: getMelukaCalc(),
+    },
+    {
+      key: "5",
+      label: "Titanion",
+      children: getTitanionCalc(),
     },
   ];
   return (

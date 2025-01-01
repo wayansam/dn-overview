@@ -64,13 +64,13 @@ const TradingHouseCalc = ({
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
             <Divider type="vertical" />
-            <Text italic>= {it.amt * it.price}</Text>
+            <Text italic>= {(it.amt * it.price).toLocaleString()}</Text>
           </div>
         </div>
       ))}
       <div style={{ marginBottom: 4 }}>
         <Divider type="vertical" />
-        <Text italic>Total Gold need: {totalGold}</Text>
+        <Text italic>Total Gold need: {totalGold.toLocaleString()}</Text>
       </div>
     </div>
   );
