@@ -1,8 +1,18 @@
-import { Collapse, CollapseProps, theme, Typography } from "antd";
+import {
+  Alert,
+  Collapse,
+  CollapseProps,
+  Divider,
+  theme,
+  Typography,
+} from "antd";
 import Slider, { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
+import ListingCard from "../../components/ListingCard";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
+import { ITEM_RARITY } from "../../constants/InGame.constants";
 import {
   BDAncientElementTalismanStatTable,
   BDBaofaTalismanMatsTable,
@@ -12,6 +22,7 @@ import {
   BDTitanionTalismanStatTable,
   BDUmbalaTalismanStatTable,
 } from "../../data/BlackDragonTalismanData";
+import { BlackDragonTalismanCraftMaterial } from "../../interface/Item.interface";
 import {
   BDAncientElementTalismanStat,
   BDBaofaTalismanStat,
@@ -29,10 +40,14 @@ interface TableResource {
   amount: number;
 }
 
-interface BaofaTableMaterialList {
-  "Dreamy Core": number;
-  "High Purity Dreamy Core": number;
+interface TalismanTableMaterialList {
+  "Black Dragon Memories": number;
+  Garnet: number;
+  Essence: number;
   Gold: number;
+}
+interface BaofaTableMaterialList extends TalismanTableMaterialList {
+  "Baofa Fragment": number;
 }
 
 const style: React.CSSProperties = {
@@ -60,7 +75,8 @@ const BlackDragonTalismanContent = () => {
     token: { colorBgContainer, colorText },
   } = theme.useToken();
 
-  const [baofaRange, setBaofaRange] = useState([0, 6]);
+  const defaultRange: [number, number] = [0, 5];
+  const [baofaRange, setBaofaRange] = useState(defaultRange);
 
   const columnsResource: ColumnsType<TableResource> = [
     { title: "Materials", dataIndex: "mats" },
@@ -383,34 +399,83 @@ const BlackDragonTalismanContent = () => {
     </div>
   );
 
-  const baofaDataSource: BaofaTableMaterialList = useMemo(() => {
+  const getSum = (temp: BlackDragonTalismanCraftMaterial[]) => {
+    let tempMemories = 0;
+    let tempFrag = 0;
+    let tempGold = 0;
+    let tempGarnet = 0;
+    let tempEssence = 0;
+
+    temp.forEach((slicedItem) => {
+      tempMemories += slicedItem.bdMemories;
+      tempFrag += slicedItem.fragment;
+      tempGarnet += slicedItem.garnet;
+      tempEssence += slicedItem.essence;
+      tempGold += slicedItem.gold;
+    });
+    return {
+      tempMemories,
+      tempFrag,
+      tempGold,
+      tempGarnet,
+      tempEssence,
+    };
+  };
+  function getComparedData<T>(arr: Array<T>, min: number, max: number) {
+    const dt1 = arr.length >= min ? arr[min - 1] : undefined;
+    const dt2 = arr.length >= max ? arr[max - 1] : undefined;
+    return { dt1, dt2 };
+  }
+
+  const baofaDataSource: BaofaTableMaterialList | undefined = useMemo(() => {
     const tempSlice = BDBaofaTalismanMatsTable.slice(
       baofaRange[0],
       baofaRange[1]
     );
-    let tempHFrag = 0;
-    let tempLFrag = 0;
-    let tempGold = 0;
+    const nonCraftable = tempSlice.map((it) => it.craftable).includes(false);
+    if (nonCraftable) {
+      return;
+    }
+    const { tempMemories, tempFrag, tempGold, tempGarnet, tempEssence } =
+      getSum(tempSlice);
 
-    // tempSlice.forEach((slicedItem) => {
-    //   tempHFrag += slicedItem.higherFragment;
-    //   tempLFrag += slicedItem.lowerFragment;
-    //   tempGold += slicedItem.gold;
-    // });
     const temp: BaofaTableMaterialList = {
-      "Dreamy Core": tempLFrag,
-      "High Purity Dreamy Core": tempHFrag,
+      "Black Dragon Memories": tempMemories,
+      "Baofa Fragment": tempFrag,
+      Garnet: tempGarnet,
+      Essence: tempEssence,
       Gold: tempGold,
     };
     return temp;
   }, [baofaRange]);
 
+  const baofaStatDiff: BDBaofaTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      BDBaofaTalismanStatTable,
+      baofaRange[0],
+      baofaRange[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      name: "",
+      rarity: ITEM_RARITY.CRAFT,
+      maxHPPercent: (dt2.maxHPPercent ?? 0) - (dt1.maxHPPercent ?? 0),
+      attackPercent: (dt2.attackPercent ?? 0) - (dt1.attackPercent ?? 0),
+      fd: [],
+      craftable: true,
+      maxHP: (dt2.maxHP ?? 0) - (dt1.maxHP ?? 0),
+    };
+  }, [baofaRange]);
+
   const getBaofaCalc = () => {
-    const onAfterChange = (value: number[]) => {
+    const onAfterChange = (value: [number, number]) => {
       setBaofaRange(value);
     };
-
-    console.log({ marks });
 
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -419,42 +484,77 @@ const BlackDragonTalismanContent = () => {
             vertical
             range
             marks={getFilteredMarks(getMarkKey(0, 6))}
-            defaultValue={[0, 6]}
+            defaultValue={defaultRange}
             max={6}
             min={0}
             onAfterChange={onAfterChange}
           />
         </div>
         <div>
-          {/* {showDWarning && (
+          <Divider orientation="left">Materials</Divider>
+          {!baofaDataSource && (
             <div>
               <Alert
                 banner
-                message="From +11 onward, the enhancement might fail"
+                message="Legend Talisman is non craftable for this"
                 type="warning"
               />
             </div>
-          )} */}
+          )}
           <Table
             size={"small"}
-            dataSource={Object.entries(baofaDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
+            dataSource={Object.entries(baofaDataSource ?? {}).map(
+              ([key, value]) => ({
+                mats: key,
+                amount: value,
+              })
+            )}
             columns={columnsResource}
             pagination={false}
             bordered
           />
-          {/* {statRangeD && (
-            <div>
-              <Card size="small" style={{ marginTop: 4 }}>
-                <Space direction="vertical">
-                  <Text>ATK +{statRangeD.attackPercent}%</Text>
-                  <Text>Cooldown Decrease {statRangeD.cooldownPercent}%</Text>
-                </Space>
-              </Card>
-            </div>
-          )} */}
+          {baofaStatDiff && (
+            <ListingCard
+              title="Status Increase"
+              data={[
+                {
+                  title: "ATK",
+                  value: baofaStatDiff.attackPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "MAX HP",
+                  value: baofaStatDiff.maxHPPercent,
+                  suffix: "%",
+                },
+                {
+                  title: "MAX HP",
+                  value: baofaStatDiff.maxHP,
+                },
+              ]}
+            />
+          )}
+        </div>
+        <div>
+          {baofaDataSource && (
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Black Dragon Memories",
+                  amt: baofaDataSource["Black Dragon Memories"],
+                },
+                {
+                  name: "Garnet",
+                  amt: baofaDataSource.Garnet,
+                },
+                {
+                  name: "Essence",
+                  amt: baofaDataSource.Essence,
+                },
+              ]}
+              additionalTotal={baofaDataSource.Gold}
+            />
+          )}
         </div>
       </div>
     );
