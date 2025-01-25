@@ -238,6 +238,16 @@ const getItems: (
           <p>
             <i>You can access this shop via Heraldry NPC in Milla Laurel.</i>
           </p>
+          <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/123/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ancients' Goddess Heraldry
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
@@ -264,13 +274,12 @@ const getItems: (
           <p>
             Patch Note related{" "}
             <a
-              href="https://patchnote.dragonnest.com/sea/129/c/3/"
+              href="https://patchnote.dragonnest.com/sea/108/c/3"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Eternal Talisman
+              Black Dragon Talismans
             </a>
-            .
           </p>
         </div>
       ),

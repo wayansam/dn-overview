@@ -11,6 +11,7 @@ import Slider, { SliderMarks } from "antd/es/slider";
 import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
 import {
   AncientDJSkillMaterialTable,
   AncientDJSkillStatTable,
@@ -239,6 +240,22 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Dreamy Core",
+                amt: dDataSource["Dreamy Core"],
+              },
+              {
+                name: "High Purity Dreamy Core",
+                amt: dDataSource["High Purity Dreamy Core"],
+                useCustomAmt: true,
+              },
+            ]}
+            additionalTotal={dDataSource.Gold}
+          />
+        </div>
       </div>
     );
   };
@@ -319,6 +336,22 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Blood Moon Core",
+                amt: bmDataSource["Blood Moon Core"],
+              },
+              {
+                name: "High Purity Blood Moon Core",
+                amt: bmDataSource["High Purity Blood Moon Core"],
+                useCustomAmt: true,
+              },
+            ]}
+            additionalTotal={bmDataSource.Gold}
+          />
+        </div>
       </div>
     );
   };
@@ -398,6 +431,22 @@ const SkillJadeContent = () => {
               </Card>
             </div>
           )}
+        </div>
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Verdure Core",
+                amt: vDataSource["Verdure Core"],
+              },
+              {
+                name: "High Purity Verdure Core",
+                amt: vDataSource["High Purity Verdure Core"],
+                useCustomAmt: true,
+              },
+            ]}
+            additionalTotal={vDataSource.Gold}
+          />
         </div>
       </div>
     );
