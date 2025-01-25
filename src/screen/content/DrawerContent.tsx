@@ -242,6 +242,40 @@ const getItems: (
       ),
       style: panelStyle,
     },
+    {
+      key: TAB_KEY.talismanBlackDragon,
+      label: TAB_KEY.talismanBlackDragon,
+      children: (
+        <div>
+          <p>
+            <b>
+              There are 6 Black Dragon's Talisman type but only 4 can be
+              crafted.
+            </b>
+          </p>
+          <p>
+            To use the calculator, set the bottom point to your state right now
+            and the top point to where you want to.
+          </p>
+          <p>You can trade this talisman (Reseal Count).</p>
+          <p>
+            <i>Most of the item is only drop from Black Dragon Nest.</i>
+          </p>
+          <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/129/c/3/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Eternal Talisman
+            </a>
+            .
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
   ];
 
   return [

@@ -8,7 +8,6 @@ import {
 } from "antd";
 import Slider, { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
@@ -344,75 +343,246 @@ const BlackDragonTalismanContent = () => {
     ...get2ndColumn(),
   ];
 
-  const getStatContent = () => (
-    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-      <div style={{ width: 500, marginRight: 10 }}>
-        <Title level={5}>{"Baofa"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDBaofaTalismanStatTable}
-          columns={columnsBaofaMats}
-          pagination={false}
-          bordered
-        />
-      </div>
+  const getStatContent = () => {
+    const itemStat: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Baofa",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDBaofaTalismanStatTable}
+              columns={columnsBaofaMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Umbala",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDUmbalaTalismanStatTable}
+              columns={columnsUmbalaMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "3",
+        label: "Meluka",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDMelukaTalismanStatTable}
+              columns={columnsMelukaMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "4",
+        label: "Titanion",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDTitanionTalismanStatTable}
+              columns={columnsTitanionMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "5",
+        label: "Keen",
+        children: (
+          <div style={{ width: 700, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDKeenTalismanStatTable}
+              columns={columnsKeenMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "6",
+        label: "Ancient Element",
+        children: (
+          <div style={{ width: 600, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDAncientElementTalismanStatTable}
+              columns={columnsAncientElementMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+    ];
 
-      <div style={{ width: 500, marginRight: 10 }}>
-        <Title level={5}>{"Umbala"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDUmbalaTalismanStatTable}
-          columns={columnsUmbalaMats}
-          pagination={false}
-          bordered
-        />
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <Collapse items={itemStat} size="small" />
       </div>
+    );
+  };
 
-      <div style={{ width: 500, marginRight: 10 }}>
-        <Title level={5}>{"Meluka"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDMelukaTalismanStatTable}
-          columns={columnsMelukaMats}
-          pagination={false}
-          bordered
-        />
-      </div>
+  const getColumnsMats = (
+    type: string
+  ): ColumnsType<BlackDragonTalismanCraftMaterial> => {
+    return [
+      {
+        title: "Stage Rarity",
+        dataIndex: "rarity",
+        width: 150,
+        render: (_, { rarity }) => (
+          <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
+        ),
+      },
+      {
+        title: (
+          <div>
+            <p>Black Dragon Memories</p>
+            <p>{type} Fragment</p>
+            <p>Garnet</p>
+            <p>Essence</p>
+            <p>Gold</p>
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (_, { bdMemories, fragment, garnet, essence, gold }) => (
+          <div>
+            <p>{bdMemories}</p>
+            <p>{fragment}</p>
+            <p>{garnet}</p>
+            <p>{essence}</p>
+            <p>{gold}</p>
+          </div>
+        ),
+      },
+      {
+        title: "Black Dragon Memories",
+        dataIndex: "bdMemories",
+        responsive: ["sm"],
+      },
+      {
+        title: `${type} Fragment`,
+        dataIndex: "fragment",
+        responsive: ["sm"],
+      },
+      {
+        title: "Garnet",
+        dataIndex: "garnet",
+        responsive: ["sm"],
+      },
+      {
+        title: "Essence",
+        dataIndex: "essence",
+        responsive: ["sm"],
+      },
+      {
+        title: "Gold",
+        dataIndex: "gold",
+        responsive: ["sm"],
+      },
+    ];
+  };
 
-      <div style={{ width: 500, marginRight: 10 }}>
-        <Title level={5}>{"Titanion"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDTitanionTalismanStatTable}
-          columns={columnsTitanionMats}
-          pagination={false}
-          bordered
-        />
-      </div>
+  const getMatsContent = () => {
+    const itemStat: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Baofa",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDBaofaTalismanMatsTable.filter(
+                (it) => it.rarity !== ITEM_RARITY.LEGEND
+              )}
+              columns={getColumnsMats("Baofa")}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Umbala",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDUmbalaTalismanMatsTable.filter(
+                (it) => it.rarity !== ITEM_RARITY.LEGEND
+              )}
+              columns={getColumnsMats("Umbala")}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "3",
+        label: "Meluka",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDMelukaTalismanMatsTable.filter(
+                (it) => it.rarity !== ITEM_RARITY.LEGEND
+              )}
+              columns={getColumnsMats("Meluka")}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "4",
+        label: "Titanion",
+        children: (
+          <div style={{ width: 500, marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={BDTitanionTalismanMatsTable.filter(
+                (it) => it.rarity !== ITEM_RARITY.LEGEND
+              )}
+              columns={getColumnsMats("Titanion")}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+    ];
 
-      <div style={{ width: 700, marginRight: 10 }}>
-        <Title level={5}>{"Keen"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDKeenTalismanStatTable}
-          columns={columnsKeenMats}
-          pagination={false}
-          bordered
-        />
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <Collapse items={itemStat} size="small" />
       </div>
-
-      <div style={{ width: 600, marginRight: 10 }}>
-        <Title level={5}>{"Ancient Element"}</Title>
-        <Table
-          size={"small"}
-          dataSource={BDAncientElementTalismanStatTable}
-          columns={columnsAncientElementMats}
-          pagination={false}
-          bordered
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   const getSum = (temp: BlackDragonTalismanCraftMaterial[]) => {
     let tempMemories = 0;
@@ -991,28 +1161,33 @@ const BlackDragonTalismanContent = () => {
     },
     {
       key: "2",
+      label: "Mats",
+      children: getMatsContent(),
+    },
+    {
+      key: "3",
       label: "Baofa",
       children: getBaofaCalc(),
     },
     {
-      key: "3",
+      key: "4",
       label: "Umbala",
       children: getUmbalaCalc(),
     },
     {
-      key: "4",
+      key: "5",
       label: "Meluka",
       children: getMelukaCalc(),
     },
     {
-      key: "5",
+      key: "6",
       label: "Titanion",
       children: getTitanionCalc(),
     },
   ];
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["2"]} />
+      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
     </div>
   );
 };
