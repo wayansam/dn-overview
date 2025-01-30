@@ -8,6 +8,7 @@ import AncientHeraldryContent from "./AncientHeraldryContent";
 import BlackDragonTalismanContent from "./BlackDragonTalismanContent";
 import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./ErosionJadeContent";
+import ExternalTalismanContent from "./EternalTalismanContent";
 import GeneralContent from "./GeneralContent";
 import KilosEqContent from "./KilosEqContent";
 import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
@@ -54,6 +55,9 @@ const MainContent = () => {
 
       case TAB_KEY.talismanBlackDragon:
         return <BlackDragonTalismanContent />;
+
+      case TAB_KEY.talismanEternal:
+        return <ExternalTalismanContent />;
 
       case TAB_KEY.setting:
         return <SettingContent />;

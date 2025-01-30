@@ -121,3 +121,15 @@ export interface BlackDragonTalismanCraftMaterial {
   gold: number;
   craftable: boolean;
 }
+
+export interface EternalWorldTalismanMats {
+  encLevel: number;
+  apparition: number;
+  gold: number;
+}
+export interface EternalPainTalismanMats {
+  encLevel: number;
+  apparition: number;
+  vortex: number;
+  gold: number;
+}

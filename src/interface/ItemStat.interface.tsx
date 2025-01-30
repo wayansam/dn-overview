@@ -51,3 +51,23 @@ export interface BDAncientElementTalismanStat
   attributePercent?: number;
   attack?: number;
 }
+
+export interface EternalWorldTalismanStat {
+  encLevel: number;
+  attack: number;
+  attributePercent: number;
+  maxHP: number;
+}
+export interface EternalPainTalismanStat {
+  encLevel: number;
+  attack: number;
+  fd: number;
+  maxHP: number;
+}
+export interface EternalChaosTalismanStat {
+  critical: number[];
+  criticalDamage: number[];
+  phyDef: number[];
+  magDef: number[];
+  fd: number[];
+}
