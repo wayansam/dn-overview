@@ -1,17 +1,21 @@
 import { ConfigProvider, Layout, theme } from "antd";
 import Title from "antd/es/typography/Title";
-import { useState } from "react";
+import { useEffect } from "react";
 import { LS_KEYS } from "../constants/localStorage.constants";
-import { useAppSelector } from "../hooks";
+import { useAppDispatch, useAppSelector } from "../hooks";
+import { setIsDarkMode } from "../slice/UIState.reducer";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
 
 const { Header, Content, Footer } = Layout;
 
 const MainPage = () => {
+  const dispatch = useAppDispatch();
   const dm = localStorage.getItem(LS_KEYS.dark_mode);
   const { defaultAlgorithm, darkAlgorithm } = theme;
-  const [isDarkMode, setIsDarkMode] = useState(dm === "true");
+  useEffect(() => {
+    dispatch(setIsDarkMode(dm === "true"));
+  }, []);
 
   const {
     token: { colorBgContainer, colorText },
@@ -21,6 +25,7 @@ const MainPage = () => {
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
   );
+  const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
 
   return (
     <ConfigProvider
@@ -37,13 +42,7 @@ const MainPage = () => {
             : `rgba(200,200,200,0.9) ${colorBgContainer}`,
         }}
       >
-        <SideBar
-          isDarkMode={isDarkMode}
-          setIsDarkMode={(flag) => {
-            localStorage.setItem(LS_KEYS.dark_mode, JSON.stringify(flag));
-            setIsDarkMode(flag);
-          }}
-        />
+        <SideBar />
         <Layout>
           <Header
             style={{

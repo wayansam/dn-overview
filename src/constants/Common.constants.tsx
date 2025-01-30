@@ -2,6 +2,7 @@ import { SideBarGroupTab } from "../interface/Common.interface";
 
 export const TAB_KEY = {
   mainGeneral: "General",
+  setting: "Setting",
   eqAncient: "Ancient",
   eqKilos: "Kilos",
   eqNamedEOD: "Named EOD",
@@ -76,6 +77,16 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.talismanBlackDragon,
         name: TAB_KEY.talismanBlackDragon,
+      },
+    ],
+  },
+  {
+    key: "UTILITY",
+    name: "Utility",
+    children: [
+      {
+        key: TAB_KEY.setting,
+        name: TAB_KEY.setting,
       },
     ],
   },

@@ -4,10 +4,12 @@ import { SideBarTab } from "../interface/Common.interface";
 
 interface UIState {
   selectedSideBar: SideBarTab;
+  isDarkMode: boolean;
 }
 
 const initialState: UIState = {
   selectedSideBar: TAB_GROUP_LIST[0].children[0],
+  isDarkMode: true,
 };
 
 const UIStateSlice = createSlice({
@@ -20,8 +22,11 @@ const UIStateSlice = createSlice({
     ) => {
       state.selectedSideBar = action.payload;
     },
+    setIsDarkMode: (state, action: PayloadAction<UIState["isDarkMode"]>) => {
+      state.isDarkMode = action.payload;
+    },
   },
 });
 
 export const UIStateReducer = UIStateSlice.reducer;
-export const { setSelectedSideBar } = UIStateSlice.actions;
+export const { setSelectedSideBar, setIsDarkMode } = UIStateSlice.actions;

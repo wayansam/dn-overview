@@ -1,4 +1,4 @@
-import { Button, Divider, Layout, Space, Switch, theme } from "antd";
+import { Button, Divider, Layout, Space, theme } from "antd";
 import { useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
@@ -6,12 +6,7 @@ import { setSelectedSideBar } from "../slice/UIState.reducer";
 
 const { Sider } = Layout;
 
-interface SideBarProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (f: boolean) => void;
-}
-
-const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
+const SideBar = () => {
   const dispatch = useAppDispatch();
 
   const {
@@ -30,7 +25,6 @@ const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
       collapsedWidth="0"
       onBreakpoint={(broken) => {
         setIsSmall(broken);
-        // console.log({ broken });
       }}
       onCollapse={(collapsed, type) => {
         // console.log({ collapsed, type });
@@ -80,28 +74,6 @@ const SideBar = ({ isDarkMode, setIsDarkMode }: SideBarProps) => {
               ))}
             </>
           ))}
-        </Space>
-
-        <Space
-          direction="vertical"
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderWidth: 1,
-            alignItems: "center",
-            backgroundColor: "#ffffff44",
-          }}
-        >
-          <Divider
-            style={{ color: "white", margin: 0, borderBlockStart: "white" }}
-            orientation={"left"}
-          >{`Dark Mode`}</Divider>
-          <Switch
-            onChange={(e) => {
-              setIsDarkMode(e);
-            }}
-            checked={isDarkMode}
-          />
         </Space>
       </div>
     </Sider>

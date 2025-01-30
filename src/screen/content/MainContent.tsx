@@ -12,6 +12,7 @@ import GeneralContent from "./GeneralContent";
 import KilosEqContent from "./KilosEqContent";
 import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import NamedEODEqContent from "./NamedEODEqContent";
+import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
 
 const MainContent = () => {
@@ -53,6 +54,9 @@ const MainContent = () => {
 
       case TAB_KEY.talismanBlackDragon:
         return <BlackDragonTalismanContent />;
+
+      case TAB_KEY.setting:
+        return <SettingContent />;
 
       default:
         return;
