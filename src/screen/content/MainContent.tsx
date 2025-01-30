@@ -5,7 +5,7 @@ import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import AncientEqContent from "./AncientEqContent";
 import AncientHeraldryContent from "./AncientHeraldryContent";
-import BlackDragonTalismanContent from "./BlackDragonTalisman";
+import BlackDragonTalismanContent from "./BlackDragonTalismanContent";
 import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./ErosionJadeContent";
 import GeneralContent from "./GeneralContent";
