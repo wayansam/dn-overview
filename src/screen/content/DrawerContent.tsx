@@ -285,6 +285,47 @@ const getItems: (
       ),
       style: panelStyle,
     },
+    {
+      key: TAB_KEY.talismanEternal,
+      label: TAB_KEY.talismanEternal,
+      children: (
+        <div>
+          <p>
+            <b>
+              There are 3 Eternal Talisman type but only 2 can be crafted (
+              <i>Eternal World Talisman</i> & <i>Eternal Pain Talisman</i>).
+            </b>
+          </p>
+          <p>
+            For <i>Eternal Chaos Talisman</i>, can be acquired within the
+            Dimensional Rift & have a total of 5 additional stats determined at
+            random.
+          </p>
+          <p>
+            To use the calculator, set the bottom point to your state right now
+            and the top point to where you want to.
+          </p>
+          <p>
+            You can trade this talisman (Reseal Count), normal storage & server
+            storage.
+          </p>
+          <p>
+            <i>Most of the item is only drop from Dimensional Rift.</i>
+          </p>
+          <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/129/c/3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Eternal Talisman
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
   ];
 
   return [
