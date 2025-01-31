@@ -2,9 +2,15 @@ import { Collapse, CollapseProps, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import {
   EternalChaosTalismanStatTable,
+  EternalPainTalismanMatsTable,
   EternalPainTalismanStatTable,
+  EternalWorldTalismanMatsTable,
   EternalWorldTalismanStatTable,
 } from "../../data/EternalTalismanData";
+import {
+  EternalPainTalismanMats,
+  EternalWorldTalismanMats,
+} from "../../interface/Item.interface";
 import {
   EternalChaosTalismanStat,
   EternalPainTalismanStat,
@@ -15,7 +21,7 @@ const { Text } = Typography;
 
 const ExternalTalismanContent = () => {
   const getStatContent = () => {
-    const columnsWorldMats: ColumnsType<EternalWorldTalismanStat> = [
+    const columnsWorldStats: ColumnsType<EternalWorldTalismanStat> = [
       {
         title: "Enhancement",
         dataIndex: "encLevel",
@@ -33,8 +39,7 @@ const ExternalTalismanContent = () => {
           <div>
             <p>ATT {attack.toLocaleString()}</p>
             <p>
-              Attribute(%){" "}
-              {getTextEmpty({ txt: attributePercent, tailText: "%" })}
+              Attribute {getTextEmpty({ txt: attributePercent, tailText: "%" })}
             </p>
             <p>HP {maxHP.toLocaleString()}</p>
           </div>
@@ -59,7 +64,7 @@ const ExternalTalismanContent = () => {
       },
     ];
 
-    const columnsPainMats: ColumnsType<EternalPainTalismanStat> = [
+    const columnsPainStats: ColumnsType<EternalPainTalismanStat> = [
       {
         title: "Enhancement",
         dataIndex: "encLevel",
@@ -98,42 +103,92 @@ const ExternalTalismanContent = () => {
       },
     ];
 
-    const columnsChaosMats: ColumnsType<EternalChaosTalismanStat> = [
+    const columnsChaosStats: ColumnsType<EternalChaosTalismanStat> = [
+      {
+        title: (
+          <>
+            <p>Critical</p>
+            <p>Critical Damage</p>
+            <p>Phy Def</p>
+            <p>Mag Def</p>
+            <p>Final Damage</p>
+          </>
+        ),
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { critical, criticalDamage, phyDef, magDef, fd }) => (
+          <>
+            <p>CRT </p>
+            {critical.map((it) => it.toLocaleString()).join(" / ")}
+
+            <p>CDM</p>
+            {criticalDamage.map((it) => it.toLocaleString()).join(" / ")}
+
+            <p>Phy Def</p>
+            {phyDef.map((it) => it.toLocaleString()).join(" / ")}
+
+            <p>Mag Def</p>
+            {magDef.map((it) => it.toLocaleString()).join(" / ")}
+
+            <p>FD</p>
+            {fd.map((it) => it.toLocaleString()).join(" / ")}
+          </>
+        ),
+      },
       {
         title: "Critical",
-        // responsive: ["sm"],
+        responsive: ["sm"],
+        width: 70,
         render: (_, { critical }) => (
-          <Text>{critical.map((it) => it.toLocaleString()).join(" / ")}</Text>
+          <Text>
+            {critical.map((it) => (
+              <p>{it.toLocaleString()}</p>
+            ))}
+          </Text>
         ),
       },
       {
         title: "Critical Damage",
-        // responsive: ["sm"],
+        responsive: ["sm"],
         render: (_, { criticalDamage }) => (
           <Text>
-            {criticalDamage.map((it) => it.toLocaleString()).join(" / ")}
+            {criticalDamage.map((it) => (
+              <p>{it.toLocaleString()}</p>
+            ))}
           </Text>
         ),
       },
       {
         title: "Phy Def",
-        // responsive: ["sm"],
+        responsive: ["sm"],
         render: (_, { phyDef }) => (
-          <Text>{phyDef.map((it) => it.toLocaleString()).join(" / ")}</Text>
+          <Text>
+            {phyDef.map((it) => (
+              <p>{it.toLocaleString()}</p>
+            ))}
+          </Text>
         ),
       },
       {
         title: "Mag Def",
-        // responsive: ["sm"],
+        responsive: ["sm"],
         render: (_, { magDef }) => (
-          <Text>{magDef.map((it) => it.toLocaleString()).join(" / ")}</Text>
+          <Text>
+            {magDef.map((it) => (
+              <p>{it.toLocaleString()}</p>
+            ))}
+          </Text>
         ),
       },
       {
         title: "Final Damage",
-        // responsive: ["sm"],
+        responsive: ["sm"],
         render: (_, { fd }) => (
-          <Text>{fd.map((it) => it.toLocaleString()).join(" / ")}</Text>
+          <Text>
+            {fd.map((it) => (
+              <p>{it.toLocaleString()}</p>
+            ))}
+          </Text>
         ),
       },
     ];
@@ -147,7 +202,7 @@ const ExternalTalismanContent = () => {
             <Table
               size={"small"}
               dataSource={EternalWorldTalismanStatTable}
-              columns={columnsWorldMats}
+              columns={columnsWorldStats}
               pagination={false}
               bordered
             />
@@ -162,7 +217,7 @@ const ExternalTalismanContent = () => {
             <Table
               size={"small"}
               dataSource={EternalPainTalismanStatTable}
-              columns={columnsPainMats}
+              columns={columnsPainStats}
               pagination={false}
               bordered
             />
@@ -177,10 +232,136 @@ const ExternalTalismanContent = () => {
             <Table
               size={"small"}
               dataSource={[EternalChaosTalismanStatTable]}
-              columns={columnsChaosMats}
+              columns={columnsChaosStats}
               pagination={false}
               bordered
             />
+            <i>notes: random add on stat</i>
+          </div>
+        ),
+      },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <Collapse items={itemStat} size="small" />
+      </div>
+    );
+  };
+
+  const getMatsContent = () => {
+    const columnsWorldMats: ColumnsType<EternalWorldTalismanMats> = [
+      {
+        title: "Enhancement",
+        dataIndex: "encLevel",
+      },
+      {
+        title: (
+          <div>
+            <p>Eternal Dim. Apparition</p>
+            <p>Gold</p>
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (_, { apparition, gold }) => (
+          <div>
+            <p>{apparition.toLocaleString()} (app)</p>
+            <p>{gold.toLocaleString()} (g)</p>
+          </div>
+        ),
+      },
+      {
+        title: "Eternal Dimensional Apparition",
+        responsive: ["sm"],
+        render: (_, { apparition }) => (
+          <Text>{apparition.toLocaleString()}</Text>
+        ),
+      },
+      {
+        title: "Gold",
+        responsive: ["sm"],
+        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
+      },
+    ];
+    const columnsPainMats: ColumnsType<EternalPainTalismanMats> = [
+      {
+        title: "Enhancement",
+        dataIndex: "encLevel",
+      },
+      {
+        title: (
+          <div>
+            <p>Eternal Dim. Apparition</p>
+            <p>Eternal Pain Vortex</p>
+            <p>Gold</p>
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (_, { apparition, vortex, gold }) => (
+          <div>
+            <p>{apparition.toLocaleString()} (app)</p>
+            <p>{vortex.toLocaleString()} (vort)</p>
+            <p>{gold.toLocaleString()} (g)</p>
+          </div>
+        ),
+      },
+      {
+        title: "Eternal Dimensional Apparition",
+        responsive: ["sm"],
+        render: (_, { apparition }) => (
+          <Text>{apparition.toLocaleString()}</Text>
+        ),
+      },
+      {
+        title: "Eternal Pain Vortex",
+        responsive: ["sm"],
+        render: (_, { vortex }) => <Text>{vortex.toLocaleString()}</Text>,
+      },
+      {
+        title: "Gold",
+        responsive: ["sm"],
+        width: 70,
+        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
+      },
+    ];
+
+    const itemStat: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Eternal World Talisman",
+        children: (
+          <div style={{ marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={EternalWorldTalismanMatsTable}
+              columns={columnsWorldMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Eternal Pain Talisman",
+        children: (
+          <div style={{ marginRight: 10 }}>
+            <Table
+              size={"small"}
+              dataSource={EternalPainTalismanMatsTable}
+              columns={columnsPainMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
+      },
+      {
+        key: "3",
+        label: "Eternal Chaos Talisman",
+        children: (
+          <div style={{ marginRight: 10 }}>
+            <i>notes: You cannot craft this type of talisman.</i>
           </div>
         ),
       },
@@ -202,7 +383,7 @@ const ExternalTalismanContent = () => {
     {
       key: "2",
       label: "Mats",
-      //   children: getMatsContent(),
+      children: getMatsContent(),
     },
     {
       key: "3",

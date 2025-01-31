@@ -109,7 +109,7 @@ export const EternalChaosTalismanStatTable: EternalChaosTalismanStat = {
   criticalDamage: [225000, 112500, -112500, -225000],
   phyDef: [15000, 7500, -7500, -15000],
   magDef: [15000, 7500, -7500, -15000],
-  fd: [600],
+  fd: [0, 600],
 };
 
 export const EternalWorldTalismanMatsTable: EternalWorldTalismanMats[] = [
