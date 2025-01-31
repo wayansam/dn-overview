@@ -3,9 +3,9 @@ import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
-import { columnsResource } from "../../constants/Common.constants";
 import { ErosionConquerorJadeMaterialTable } from "../../data/ErosionData";
 import { ErosionConquerorJadeMaterial } from "../../interface/Item.interface";
+import { columnsResource } from "../../utils/common.util";
 
 const style: React.CSSProperties = {
   display: "inline-block",

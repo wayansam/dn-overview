@@ -13,7 +13,6 @@ import {
 } from "antd";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { columnsResource } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -24,6 +23,7 @@ import {
 } from "../../data/KilosData";
 import { KilosCalculator } from "../../interface/Common.interface";
 import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
+import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;

@@ -14,7 +14,6 @@ import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
-import { columnsResource } from "../../constants/Common.constants";
 import {
   NamedEODMainStatTable,
   NamedEODMaterialTable,
@@ -22,6 +21,7 @@ import {
 } from "../../data/NamedEODData";
 import { NamedEODMaterial } from "../../interface/Item.interface";
 import { NamedEODStat } from "../../interface/ItemStat.interface";
+import { columnsResource } from "../../utils/common.util";
 
 const { Text } = Typography;
 

@@ -12,7 +12,6 @@ import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
-import { columnsResource } from "../../constants/Common.constants";
 import {
   AncientGoddesHeraDisassemblyItemTable,
   AncientGoddesHeraRequiredItemTable,
@@ -23,6 +22,7 @@ import {
   AncientGoddesHeraRequiredItem,
 } from "../../interface/Item.interface";
 import { AncientGoddesHeraStat } from "../../interface/ItemStat.interface";
+import { columnsResource } from "../../utils/common.util";
 
 const { Text } = Typography;
 

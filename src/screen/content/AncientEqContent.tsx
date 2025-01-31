@@ -11,7 +11,6 @@ import {
 } from "antd";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { columnsResource } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -21,6 +20,7 @@ import {
 } from "../../data/AncientData";
 import { AncientCalculator } from "../../interface/Common.interface";
 import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
+import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;

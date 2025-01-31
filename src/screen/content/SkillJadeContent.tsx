@@ -12,7 +12,6 @@ import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
-import { columnsResource } from "../../constants/Common.constants";
 import {
   AncientDJSkillMaterialTable,
   AncientDJSkillStatTable,
@@ -20,6 +19,7 @@ import {
   DMFDJSkillStatTable,
 } from "../../data/SkillJadeData";
 import { SkillJadeStat } from "../../interface/ItemStat.interface";
+import { columnsResource } from "../../utils/common.util";
 
 const { Text } = Typography;
 

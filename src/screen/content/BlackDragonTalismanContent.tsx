@@ -11,7 +11,6 @@ import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
-import { columnsResource } from "../../constants/Common.constants";
 import { ITEM_RARITY } from "../../constants/InGame.constants";
 import {
   BDAncientElementTalismanStatTable,
@@ -35,7 +34,12 @@ import {
   BDTitanionTalismanStat,
   BDUmbalaTalismanStat,
 } from "../../interface/ItemStat.interface";
-import { getColor, getTextEmpty } from "../../utils/common.util";
+import {
+  columnsResource,
+  getColor,
+  getComparedData,
+  getTextEmpty,
+} from "../../utils/common.util";
 const { Text } = Typography;
 
 interface TalismanTableMaterialList {
@@ -601,11 +605,6 @@ const BlackDragonTalismanContent = () => {
       tempEssence,
     };
   };
-  function getComparedData<T>(arr: Array<T>, min: number, max: number) {
-    const dt1 = arr.length >= min ? arr[min - 1] : undefined;
-    const dt2 = arr.length >= max ? arr[max - 1] : undefined;
-    return { dt1, dt2 };
-  }
 
   // Baofa
   const baofaDataSource: BaofaTableMaterialList | undefined = useMemo(() => {

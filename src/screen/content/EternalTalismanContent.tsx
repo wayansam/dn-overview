@@ -1,5 +1,15 @@
-import { Collapse, CollapseProps, Table, Typography } from "antd";
+import {
+  Collapse,
+  CollapseProps,
+  Divider,
+  Slider,
+  Table,
+  Typography,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
+import { useMemo, useState } from "react";
+import ListingCard from "../../components/ListingCard";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
 import {
   EternalChaosTalismanStatTable,
   EternalPainTalismanMatsTable,
@@ -16,10 +26,48 @@ import {
   EternalPainTalismanStat,
   EternalWorldTalismanStat,
 } from "../../interface/ItemStat.interface";
-import { getTextEmpty } from "../../utils/common.util";
+import {
+  columnsResource,
+  getComparedData,
+  getTextEmpty,
+} from "../../utils/common.util";
 const { Text } = Typography;
 
+const style: React.CSSProperties = {
+  display: "inline-block",
+  height: 300,
+  marginLeft: 20,
+  marginRight: 50,
+  marginTop: 10,
+  marginBottom: 30,
+};
+
+interface WorldTableMaterialList {
+  "Eternal Dimensional Apparition": number;
+  Gold: number;
+}
+interface PainTableMaterialList {
+  "Eternal Dimensional Apparition": number;
+  "Eternal Pain Vortex": number;
+  Gold: number;
+}
+
 const ExternalTalismanContent = () => {
+  const [worldData, setWorldData] = useState([0, 10]);
+  const [painData, setPainData] = useState([0, 5]);
+
+  const getRemarks = (N: number) => {
+    const temp = Array.from({ length: N }, (_, i) => (i + 1).toString());
+
+    return temp.reduce(
+      (obj, key) => {
+        return { ...obj, [key]: `lv.${key}` };
+      },
+      { 0: "Don't have" }
+    );
+  };
+  console.log({ temp: getRemarks(10) });
+
   const getStatContent = () => {
     const columnsWorldStats: ColumnsType<EternalWorldTalismanStat> = [
       {
@@ -374,6 +422,228 @@ const ExternalTalismanContent = () => {
     );
   };
 
+  const worldDataSource: WorldTableMaterialList = useMemo(() => {
+    const tempSlice = EternalWorldTalismanMatsTable.slice(
+      worldData[0],
+      worldData[1]
+    );
+    let tempApp = 0;
+    let tempGold = 0;
+
+    tempSlice.forEach((slicedItem) => {
+      tempApp += slicedItem.apparition;
+      tempGold += slicedItem.gold;
+    });
+    const temp: WorldTableMaterialList = {
+      "Eternal Dimensional Apparition": tempApp,
+      Gold: tempGold,
+    };
+    return temp;
+  }, [worldData]);
+
+  const worldStatDiff: EternalWorldTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      EternalWorldTalismanStatTable,
+      worldData[0],
+      worldData[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      encLevel: 0,
+      attack: (dt2.attack ?? 0) - (dt1.attack ?? 0),
+      attributePercent:
+        (dt2.attributePercent ?? 0) - (dt1.attributePercent ?? 0),
+      maxHP: (dt2.maxHP ?? 0) - (dt1.maxHP ?? 0),
+    };
+  }, [worldData]);
+
+  const getWorldCalc = () => {
+    const onAfterChange = (value: number[]) => {
+      setWorldData(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={getRemarks(10)}
+            defaultValue={[0, 10]}
+            max={10}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          <Divider orientation="left">Materials</Divider>
+          <Table
+            size={"small"}
+            dataSource={Object.entries(worldDataSource).map(([key, value]) => ({
+              mats: key,
+              amount: value,
+            }))}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK",
+                value: worldStatDiff?.attack,
+                format: true,
+              },
+              {
+                title: "Attribute",
+                value: worldStatDiff?.attributePercent,
+                suffix: "%",
+              },
+              {
+                title: "MAX HP",
+                value: worldStatDiff?.maxHP,
+                format: true,
+              },
+            ]}
+          />
+        </div>
+
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Eternal Dimensional Apparition",
+                amt: worldDataSource["Eternal Dimensional Apparition"],
+              },
+            ]}
+            additionalTotal={worldDataSource.Gold}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const painDataSource: PainTableMaterialList = useMemo(() => {
+    const tempSlice = EternalPainTalismanMatsTable.slice(
+      painData[0],
+      painData[1]
+    );
+    let tempApp = 0;
+    let tempVortex = 0;
+    let tempGold = 0;
+
+    tempSlice.forEach((slicedItem) => {
+      tempApp += slicedItem.apparition;
+      tempVortex += slicedItem.vortex;
+      tempGold += slicedItem.gold;
+    });
+    const temp: PainTableMaterialList = {
+      "Eternal Dimensional Apparition": tempApp,
+      "Eternal Pain Vortex": tempVortex,
+      Gold: tempGold,
+    };
+    return temp;
+  }, [painData]);
+
+  const painStatDiff: EternalPainTalismanStat | undefined = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(
+      EternalPainTalismanStatTable,
+      painData[0],
+      painData[1]
+    );
+    if (!dt2) {
+      return;
+    }
+    if (!dt1) {
+      return dt2;
+    }
+    return {
+      encLevel: 0,
+      attack: (dt2.attack ?? 0) - (dt1.attack ?? 0),
+      fd: (dt2.fd ?? 0) - (dt1.fd ?? 0),
+      maxHP: (dt2.maxHP ?? 0) - (dt1.maxHP ?? 0),
+    };
+  }, [painData]);
+
+  const getPainCalc = () => {
+    const onAfterChange = (value: number[]) => {
+      setPainData(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={getRemarks(5)}
+            defaultValue={[0, 5]}
+            max={5}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          <Divider orientation="left">Materials</Divider>
+          <Table
+            size={"small"}
+            dataSource={Object.entries(painDataSource).map(([key, value]) => ({
+              mats: key,
+              amount: value,
+            }))}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK",
+                value: painStatDiff?.attack,
+                format: true,
+              },
+              {
+                title: "FD",
+                value: painStatDiff?.fd,
+                format: true,
+              },
+              {
+                title: "MAX HP",
+                value: painStatDiff?.maxHP,
+                format: true,
+              },
+            ]}
+          />
+        </div>
+
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Eternal Dimensional Apparition",
+                amt: painDataSource["Eternal Dimensional Apparition"],
+              },
+              {
+                name: "Eternal Pain Vortex",
+                amt: painDataSource["Eternal Pain Vortex"],
+              },
+            ]}
+            additionalTotal={painDataSource.Gold}
+          />
+        </div>
+      </div>
+    );
+  };
+
   const items: CollapseProps["items"] = [
     {
       key: "1",
@@ -388,22 +658,17 @@ const ExternalTalismanContent = () => {
     {
       key: "3",
       label: "Eternal World Talisman",
-      //   children: getBMCalc(),
+      children: getWorldCalc(),
     },
     {
       key: "4",
       label: "Eternal Pain Talisman",
-      //   children: getVCalc(),
-    },
-    {
-      key: "5",
-      label: "Eternal Chaos Talisman",
-      //   children: getAncCalc(),
+      children: getPainCalc(),
     },
   ];
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["1"]} />
+      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
     </div>
   );
 };
