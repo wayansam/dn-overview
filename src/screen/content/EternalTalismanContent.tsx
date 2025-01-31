@@ -66,7 +66,6 @@ const ExternalTalismanContent = () => {
       { 0: "Don't have" }
     );
   };
-  console.log({ temp: getRemarks(10) });
 
   const getStatContent = () => {
     const columnsWorldStats: ColumnsType<EternalWorldTalismanStat> = [
