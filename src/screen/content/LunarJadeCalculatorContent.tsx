@@ -689,11 +689,17 @@ const LunarJadeCalculatorContent = () => {
       title: "Fragment",
       dataIndex: "amountFragment",
       width: 150,
+      render: (_, { amountFragment }) => (
+        <Text>{amountFragment.toLocaleString()}</Text>
+      ),
     },
     {
       title: "High Grade Fragment",
       dataIndex: "amountHGFragment",
       width: 150,
+      render: (_, { amountHGFragment }) => (
+        <Text>{amountHGFragment.toLocaleString()}</Text>
+      ),
     },
   ];
 

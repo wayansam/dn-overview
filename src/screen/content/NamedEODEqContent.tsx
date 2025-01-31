@@ -14,6 +14,7 @@ import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
+import { columnsResource } from "../../constants/Common.constants";
 import {
   NamedEODMainStatTable,
   NamedEODMaterialTable,
@@ -23,11 +24,6 @@ import { NamedEODMaterial } from "../../interface/Item.interface";
 import { NamedEODStat } from "../../interface/ItemStat.interface";
 
 const { Text } = Typography;
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 const style: React.CSSProperties = {
   display: "inline-block",
@@ -62,15 +58,6 @@ const NamedEODEqContent = () => {
   const [namedEODData, setNamedEODData] = useState([0, 5]);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [selectedStat, setSelectedStat] = useState(0);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   const columnsMats: ColumnsType<NamedEODMaterial> = [
     {

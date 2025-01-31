@@ -3,13 +3,9 @@ import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import { columnsResource } from "../../constants/Common.constants";
 import { ErosionConquerorJadeMaterialTable } from "../../data/ErosionData";
 import { ErosionConquerorJadeMaterial } from "../../interface/Item.interface";
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 const style: React.CSSProperties = {
   display: "inline-block",
@@ -38,15 +34,6 @@ const ErosionJadeContent = () => {
   const [erosionData, setErosionData] = useState([0, 10]);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedTier, setCheckedTier] = useState(false);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   const columnsMats: ColumnsType<ErosionConquerorJadeMaterial> = [
     {

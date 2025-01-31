@@ -13,6 +13,7 @@ import {
 } from "antd";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { columnsResource } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -46,11 +47,6 @@ const opt = (start: number, end: number) =>
     label: getLabel(item),
     value: item,
   }));
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 enum TAB {
   EQ = "Equipment",
@@ -436,15 +432,6 @@ const KilosEqContent = () => {
     }
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({

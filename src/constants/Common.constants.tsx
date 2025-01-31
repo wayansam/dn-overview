@@ -1,4 +1,7 @@
+import { Typography } from "antd";
+import { ColumnsType } from "antd/es/table";
 import { SideBarGroupTab } from "../interface/Common.interface";
+const { Text } = Typography;
 
 export const TAB_KEY = {
   mainGeneral: "General",
@@ -94,5 +97,20 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
         name: TAB_KEY.setting,
       },
     ],
+  },
+];
+
+export interface TableResource {
+  mats: string;
+  amount: number;
+}
+
+export const columnsResource: ColumnsType<TableResource> = [
+  { title: "Materials", dataIndex: "mats" },
+  {
+    title: "Amount",
+    dataIndex: "amount",
+    width: 150,
+    render: (_, { amount }) => <Text>{amount.toLocaleString()}</Text>,
   },
 ];

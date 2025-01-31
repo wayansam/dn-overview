@@ -12,6 +12,7 @@ import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
+import { columnsResource } from "../../constants/Common.constants";
 import {
   AncientDJSkillMaterialTable,
   AncientDJSkillStatTable,
@@ -21,11 +22,6 @@ import {
 import { SkillJadeStat } from "../../interface/ItemStat.interface";
 
 const { Text } = Typography;
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 interface DreamyTableMaterialList {
   "Dreamy Core": number;
@@ -91,15 +87,6 @@ const SkillJadeContent = () => {
   const [DData, setDData] = useState([0, 10]);
   const [BMData, setBMData] = useState([0, 10]);
   const [VData, setVData] = useState([0, 10]);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   const getStatDiff = (arr: SkillJadeStat[], min: number, max: number) => {
     const dt1 = arr.length > min ? arr[min] : undefined;

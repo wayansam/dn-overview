@@ -12,6 +12,7 @@ import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
+import { columnsResource } from "../../constants/Common.constants";
 import {
   AncientGoddesHeraDisassemblyItemTable,
   AncientGoddesHeraRequiredItemTable,
@@ -24,11 +25,6 @@ import {
 import { AncientGoddesHeraStat } from "../../interface/ItemStat.interface";
 
 const { Text } = Typography;
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 const style: React.CSSProperties = {
   display: "inline-block",
@@ -55,15 +51,6 @@ const AncientHeraldryContent = () => {
   const [heraldryData, setHeraldryData] = useState([0, 10]);
   const [convertToFrag, setConvertToFrag] = useState<boolean>(false);
 
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
-
   const columnsRequired: ColumnsType<AncientGoddesHeraRequiredItem> = [
     {
       title: "Enhancement",
@@ -88,11 +75,13 @@ const AncientHeraldryContent = () => {
       title: "Ancients' Blueprint",
       dataIndex: "ab",
       responsive: ["sm"],
+      render: (_, { ab }) => <Text>{ab.toLocaleString()}</Text>,
     },
     {
       title: "Ancients' Blueprint Fragment",
       dataIndex: "abFrag",
       responsive: ["sm"],
+      render: (_, { abFrag }) => <Text>{abFrag.toLocaleString()}</Text>,
     },
   ];
 
@@ -104,6 +93,7 @@ const AncientHeraldryContent = () => {
     {
       title: "Ancients' Blueprint Fragment",
       dataIndex: "abFrag",
+      render: (_, { abFrag }) => <Text>{abFrag.toLocaleString()}</Text>,
     },
   ];
   const columnsStat: ColumnsType<AncientGoddesHeraStat> = [

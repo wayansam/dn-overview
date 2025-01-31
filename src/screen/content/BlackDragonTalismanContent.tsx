@@ -11,6 +11,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
+import { columnsResource } from "../../constants/Common.constants";
 import { ITEM_RARITY } from "../../constants/InGame.constants";
 import {
   BDAncientElementTalismanStatTable,
@@ -36,11 +37,6 @@ import {
 } from "../../interface/ItemStat.interface";
 import { getColor, getTextEmpty } from "../../utils/common.util";
 const { Text } = Typography;
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 interface TalismanTableMaterialList {
   "Black Dragon Memories": number;
@@ -91,15 +87,6 @@ const BlackDragonTalismanContent = () => {
   const [umbalaRange, setUmbalaRange] = useState(defaultRange);
   const [melukaRange, setMelukaRange] = useState(defaultRange);
   const [titanRange, setTitanRange] = useState(defaultRange);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   const getMarkKey = (from: number, to: number) => {
     const markKey = ["0", "1", "2", "3", "4", "5", "6", "7"];
@@ -349,7 +336,7 @@ const BlackDragonTalismanContent = () => {
         key: "1",
         label: "Baofa",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDBaofaTalismanStatTable}
@@ -364,7 +351,7 @@ const BlackDragonTalismanContent = () => {
         key: "2",
         label: "Umbala",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDUmbalaTalismanStatTable}
@@ -379,7 +366,7 @@ const BlackDragonTalismanContent = () => {
         key: "3",
         label: "Meluka",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDMelukaTalismanStatTable}
@@ -394,7 +381,7 @@ const BlackDragonTalismanContent = () => {
         key: "4",
         label: "Titanion",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDTitanionTalismanStatTable}
@@ -409,7 +396,7 @@ const BlackDragonTalismanContent = () => {
         key: "5",
         label: "Keen",
         children: (
-          <div style={{ width: 700, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDKeenTalismanStatTable}
@@ -424,7 +411,7 @@ const BlackDragonTalismanContent = () => {
         key: "6",
         label: "Ancient Element",
         children: (
-          <div style={{ width: 600, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDAncientElementTalismanStatTable}
@@ -451,7 +438,7 @@ const BlackDragonTalismanContent = () => {
       {
         title: "Stage Rarity",
         dataIndex: "rarity",
-        width: 150,
+        width: 80,
         render: (_, { rarity }) => (
           <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
         ),
@@ -469,11 +456,11 @@ const BlackDragonTalismanContent = () => {
         responsive: ["xs"],
         render: (_, { bdMemories, fragment, garnet, essence, gold }) => (
           <div>
-            <p>{bdMemories}</p>
-            <p>{fragment}</p>
-            <p>{garnet}</p>
-            <p>{essence}</p>
-            <p>{gold}</p>
+            <p>{bdMemories.toLocaleString()} (BD memo)</p>
+            <p>{fragment.toLocaleString()} (frag)</p>
+            <p>{garnet.toLocaleString()} (garnet)</p>
+            <p>{essence.toLocaleString()} (ess)</p>
+            <p>{gold.toLocaleString()} (g)</p>
           </div>
         ),
       },
@@ -481,26 +468,34 @@ const BlackDragonTalismanContent = () => {
         title: "Black Dragon Memories",
         dataIndex: "bdMemories",
         responsive: ["sm"],
+        render: (_, { bdMemories }) => (
+          <Text>{bdMemories.toLocaleString()}</Text>
+        ),
       },
       {
         title: `${type} Fragment`,
         dataIndex: "fragment",
         responsive: ["sm"],
+        render: (_, { fragment }) => <Text>{fragment.toLocaleString()}</Text>,
       },
       {
         title: "Garnet",
         dataIndex: "garnet",
         responsive: ["sm"],
+        render: (_, { garnet }) => <Text>{garnet.toLocaleString()}</Text>,
       },
       {
         title: "Essence",
         dataIndex: "essence",
         responsive: ["sm"],
+        render: (_, { essence }) => <Text>{essence.toLocaleString()}</Text>,
       },
       {
         title: "Gold",
         dataIndex: "gold",
         responsive: ["sm"],
+        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
+        width: 90,
       },
     ];
   };
@@ -511,7 +506,7 @@ const BlackDragonTalismanContent = () => {
         key: "1",
         label: "Baofa",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDBaofaTalismanMatsTable.filter(
@@ -528,7 +523,7 @@ const BlackDragonTalismanContent = () => {
         key: "2",
         label: "Umbala",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDUmbalaTalismanMatsTable.filter(
@@ -545,7 +540,7 @@ const BlackDragonTalismanContent = () => {
         key: "3",
         label: "Meluka",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDMelukaTalismanMatsTable.filter(
@@ -562,7 +557,7 @@ const BlackDragonTalismanContent = () => {
         key: "4",
         label: "Titanion",
         children: (
-          <div style={{ width: 500, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={BDTitanionTalismanMatsTable.filter(

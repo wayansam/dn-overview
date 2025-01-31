@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { columnsResource } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -39,11 +40,6 @@ const opt = (start: number, end: number) =>
     label: item,
     value: item,
   }));
-
-interface TableResource {
-  mats: string;
-  amount: number;
-}
 
 enum TAB {
   EQ = "Equipment",
@@ -382,36 +378,6 @@ const AncientEqContent = () => {
     });
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
-
-  const columnsResource: ColumnsType<TableResource> = [
-    // {
-    //   title: "Enhancement",
-    //   dataIndex: "encLevel",
-    // },
-    // {
-    //   title: "Eq. Fragment",
-    //   dataIndex: "eqTypeFragment",
-    // },
-    // {
-    //   title: "A. Knowledge",
-    //   dataIndex: "ancKnowledge",
-    // },
-    // {
-    //   title: "A. Insignia",
-    //   dataIndex: "ancInsignia",
-    // },
-    // {
-    //   title: "Gold",
-    //   dataIndex: "gold",
-    // },
-
-    { title: "Materials", dataIndex: "mats" },
-    {
-      title: "Amount",
-      dataIndex: "amount",
-      width: 150,
-    },
-  ];
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
