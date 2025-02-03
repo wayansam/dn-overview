@@ -15,6 +15,8 @@ import TradingHouseCalc from "../../components/TradingHouseCalc";
 import {
   AncientDJSkillMaterialTable,
   AncientDJSkillStatTable,
+  DimensionalDJSkillMaterialTable,
+  DimensionalDJSkillStatTable,
   DMFDJSkillMaterialTable,
   DMFDJSkillStatTable,
 } from "../../data/SkillJadeData";
@@ -44,6 +46,12 @@ interface VerdureTableMaterialList {
 interface AncientTableMaterialList {
   "Ancient Broken Dragon Jade Fragments": number;
   "Ancient Dragon Jade Fragments": number;
+  Gold: number;
+}
+
+interface DimensionalTableMaterialList {
+  "Dimensional Core": number;
+  "High Purity Dimensional Core": number;
   Gold: number;
 }
 
@@ -87,6 +95,7 @@ const SkillJadeContent = () => {
   const [DData, setDData] = useState([0, 10]);
   const [BMData, setBMData] = useState([0, 10]);
   const [VData, setVData] = useState([0, 10]);
+  const [DmData, setDmData] = useState([0, 10]);
 
   const getStatDiff = (arr: SkillJadeStat[], min: number, max: number) => {
     const dt1 = arr.length > min ? arr[min] : undefined;
@@ -518,6 +527,102 @@ const SkillJadeContent = () => {
     );
   };
 
+  const dmDataSource: DimensionalTableMaterialList = useMemo(() => {
+    const tempSlice = DimensionalDJSkillMaterialTable.slice(DmData[0], DmData[1]);
+    let tempHFrag = 0;
+    let tempLFrag = 0;
+    let tempGold = 0;
+
+    tempSlice.forEach((slicedItem) => {
+      tempHFrag += slicedItem.higherFragment;
+      tempLFrag += slicedItem.lowerFragment;
+      tempGold += slicedItem.gold;
+    });
+    const temp: DimensionalTableMaterialList = {
+      "Dimensional Core": tempLFrag,
+      "High Purity Dimensional Core": tempHFrag,
+      Gold: tempGold,
+    };
+    return temp;
+  }, [DmData]);
+
+  const showDmWarning = useMemo(() => {
+    return DmData.some((dt) => dt > 10);
+  }, [DmData]);
+
+  const statRangeDm: SkillJadeStat = useMemo(() => {
+    return getStatDiff(DimensionalDJSkillStatTable, DmData[0], DmData[1]);
+  }, [DmData]);
+
+  const getDmCalc = () => {
+    const onAfterChange = (value: number[]) => {
+      setDmData(value);
+    };
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={style}>
+          <Slider
+            vertical
+            range
+            marks={marks}
+            defaultValue={[0, 10]}
+            max={15}
+            min={0}
+            onAfterChange={onAfterChange}
+          />
+        </div>
+        <div>
+          {showDmWarning && (
+            <div>
+              <Alert
+                banner
+                message="From +11 onward, the enhancement might fail"
+                type="warning"
+              />
+            </div>
+          )}
+          <Table
+            size={"small"}
+            dataSource={Object.entries(dmDataSource).map(([key, value]) => ({
+              mats: key,
+              amount: value,
+            }))}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+          {statRangeDm && (
+            <div>
+              <Card size="small" style={{ marginTop: 4 }}>
+                <Space direction="vertical">
+                  <Text>ATK +{statRangeDm.attackPercent}%</Text>
+                  <Text>Cooldown Decrease {statRangeDm.cooldownPercent}%</Text>
+                </Space>
+              </Card>
+            </div>
+          )}
+        </div>
+        <div>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Dimensional Core",
+                amt: dmDataSource["Dimensional Core"],
+              },
+              {
+                name: "High Purity Dimensional Core",
+                amt: dmDataSource["High Purity Dimensional Core"],
+                useCustomAmt: true,
+              },
+            ]}
+            additionalTotal={dmDataSource.Gold}
+          />
+        </div>
+      </div>
+    );
+  };
+
   const items: CollapseProps["items"] = [
     {
       key: "1",
@@ -548,6 +653,16 @@ const SkillJadeContent = () => {
               bordered
             />
           </div>
+          <div style={{ width: 500, marginRight: 30 }}>
+            <Title level={5}>{"Dimensional Dragon Jade"}</Title>
+            <Table
+              size={"small"}
+              dataSource={DimensionalDJSkillStatTable}
+              columns={getColumnsStats(true)}
+              pagination={false}
+              bordered
+            />
+          </div>
         </div>
       ),
     },
@@ -571,11 +686,16 @@ const SkillJadeContent = () => {
       label: "Ancient Dragon Jade",
       children: getAncCalc(),
     },
+    {
+      key: "6",
+      label: "Dimensional Dragon Jade",
+      children: getDmCalc(),
+    },
   ];
 
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["5"]} />
+      <Collapse items={items} size="small" defaultActiveKey={["6"]} />
     </div>
   );
 };
