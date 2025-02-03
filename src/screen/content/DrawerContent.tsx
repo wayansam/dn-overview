@@ -62,7 +62,7 @@ const getItems: (
           <p>
             <b>
               The Max settings for armor is only available with tier 2 Ancient
-              Armor where you can put additional attack jade in it.
+              Armor and its upgrade (can put additional attack jade in it) & VIP ring (put additional defense jade in it start from Evo Ring).
             </b>
           </p>
           <p>
