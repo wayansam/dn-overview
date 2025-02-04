@@ -1,5 +1,5 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Drawer, FloatButton, theme } from "antd";
+import { Col, Drawer, FloatButton, Grid, Row, Space, theme, Image } from "antd";
 import { useMemo, useState } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
@@ -16,16 +16,24 @@ import NamedEODEqContent from "./NamedEODEqContent";
 import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
 
+const { useBreakpoint } = Grid;
+
+
 const MainContent = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  const [open, setOpen] = useState(false);
-
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
   );
+  const isImgEnabled = useAppSelector((state) => state.UIState.isImgEnabled);
+  const imgData = useAppSelector((state) => state.UIState.imgData);
+
+  const [open, setOpen] = useState(false);
+  const screens = useBreakpoint();
+  console.log({ screens });
+  const isShowingImg = !!(isImgEnabled && imgData)
 
   const content = useMemo(() => {
     switch (selectedSideBar.key) {
@@ -67,19 +75,44 @@ const MainContent = () => {
     }
   }, [selectedSideBar]);
 
+  const imgComponent = imgData ? (<div style={
+    {
+      marginLeft: 8,
+      display: 'flex',
+      justifyContent: 'flex-end',
+      marginRight: -16
+    }
+  }>
+    <Image
+      // width={200}
+      src={imgData.url}
+      style={{ maxWidth: '100%', height: 'auto' }}
+      preview={false}
+    />
+  </div>) : <div></div>
+
   return (
     <>
-      <div
-        style={{
-          padding: 24,
-          background: colorBgContainer,
-          borderRadius: 24,
-          boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.1)",
-          marginBottom: 20,
-        }}
-      >
-        {content}
-      </div>
+      {screens.xs && isShowingImg && imgData?.onTop && imgComponent}
+      <Row>
+        <Col span={!screens.xs && isShowingImg ? 18 : 24}>
+          <div
+            style={{
+              padding: 24,
+              background: colorBgContainer,
+              borderRadius: 24,
+              boxShadow: "10px 10px 10px 0px rgba(0,0,0,0.1)",
+              marginBottom: 20,
+            }}
+          >
+            {content}
+          </div>
+        </Col>
+        <Col span={!screens.xs && isShowingImg ? 6 : 0}>
+          {imgComponent}
+        </Col>
+      </Row>
+      {screens.xs && isShowingImg && !imgData?.onTop && imgComponent}
       <FloatButton
         icon={<QuestionCircleOutlined />}
         type="primary"

@@ -3,7 +3,7 @@ import Title from "antd/es/typography/Title";
 import { useEffect } from "react";
 import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { setIsDarkMode } from "../slice/UIState.reducer";
+import { setImgData, setIsDarkMode, setIsImgEnabled } from "../slice/UIState.reducer";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
 
@@ -11,10 +11,18 @@ const { Header, Content, Footer } = Layout;
 
 const MainPage = () => {
   const dispatch = useAppDispatch();
-  const dm = localStorage.getItem(LS_KEYS.dark_mode);
   const { defaultAlgorithm, darkAlgorithm } = theme;
+
+  const dm = localStorage.getItem(LS_KEYS.dark_mode);
+  const imgEn = localStorage.getItem(LS_KEYS.img_enabled);
+  const imgDt = localStorage.getItem(LS_KEYS.img_data);
+  const imgDtJson = imgDt ? JSON.parse(imgDt) : null;
+
+
   useEffect(() => {
     dispatch(setIsDarkMode(dm === "true"));
+    dispatch(setIsImgEnabled(imgEn === "true"));
+    dispatch(setImgData(imgDtJson));
   }, []);
 
   const {

@@ -1,15 +1,21 @@
-import { Card, Divider, List, Space, Switch, Typography } from "antd";
+import { Button, Card, Divider, Form, Input, List, Space, Switch, Typography } from "antd";
 import { LS_KEYS } from "../../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { setIsDarkMode, setSelectedSideBar } from "../../slice/UIState.reducer";
+import { setImgData, setIsDarkMode, setIsImgEnabled, setSelectedSideBar } from "../../slice/UIState.reducer";
 import { SideBarTab } from "../../interface/Common.interface";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { BaseType } from "antd/es/typography/Base";
 import Link from "antd/es/typography/Link";
+import { useEffect } from "react";
 
 const SettingContent = () => {
   const dispatch = useAppDispatch();
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
+  const isImgEnabled = useAppSelector((state) => state.UIState.isImgEnabled);
+  const imgData = useAppSelector((state) => state.UIState.imgData);
+
+  const [form] = Form.useForm();
+
 
   enum keyUpdate {
     N = 'New', U = 'Update', P = 'Planned', I = 'In Progress'
@@ -61,19 +67,81 @@ const SettingContent = () => {
       </Link>}
     </List.Item>
   )
+
+  // test https://media.tenor.com/_iNTPDlgTgEAAAAj/coffee-bara-capybara.gif
+  useEffect(() => {
+    form.setFieldsValue(imgData);
+  }, [imgData]);
+
+  const onFinish = (values: any) => {
+    dispatch(setImgData(values));
+    localStorage.setItem(LS_KEYS.img_data, JSON.stringify(values));
+  };
+  const onReset = () => {
+    form.resetFields();
+    dispatch(setImgData(null));
+    localStorage.removeItem(LS_KEYS.img_data);
+  };
+
   return (
     <div>
       <Card size="small" style={{ marginTop: 4 }}>
         <Divider orientation="left">Display Settings</Divider>
-        <Space direction="horizontal">
-          <Switch
-            onChange={(e) => {
-              localStorage.setItem(LS_KEYS.dark_mode, JSON.stringify(e));
-              dispatch(setIsDarkMode(e));
-            }}
-            checked={isDarkMode}
-          />
-          Dark Mode
+        <Space direction="vertical">
+          <Space direction="horizontal">
+            <Switch
+              onChange={(e) => {
+                localStorage.setItem(LS_KEYS.dark_mode, JSON.stringify(e));
+                dispatch(setIsDarkMode(e));
+              }}
+              checked={isDarkMode}
+            />
+            Dark Mode
+          </Space>
+          <Space direction="horizontal">
+            <Switch
+              onChange={(e) => {
+                localStorage.setItem(LS_KEYS.img_enabled, JSON.stringify(e));
+                dispatch(setIsImgEnabled(e));
+              }}
+              checked={isImgEnabled}
+            />
+            Use Custom Image
+          </Space>
+          <Card>
+            <Form
+              labelCol={{ span: 8 }}
+              wrapperCol={{ span: 16 }}
+              form={form}
+              name="control-hooks"
+              onFinish={onFinish}
+              style={{ maxWidth: 600 }}
+              disabled={!isImgEnabled}
+            >
+              <Form.Item name="url"
+                label="URL"
+                rules={[{ required: true }, { type: 'url', warningOnly: true }, { type: 'string', min: 6 }]}
+              >
+                <Input />
+              </Form.Item>
+              <Form.Item name="onTop" label="On Top" valuePropName="checked">
+                <Switch />
+              </Form.Item>
+
+              <Form.Item {... {
+                wrapperCol: { offset: 8, span: 16 },
+              }}>
+                <Space>
+                  <Button type="primary" htmlType="submit">
+                    Submit
+                  </Button>
+                  <Button htmlType="button" onClick={onReset}>
+                    Reset
+                  </Button>
+                </Space>
+              </Form.Item>
+            </Form>
+          </Card>
         </Space>
 
         <Divider orientation="left">What's New</Divider>
@@ -94,7 +162,7 @@ const SettingContent = () => {
           />
         </Space>
       </Card>
-    </div>
+    </div >
   );
 };
 
