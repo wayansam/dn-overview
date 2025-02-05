@@ -5,6 +5,7 @@ import { SideBarTab } from "../interface/Common.interface";
 export interface ImageData {
   url: string;
   onTop: boolean;
+  stickyWall: boolean;
 }
 interface UIState {
   selectedSideBar: SideBarTab;

@@ -117,6 +117,7 @@ const SettingContent = () => {
               onFinish={onFinish}
               style={{ maxWidth: 600 }}
               disabled={!isImgEnabled}
+              size={'small'}
             >
               <Form.Item name="url"
                 label="URL"
@@ -125,6 +126,9 @@ const SettingContent = () => {
                 <Input />
               </Form.Item>
               <Form.Item name="onTop" label="On Top" valuePropName="checked">
+                <Switch />
+              </Form.Item>
+              <Form.Item name="stickyWall" label="Stick to Wall" valuePropName="checked">
                 <Switch />
               </Form.Item>
 

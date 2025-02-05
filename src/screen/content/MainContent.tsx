@@ -32,7 +32,6 @@ const MainContent = () => {
 
   const [open, setOpen] = useState(false);
   const screens = useBreakpoint();
-  console.log({ screens });
   const isShowingImg = !!(isImgEnabled && imgData)
 
   const content = useMemo(() => {
@@ -80,7 +79,7 @@ const MainContent = () => {
       marginLeft: 8,
       display: 'flex',
       justifyContent: 'flex-end',
-      marginRight: -16
+      marginRight: imgData.stickyWall ? -16 : 0
     }
   }>
     <Image
