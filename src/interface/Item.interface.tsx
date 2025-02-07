@@ -133,3 +133,11 @@ export interface EternalPainTalismanMats {
   vortex: number;
   gold: number;
 }
+
+export interface LunarJadeEnhancementMats {
+  encLevel: number;
+  stigmata: number;
+  crystal: number;
+  gold: number;
+  hgFragment: number;
+}

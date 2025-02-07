@@ -9,8 +9,10 @@ import {
   LunarFragment,
   LunarJadeCraftAmount,
   LunarJadeCraftMaterial,
+  LunarJadeEnhancementMats,
   TigerIntactOrbCraftMats,
 } from "../interface/Item.interface";
+import { LunarJadeEnhancementStats } from "../interface/ItemStat.interface";
 
 export const tigerIntactOrbCraftMats: TigerIntactOrbCraftMats = {
   tigerIntactOrb: 10,
@@ -18,11 +20,11 @@ export const tigerIntactOrbCraftMats: TigerIntactOrbCraftMats = {
 };
 
 export const concentratedDimensionalEnergyCraftMats: ConcentratedDimensionalEnergyCraftMats =
-  {
-    tigerIntactOrb: 10,
-    dimensionalEnergy: 10,
-    gold: 10000,
-  };
+{
+  tigerIntactOrb: 10,
+  dimensionalEnergy: 10,
+  gold: 10000,
+};
 
 export const LunarJadeCraftAmountTable: LunarJadeCraftAmount[] = [
   {
@@ -176,3 +178,9 @@ export const LunarJadeCraftMaterialList: LunarJadeCraftMaterial[] = [
     lunarFragment: [LunarFragmentList.holy, LunarFragmentList.pitch],
   },
 ];
+
+export const LunarJadeAttEnhancementMatsTable: LunarJadeEnhancementMats[] = []
+export const LunarJadeDefEnhancementMatsTable: LunarJadeEnhancementMats[] = []
+
+export const LunarJadeAttEnhancementStatsTable: LunarJadeEnhancementStats[] = []
+export const LunarJadeDefEnhancementStatsTable: LunarJadeEnhancementStats[] = []
