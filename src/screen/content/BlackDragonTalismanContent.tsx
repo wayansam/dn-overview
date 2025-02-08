@@ -173,7 +173,7 @@ const BlackDragonTalismanContent = () => {
       <div>
         {item}
         <p>HP {getTextEmpty({ txt: maxHPPercent, tailText: "%" })}</p>
-        <p>ATT {getTextEmpty({ txt: attackPercent, tailText: "%" })}</p>
+        <p>ATK {getTextEmpty({ txt: attackPercent, tailText: "%" })}</p>
         <p>FD {getTextEmpty({ txt: fd?.join("/ ") })}</p>
         <p>{craftable ? "Craftable" : "Not craftable"}</p>
       </div>

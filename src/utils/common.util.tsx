@@ -50,7 +50,7 @@ export const getTextEmpty = ({
   tailText?: string;
   customChange?: string;
 }) => {
-  return txt ? `${txt}${tailText ?? ""}` : customChange ?? "-";
+  return txt ? `${txt.toLocaleString()}${tailText ?? ""}` : customChange ?? "-";
 };
 
 export function getComparedData<T>(arr: Array<T>, min: number, max: number) {
