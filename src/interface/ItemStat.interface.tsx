@@ -75,11 +75,18 @@ export interface EternalChaosTalismanStat {
 export interface LunarJadeEnhancementStats {
   encLevel: number;
   attack: number;
-  hpPercent: number;
   attPercent: number;
-  hp: number;
-  phyDef: number;
-  magDef: number;
   fd: number;
   hsSkillPercent: number;
+
+  // att
+  attackPercent?: number;
+  critical?: number;
+  criticalDamage?: number;
+
+  // def
+  hpPercent?: number;
+  hp?: number;
+  phyDef?: number;
+  magDef?: number;
 }

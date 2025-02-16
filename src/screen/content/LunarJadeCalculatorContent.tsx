@@ -1,3 +1,4 @@
+import { CloseOutlined } from "@ant-design/icons";
 import type { CollapseProps } from "antd";
 import {
   Alert,
@@ -8,11 +9,9 @@ import {
   Divider,
   Form,
   Grid,
-  Input,
   InputNumber,
   Radio,
   Select,
-  Slider,
   Space,
   Table,
   Typography,
@@ -22,7 +21,12 @@ import type { FormInstance } from "antd/es/form";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { EQUIPMENT, ITEM_RARITY, LUNAR_JADE_TYPE } from "../../constants/InGame.constants";
+import CustomSlider from "../../components/CustomSlider";
+import {
+  EQUIPMENT,
+  ITEM_RARITY,
+  LUNAR_JADE_TYPE,
+} from "../../constants/InGame.constants";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
   LunarJadeAttEnhancementMatsTable,
@@ -34,7 +38,6 @@ import {
   concentratedDimensionalEnergyCraftMats,
   tigerIntactOrbCraftMats,
 } from "../../data/lunarData";
-import { CloseOutlined } from '@ant-design/icons';
 import { LunarJadeCalculator } from "../../interface/Common.interface";
 import {
   LunarFragmentData,
@@ -42,8 +45,12 @@ import {
   LunarJadeCraftMaterial,
   LunarJadeEnhancementMats,
 } from "../../interface/Item.interface";
-import { columnsResource, getColor, getTextEmpty } from "../../utils/common.util";
 import { LunarJadeEnhancementStats } from "../../interface/ItemStat.interface";
+import {
+  columnsResource,
+  getColor,
+  getTextEmpty,
+} from "../../utils/common.util";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -231,7 +238,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
+                  // disabled={(findTo?.rateValue ?? 0) <= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -260,7 +267,7 @@ const EditableCell: React.FC<EditableCellProps> = ({
                   value={item.value}
                   label={item.label}
                   key={item.value}
-                // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
+                  // disabled={(findFr?.rateValue ?? 8) >= item.rateValue}
                 >
                   <Space>{item.label}</Space>
                 </Option>
@@ -276,15 +283,15 @@ const EditableCell: React.FC<EditableCellProps> = ({
           paddingRight: 24,
           color:
             (title === TAB.FR || title === TAB.TO) &&
-              (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
+            (findTo?.rateValue ?? 0) <= (findFr?.rateValue ?? 0)
               ? "red"
               : "unset",
           minWidth:
             title === TAB.FR || title === TAB.TO
               ? 80
               : title === TAB.QT
-                ? 60
-                : undefined,
+              ? 60
+              : undefined,
           paddingTop: 1,
           paddingBottom: 1,
         }}
@@ -306,32 +313,28 @@ type ColumnTypes = (
 )[];
 
 interface FormEnhance {
-  "type": string | null,
-  "listEnhance":
-  Array<{
-    "range": [
-      number,
-      number
-    ] | null,
-    "amt": number | null
-  }> | null
+  type: string | null;
+  listEnhance: Array<{
+    range?: [number, number] | null;
+    amt?: number | null;
+  }> | null;
 }
 
 interface EnhanceTableMaterialList {
-  'Lunar Eclipse Stigmata': number;
-  'Lunar Eclipse Crystal': number;
-  'HG Holy Lunar': number;
-  'HG Burning Lunar': number;
-  'HG Pitch Black Lunar': number;
-  'HG Crystal Clear Lunar': number;
-  'HG Tailwind Lunar': number;
-  'HG Ardent Lunar': number;
-  'Gold': number;
+  "Lunar Eclipse Stigmata": number;
+  "Lunar Eclipse Crystal": number;
+  "HG Holy Lunar": number;
+  "HG Burning Lunar": number;
+  "HG Pitch Black Lunar": number;
+  "HG Crystal Clear Lunar": number;
+  "HG Tailwind Lunar": number;
+  "HG Ardent Lunar": number;
+  Gold: number;
 }
 
 interface MatsTableRes {
   matsData?: EnhanceTableMaterialList;
-  errorDt?: string[]
+  errorDt?: string[];
 }
 
 const LunarJadeCalculatorContent = () => {
@@ -351,7 +354,7 @@ const LunarJadeCalculatorContent = () => {
   const [changeOrb, setChangeOrb] = useState<boolean>(false);
   const [changeEnergy, setChangeEnergy] = useState<boolean>(false);
 
-  const [enhanceDataSource, setEnhanceDataSource] = useState<MatsTableRes>({})
+  const [enhanceDataSource, setEnhanceDataSource] = useState<MatsTableRes>({});
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -388,26 +391,26 @@ const LunarJadeCalculatorContent = () => {
     editable?: boolean;
     dataIndex: string;
   })[] = [
-      {
-        title: TAB.EQ,
-        dataIndex: "equipment",
-      },
-      {
-        title: TAB.QT,
-        dataIndex: "defaultValue",
-        editable: true,
-      },
-      {
-        title: TAB.FR,
-        dataIndex: "from",
-        editable: true,
-      },
-      {
-        title: TAB.TO,
-        dataIndex: "to",
-        editable: true,
-      },
-    ];
+    {
+      title: TAB.EQ,
+      dataIndex: "equipment",
+    },
+    {
+      title: TAB.QT,
+      dataIndex: "defaultValue",
+      editable: true,
+    },
+    {
+      title: TAB.FR,
+      dataIndex: "from",
+      editable: true,
+    },
+    {
+      title: TAB.TO,
+      dataIndex: "to",
+      editable: true,
+    },
+  ];
 
   const columns = columnsCalculator.map((col) => {
     if (!col.editable) {
@@ -1046,15 +1049,7 @@ const LunarJadeCalculatorContent = () => {
         </div>
       ),
       responsive: ["xs"],
-      render: (
-        _,
-        {
-          stigmata,
-          crystal,
-          gold,
-          hgFragment,
-        }
-      ) => (
+      render: (_, { stigmata, crystal, gold, hgFragment }) => (
         <div>
           <p>{stigmata.toLocaleString()} (s)</p>
           <p>{crystal.toLocaleString()} (crs)</p>
@@ -1107,7 +1102,7 @@ const LunarJadeCalculatorContent = () => {
           <p>Hero Skill ATK</p>
         </div>
       ),
-      responsive: ['xs'],
+      responsive: ["xs"],
       render: (
         _,
         {
@@ -1123,70 +1118,60 @@ const LunarJadeCalculatorContent = () => {
       ) => (
         <div>
           <p>ATK {getTextEmpty({ txt: attack })}</p>
-          <p>ATT {getTextEmpty({ txt: attPercent, tailText: '%' })}</p>
-          <p>HP {getTextEmpty({ txt: hpPercent, tailText: '%' })}</p>
-          <p>HP {getTextEmpty({ txt: hp, })}</p>
-          <p>Phy Def {getTextEmpty({ txt: phyDef, })}</p>
-          <p>Mag Def {getTextEmpty({ txt: magDef, })}</p>
-          <p>FD {getTextEmpty({ txt: fd, })}</p>
-          <p>HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: '%' })}</p>
+          <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
+          <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+          <p>HP {getTextEmpty({ txt: hp })}</p>
+          <p>Phy Def {getTextEmpty({ txt: phyDef })}</p>
+          <p>Mag Def {getTextEmpty({ txt: magDef })}</p>
+          <p>FD {getTextEmpty({ txt: fd })}</p>
+          <p>HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</p>
         </div>
       ),
     },
-    ...!screens.lg ? ([{
-      title: (
-        <div>
-          <p>Attack</p>
-          <p>Attribute ATK</p>
-          <p>HP%</p>
-          <p>HP</p>
-        </div>
-      ),
-      responsive: ['sm'],
-      render: (
-        _,
-        {
-          attack,
-          hpPercent,
-          attPercent,
-          hp,
-        }
-      ) => (
-        <div>
-          <p>ATK {getTextEmpty({ txt: attack })}</p>
-          <p>ATT {getTextEmpty({ txt: attPercent, tailText: '%' })}</p>
-          <p>HP {getTextEmpty({ txt: hpPercent, tailText: '%' })}</p>
-          <p>HP {getTextEmpty({ txt: hp, })}</p>
-        </div>
-      ),
-    },
-    {
-      title: (
-        <div>
-          <p>Phy Def</p>
-          <p>Mag Def</p>
-          <p>Final Damage</p>
-          <p>Hero Skill ATK</p>
-        </div>
-      ),
-      responsive: ['sm'],
-      render: (
-        _,
-        {
-          phyDef,
-          magDef,
-          fd,
-          hsSkillPercent,
-        }
-      ) => (
-        <div>
-          <p>Phy Def {getTextEmpty({ txt: phyDef, })}</p>
-          <p>Mag Def {getTextEmpty({ txt: magDef, })}</p>
-          <p>FD {getTextEmpty({ txt: fd, })}</p>
-          <p>HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: '%' })}</p>
-        </div>
-      ),
-    }] as ColumnsType<LunarJadeEnhancementStats>) : [],
+    ...(!screens.lg
+      ? ([
+          {
+            title: (
+              <div>
+                <p>Attack</p>
+                <p>Attribute ATK</p>
+                <p>HP%</p>
+                <p>HP</p>
+              </div>
+            ),
+            responsive: ["sm"],
+            render: (_, { attack, hpPercent, attPercent, hp }) => (
+              <div>
+                <p>ATK {getTextEmpty({ txt: attack })}</p>
+                <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
+                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+                <p>HP {getTextEmpty({ txt: hp })}</p>
+              </div>
+            ),
+          },
+          {
+            title: (
+              <div>
+                <p>Phy Def</p>
+                <p>Mag Def</p>
+                <p>Final Damage</p>
+                <p>Hero Skill ATK</p>
+              </div>
+            ),
+            responsive: ["sm"],
+            render: (_, { phyDef, magDef, fd, hsSkillPercent }) => (
+              <div>
+                <p>Phy Def {getTextEmpty({ txt: phyDef })}</p>
+                <p>Mag Def {getTextEmpty({ txt: magDef })}</p>
+                <p>FD {getTextEmpty({ txt: fd })}</p>
+                <p>
+                  HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}
+                </p>
+              </div>
+            ),
+          },
+        ] as ColumnsType<LunarJadeEnhancementStats>)
+      : []),
     {
       title: "Attack",
       responsive: ["lg"],
@@ -1195,52 +1180,49 @@ const LunarJadeCalculatorContent = () => {
     {
       title: "Attribute ATK",
       responsive: ["lg"],
-      render: (_, { attPercent }) => <Text>{getTextEmpty({ txt: attPercent, tailText: '%' })}</Text>,
+      render: (_, { attPercent }) => (
+        <Text>{getTextEmpty({ txt: attPercent, tailText: "%" })}</Text>
+      ),
     },
     {
       title: "HP%",
       responsive: ["lg"],
-      render: (_, { hpPercent }) => <Text>{getTextEmpty({ txt: hpPercent, tailText: '%' })}</Text>,
+      render: (_, { hpPercent }) => (
+        <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
+      ),
     },
     {
       title: "HP",
       responsive: ["lg"],
-      render: (_, { hp }) => <Text>{getTextEmpty({ txt: hp, })}</Text>,
+      render: (_, { hp }) => <Text>{getTextEmpty({ txt: hp })}</Text>,
     },
     {
       title: "Phy Def",
       responsive: ["lg"],
-      render: (_, { phyDef }) => <Text>{getTextEmpty({ txt: phyDef, })}</Text>,
+      render: (_, { phyDef }) => <Text>{getTextEmpty({ txt: phyDef })}</Text>,
     },
     {
       title: "Mag Def",
       responsive: ["lg"],
-      render: (_, { magDef }) => <Text>{getTextEmpty({ txt: magDef, })}</Text>,
+      render: (_, { magDef }) => <Text>{getTextEmpty({ txt: magDef })}</Text>,
     },
     {
       title: "Final Damage",
       responsive: ["lg"],
-      render: (_, { fd }) => <Text>{getTextEmpty({ txt: fd, })}</Text>,
+      render: (_, { fd }) => <Text>{getTextEmpty({ txt: fd })}</Text>,
     },
     {
       title: "Hero Skill ATK",
       responsive: ["lg"],
-      render: (_, { hsSkillPercent }) => <Text>{getTextEmpty({ txt: hsSkillPercent, tailText: '%' })}</Text>,
+      render: (_, { hsSkillPercent }) => (
+        <Text>{getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</Text>
+      ),
     },
-
   ];
 
-
-
-  // const temp = formEnhance.getFieldsValue() as Array<FormEnhance> | null
-  // console.log({ temp });
-
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
-    // const temp = formEnhance.getFieldsValue() as Array<FormEnhance> | null
-    // const temp = formEnhance.getFieldsValue()
-    console.log({ temp });
     if (!temp || !Array.isArray(temp)) {
-      return { errorDt: ['Empty List'] }
+      return { errorDt: ["Empty List"] };
     }
     let tempStigmata = 0;
     let tempCrystal = 0;
@@ -1252,24 +1234,26 @@ const LunarJadeCalculatorContent = () => {
     let tempHgTail = 0;
     let tempHgArd = 0;
 
-    let errorMsg: string[] = []
+    let errorMsg: string[] = [];
 
     temp.forEach((enhItem, idx) => {
       if (!enhItem) {
-        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`)
+        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
       }
-      const { type, listEnhance } = enhItem
-      if (type && listEnhance && listEnhance.length > 0) {
-        listEnhance.forEach((item, i) => {
+      if (
+        enhItem?.type &&
+        enhItem?.listEnhance &&
+        enhItem?.listEnhance.length > 0
+      ) {
+        enhItem?.listEnhance.forEach((item, i) => {
           if (!item) {
-            errorMsg.push(`Nothing to calculate on Enhance ${idx + 1} list`)
+            errorMsg.push(`Nothing to calculate on Enhance ${idx + 1} list`);
           }
-          const { amt, range } = item;
-          if (amt && range) {
-            if (type === LUNAR_JADE_TYPE.ATT) {
+          if (item?.amt && item?.range) {
+            if (enhItem?.type === LUNAR_JADE_TYPE.ATT) {
               const tempSlice = LunarJadeAttEnhancementMatsTable.slice(
-                range[0],
-                range[1]
+                item?.range[0],
+                item?.range[1]
               );
 
               tempSlice.forEach((slicedItem) => {
@@ -1279,11 +1263,11 @@ const LunarJadeCalculatorContent = () => {
                 tempHgHoly += slicedItem.hgFragment;
                 tempHgBurn += slicedItem.hgFragment;
                 tempHgPitch += slicedItem.hgFragment;
-              })
+              });
             } else {
               const tempSlice = LunarJadeDefEnhancementMatsTable.slice(
-                range[0],
-                range[1]
+                item?.range[0],
+                item?.range[1]
               );
 
               tempSlice.forEach((slicedItem) => {
@@ -1293,58 +1277,56 @@ const LunarJadeCalculatorContent = () => {
                 tempHgCrys += slicedItem.hgFragment;
                 tempHgTail += slicedItem.hgFragment;
                 tempHgArd += slicedItem.hgFragment;
-              })
+              });
             }
-
           } else {
-            let emsg = ''
-            if (!amt && !range) {
-              emsg = 'Amount & Range'
-            } else if (!amt) {
-              emsg = 'Amount'
-            } else if (!range) {
-              emsg = 'Range'
+            let emsg = "";
+            if (!item?.amt && !item?.range) {
+              emsg = "Amount & Range";
+            } else if (!item?.amt) {
+              emsg = "Amount";
+            } else if (!item?.range) {
+              emsg = "Range";
             }
-            errorMsg.push(`The ${emsg} in Enhance ${idx + 1}, item ${i + 1} haven't inputted properly`)
+            errorMsg.push(
+              `The ${emsg} in Enhance ${idx + 1}, item ${
+                i + 1
+              } haven't inputted properly`
+            );
           }
-        })
+        });
       } else {
-        let msg = ''
-        if (!type && !listEnhance) {
-          msg = 'Type & List'
-        } else if (!type) {
-          msg = 'Type'
-        } else if (!listEnhance || listEnhance.length === 0) {
-          msg = 'List'
+        let msg = "";
+        if (!enhItem?.type && !enhItem?.listEnhance) {
+          msg = "Type & List";
+        } else if (!enhItem?.type) {
+          msg = "Type";
+        } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
+          msg = "List";
         }
-        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`)
+        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`);
       }
-    })
+    });
 
     return {
       matsData: {
-        'Lunar Eclipse Stigmata': tempStigmata,
-        'Lunar Eclipse Crystal': tempCrystal,
-        'HG Holy Lunar': tempHgHoly,
-        'HG Burning Lunar': tempHgBurn,
-        'HG Pitch Black Lunar': tempHgPitch,
-        'HG Crystal Clear Lunar': tempHgCrys,
-        'HG Tailwind Lunar': tempHgTail,
-        'HG Ardent Lunar': tempHgArd,
-        'Gold': tempGold,
+        "Lunar Eclipse Stigmata": tempStigmata,
+        "Lunar Eclipse Crystal": tempCrystal,
+        "HG Holy Lunar": tempHgHoly,
+        "HG Burning Lunar": tempHgBurn,
+        "HG Pitch Black Lunar": tempHgPitch,
+        "HG Crystal Clear Lunar": tempHgCrys,
+        "HG Tailwind Lunar": tempHgTail,
+        "HG Ardent Lunar": tempHgArd,
+        Gold: tempGold,
       },
-      errorDt: errorMsg.length > 0 ? errorMsg : undefined
-    }
-  }
-
-
-  const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
-    console.log('Form Values Changed:', { allValues });
-    setEnhanceDataSource(calcEnhanceDataSource(allValues.items))
+      errorDt: errorMsg.length > 0 ? errorMsg : undefined,
+    };
   };
 
-  console.log({ enhanceDataSource });
-
+  const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
+    setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
+  };
 
   const getEnhanceCalculator = () => {
     return (
@@ -1363,13 +1345,20 @@ const LunarJadeCalculatorContent = () => {
           >
             <Form.List name="items">
               {(fields, { add, remove }) => (
-                <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
-                  {fields.map((field) => (
+                <div
+                  style={{
+                    display: "flex",
+                    rowGap: 16,
+                    flexDirection: "column",
+                  }}
+                >
+                  {fields.map((field, index) => (
                     <Card
                       size="small"
                       title={`Enhance ${field.name + 1}`}
                       style={{ minWidth: 320 }}
                       key={field.key}
+                      id={`${field.name}-card-${index}`}
                       extra={
                         <CloseOutlined
                           onClick={() => {
@@ -1378,27 +1367,53 @@ const LunarJadeCalculatorContent = () => {
                         />
                       }
                     >
-                      <Form.Item label="Type" name={[field.name, 'type']} rules={[{ required: true }]}>
-                        <Radio.Group >
-                          <Radio.Button value={LUNAR_JADE_TYPE.ATT}>Attack</Radio.Button>
-                          <Radio.Button value={LUNAR_JADE_TYPE.DEF}>Defense</Radio.Button>
+                      <Form.Item
+                        label="Type"
+                        name={[field.name, "type"]}
+                        rules={[{ required: true }]}
+                        id={`${field.name}-type-${index}`}
+                      >
+                        <Radio.Group>
+                          <Radio.Button value={LUNAR_JADE_TYPE.ATT}>
+                            Attack
+                          </Radio.Button>
+                          <Radio.Button value={LUNAR_JADE_TYPE.DEF}>
+                            Defense
+                          </Radio.Button>
                         </Radio.Group>
                       </Form.Item>
 
                       {/* Nest Form.List */}
                       <Form.Item label="List">
-                        <Form.List name={[field.name, 'listEnhance']}>
+                        <Form.List name={[field.name, "listEnhance"]}>
                           {(subFields, subOpt) => (
-                            <div style={{ display: 'flex', flexDirection: 'column', rowGap: 18 }}>
-                              {subFields.map((subField) => (
-
-                                <Card key={subField.key} size="small" style={{ width: '100%' }}>
-                                  <Space direction='horizontal' style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'flex-start'
-                                  }}>
-                                    <Form.Item noStyle name={[subField.name, 'amt']}>
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                rowGap: 18,
+                              }}
+                            >
+                              {subFields.map((subField, idx) => (
+                                <Card
+                                  key={subField.key}
+                                  size="small"
+                                  style={{ width: "100%" }}
+                                  id={`${subField.name}-card-${idx}`}
+                                >
+                                  <Space
+                                    direction="horizontal"
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "flex-start",
+                                    }}
+                                  >
+                                    <Form.Item
+                                      noStyle
+                                      name={[subField.name, "amt"]}
+                                      id={`${subField.name}-amt-${idx}`}
+                                    >
                                       <InputNumber placeholder="amount" />
                                     </Form.Item>
 
@@ -1409,26 +1424,21 @@ const LunarJadeCalculatorContent = () => {
                                     />
                                   </Space>
 
-                                  <Form.Item noStyle name={[subField.name, 'range']}>
-                                    <Slider
-                                      style={{ marginRight: 20 }}
-                                      min={0}
-                                      max={20}
-                                      range
-                                      marks={{
-                                        0: '+0',
-                                        5: '+5',
-                                        10: '+10',
-                                        15: '+15',
-                                        20: '+20',
-                                      }}
+                                  <Form.Item
+                                    noStyle
+                                    name={[subField.name, "range"]}
+                                  >
+                                    <CustomSlider
+                                      id={`${subField.name}-range-${idx}`}
                                     />
                                   </Form.Item>
-
                                 </Card>
-
                               ))}
-                              <Button type="dashed" onClick={() => subOpt.add()} block>
+                              <Button
+                                type="dashed"
+                                onClick={() => subOpt.add()}
+                                block
+                              >
                                 + Add Enhancement
                               </Button>
                             </div>
@@ -1445,15 +1455,16 @@ const LunarJadeCalculatorContent = () => {
               )}
             </Form.List>
 
-            <Form.Item noStyle shouldUpdate>
+            {/* <Form.Item noStyle shouldUpdate>
               {() => (
                 <Typography>
-                  <pre>{JSON.stringify(formEnhance.getFieldsValue(), null, 2)}</pre>
+                  <pre>
+                    {JSON.stringify(formEnhance.getFieldsValue(), null, 2)}
+                  </pre>
                 </Typography>
               )}
-            </Form.Item>
+            </Form.Item> */}
           </Form>
-
         </div>
 
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
@@ -1469,19 +1480,20 @@ const LunarJadeCalculatorContent = () => {
           )}
           <Table
             size={"small"}
-            dataSource={Object.entries(enhanceDataSource.matsData ?? {}).filter((_, value) => value !== 0).map(
-              ([key, value]) => ({
+            dataSource={Object.entries(enhanceDataSource.matsData ?? {})
+              .filter((_, value) => value !== 0)
+              .map(([key, value]) => ({
                 mats: key,
                 amount: value,
-              })
-            )}
+              }))}
             columns={columnsResource}
             pagination={false}
             bordered
           />
         </div>
-      </div>)
-  }
+      </div>
+    );
+  };
 
   const items: CollapseProps["items"] = [
     {
@@ -1522,50 +1534,52 @@ const LunarJadeCalculatorContent = () => {
     {
       key: "3",
       label: "Enhance Reference",
-      children: <div
-        style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-      >
-        <div style={{ marginRight: 30 }}>
-          <Title level={5}>{"Enhance Attack Jade Materials"}</Title>
-          <Table
-            size={"small"}
-            dataSource={LunarJadeAttEnhancementMatsTable}
-            columns={columnsEnhMats}
-            pagination={false}
-            bordered
-          />
+      children: (
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ marginRight: 30 }}>
+            <Title level={5}>{"Enhance Attack Jade Materials"}</Title>
+            <Table
+              size={"small"}
+              dataSource={LunarJadeAttEnhancementMatsTable}
+              columns={columnsEnhMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ marginRight: 30 }}>
+            <Title level={5}>{"Enhance Defense Jade Materials"}</Title>
+            <Table
+              size={"small"}
+              dataSource={LunarJadeDefEnhancementMatsTable}
+              columns={columnsEnhMats}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ marginRight: 30 }}>
+            <Title level={5}>{"Enhance Attack Jade Stats"}</Title>
+            <Table
+              size={"small"}
+              dataSource={LunarJadeAttEnhancementStatsTable}
+              columns={columnsEnhStats}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{}}>
+            <Title level={5}>{"Enhance Defense Jade Stats"}</Title>
+            <Table
+              size={"small"}
+              dataSource={LunarJadeDefEnhancementStatsTable}
+              columns={columnsEnhStats}
+              pagination={false}
+              bordered
+            />
+          </div>
         </div>
-        <div style={{ marginRight: 30 }}>
-          <Title level={5}>{"Enhance Defense Jade Materials"}</Title>
-          <Table
-            size={"small"}
-            dataSource={LunarJadeDefEnhancementMatsTable}
-            columns={columnsEnhMats}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{ marginRight: 30 }}>
-          <Title level={5}>{"Enhance Attack Jade Stats"}</Title>
-          <Table
-            size={"small"}
-            dataSource={LunarJadeAttEnhancementStatsTable}
-            columns={columnsEnhStats}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{}}>
-          <Title level={5}>{"Enhance Defense Jade Stats"}</Title>
-          <Table
-            size={"small"}
-            dataSource={LunarJadeDefEnhancementStatsTable}
-            columns={columnsEnhStats}
-            pagination={false}
-            bordered
-          />
-        </div>
-      </div>,
+      ),
     },
     {
       key: "4",
@@ -1582,5 +1596,3 @@ const LunarJadeCalculatorContent = () => {
 };
 
 export default LunarJadeCalculatorContent;
-
-
