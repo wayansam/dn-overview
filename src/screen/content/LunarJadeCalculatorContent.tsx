@@ -1250,34 +1250,36 @@ const LunarJadeCalculatorContent = () => {
             errorMsg.push(`Nothing to calculate on Enhance ${idx + 1} list`);
           }
           if (item?.amt && item?.range) {
+            let tempStigmataC = 0;
+            let tempCrystalC = 0;
+            let tempGoldC = 0;
+            let tempHgC = 0;
+
+            const tempSlice = (
+              enhItem?.type === LUNAR_JADE_TYPE.ATT
+                ? LunarJadeAttEnhancementMatsTable
+                : LunarJadeDefEnhancementMatsTable
+            ).slice(item?.range[0] + 1, item?.range[1] + 1);
+
+            tempSlice.forEach((slicedItem) => {
+              tempStigmataC += slicedItem.stigmata;
+              tempCrystalC += slicedItem.crystal;
+              tempGoldC += slicedItem.gold;
+              tempHgC += slicedItem.hgFragment;
+            });
+
+            tempStigmata += tempStigmataC * item?.amt;
+            tempCrystal += tempCrystalC * item?.amt;
+            tempGold += tempGoldC * item?.amt;
+            const totalHG = tempHgC * item?.amt;
             if (enhItem?.type === LUNAR_JADE_TYPE.ATT) {
-              const tempSlice = LunarJadeAttEnhancementMatsTable.slice(
-                item?.range[0],
-                item?.range[1]
-              );
-
-              tempSlice.forEach((slicedItem) => {
-                tempStigmata += slicedItem.stigmata;
-                tempCrystal += slicedItem.crystal;
-                tempGold += slicedItem.gold;
-                tempHgHoly += slicedItem.hgFragment;
-                tempHgBurn += slicedItem.hgFragment;
-                tempHgPitch += slicedItem.hgFragment;
-              });
+              tempHgHoly += totalHG;
+              tempHgBurn += totalHG;
+              tempHgPitch += totalHG;
             } else {
-              const tempSlice = LunarJadeDefEnhancementMatsTable.slice(
-                item?.range[0],
-                item?.range[1]
-              );
-
-              tempSlice.forEach((slicedItem) => {
-                tempStigmata += slicedItem.stigmata;
-                tempCrystal += slicedItem.crystal;
-                tempGold += slicedItem.gold;
-                tempHgCrys += slicedItem.hgFragment;
-                tempHgTail += slicedItem.hgFragment;
-                tempHgArd += slicedItem.hgFragment;
-              });
+              tempHgCrys += totalHG;
+              tempHgTail += totalHG;
+              tempHgArd += totalHG;
             }
           } else {
             let emsg = "";
@@ -1455,7 +1457,7 @@ const LunarJadeCalculatorContent = () => {
               )}
             </Form.List>
 
-            {/* <Form.Item noStyle shouldUpdate>
+            <Form.Item noStyle shouldUpdate>
               {() => (
                 <Typography>
                   <pre>
@@ -1463,7 +1465,7 @@ const LunarJadeCalculatorContent = () => {
                   </pre>
                 </Typography>
               )}
-            </Form.Item> */}
+            </Form.Item>
           </Form>
         </div>
 
@@ -1481,7 +1483,7 @@ const LunarJadeCalculatorContent = () => {
           <Table
             size={"small"}
             dataSource={Object.entries(enhanceDataSource.matsData ?? {})
-              .filter((_, value) => value !== 0)
+              .filter(([_, value]) => value !== 0)
               .map(([key, value]) => ({
                 mats: key,
                 amount: value,
