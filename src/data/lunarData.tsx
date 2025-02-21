@@ -3,12 +3,14 @@ import {
   EQUIPMENT,
   ITEM_RARITY,
   LUNAR_FRAGMENT_TYPE,
+  LUNAR_JADE_TYPE,
 } from "../constants/InGame.constants";
 import {
   ConcentratedDimensionalEnergyCraftMats,
   LunarFragment,
   LunarJadeCraftAmount,
   LunarJadeCraftMaterial,
+  LunarJadeEnhanceMaterial,
   LunarJadeEnhancementMats,
   TigerIntactOrbCraftMats,
 } from "../interface/Item.interface";
@@ -176,6 +178,25 @@ export const LunarJadeCraftMaterialList: LunarJadeCraftMaterial[] = [
   {
     equipmentType: EQUIPMENT.RING,
     lunarFragment: [LunarFragmentList.holy, LunarFragmentList.pitch],
+  },
+];
+
+export const LunarJadeEnhanceMaterialList: LunarJadeEnhanceMaterial[] = [
+  {
+    jadeType: LUNAR_JADE_TYPE.ATT,
+    lunarFragment: [
+      LunarFragmentList.holy,
+      LunarFragmentList.burning,
+      LunarFragmentList.pitch,
+    ],
+  },
+  {
+    jadeType: LUNAR_JADE_TYPE.DEF,
+    lunarFragment: [
+      LunarFragmentList.crystal,
+      LunarFragmentList.tailwind,
+      LunarFragmentList.ardent,
+    ],
   },
 ];
 

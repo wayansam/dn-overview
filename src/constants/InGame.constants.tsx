@@ -96,6 +96,6 @@ export enum EQUIPMENT {
 }
 
 export enum LUNAR_JADE_TYPE {
-  ATT = 'attack',
-  DEF = 'defense'
+  ATT = "Attack",
+  DEF = "Defense",
 }

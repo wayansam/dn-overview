@@ -35,6 +35,7 @@ import {
   LunarJadeCraftMaterialList,
   LunarJadeDefEnhancementMatsTable,
   LunarJadeDefEnhancementStatsTable,
+  LunarJadeEnhanceMaterialList,
   concentratedDimensionalEnergyCraftMats,
   tigerIntactOrbCraftMats,
 } from "../../data/lunarData";
@@ -43,6 +44,7 @@ import {
   LunarFragmentData,
   LunarJadeCraftAmount,
   LunarJadeCraftMaterial,
+  LunarJadeEnhanceMaterial,
   LunarJadeEnhancementMats,
 } from "../../interface/Item.interface";
 import { LunarJadeEnhancementStats } from "../../interface/ItemStat.interface";
@@ -318,6 +320,11 @@ interface FormEnhance {
     range?: [number, number] | null;
     amt?: number | null;
   }> | null;
+}
+
+interface LJade {
+  amt: number;
+  type: LunarFragmentData;
 }
 
 interface EnhanceTableMaterialList {
@@ -1033,6 +1040,26 @@ const LunarJadeCalculatorContent = () => {
       ),
     },
   ];
+  const columnsEnhance: ColumnsType<LunarJadeEnhanceMaterial> = [
+    {
+      title: "Jade Type",
+      dataIndex: "jadeType",
+      width: 150,
+    },
+    {
+      title: "Fragment Mat",
+      dataIndex: "lunarFragment",
+      render: (_, { lunarFragment }) => (
+        <div>
+          {lunarFragment.map((item) => (
+            <Text style={{ color: item.color, marginRight: 5 }}>
+              {item.type}
+            </Text>
+          ))}
+        </div>
+      ),
+    },
+  ];
 
   const columnsEnhMats: ColumnsType<LunarJadeEnhancementMats> = [
     {
@@ -1416,7 +1443,11 @@ const LunarJadeCalculatorContent = () => {
                                       name={[subField.name, "amt"]}
                                       id={`${subField.name}-amt-${idx}`}
                                     >
-                                      <InputNumber placeholder="amount" />
+                                      <InputNumber
+                                        placeholder="amount"
+                                        max={20}
+                                        min={0}
+                                      />
                                     </Form.Item>
 
                                     <CloseOutlined
@@ -1440,6 +1471,7 @@ const LunarJadeCalculatorContent = () => {
                                 type="dashed"
                                 onClick={() => subOpt.add()}
                                 block
+                                disabled={subFields && subFields.length >= 20}
                               >
                                 + Add Enhancement
                               </Button>
@@ -1450,7 +1482,12 @@ const LunarJadeCalculatorContent = () => {
                     </Card>
                   ))}
 
-                  <Button type="dashed" onClick={() => add()} block>
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    disabled={fields && fields.length >= 2}
+                  >
                     + Add Type
                   </Button>
                 </div>
@@ -1540,6 +1577,18 @@ const LunarJadeCalculatorContent = () => {
         <div
           style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
         >
+          <div style={{ width: "100%", marginRight: 30 }}>
+            <div style={{ maxWidth: 400 }}>
+              <Title level={5}>{"Craftable"}</Title>
+              <Table
+                size={"small"}
+                dataSource={LunarJadeEnhanceMaterialList}
+                columns={columnsEnhance}
+                pagination={false}
+                bordered
+              />
+            </div>
+          </div>
           <div style={{ marginRight: 30 }}>
             <Title level={5}>{"Enhance Attack Jade Materials"}</Title>
             <Table

@@ -3,6 +3,7 @@ import {
   EQUIPMENT,
   ITEM_RARITY,
   LUNAR_FRAGMENT_TYPE,
+  LUNAR_JADE_TYPE,
   RUNE_GRADE,
   RUNE_SHAPE,
   RUNE_STAT_TYPE,
@@ -62,6 +63,10 @@ export interface LunarFragment {
 }
 export interface LunarJadeCraftMaterial {
   equipmentType: EQUIPMENT;
+  lunarFragment: Array<LunarFragmentData>;
+}
+export interface LunarJadeEnhanceMaterial {
+  jadeType: LUNAR_JADE_TYPE;
   lunarFragment: Array<LunarFragmentData>;
 }
 

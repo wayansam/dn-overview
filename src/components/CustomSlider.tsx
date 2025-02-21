@@ -33,6 +33,7 @@ const CustomSlider: React.FC<CustomSliderProps> = (props) => {
       <Slider
         onAfterChange={onChangeComplete}
         style={{ marginRight: 20 }}
+        defaultValue={localRange}
         min={0}
         max={20}
         range
