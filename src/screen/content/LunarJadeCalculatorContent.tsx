@@ -1117,141 +1117,246 @@ const LunarJadeCalculatorContent = () => {
     },
   ];
 
-  const columnsEnhStats: ColumnsType<LunarJadeEnhancementStats> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Attack</p>
-          <p>Attribute ATK</p>
-          <p>HP%</p>
-          <p>HP</p>
-          <p>Phy Def</p>
-          <p>Mag Def</p>
-          <p>Final Damage</p>
-          <p>Hero Skill ATK</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (
-        _,
-        {
-          attack,
-          hpPercent,
-          attPercent,
-          hp,
-          phyDef,
-          magDef,
-          fd,
-          hsSkillPercent,
-        }
-      ) => (
-        <div>
-          <p>ATK {getTextEmpty({ txt: attack })}</p>
-          <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
-          <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-          <p>HP {getTextEmpty({ txt: hp })}</p>
-          <p>Phy Def {getTextEmpty({ txt: phyDef })}</p>
-          <p>Mag Def {getTextEmpty({ txt: magDef })}</p>
-          <p>FD {getTextEmpty({ txt: fd })}</p>
-          <p>HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</p>
-        </div>
-      ),
-    },
-    ...(!screens.lg
-      ? ([
-          {
-            title: (
-              <div>
-                <p>Attack</p>
-                <p>Attribute ATK</p>
+  const getEnhanceCol = (
+    isAttack?: boolean
+  ): ColumnsType<LunarJadeEnhancementStats> => {
+    return [
+      {
+        title: "Enhancement",
+        dataIndex: "encLevel",
+      },
+      {
+        title: (
+          <div>
+            <p>Attack</p>
+            <p>Attribute ATK</p>
+            {isAttack ? (
+              <>
+                <p>ATK%</p>
+                <p>Critical</p>
+                <p>Critical Damage</p>
+              </>
+            ) : (
+              <>
                 <p>HP%</p>
                 <p>HP</p>
-              </div>
-            ),
-            responsive: ["sm"],
-            render: (_, { attack, hpPercent, attPercent, hp }) => (
-              <div>
-                <p>ATK {getTextEmpty({ txt: attack })}</p>
-                <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
-                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-                <p>HP {getTextEmpty({ txt: hp })}</p>
-              </div>
-            ),
-          },
-          {
-            title: (
-              <div>
                 <p>Phy Def</p>
                 <p>Mag Def</p>
-                <p>Final Damage</p>
-                <p>Hero Skill ATK</p>
-              </div>
-            ),
-            responsive: ["sm"],
-            render: (_, { phyDef, magDef, fd, hsSkillPercent }) => (
-              <div>
+              </>
+            )}
+            <p>Final Damage</p>
+            <p>Hero Skill ATK</p>
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (
+          _,
+          {
+            attack,
+            attPercent,
+            attackPercent,
+            critical,
+            criticalDamage,
+            hpPercent,
+            hp,
+            phyDef,
+            magDef,
+            fd,
+            hsSkillPercent,
+          }
+        ) => (
+          <div>
+            <p>ATK {getTextEmpty({ txt: attack })}</p>
+            <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
+            {isAttack ? (
+              <>
+                <p>ATK {getTextEmpty({ txt: attackPercent, tailText: "%" })}</p>
+                <p>CRT {getTextEmpty({ txt: critical })}</p>
+                <p>CDM {getTextEmpty({ txt: criticalDamage })}</p>
+              </>
+            ) : (
+              <>
+                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+                <p>HP {getTextEmpty({ txt: hp })}</p>
                 <p>Phy Def {getTextEmpty({ txt: phyDef })}</p>
                 <p>Mag Def {getTextEmpty({ txt: magDef })}</p>
-                <p>FD {getTextEmpty({ txt: fd })}</p>
-                <p>
-                  HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}
-                </p>
-              </div>
-            ),
-          },
-        ] as ColumnsType<LunarJadeEnhancementStats>)
-      : []),
-    {
-      title: "Attack",
-      responsive: ["lg"],
-      render: (_, { attack }) => <Text>{getTextEmpty({ txt: attack })}</Text>,
-    },
-    {
-      title: "Attribute ATK",
-      responsive: ["lg"],
-      render: (_, { attPercent }) => (
-        <Text>{getTextEmpty({ txt: attPercent, tailText: "%" })}</Text>
-      ),
-    },
-    {
-      title: "HP%",
-      responsive: ["lg"],
-      render: (_, { hpPercent }) => (
-        <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-      ),
-    },
-    {
-      title: "HP",
-      responsive: ["lg"],
-      render: (_, { hp }) => <Text>{getTextEmpty({ txt: hp })}</Text>,
-    },
-    {
-      title: "Phy Def",
-      responsive: ["lg"],
-      render: (_, { phyDef }) => <Text>{getTextEmpty({ txt: phyDef })}</Text>,
-    },
-    {
-      title: "Mag Def",
-      responsive: ["lg"],
-      render: (_, { magDef }) => <Text>{getTextEmpty({ txt: magDef })}</Text>,
-    },
-    {
-      title: "Final Damage",
-      responsive: ["lg"],
-      render: (_, { fd }) => <Text>{getTextEmpty({ txt: fd })}</Text>,
-    },
-    {
-      title: "Hero Skill ATK",
-      responsive: ["lg"],
-      render: (_, { hsSkillPercent }) => (
-        <Text>{getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</Text>
-      ),
-    },
-  ];
+              </>
+            )}
+            <p>FD {getTextEmpty({ txt: fd })}</p>
+            <p>HS ATK {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</p>
+          </div>
+        ),
+      },
+      ...(!screens.lg
+        ? ([
+            {
+              title: (
+                <div>
+                  <p>Attack</p>
+                  <p>Attribute ATK</p>
+                  {isAttack ? (
+                    <>
+                      <p>ATK%</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>HP%</p>
+                      <p>HP</p>
+                    </>
+                  )}
+                </div>
+              ),
+              responsive: ["sm"],
+              render: (
+                _,
+                { attack, hpPercent, attPercent, hp, attackPercent }
+              ) => (
+                <div>
+                  <p>ATK {getTextEmpty({ txt: attack })}</p>
+                  <p>ATT {getTextEmpty({ txt: attPercent, tailText: "%" })}</p>
+                  {isAttack ? (
+                    <>
+                      <p>
+                        ATK{" "}
+                        {getTextEmpty({ txt: attackPercent, tailText: "%" })}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}
+                      </p>
+                      <p>HP {getTextEmpty({ txt: hp })}</p>
+                    </>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: (
+                <div>
+                  {isAttack ? (
+                    <>
+                      <p>Critical</p>
+                      <p>Critical Damage</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>Phy Def</p>
+                      <p>Mag Def</p>
+                    </>
+                  )}
+                  <p>Final Damage</p>
+                  <p>Hero Skill ATK</p>
+                </div>
+              ),
+              responsive: ["sm"],
+              render: (
+                _,
+                { phyDef, magDef, fd, hsSkillPercent, critical, criticalDamage }
+              ) => (
+                <div>
+                  {isAttack ? (
+                    <>
+                      <p>CRT {getTextEmpty({ txt: critical })}</p>
+                      <p>CDM {getTextEmpty({ txt: criticalDamage })}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>Phy Def {getTextEmpty({ txt: phyDef })}</p>
+                      <p>Mag Def {getTextEmpty({ txt: magDef })}</p>
+                    </>
+                  )}
+                  <p>FD {getTextEmpty({ txt: fd })}</p>
+                  <p>
+                    HS ATK{" "}
+                    {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}
+                  </p>
+                </div>
+              ),
+            },
+          ] as ColumnsType<LunarJadeEnhancementStats>)
+        : []),
+      {
+        title: "Attack",
+        responsive: ["lg"],
+        render: (_, { attack }) => <Text>{getTextEmpty({ txt: attack })}</Text>,
+      },
+      {
+        title: "Attribute ATK",
+        responsive: ["lg"],
+        render: (_, { attPercent }) => (
+          <Text>{getTextEmpty({ txt: attPercent, tailText: "%" })}</Text>
+        ),
+      },
+      ...(isAttack
+        ? ([
+            {
+              title: "ATK%",
+              responsive: ["lg"],
+              render: (_, { attackPercent }) => (
+                <Text>
+                  {getTextEmpty({ txt: attackPercent, tailText: "%" })}
+                </Text>
+              ),
+            },
+            {
+              title: "Critical",
+              responsive: ["lg"],
+              render: (_, { critical }) => (
+                <Text>{getTextEmpty({ txt: critical })}</Text>
+              ),
+            },
+            {
+              title: "Critical Damage",
+              responsive: ["lg"],
+              render: (_, { criticalDamage }) => (
+                <Text>{getTextEmpty({ txt: criticalDamage })}</Text>
+              ),
+            },
+          ] as ColumnsType<LunarJadeEnhancementStats>)
+        : ([
+            {
+              title: "HP%",
+              responsive: ["lg"],
+              render: (_, { hpPercent }) => (
+                <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
+              ),
+            },
+            {
+              title: "HP",
+              responsive: ["lg"],
+              render: (_, { hp }) => <Text>{getTextEmpty({ txt: hp })}</Text>,
+            },
+            {
+              title: "Phy Def",
+              responsive: ["lg"],
+              render: (_, { phyDef }) => (
+                <Text>{getTextEmpty({ txt: phyDef })}</Text>
+              ),
+            },
+            {
+              title: "Mag Def",
+              responsive: ["lg"],
+              render: (_, { magDef }) => (
+                <Text>{getTextEmpty({ txt: magDef })}</Text>
+              ),
+            },
+          ] as ColumnsType<LunarJadeEnhancementStats>)),
+      {
+        title: "Final Damage",
+        responsive: ["lg"],
+        render: (_, { fd }) => <Text>{getTextEmpty({ txt: fd })}</Text>,
+      },
+      {
+        title: "Hero Skill ATK",
+        responsive: ["lg"],
+        render: (_, { hsSkillPercent }) => (
+          <Text>{getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</Text>
+        ),
+      },
+    ];
+  };
 
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
     if (!temp || !Array.isArray(temp)) {
@@ -1652,7 +1757,7 @@ const LunarJadeCalculatorContent = () => {
             <Table
               size={"small"}
               dataSource={LunarJadeAttEnhancementStatsTable}
-              columns={columnsEnhStats}
+              columns={getEnhanceCol(true)}
               pagination={false}
               bordered
             />
@@ -1662,7 +1767,7 @@ const LunarJadeCalculatorContent = () => {
             <Table
               size={"small"}
               dataSource={LunarJadeDefEnhancementStatsTable}
-              columns={columnsEnhStats}
+              columns={getEnhanceCol()}
               pagination={false}
               bordered
             />
