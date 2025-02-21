@@ -60,7 +60,15 @@ export function getComparedData<T>(arr: Array<T>, min: number, max: number) {
 }
 
 export const columnsResource: ColumnsType<TableResource> = [
-  { title: "Materials", dataIndex: "mats" },
+  {
+    title: "Materials",
+    dataIndex: "mats",
+    render: (_, { mats, customLabel }) => (
+      <Text style={{ color: customLabel?.lunarStyle?.color ?? undefined }}>
+        {mats}
+      </Text>
+    ),
+  },
   {
     title: "Amount",
     dataIndex: "amount",

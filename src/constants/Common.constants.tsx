@@ -1,5 +1,6 @@
 import { Typography } from "antd";
 import { SideBarGroupTab } from "../interface/Common.interface";
+import { LunarFragmentData } from "../interface/Item.interface";
 const { Text } = Typography;
 
 export const TAB_KEY = {
@@ -102,4 +103,7 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
 export interface TableResource {
   mats: string;
   amount: number;
+  customLabel?: {
+    lunarStyle?: LunarFragmentData;
+  };
 }

@@ -22,6 +22,7 @@ import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import CustomSlider from "../../components/CustomSlider";
+import { TableResource } from "../../constants/Common.constants";
 import {
   EQUIPMENT,
   ITEM_RARITY,
@@ -29,6 +30,7 @@ import {
 } from "../../constants/InGame.constants";
 import { dataCalculator } from "../../data/lunarCalculatorData";
 import {
+  LunarFragmentList,
   LunarJadeAttEnhancementMatsTable,
   LunarJadeAttEnhancementStatsTable,
   LunarJadeCraftAmountTable,
@@ -58,7 +60,7 @@ const { useBreakpoint } = Grid;
 const { Text } = Typography;
 const { Option } = Select;
 
-interface TableResource {
+interface TableLunarResource {
   lunarFragment: LunarFragmentData;
   amountFragment: number;
   amountHGFragment: number;
@@ -330,13 +332,17 @@ interface LJade {
 interface EnhanceTableMaterialList {
   "Lunar Eclipse Stigmata": number;
   "Lunar Eclipse Crystal": number;
-  "HG Holy Lunar": number;
-  "HG Burning Lunar": number;
-  "HG Pitch Black Lunar": number;
-  "HG Crystal Clear Lunar": number;
-  "HG Tailwind Lunar": number;
-  "HG Ardent Lunar": number;
+  "HG Holy Lunar": LJade;
+  "HG Burning Lunar": LJade;
+  "HG Pitch Black Lunar": LJade;
+  "HG Crystal Clear Lunar": LJade;
+  "HG Tailwind Lunar": LJade;
+  "HG Ardent Lunar": LJade;
   Gold: number;
+}
+
+function typedEntries<T extends {}>(obj: T): [string, T[keyof T]][] {
+  return Object.entries(obj) as [string, T[keyof T]][];
 }
 
 interface MatsTableRes {
@@ -454,8 +460,8 @@ const LunarJadeCalculatorContent = () => {
     return flag;
   }, [selectedRowKeys, dataSource]);
 
-  const tableResource: TableResource[] = useMemo(() => {
-    let temp: TableResource[] = [];
+  const tableResource: TableLunarResource[] = useMemo(() => {
+    let temp: TableLunarResource[] = [];
     if (invalidDtSrc) {
       return [];
     }
@@ -731,7 +737,7 @@ const LunarJadeCalculatorContent = () => {
     return tempDimEnergy;
   }, [selectedRowKeys, dataSource, invalidDtSrc, changeEnergy]);
 
-  const columnsResourceLunar: ColumnsType<TableResource> = [
+  const columnsResourceLunar: ColumnsType<TableLunarResource> = [
     {
       title: "Fragment Mat",
       dataIndex: "lunarFragment",
@@ -1341,16 +1347,28 @@ const LunarJadeCalculatorContent = () => {
       matsData: {
         "Lunar Eclipse Stigmata": tempStigmata,
         "Lunar Eclipse Crystal": tempCrystal,
-        "HG Holy Lunar": tempHgHoly,
-        "HG Burning Lunar": tempHgBurn,
-        "HG Pitch Black Lunar": tempHgPitch,
-        "HG Crystal Clear Lunar": tempHgCrys,
-        "HG Tailwind Lunar": tempHgTail,
-        "HG Ardent Lunar": tempHgArd,
+        "HG Holy Lunar": { amt: tempHgHoly, type: LunarFragmentList.holy },
+        "HG Burning Lunar": {
+          amt: tempHgBurn,
+          type: LunarFragmentList.burning,
+        },
+        "HG Pitch Black Lunar": {
+          amt: tempHgPitch,
+          type: LunarFragmentList.pitch,
+        },
+        "HG Crystal Clear Lunar": {
+          amt: tempHgCrys,
+          type: LunarFragmentList.crystal,
+        },
+        "HG Tailwind Lunar": {
+          amt: tempHgTail,
+          type: LunarFragmentList.tailwind,
+        },
+        "HG Ardent Lunar": { amt: tempHgArd, type: LunarFragmentList.ardent },
         Gold: tempGold,
       },
       errorDt: errorMsg.length > 0 ? errorMsg : undefined,
-    };
+    } as MatsTableRes;
   };
 
   const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
@@ -1519,12 +1537,32 @@ const LunarJadeCalculatorContent = () => {
           )}
           <Table
             size={"small"}
-            dataSource={Object.entries(enhanceDataSource.matsData ?? {})
-              .filter(([_, value]) => value !== 0)
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
+            dataSource={
+              (enhanceDataSource.matsData
+                ? typedEntries(enhanceDataSource.matsData)
+                    .filter(([_, value]) => {
+                      if (typeof value === "number") {
+                        return value !== 0;
+                      }
+                      return value.amt !== 0;
+                    })
+                    .map(([key, value]) => {
+                      if (typeof value === "number") {
+                        return {
+                          mats: key,
+                          amount: value,
+                        };
+                      }
+                      return {
+                        mats: key,
+                        amount: value.amt,
+                        customLabel: {
+                          lunarStyle: value.type,
+                        },
+                      };
+                    })
+                : []) as TableResource[]
+            }
             columns={columnsResource}
             pagination={false}
             bordered
