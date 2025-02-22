@@ -347,6 +347,7 @@ function typedEntries<T extends {}>(obj: T): [string, T[keyof T]][] {
 
 interface MatsTableRes {
   matsData?: EnhanceTableMaterialList;
+  statsData?: LunarJadeEnhancementStats;
   errorDt?: string[];
 }
 
@@ -1362,6 +1363,7 @@ const LunarJadeCalculatorContent = () => {
     if (!temp || !Array.isArray(temp)) {
       return { errorDt: ["Empty List"] };
     }
+    // mats
     let tempStigmata = 0;
     let tempCrystal = 0;
     let tempGold = 0;
@@ -1371,6 +1373,21 @@ const LunarJadeCalculatorContent = () => {
     let tempHgCrys = 0;
     let tempHgTail = 0;
     let tempHgArd = 0;
+
+    // stats
+    let tempAttack = 0;
+    let tempAttPercent = 0;
+    let tempFd = 0;
+    let tempHsSkillPercent = 0;
+    // att
+    let tempAttackPercent = 0;
+    let tempCritical = 0;
+    let tempCriticalDamage = 0;
+    // def
+    let tempHpPercent = 0;
+    let tempHp = 0;
+    let tempPhyDef = 0;
+    let tempMagDef = 0;
 
     let errorMsg: string[] = [];
 
@@ -1388,18 +1405,21 @@ const LunarJadeCalculatorContent = () => {
             errorMsg.push(`Nothing to calculate on Enhance ${idx + 1} list`);
           }
           if (item?.amt && item?.range) {
+            // mats
             let tempStigmataC = 0;
             let tempCrystalC = 0;
             let tempGoldC = 0;
             let tempHgC = 0;
 
-            const tempSlice = (
-              enhItem?.type === LUNAR_JADE_TYPE.ATT
+            const isAtt = enhItem?.type === LUNAR_JADE_TYPE.ATT;
+
+            const tempSliceMats = (
+              isAtt
                 ? LunarJadeAttEnhancementMatsTable
                 : LunarJadeDefEnhancementMatsTable
             ).slice(item?.range[0] + 1, item?.range[1] + 1);
 
-            tempSlice.forEach((slicedItem) => {
+            tempSliceMats.forEach((slicedItem) => {
               tempStigmataC += slicedItem.stigmata;
               tempCrystalC += slicedItem.crystal;
               tempGoldC += slicedItem.gold;
@@ -1410,7 +1430,7 @@ const LunarJadeCalculatorContent = () => {
             tempCrystal += tempCrystalC * item?.amt;
             tempGold += tempGoldC * item?.amt;
             const totalHG = tempHgC * item?.amt;
-            if (enhItem?.type === LUNAR_JADE_TYPE.ATT) {
+            if (isAtt) {
               tempHgHoly += totalHG;
               tempHgBurn += totalHG;
               tempHgPitch += totalHG;
@@ -1418,6 +1438,63 @@ const LunarJadeCalculatorContent = () => {
               tempHgCrys += totalHG;
               tempHgTail += totalHG;
               tempHgArd += totalHG;
+            }
+
+            // stats
+            const tempArrStats = isAtt
+              ? LunarJadeAttEnhancementStatsTable
+              : LunarJadeDefEnhancementStatsTable;
+
+            const dt1 =
+              tempArrStats.length > item?.range[0]
+                ? tempArrStats[item?.range[0]]
+                : undefined;
+            const dt2 =
+              tempArrStats.length > item?.range[1]
+                ? tempArrStats[item?.range[1]]
+                : undefined;
+
+            const minusAndMulti = (n1?: number, n2?: number, ex?: number) => {
+              return ((n1 ?? 0) - (n2 ?? 0)) * (ex ?? 1);
+            };
+            if (dt1 && dt2) {
+              tempAttack += minusAndMulti(dt2.attack, dt1.attack, item?.amt);
+              tempAttPercent += minusAndMulti(
+                dt2.attPercent,
+                dt1.attPercent,
+                item?.amt
+              );
+              tempFd += minusAndMulti(dt2.fd, dt1.fd, item?.amt);
+              tempHsSkillPercent += minusAndMulti(
+                dt2.hsSkillPercent,
+                dt1.hsSkillPercent,
+                item?.amt
+              );
+              // att
+              tempAttackPercent += minusAndMulti(
+                dt2.attackPercent,
+                dt1.attackPercent,
+                item?.amt
+              );
+              tempCritical += minusAndMulti(
+                dt2.critical,
+                dt1.critical,
+                item?.amt
+              );
+              tempCriticalDamage += minusAndMulti(
+                dt2.criticalDamage,
+                dt1.criticalDamage,
+                item?.amt
+              );
+              // def
+              tempHpPercent += minusAndMulti(
+                dt2.hpPercent,
+                dt1.hpPercent,
+                item?.amt
+              );
+              tempHp += minusAndMulti(dt2.hp, dt1.hp, item?.amt);
+              tempPhyDef += minusAndMulti(dt2.phyDef, dt1.phyDef, item?.amt);
+              tempMagDef += minusAndMulti(dt2.magDef, dt1.magDef, item?.amt);
             }
           } else {
             let emsg = "";
@@ -1471,6 +1548,21 @@ const LunarJadeCalculatorContent = () => {
         },
         "HG Ardent Lunar": { amt: tempHgArd, type: LunarFragmentList.ardent },
         Gold: tempGold,
+      },
+      statsData: {
+        attack: tempAttack,
+        attPercent: tempAttPercent,
+        fd: tempFd,
+        hsSkillPercent: tempHsSkillPercent,
+        // att
+        attackPercent: tempAttackPercent,
+        critical: tempCritical,
+        criticalDamage: tempCriticalDamage,
+        // def
+        hpPercent: tempHpPercent,
+        hp: tempHp,
+        phyDef: tempPhyDef,
+        magDef: tempMagDef,
       },
       errorDt: errorMsg.length > 0 ? errorMsg : undefined,
     } as MatsTableRes;
