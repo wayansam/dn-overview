@@ -142,7 +142,8 @@ export interface EternalPainTalismanMats {
 export interface LunarJadeEnhancementMats {
   encLevel: number;
   stigmata: number;
-  crystal: number;
+  crystal: number; // att
+  remains: number; // def
   gold: number;
   hgFragment: number;
 }

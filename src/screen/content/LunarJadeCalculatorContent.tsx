@@ -22,6 +22,8 @@ import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import CustomSlider from "../../components/CustomSlider";
+import ListingCard from "../../components/ListingCard";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { TableResource } from "../../constants/Common.constants";
 import {
   EQUIPMENT,
@@ -332,6 +334,7 @@ interface LJade {
 interface EnhanceTableMaterialList {
   "Lunar Eclipse Stigmata": number;
   "Lunar Eclipse Crystal": number;
+  "Lunar Eclipse Remains": number;
   "HG Holy Lunar": LJade;
   "HG Burning Lunar": LJade;
   "HG Pitch Black Lunar": LJade;
@@ -1068,55 +1071,80 @@ const LunarJadeCalculatorContent = () => {
     },
   ];
 
-  const columnsEnhMats: ColumnsType<LunarJadeEnhancementMats> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Stigmata</p>
-          <p>Crystal</p>
-          <p>High Grade Fragment</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { stigmata, crystal, gold, hgFragment }) => (
-        <div>
-          <p>{stigmata.toLocaleString()} (s)</p>
-          <p>{crystal.toLocaleString()} (crs)</p>
-          <p>{hgFragment.toLocaleString()} (hg frag)</p>
-          <p>{gold.toLocaleString()} (g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Stigmata",
-      dataIndex: "stigmata",
-      responsive: ["sm"],
-      render: (_, { stigmata }) => <Text>{stigmata.toLocaleString()}</Text>,
-    },
-    {
-      title: "Crystal",
-      dataIndex: "crystal",
-      responsive: ["sm"],
-      render: (_, { crystal }) => <Text>{crystal.toLocaleString()}</Text>,
-    },
-    {
-      title: "High Grade Fragment",
-      dataIndex: "hgFragment",
-      responsive: ["sm"],
-      render: (_, { hgFragment }) => <Text>{hgFragment.toLocaleString()}</Text>,
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-      render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
-    },
-  ];
+  const getMatsCol = (
+    isAttack?: boolean
+  ): ColumnsType<LunarJadeEnhancementMats> => {
+    return [
+      {
+        title: "Enhancement",
+        dataIndex: "encLevel",
+      },
+      {
+        title: (
+          <div>
+            <p>Stigmata</p>
+            {isAttack ? <p>Crystal</p> : <p>Remains</p>}
+            <p>High Grade Fragment</p>
+            <p>Gold</p>
+          </div>
+        ),
+        responsive: ["xs"],
+        render: (_, { stigmata, crystal, remains, gold, hgFragment }) => (
+          <div>
+            <p>{stigmata.toLocaleString()} (s)</p>
+            {isAttack ? (
+              <p>{crystal.toLocaleString()} (crs)</p>
+            ) : (
+              <p>{remains.toLocaleString()} (rem)</p>
+            )}
+            <p>{hgFragment.toLocaleString()} (hg frag)</p>
+            <p>{gold.toLocaleString()} (g)</p>
+          </div>
+        ),
+      },
+      {
+        title: "Stigmata",
+        dataIndex: "stigmata",
+        responsive: ["sm"],
+        render: (_, { stigmata }) => <Text>{stigmata.toLocaleString()}</Text>,
+      },
+      ...(isAttack
+        ? ([
+            {
+              title: "Crystal",
+              dataIndex: "crystal",
+              responsive: ["sm"],
+              render: (_, { crystal }) => (
+                <Text>{crystal.toLocaleString()}</Text>
+              ),
+            },
+          ] as ColumnsType<LunarJadeEnhancementMats>)
+        : ([
+            {
+              title: "Remains",
+              dataIndex: "remains",
+              responsive: ["sm"],
+              render: (_, { remains }) => (
+                <Text>{remains.toLocaleString()}</Text>
+              ),
+            },
+          ] as ColumnsType<LunarJadeEnhancementMats>)),
+      {
+        title: "High Grade Fragment",
+        dataIndex: "hgFragment",
+        responsive: ["sm"],
+        render: (_, { hgFragment }) => (
+          <Text>{hgFragment.toLocaleString()}</Text>
+        ),
+      },
+      {
+        title: "Gold",
+        dataIndex: "gold",
+        responsive: ["sm"],
+        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
+      },
+    ];
+  };
 
   const getEnhanceCol = (
     isAttack?: boolean
@@ -1366,6 +1394,7 @@ const LunarJadeCalculatorContent = () => {
     // mats
     let tempStigmata = 0;
     let tempCrystal = 0;
+    let tempRemains = 0;
     let tempGold = 0;
     let tempHgHoly = 0;
     let tempHgBurn = 0;
@@ -1408,6 +1437,7 @@ const LunarJadeCalculatorContent = () => {
             // mats
             let tempStigmataC = 0;
             let tempCrystalC = 0;
+            let tempRemainsC = 0;
             let tempGoldC = 0;
             let tempHgC = 0;
 
@@ -1422,12 +1452,14 @@ const LunarJadeCalculatorContent = () => {
             tempSliceMats.forEach((slicedItem) => {
               tempStigmataC += slicedItem.stigmata;
               tempCrystalC += slicedItem.crystal;
+              tempRemainsC += slicedItem.remains;
               tempGoldC += slicedItem.gold;
               tempHgC += slicedItem.hgFragment;
             });
 
             tempStigmata += tempStigmataC * item?.amt;
             tempCrystal += tempCrystalC * item?.amt;
+            tempRemains += tempRemainsC * item?.amt;
             tempGold += tempGoldC * item?.amt;
             const totalHG = tempHgC * item?.amt;
             if (isAtt) {
@@ -1529,6 +1561,7 @@ const LunarJadeCalculatorContent = () => {
       matsData: {
         "Lunar Eclipse Stigmata": tempStigmata,
         "Lunar Eclipse Crystal": tempCrystal,
+        "Lunar Eclipse Remains": tempRemains,
         "HG Holy Lunar": { amt: tempHgHoly, type: LunarFragmentList.holy },
         "HG Burning Lunar": {
           amt: tempHgBurn,
@@ -1764,6 +1797,107 @@ const LunarJadeCalculatorContent = () => {
             pagination={false}
             bordered
           />
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK",
+                value: enhanceDataSource.statsData?.attack,
+                format: true,
+              },
+              {
+                title: "ATT",
+                value: enhanceDataSource.statsData?.attPercent,
+                suffix: "%",
+              },
+              {
+                title: "FD",
+                value: enhanceDataSource.statsData?.fd,
+                format: true,
+              },
+              {
+                title: "HS Skill",
+                value: enhanceDataSource.statsData?.hsSkillPercent,
+                format: true,
+              },
+              {
+                title: "ATK",
+                value: enhanceDataSource.statsData?.attackPercent,
+                suffix: "%",
+              },
+              {
+                title: "CRT",
+                value: enhanceDataSource.statsData?.critical,
+                format: true,
+              },
+              {
+                title: "CDM",
+                value: enhanceDataSource.statsData?.criticalDamage,
+                format: true,
+              },
+              {
+                title: "HP",
+                value: enhanceDataSource.statsData?.hpPercent,
+                suffix: "%",
+              },
+              {
+                title: "HP",
+                value: enhanceDataSource.statsData?.hp,
+                format: true,
+              },
+              {
+                title: "Phy Def",
+                value: enhanceDataSource.statsData?.phyDef,
+                format: true,
+              },
+              {
+                title: "Mag Def",
+                value: enhanceDataSource.statsData?.magDef,
+                format: true,
+              },
+            ]}
+          />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          {enhanceDataSource.matsData && (
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Lunar Eclipse Crystal",
+                  amt: enhanceDataSource.matsData["Lunar Eclipse Crystal"],
+                },
+                {
+                  name: "Lunar Eclipse Remains",
+                  amt: enhanceDataSource.matsData["Lunar Eclipse Remains"],
+                },
+                {
+                  name: "HG Holy Lunar",
+                  amt: enhanceDataSource.matsData["HG Holy Lunar"].amt,
+                },
+                {
+                  name: "HG Burning Lunar",
+                  amt: enhanceDataSource.matsData["HG Burning Lunar"].amt,
+                },
+                {
+                  name: "HG Pitch Black Lunar",
+                  amt: enhanceDataSource.matsData["HG Pitch Black Lunar"].amt,
+                },
+                {
+                  name: "HG Crystal Clear Lunar",
+                  amt: enhanceDataSource.matsData["HG Crystal Clear Lunar"].amt,
+                },
+                {
+                  name: "HG Tailwind Lunar",
+                  amt: enhanceDataSource.matsData["HG Tailwind Lunar"].amt,
+                },
+                {
+                  name: "HG Ardent Lunar",
+                  amt: enhanceDataSource.matsData["HG Ardent Lunar"].amt,
+                },
+              ]}
+              additionalTotal={enhanceDataSource.matsData?.Gold}
+            />
+          )}
         </div>
       </div>
     );
@@ -1829,7 +1963,7 @@ const LunarJadeCalculatorContent = () => {
             <Table
               size={"small"}
               dataSource={LunarJadeAttEnhancementMatsTable}
-              columns={columnsEnhMats}
+              columns={getMatsCol(true)}
               pagination={false}
               bordered
             />
@@ -1839,7 +1973,7 @@ const LunarJadeCalculatorContent = () => {
             <Table
               size={"small"}
               dataSource={LunarJadeDefEnhancementMatsTable}
-              columns={columnsEnhMats}
+              columns={getMatsCol()}
               pagination={false}
               bordered
             />

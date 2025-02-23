@@ -4,7 +4,7 @@ const { Text } = Typography;
 
 interface CalcData {
   name: string;
-  amt: number;
+  amt?: number;
   useCustomAmt?: boolean;
 }
 interface CalcDataMapped extends CalcData {
@@ -58,7 +58,7 @@ const TradingHouseCalc = ({
 
   const totalGold = useMemo(() => {
     const temp = dt.reduce(
-      (sum, a) => sum + (a.amt - a.partialHave) * a.price,
+      (sum, a) => sum + ((a.amt ?? 0) - a.partialHave) * a.price,
       0
     );
     return temp + additionalTotal;
@@ -67,74 +67,77 @@ const TradingHouseCalc = ({
   return (
     <div>
       <Divider orientation="left">Buy from Trading House</Divider>
-      {dt.map((it) => (
-        <div>
-          <Card
-            size="small"
-            style={{ marginTop: 4, marginLeft: 8, marginRight: 8 }}
-          >
-            <div style={{ marginBottom: 4 }}>
-              <Text>{it.name}:</Text>
-            </div>
-            <div style={{ marginBottom: 4 }}>
-              <Divider type="vertical" />
-              {it.useCustomAmt ? (
+      {dt
+        .filter((item) => item.amt && item.amt !== 0)
+        .map((it) => (
+          <div>
+            <Card
+              size="small"
+              style={{ marginTop: 4, marginLeft: 8, marginRight: 8 }}
+            >
+              <div style={{ marginBottom: 4 }}>
+                <Text>{it.name}:</Text>
+              </div>
+              <div style={{ marginBottom: 4 }}>
+                <Divider type="vertical" />
+                {it.useCustomAmt ? (
+                  <Text>
+                    <InputNumber
+                      min={0}
+                      value={it.customAmt}
+                      onChange={(val) => {
+                        updateDt(val, it.name, "customAmt");
+                      }}
+                      size="middle"
+                      style={{ width: 120 }}
+                    />
+                  </Text>
+                ) : (
+                  <Text>
+                    {it.amt} -{" "}
+                    <InputNumber
+                      min={0}
+                      max={it.amt}
+                      value={it.partialHave}
+                      onChange={(val) => {
+                        updateDt(val, it.name, "partialHave");
+                      }}
+                      size="middle"
+                      style={{ width: 120 }}
+                    />
+                  </Text>
+                )}
+              </div>
+              <div style={{ marginBottom: 4 }}>
+                <Divider type="vertical" />
                 <Text>
+                  x{" "}
                   <InputNumber
                     min={0}
-                    value={it.customAmt}
+                    value={it.price}
                     onChange={(val) => {
-                      updateDt(val, it.name, "customAmt");
+                      updateDt(val, it.name, "price");
                     }}
                     size="middle"
                     style={{ width: 120 }}
                   />
                 </Text>
-              ) : (
-                <Text>
-                  {it.amt} -{" "}
-                  <InputNumber
-                    min={0}
-                    max={it.amt}
-                    value={it.partialHave}
-                    onChange={(val) => {
-                      updateDt(val, it.name, "partialHave");
-                    }}
-                    size="middle"
-                    style={{ width: 120 }}
-                  />
+              </div>
+              <div style={{ marginBottom: 4 }}>
+                <Divider type="vertical" />
+                <Divider type="vertical" />
+                <Text italic>
+                  ={" "}
+                  {(
+                    (it.useCustomAmt
+                      ? it.customAmt
+                      : (it.amt ?? 0) - it.partialHave) * it.price
+                  ).toLocaleString()}
                 </Text>
-              )}
-            </div>
-            <div style={{ marginBottom: 4 }}>
-              <Divider type="vertical" />
-              <Text>
-                x{" "}
-                <InputNumber
-                  min={0}
-                  value={it.price}
-                  onChange={(val) => {
-                    updateDt(val, it.name, "price");
-                  }}
-                  size="middle"
-                  style={{ width: 120 }}
-                />
-              </Text>
-            </div>
-            <div style={{ marginBottom: 4 }}>
-              <Divider type="vertical" />
-              <Divider type="vertical" />
-              <Text italic>
-                ={" "}
-                {(
-                  (it.useCustomAmt ? it.customAmt : it.amt - it.partialHave) *
-                  it.price
-                ).toLocaleString()}
-              </Text>
-            </div>
-          </Card>
-        </div>
-      ))}
+              </div>
+            </Card>
+          </div>
+        ))}
       <div style={{ marginBottom: 4 }}>
         <Divider type="vertical" />
         <Text italic>Total Gold need: {totalGold.toLocaleString()}</Text>
