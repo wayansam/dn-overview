@@ -1,8 +1,14 @@
 import { EQUIPMENT, ITEM_RARITY } from "../constants/InGame.constants";
 
+export interface ExtraPayload {
+  lunarScreen?: {
+    tabOpen: string[];
+  };
+}
 export interface SideBarTab {
   key: string;
   name: string;
+  payload?: ExtraPayload;
 }
 
 export interface SideBarGroupTab {

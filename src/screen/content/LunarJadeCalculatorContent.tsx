@@ -20,7 +20,7 @@ import {
 import type { FormInstance } from "antd/es/form";
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import CustomSlider from "../../components/CustomSlider";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
@@ -43,6 +43,7 @@ import {
   concentratedDimensionalEnergyCraftMats,
   tigerIntactOrbCraftMats,
 } from "../../data/lunarData";
+import { useAppSelector } from "../../hooks";
 import { LunarJadeCalculator } from "../../interface/Common.interface";
 import {
   LunarFragmentData,
@@ -361,6 +362,11 @@ const LunarJadeCalculatorContent = () => {
   const screens = useBreakpoint();
 
   const [formEnhance] = Form.useForm<{ items: Array<FormEnhance> }>();
+
+  const lunarScreen = useAppSelector(
+    (state) => state.UIState.selectedSideBar.payload?.lunarScreen
+  );
+  const activeKey = useRef(lunarScreen?.tabOpen || ["2", "4"]);
 
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
@@ -2024,7 +2030,11 @@ const LunarJadeCalculatorContent = () => {
 
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["4"]} />
+      <Collapse
+        items={items}
+        size="small"
+        defaultActiveKey={activeKey.current}
+      />
     </div>
   );
 };
