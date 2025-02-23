@@ -134,6 +134,16 @@ const getItems: (
               (yellow text).
             </i>
           </p>
+          <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/108/c/5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Lunar Eclipse Dragon Jade Ancient Grade – Enhancement
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
