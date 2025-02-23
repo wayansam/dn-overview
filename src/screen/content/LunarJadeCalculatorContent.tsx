@@ -1388,7 +1388,7 @@ const LunarJadeCalculatorContent = () => {
   };
 
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
-    if (!temp || !Array.isArray(temp)) {
+    if (!temp || !Array.isArray(temp) || temp.length < 1) {
       return { errorDt: ["Empty List"] };
     }
     // mats
@@ -1421,19 +1421,19 @@ const LunarJadeCalculatorContent = () => {
     let errorMsg: string[] = [];
 
     temp.forEach((enhItem, idx) => {
-      if (!enhItem) {
+      if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
         errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
-      }
-      if (
+      } else if (
         enhItem?.type &&
         enhItem?.listEnhance &&
         enhItem?.listEnhance.length > 0
       ) {
         enhItem?.listEnhance.forEach((item, i) => {
-          if (!item) {
-            errorMsg.push(`Nothing to calculate on Enhance ${idx + 1} list`);
-          }
-          if (item?.amt && item?.range) {
+          if (!item || (!item?.amt && !item?.range)) {
+            errorMsg.push(
+              `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
+            );
+          } else if (item?.amt && item?.range) {
             // mats
             let tempStigmataC = 0;
             let tempCrystalC = 0;
@@ -1530,9 +1530,7 @@ const LunarJadeCalculatorContent = () => {
             }
           } else {
             let emsg = "";
-            if (!item?.amt && !item?.range) {
-              emsg = "Amount & Range";
-            } else if (!item?.amt) {
+            if (!item?.amt) {
               emsg = "Amount";
             } else if (!item?.range) {
               emsg = "Range";
@@ -1546,9 +1544,7 @@ const LunarJadeCalculatorContent = () => {
         });
       } else {
         let msg = "";
-        if (!enhItem?.type && !enhItem?.listEnhance) {
-          msg = "Type & List";
-        } else if (!enhItem?.type) {
+        if (!enhItem?.type) {
           msg = "Type";
         } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
           msg = "List";
@@ -1600,6 +1596,12 @@ const LunarJadeCalculatorContent = () => {
       errorDt: errorMsg.length > 0 ? errorMsg : undefined,
     } as MatsTableRes;
   };
+
+  useEffect(() => {
+    setEnhanceDataSource(
+      calcEnhanceDataSource([{ type: null, listEnhance: null }])
+    );
+  }, []);
 
   const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
     setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
@@ -1742,7 +1744,7 @@ const LunarJadeCalculatorContent = () => {
               )}
             </Form.List>
 
-            <Form.Item noStyle shouldUpdate>
+            {/* <Form.Item noStyle shouldUpdate>
               {() => (
                 <Typography>
                   <pre>
@@ -1750,8 +1752,20 @@ const LunarJadeCalculatorContent = () => {
                   </pre>
                 </Typography>
               )}
-            </Form.Item>
+            </Form.Item> */}
           </Form>
+          {enhanceDataSource.errorDt &&
+            enhanceDataSource.errorDt.length > 0 && (
+              <div style={{ marginTop: 4, maxWidth: 300 }}>
+                <Space direction="vertical" size={"small"}>
+                  {enhanceDataSource.errorDt.map((it, x) => (
+                    <Text type="warning" key={`error-label-${x}`}>
+                      {it}
+                    </Text>
+                  ))}
+                </Space>
+              </div>
+            )}
         </div>
 
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
