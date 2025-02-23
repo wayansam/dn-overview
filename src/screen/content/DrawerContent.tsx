@@ -60,9 +60,13 @@ const getItems: (
       children: (
         <div>
           <p>
+            <b>~Craft Section~</b>
+          </p>
+          <p>
             <b>
               The Max settings for armor is only available with tier 2 Ancient
-              Armor and its upgrade (can put additional attack jade in it) & VIP ring (put additional defense jade in it start from Evo Ring).
+              Armor and its upgrade (can put additional attack jade in it) & VIP
+              ring (put additional defense jade in it start from Evo Ring).
             </b>
           </p>
           <p>
@@ -97,6 +101,37 @@ const getItems: (
             <i>
               Best way to do this is setup everything in common from settings,
               then adjust things you needed.
+            </i>
+          </p>
+          <p>
+            <b>~Enhance Section~</b>
+          </p>
+          <p>
+            <b>
+              Enhancing lunar dragon jade only available for 'Ancient grade'
+              jade. And the stat increase is added to your current jade stat.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please filled in Jade type, then amount and
+            range (current enhance level to your target).
+          </p>
+          <p>
+            Main Weapon Attack Dragon Jade does not have Final Damage as an
+            additional stat. Final Damage only appears with a value of 150 at
+            +20.
+          </p>
+          <p>
+            <i>
+              Enhance list limited to 2 (because only 2 type, attack & defense).
+              But the list inside you can put up to 20 depends on your current
+              plan.
+            </i>
+          </p>
+          <p>
+            <i>
+              You can check which input is not correct in below warning message
+              (yellow text).
             </i>
           </p>
         </div>
