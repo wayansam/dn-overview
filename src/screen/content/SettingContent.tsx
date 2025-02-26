@@ -216,6 +216,17 @@ const SettingContent = () => {
         <Space direction="horizontal">
           <List bordered dataSource={dataSoon} renderItem={renderItem} />
         </Space>
+
+        <Divider orientation="left">Have Something in Mind?</Divider>
+        <Space direction="horizontal">
+          <List bordered>
+            <List.Item>
+              <Link href="https://forms.gle/3nRYqHGPTyXugfKT8" target="_blank">
+                DN Overview User Feedback form
+              </Link>
+            </List.Item>
+          </List>
+        </Space>
       </Card>
     </div>
   );
