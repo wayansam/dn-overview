@@ -1,5 +1,8 @@
-import { Card, Divider, InputNumber, Typography } from "antd";
+import { Card, Divider, InputNumber, Typography, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import { copyTextToClipboard } from "../utils/common.util";
+import Link from "antd/es/typography/Link";
+import { InfoCircleOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 
 interface CalcData {
@@ -65,7 +68,7 @@ const TradingHouseCalc = ({
   }, [dt, additionalTotal]);
 
   return (
-    <div>
+    <div style={{ flexGrow: 0.5 }}>
       <Divider orientation="left">Buy from Trading House</Divider>
       {dt
         .filter((item) => item.amt && item.amt !== 0)
@@ -78,53 +81,71 @@ const TradingHouseCalc = ({
               <div style={{ marginBottom: 4 }}>
                 <Text>{it.name}:</Text>
               </div>
-              <div style={{ marginBottom: 4 }}>
-                <Divider type="vertical" />
-                {it.useCustomAmt ? (
+
+              <div style={{ flexWrap: "wrap", flexDirection: "row" }}>
+                <div style={{ marginBottom: 4, display: "inline-grid" }}>
+                  {it.useCustomAmt ? (
+                    <Text>
+                      <InputNumber
+                        min={0}
+                        value={it.customAmt}
+                        onChange={(val) => {
+                          updateDt(val, it.name, "customAmt");
+                        }}
+                        size="middle"
+                        style={{ width: 120 }}
+                      />
+                    </Text>
+                  ) : (
+                    <Text>
+                      {`( ${it.amt} - `}
+                      <InputNumber
+                        min={0}
+                        max={it.amt}
+                        value={it.partialHave}
+                        onChange={(val) => {
+                          updateDt(val, it.name, "partialHave");
+                        }}
+                        size="middle"
+                        style={{ width: 120 }}
+                      />{" "}
+                      <Tooltip
+                        title={((it?.amt ?? 0) - it.partialHave).toString()}
+                        trigger="hover"
+                        color="blue"
+                        placement="top"
+                      >
+                        <Link
+                          onClick={() => {
+                            copyTextToClipboard(
+                              ((it?.amt ?? 0) - it.partialHave).toString()
+                            );
+                          }}
+                          target="_blank"
+                        >
+                          <InfoCircleOutlined />
+                        </Link>
+                      </Tooltip>
+                      {" ) "}
+                    </Text>
+                  )}
+                </div>
+                <div style={{ marginBottom: 4, display: "inline-grid" }}>
                   <Text>
+                    {" x "}
                     <InputNumber
                       min={0}
-                      value={it.customAmt}
+                      value={it.price}
                       onChange={(val) => {
-                        updateDt(val, it.name, "customAmt");
+                        updateDt(val, it.name, "price");
                       }}
                       size="middle"
                       style={{ width: 120 }}
                     />
                   </Text>
-                ) : (
-                  <Text>
-                    {it.amt} -{" "}
-                    <InputNumber
-                      min={0}
-                      max={it.amt}
-                      value={it.partialHave}
-                      onChange={(val) => {
-                        updateDt(val, it.name, "partialHave");
-                      }}
-                      size="middle"
-                      style={{ width: 120 }}
-                    />
-                  </Text>
-                )}
+                </div>
               </div>
               <div style={{ marginBottom: 4 }}>
-                <Divider type="vertical" />
-                <Text>
-                  x{" "}
-                  <InputNumber
-                    min={0}
-                    value={it.price}
-                    onChange={(val) => {
-                      updateDt(val, it.name, "price");
-                    }}
-                    size="middle"
-                    style={{ width: 120 }}
-                  />
-                </Text>
-              </div>
-              <div style={{ marginBottom: 4 }}>
-                <Divider type="vertical" />
                 <Divider type="vertical" />
                 <Text italic>
                   ={" "}

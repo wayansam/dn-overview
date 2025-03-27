@@ -236,22 +236,21 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Dreamy Core",
-                amt: dDataSource["Dreamy Core"],
-              },
-              {
-                name: "High Purity Dreamy Core",
-                amt: dDataSource["High Purity Dreamy Core"],
-                useCustomAmt: true,
-              },
-            ]}
-            additionalTotal={dDataSource.Gold}
-          />
-        </div>
+
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Dreamy Core",
+              amt: dDataSource["Dreamy Core"],
+            },
+            {
+              name: "High Purity Dreamy Core",
+              amt: dDataSource["High Purity Dreamy Core"],
+              useCustomAmt: true,
+            },
+          ]}
+          additionalTotal={dDataSource.Gold}
+        />
       </div>
     );
   };
@@ -332,22 +331,21 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Blood Moon Core",
-                amt: bmDataSource["Blood Moon Core"],
-              },
-              {
-                name: "High Purity Blood Moon Core",
-                amt: bmDataSource["High Purity Blood Moon Core"],
-                useCustomAmt: true,
-              },
-            ]}
-            additionalTotal={bmDataSource.Gold}
-          />
-        </div>
+
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Blood Moon Core",
+              amt: bmDataSource["Blood Moon Core"],
+            },
+            {
+              name: "High Purity Blood Moon Core",
+              amt: bmDataSource["High Purity Blood Moon Core"],
+              useCustomAmt: true,
+            },
+          ]}
+          additionalTotal={bmDataSource.Gold}
+        />
       </div>
     );
   };
@@ -428,22 +426,21 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Verdure Core",
-                amt: vDataSource["Verdure Core"],
-              },
-              {
-                name: "High Purity Verdure Core",
-                amt: vDataSource["High Purity Verdure Core"],
-                useCustomAmt: true,
-              },
-            ]}
-            additionalTotal={vDataSource.Gold}
-          />
-        </div>
+
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Verdure Core",
+              amt: vDataSource["Verdure Core"],
+            },
+            {
+              name: "High Purity Verdure Core",
+              amt: vDataSource["High Purity Verdure Core"],
+              useCustomAmt: true,
+            },
+          ]}
+          additionalTotal={vDataSource.Gold}
+        />
       </div>
     );
   };
@@ -528,7 +525,10 @@ const SkillJadeContent = () => {
   };
 
   const dmDataSource: DimensionalTableMaterialList = useMemo(() => {
-    const tempSlice = DimensionalDJSkillMaterialTable.slice(DmData[0], DmData[1]);
+    const tempSlice = DimensionalDJSkillMaterialTable.slice(
+      DmData[0],
+      DmData[1]
+    );
     let tempHFrag = 0;
     let tempLFrag = 0;
     let tempGold = 0;
@@ -603,22 +603,21 @@ const SkillJadeContent = () => {
             </div>
           )}
         </div>
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Dimensional Core",
-                amt: dmDataSource["Dimensional Core"],
-              },
-              {
-                name: "High Purity Dimensional Core",
-                amt: dmDataSource["High Purity Dimensional Core"],
-                useCustomAmt: true,
-              },
-            ]}
-            additionalTotal={dmDataSource.Gold}
-          />
-        </div>
+
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Dimensional Core",
+              amt: dmDataSource["Dimensional Core"],
+            },
+            {
+              name: "High Purity Dimensional Core",
+              amt: dmDataSource["High Purity Dimensional Core"],
+              useCustomAmt: true,
+            },
+          ]}
+          additionalTotal={dmDataSource.Gold}
+        />
       </div>
     );
   };

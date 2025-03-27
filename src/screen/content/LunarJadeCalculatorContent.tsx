@@ -1641,7 +1641,7 @@ const LunarJadeCalculatorContent = () => {
                     <Card
                       size="small"
                       title={`Enhance ${field.name + 1}`}
-                      style={{ minWidth: 320 }}
+                      style={{ minWidth: 200 }}
                       key={field.key}
                       id={`${field.name}-card-${index}`}
                       extra={
@@ -1878,47 +1878,45 @@ const LunarJadeCalculatorContent = () => {
             ]}
           />
         </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {enhanceDataSource.matsData && (
-            <TradingHouseCalc
-              data={[
-                {
-                  name: "Lunar Eclipse Crystal",
-                  amt: enhanceDataSource.matsData["Lunar Eclipse Crystal"],
-                },
-                {
-                  name: "Lunar Eclipse Remains",
-                  amt: enhanceDataSource.matsData["Lunar Eclipse Remains"],
-                },
-                {
-                  name: "HG Holy Lunar",
-                  amt: enhanceDataSource.matsData["HG Holy Lunar"].amt,
-                },
-                {
-                  name: "HG Burning Lunar",
-                  amt: enhanceDataSource.matsData["HG Burning Lunar"].amt,
-                },
-                {
-                  name: "HG Pitch Black Lunar",
-                  amt: enhanceDataSource.matsData["HG Pitch Black Lunar"].amt,
-                },
-                {
-                  name: "HG Crystal Clear Lunar",
-                  amt: enhanceDataSource.matsData["HG Crystal Clear Lunar"].amt,
-                },
-                {
-                  name: "HG Tailwind Lunar",
-                  amt: enhanceDataSource.matsData["HG Tailwind Lunar"].amt,
-                },
-                {
-                  name: "HG Ardent Lunar",
-                  amt: enhanceDataSource.matsData["HG Ardent Lunar"].amt,
-                },
-              ]}
-              additionalTotal={enhanceDataSource.matsData?.Gold}
-            />
-          )}
-        </div>
+        {enhanceDataSource.matsData && (
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Lunar Eclipse Crystal",
+                amt: enhanceDataSource.matsData["Lunar Eclipse Crystal"],
+              },
+              {
+                name: "Lunar Eclipse Remains",
+                amt: enhanceDataSource.matsData["Lunar Eclipse Remains"],
+              },
+              {
+                name: "HG Holy Lunar",
+                amt: enhanceDataSource.matsData["HG Holy Lunar"].amt,
+              },
+              {
+                name: "HG Burning Lunar",
+                amt: enhanceDataSource.matsData["HG Burning Lunar"].amt,
+              },
+              {
+                name: "HG Pitch Black Lunar",
+                amt: enhanceDataSource.matsData["HG Pitch Black Lunar"].amt,
+              },
+              {
+                name: "HG Crystal Clear Lunar",
+                amt: enhanceDataSource.matsData["HG Crystal Clear Lunar"].amt,
+              },
+              {
+                name: "HG Tailwind Lunar",
+                amt: enhanceDataSource.matsData["HG Tailwind Lunar"].amt,
+              },
+              {
+                name: "HG Ardent Lunar",
+                amt: enhanceDataSource.matsData["HG Ardent Lunar"].amt,
+              },
+            ]}
+            additionalTotal={enhanceDataSource.matsData?.Gold}
+          />
+        )}
       </div>
     );
   };

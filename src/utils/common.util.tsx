@@ -1,4 +1,4 @@
-import { Typography } from "antd";
+import { Typography, message } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { TableResource } from "../constants/Common.constants";
 import { ITEM_RARITY_COLOR } from "../constants/InGame.color.constants";
@@ -76,3 +76,21 @@ export const columnsResource: ColumnsType<TableResource> = [
     render: (_, { amount }) => <Text>{amount.toLocaleString()}</Text>,
   },
 ];
+
+export const copyTextToClipboard = async (txt: string) => {
+  try {
+    await navigator.clipboard.writeText(txt);
+    console.log('Content copied to clipboard');
+    // messageApi.open({
+    //   type: 'success',
+    //   content: 'This is a success message',
+    // });
+
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+    // messageApi.open({
+    //   type: 'error',
+    //   content: 'This is an error message',
+    // });
+  }
+}

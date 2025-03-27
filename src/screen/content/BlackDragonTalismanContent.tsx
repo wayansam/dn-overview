@@ -716,27 +716,26 @@ const BlackDragonTalismanContent = () => {
             />
           )}
         </div>
-        <div>
-          {baofaDataSource && (
-            <TradingHouseCalc
-              data={[
-                {
-                  name: "Black Dragon Memories",
-                  amt: baofaDataSource["Black Dragon Memories"],
-                },
-                {
-                  name: "Garnet",
-                  amt: baofaDataSource.Garnet,
-                },
-                {
-                  name: "Essence",
-                  amt: baofaDataSource.Essence,
-                },
-              ]}
-              additionalTotal={baofaDataSource.Gold}
-            />
-          )}
-        </div>
+
+        {baofaDataSource && (
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Black Dragon Memories",
+                amt: baofaDataSource["Black Dragon Memories"],
+              },
+              {
+                name: "Garnet",
+                amt: baofaDataSource.Garnet,
+              },
+              {
+                name: "Essence",
+                amt: baofaDataSource.Essence,
+              },
+            ]}
+            additionalTotal={baofaDataSource.Gold}
+          />
+        )}
       </div>
     );
   };
@@ -851,27 +850,26 @@ const BlackDragonTalismanContent = () => {
             />
           )}
         </div>
-        <div>
-          {umbalaDataSource && (
-            <TradingHouseCalc
-              data={[
-                {
-                  name: "Black Dragon Memories",
-                  amt: umbalaDataSource["Black Dragon Memories"],
-                },
-                {
-                  name: "Garnet",
-                  amt: umbalaDataSource.Garnet,
-                },
-                {
-                  name: "Essence",
-                  amt: umbalaDataSource.Essence,
-                },
-              ]}
-              additionalTotal={umbalaDataSource.Gold}
-            />
-          )}
-        </div>
+
+        {umbalaDataSource && (
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Black Dragon Memories",
+                amt: umbalaDataSource["Black Dragon Memories"],
+              },
+              {
+                name: "Garnet",
+                amt: umbalaDataSource.Garnet,
+              },
+              {
+                name: "Essence",
+                amt: umbalaDataSource.Essence,
+              },
+            ]}
+            additionalTotal={umbalaDataSource.Gold}
+          />
+        )}
       </div>
     );
   };
@@ -986,27 +984,26 @@ const BlackDragonTalismanContent = () => {
             />
           )}
         </div>
-        <div>
-          {melukaDataSource && (
-            <TradingHouseCalc
-              data={[
-                {
-                  name: "Black Dragon Memories",
-                  amt: melukaDataSource["Black Dragon Memories"],
-                },
-                {
-                  name: "Garnet",
-                  amt: melukaDataSource.Garnet,
-                },
-                {
-                  name: "Essence",
-                  amt: melukaDataSource.Essence,
-                },
-              ]}
-              additionalTotal={melukaDataSource.Gold}
-            />
-          )}
-        </div>
+
+        {melukaDataSource && (
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Black Dragon Memories",
+                amt: melukaDataSource["Black Dragon Memories"],
+              },
+              {
+                name: "Garnet",
+                amt: melukaDataSource.Garnet,
+              },
+              {
+                name: "Essence",
+                amt: melukaDataSource.Essence,
+              },
+            ]}
+            additionalTotal={melukaDataSource.Gold}
+          />
+        )}
       </div>
     );
   };
@@ -1122,27 +1119,26 @@ const BlackDragonTalismanContent = () => {
             />
           )}
         </div>
-        <div>
-          {titanionDataSource && (
-            <TradingHouseCalc
-              data={[
-                {
-                  name: "Black Dragon Memories",
-                  amt: titanionDataSource["Black Dragon Memories"],
-                },
-                {
-                  name: "Garnet",
-                  amt: titanionDataSource.Garnet,
-                },
-                {
-                  name: "Essence",
-                  amt: titanionDataSource.Essence,
-                },
-              ]}
-              additionalTotal={titanionDataSource.Gold}
-            />
-          )}
-        </div>
+
+        {titanionDataSource && (
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Black Dragon Memories",
+                amt: titanionDataSource["Black Dragon Memories"],
+              },
+              {
+                name: "Garnet",
+                amt: titanionDataSource.Garnet,
+              },
+              {
+                name: "Essence",
+                amt: titanionDataSource.Essence,
+              },
+            ]}
+            additionalTotal={titanionDataSource.Gold}
+          />
+        )}
       </div>
     );
   };

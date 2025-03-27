@@ -514,17 +514,15 @@ const ExternalTalismanContent = () => {
           />
         </div>
 
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Eternal Dimensional Apparition",
-                amt: worldDataSource["Eternal Dimensional Apparition"],
-              },
-            ]}
-            additionalTotal={worldDataSource.Gold}
-          />
-        </div>
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Eternal Dimensional Apparition",
+              amt: worldDataSource["Eternal Dimensional Apparition"],
+            },
+          ]}
+          additionalTotal={worldDataSource.Gold}
+        />
       </div>
     );
   };
@@ -624,21 +622,19 @@ const ExternalTalismanContent = () => {
           />
         </div>
 
-        <div>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Eternal Dimensional Apparition",
-                amt: painDataSource["Eternal Dimensional Apparition"],
-              },
-              {
-                name: "Eternal Pain Vortex",
-                amt: painDataSource["Eternal Pain Vortex"],
-              },
-            ]}
-            additionalTotal={painDataSource.Gold}
-          />
-        </div>
+        <TradingHouseCalc
+          data={[
+            {
+              name: "Eternal Dimensional Apparition",
+              amt: painDataSource["Eternal Dimensional Apparition"],
+            },
+            {
+              name: "Eternal Pain Vortex",
+              amt: painDataSource["Eternal Pain Vortex"],
+            },
+          ]}
+          additionalTotal={painDataSource.Gold}
+        />
       </div>
     );
   };

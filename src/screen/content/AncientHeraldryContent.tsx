@@ -193,18 +193,17 @@ const AncientHeraldryContent = () => {
               Change Blueprint to Fragment
             </Checkbox>
           </div>
-
-          <TradingHouseCalc
-            data={[
-              { name: "Blueprint", amt: ancDataSource["Ancients' Blueprint"] },
-              {
-                name: "Blueprint Frag",
-                amt: ancDataSource["Ancients' Blueprint Fragment"],
-              },
-            ]}
-            additionalTotal={ancDataSource.Gold}
-          />
         </div>
+        <TradingHouseCalc
+          data={[
+            { name: "Blueprint", amt: ancDataSource["Ancients' Blueprint"] },
+            {
+              name: "Blueprint Frag",
+              amt: ancDataSource["Ancients' Blueprint Fragment"],
+            },
+          ]}
+          additionalTotal={ancDataSource.Gold}
+        />
       </div>
     );
   };
