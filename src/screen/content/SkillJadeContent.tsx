@@ -105,27 +105,47 @@ const SkillJadeContent = () => {
         encLevel: 0,
         attackPercent: 0,
         cooldownPercent: 0,
+        successRate: 0,
       };
     }
     return {
       encLevel: 0,
       attackPercent: dt2.attackPercent - dt1.attackPercent,
       cooldownPercent: dt2.cooldownPercent - dt1.cooldownPercent,
+      successRate: 0,
     };
+  };
+  const getChanceDiff = (
+    arr: SkillJadeStat[],
+    min: number,
+    max: number
+  ): number[] => {
+    const dt1 = arr.length > min ? arr[min] : undefined;
+    const dt2 = arr.length > max ? arr[max] : undefined;
+    if (!dt1 || !dt2) {
+      return [];
+    }
+    const temp: number[] = [];
+    for (let a = Math.max(min + 1, 11); a <= max; a++) {
+      temp.push(arr[a].successRate);
+    }
+    return temp;
   };
 
   const getColumnsStats = (showCd?: boolean): ColumnsType<SkillJadeStat> => {
-    const cdData: ColumnsType<SkillJadeStat> = [
-      {
-        title: "Cooldown Decrease",
-        responsive: ["sm"],
-        render: (_, { cooldownPercent }) => (
-          <div>
-            <Text>Cd -{cooldownPercent}%</Text>
-          </div>
-        ),
-      },
-    ];
+    const cdData: ColumnsType<SkillJadeStat> = showCd
+      ? [
+          {
+            title: "Cooldown Decrease",
+            responsive: ["sm"],
+            render: (_, { cooldownPercent }) => (
+              <div>
+                <Text>Cd -{cooldownPercent}%</Text>
+              </div>
+            ),
+          },
+        ]
+      : [];
     const dt: ColumnsType<SkillJadeStat> = [
       {
         title: "Enhancement",
@@ -136,13 +156,15 @@ const SkillJadeContent = () => {
           <div>
             <Text>Attack Percentage</Text>
             {showCd && <Text>Cooldown Decrease</Text>}
+            <Text>Success Rate</Text>
           </div>
         ),
         responsive: ["xs"],
-        render: (_, { attackPercent, cooldownPercent }) => (
+        render: (_, { attackPercent, cooldownPercent, successRate }) => (
           <div>
             <p>ATK {attackPercent}%</p>
             {showCd && <p>Cd -{cooldownPercent}%</p>}
+            <p>Success: {successRate}%</p>
           </div>
         ),
       },
@@ -157,7 +179,30 @@ const SkillJadeContent = () => {
       },
     ];
 
-    return showCd ? dt.concat(cdData) : dt;
+    const sRate: ColumnsType<SkillJadeStat> = [
+      {
+        title: "Success Rate",
+        responsive: ["sm"],
+        render: (_, { successRate }) => (
+          <div>
+            <Text style={{ margin: 0 }}>{successRate}%</Text>
+          </div>
+        ),
+      },
+    ];
+
+    return [...dt, ...cdData, ...sRate];
+  };
+
+  const successComp = (arr: number[]) => {
+    return succRangeDm.length > 0 ? (
+      <>
+        <Text>Succes rate from the smaller enhancement</Text>
+        <Text>{arr.map((it) => `${it}%`).join(", ")}</Text>
+      </>
+    ) : (
+      <></>
+    );
   };
 
   const dDataSource: DreamyTableMaterialList = useMemo(() => {
@@ -185,6 +230,9 @@ const SkillJadeContent = () => {
 
   const statRangeD: SkillJadeStat = useMemo(() => {
     return getStatDiff(DMFDJSkillStatTable, DData[0], DData[1]);
+  }, [DData]);
+  const succRangeD = useMemo(() => {
+    return getChanceDiff(DMFDJSkillStatTable, DData[0], DData[1]);
   }, [DData]);
 
   const getDCalc = () => {
@@ -231,6 +279,7 @@ const SkillJadeContent = () => {
                 <Space direction="vertical">
                   <Text>ATK +{statRangeD.attackPercent}%</Text>
                   <Text>Cooldown Decrease {statRangeD.cooldownPercent}%</Text>
+                  {successComp(succRangeD)}
                 </Space>
               </Card>
             </div>
@@ -281,6 +330,9 @@ const SkillJadeContent = () => {
   const statRangeB: SkillJadeStat = useMemo(() => {
     return getStatDiff(DMFDJSkillStatTable, BMData[0], BMData[1]);
   }, [BMData]);
+  const succRangeB = useMemo(() => {
+    return getChanceDiff(DMFDJSkillStatTable, BMData[0], BMData[1]);
+  }, [BMData]);
 
   const getBMCalc = () => {
     const onAfterChange = (value: number[]) => {
@@ -326,6 +378,7 @@ const SkillJadeContent = () => {
                 <Space direction="vertical">
                   <Text>ATK +{statRangeB.attackPercent}%</Text>
                   <Text>Cooldown Decrease {statRangeB.cooldownPercent}%</Text>
+                  {successComp(succRangeB)}
                 </Space>
               </Card>
             </div>
@@ -376,6 +429,9 @@ const SkillJadeContent = () => {
   const statRangeV: SkillJadeStat = useMemo(() => {
     return getStatDiff(DMFDJSkillStatTable, VData[0], VData[1]);
   }, [VData]);
+  const succRangeV = useMemo(() => {
+    return getChanceDiff(DMFDJSkillStatTable, VData[0], VData[1]);
+  }, [VData]);
 
   const getVCalc = () => {
     const onAfterChange = (value: number[]) => {
@@ -421,6 +477,7 @@ const SkillJadeContent = () => {
                 <Space direction="vertical">
                   <Text>ATK +{statRangeV.attackPercent}%</Text>
                   <Text>Cooldown Decrease {statRangeV.cooldownPercent}%</Text>
+                  {successComp(succRangeV)}
                 </Space>
               </Card>
             </div>
@@ -471,6 +528,9 @@ const SkillJadeContent = () => {
   const statRangeA: SkillJadeStat = useMemo(() => {
     return getStatDiff(AncientDJSkillStatTable, AncData[0], AncData[1]);
   }, [AncData]);
+  const succRangeA = useMemo(() => {
+    return getChanceDiff(AncientDJSkillStatTable, AncData[0], AncData[1]);
+  }, [AncData]);
 
   const getAncCalc = () => {
     const onAfterChange = (value: number[]) => {
@@ -515,6 +575,7 @@ const SkillJadeContent = () => {
               <Card size="small" style={{ marginTop: 4 }}>
                 <Space direction="vertical">
                   <Text>ATK +{statRangeA.attackPercent}%</Text>
+                  {successComp(succRangeA)}
                 </Space>
               </Card>
             </div>
@@ -552,6 +613,9 @@ const SkillJadeContent = () => {
 
   const statRangeDm: SkillJadeStat = useMemo(() => {
     return getStatDiff(DimensionalDJSkillStatTable, DmData[0], DmData[1]);
+  }, [DmData]);
+  const succRangeDm = useMemo(() => {
+    return getChanceDiff(DimensionalDJSkillStatTable, DmData[0], DmData[1]);
   }, [DmData]);
 
   const getDmCalc = () => {
@@ -598,6 +662,7 @@ const SkillJadeContent = () => {
                 <Space direction="vertical">
                   <Text>ATK +{statRangeDm.attackPercent}%</Text>
                   <Text>Cooldown Decrease {statRangeDm.cooldownPercent}%</Text>
+                  {successComp(succRangeDm)}
                 </Space>
               </Card>
             </div>

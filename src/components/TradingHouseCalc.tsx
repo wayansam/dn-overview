@@ -93,7 +93,7 @@ const TradingHouseCalc = ({
                           updateDt(val, it.name, "customAmt");
                         }}
                         size="middle"
-                        style={{ width: 120 }}
+                        style={{ width: 120, marginRight: 4 }}
                       />
                     </Text>
                   ) : (
