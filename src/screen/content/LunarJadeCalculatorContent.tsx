@@ -1613,14 +1613,21 @@ const LunarJadeCalculatorContent = () => {
     setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
   };
 
+  const getWidthSetting = () => {
+    if (screens.xs) {
+      return 200;
+    }
+    return 320;
+  };
+
   const getEnhanceCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <Divider orientation="left">Enhance List</Divider>
           <Form
-            labelCol={{ span: 4 }}
-            wrapperCol={{ span: 20 }}
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 19 }}
             form={formEnhance}
             name="dynamic_form_complex"
             style={{ maxWidth: 600 }}
@@ -1641,7 +1648,7 @@ const LunarJadeCalculatorContent = () => {
                     <Card
                       size="small"
                       title={`Enhance ${field.name + 1}`}
-                      style={{ minWidth: 200 }}
+                      style={{ minWidth: getWidthSetting() }}
                       key={field.key}
                       id={`${field.name}-card-${index}`}
                       extra={
@@ -1762,7 +1769,7 @@ const LunarJadeCalculatorContent = () => {
           </Form>
           {enhanceDataSource.errorDt &&
             enhanceDataSource.errorDt.length > 0 && (
-              <div style={{ marginTop: 4, maxWidth: 300 }}>
+              <div style={{ marginTop: 4, maxWidth: getWidthSetting() }}>
                 <Space direction="vertical" size={"small"}>
                   {enhanceDataSource.errorDt.map((it, x) => (
                     <Text type="warning" key={`error-label-${x}`}>

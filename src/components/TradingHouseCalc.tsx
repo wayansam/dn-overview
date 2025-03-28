@@ -73,7 +73,7 @@ const TradingHouseCalc = ({
       {dt
         .filter((item) => item.amt && item.amt !== 0)
         .map((it) => (
-          <div>
+          <div key={`th-calc-${it.name}`}>
             <Card
               size="small"
               style={{ marginTop: 4, marginLeft: 8, marginRight: 8 }}
