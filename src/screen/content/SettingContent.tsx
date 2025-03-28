@@ -74,6 +74,11 @@ const SettingContent = () => {
       },
       date: "23-02-2025",
     },
+    {
+      key: keyUpdate.U,
+      label:
+        "Success rate note on all of the skill jade",
+    },
   ];
   const dataSoon: Array<FeatureItem> = [
     { key: keyUpdate.P, label: "Conversion Costume Calculator" },
