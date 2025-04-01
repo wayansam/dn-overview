@@ -1,5 +1,18 @@
-import { QuestionCircleOutlined } from "@ant-design/icons";
-import { Col, Drawer, FloatButton, Grid, Row, Space, theme, Image } from "antd";
+import {
+  ExperimentTwoTone,
+  LoadingOutlined,
+  QuestionCircleOutlined,
+} from "@ant-design/icons";
+import {
+  Col,
+  Drawer,
+  FloatButton,
+  Grid,
+  Image,
+  Row,
+  theme,
+  Typography,
+} from "antd";
 import { useMemo, useState } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
@@ -15,13 +28,13 @@ import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import NamedEODEqContent from "./NamedEODEqContent";
 import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
-import { ExperimentTwoTone } from "@ant-design/icons";
 
 const { useBreakpoint } = Grid;
+const { Text } = Typography;
 
 const MainContent = () => {
   const {
-    token: { colorBgContainer },
+    token: { colorBgContainer, colorText },
   } = theme.useToken();
 
   const selectedSideBar = useAppSelector(
@@ -29,6 +42,7 @@ const MainContent = () => {
   );
   const isImgEnabled = useAppSelector((state) => state.UIState.isImgEnabled);
   const imgData = useAppSelector((state) => state.UIState.imgData);
+  const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
 
   const [open, setOpen] = useState(false);
   const screens = useBreakpoint();
@@ -72,9 +86,35 @@ const MainContent = () => {
       default:
         return (
           <div
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+            style={{
+              flex: 1,
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
-            <ExperimentTwoTone style={{ width: 40, height: 40 }} />
+            <div
+              style={{
+                backgroundColor: `rgba(200,200,200,0.3)`,
+                padding: 40,
+                borderRadius: 28,
+                justifyItems: "center",
+              }}
+            >
+              <div>
+                <ExperimentTwoTone style={{ fontSize: 28, padding: 7 }} />
+                <LoadingOutlined
+                  style={{
+                    fontSize: 42,
+                    color: "white",
+                    position: "fixed",
+                    marginLeft: -42,
+                  }}
+                />
+              </div>
+              <div>
+                <Text>Crafting...</Text>
+              </div>
+            </div>
           </div>
         );
     }
