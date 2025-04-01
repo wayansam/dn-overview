@@ -15,6 +15,7 @@ export const TAB_KEY = {
   heraldryAncientGoddes: "Ancients' Goddess",
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
+  miscConversion: "Conversion",
 };
 
 export const TAB_GROUP_LIST: SideBarGroupTab[] = [
@@ -85,6 +86,16 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.talismanEternal,
         name: TAB_KEY.talismanEternal,
+      },
+    ],
+  },
+  {
+    key: "MISC",
+    name: "Misc.",
+    children: [
+      {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
       },
     ],
   },

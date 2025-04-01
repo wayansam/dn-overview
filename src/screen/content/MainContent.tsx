@@ -15,9 +15,9 @@ import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import NamedEODEqContent from "./NamedEODEqContent";
 import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
+import { ExperimentTwoTone } from "@ant-design/icons";
 
 const { useBreakpoint } = Grid;
-
 
 const MainContent = () => {
   const {
@@ -32,7 +32,7 @@ const MainContent = () => {
 
   const [open, setOpen] = useState(false);
   const screens = useBreakpoint();
-  const isShowingImg = !!(isImgEnabled && imgData)
+  const isShowingImg = !!(isImgEnabled && imgData);
 
   const content = useMemo(() => {
     switch (selectedSideBar.key) {
@@ -70,25 +70,35 @@ const MainContent = () => {
         return <SettingContent />;
 
       default:
-        return;
+        return (
+          <div
+            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          >
+            <ExperimentTwoTone style={{ width: 40, height: 40 }} />
+          </div>
+        );
     }
   }, [selectedSideBar]);
 
-  const imgComponent = imgData ? (<div style={
-    {
-      marginLeft: 8,
-      display: 'flex',
-      justifyContent: 'flex-end',
-      marginRight: imgData.stickyWall ? -16 : 0
-    }
-  }>
-    <Image
-      // width={200}
-      src={imgData.url}
-      style={{ maxWidth: '100%', height: 'auto' }}
-      preview={false}
-    />
-  </div>) : <div></div>
+  const imgComponent = imgData ? (
+    <div
+      style={{
+        marginLeft: 8,
+        display: "flex",
+        justifyContent: "flex-end",
+        marginRight: imgData.stickyWall ? -16 : 0,
+      }}
+    >
+      <Image
+        // width={200}
+        src={imgData.url}
+        style={{ maxWidth: "100%", height: "auto" }}
+        preview={false}
+      />
+    </div>
+  ) : (
+    <div></div>
+  );
 
   return (
     <>
@@ -107,9 +117,7 @@ const MainContent = () => {
             {content}
           </div>
         </Col>
-        <Col span={!screens.xs && isShowingImg ? 6 : 0}>
-          {imgComponent}
-        </Col>
+        <Col span={!screens.xs && isShowingImg ? 6 : 0}>{imgComponent}</Col>
       </Row>
       {screens.xs && isShowingImg && !imgData?.onTop && imgComponent}
       <FloatButton
