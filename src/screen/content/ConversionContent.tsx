@@ -368,6 +368,14 @@ const ConversionContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
 
+  const tempComp = (str: string, arr: number[]) =>
+    arr.length > 0 ? (
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <Text>{str} succes rate from the smaller enhancement</Text>
+        <Text>{arr.map((it) => `${it}%`).join(", ")}</Text>
+      </div>
+    ) : undefined;
+
   const weaponNotes = useMemo(() => {
     if (invalidDtSrc) {
       return;
@@ -387,19 +395,13 @@ const ConversionContent = () => {
           Math.max(from, 1) - 1,
           Math.min(to, 11) - 1
         );
-        const tempComp = (str: string) =>
-          tempSlice.length > 0 ? (
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <Text>{str} succes rate from the smaller enhancement</Text>
-              <Text>{tempSlice.map((it) => `${it}%`).join(", ")}</Text>
-            </div>
-          ) : undefined;
+
         switch (equipment) {
           case CONVERSION_TYPE.MAIN_WEAPON:
-            temp.main = tempComp("Main Weapon");
+            temp.main = tempComp("Main Weapon", tempSlice);
             break;
           case CONVERSION_TYPE.SECOND_WEAPON:
-            temp.second = tempComp("Second Weapon");
+            temp.second = tempComp("Second Weapon", tempSlice);
             break;
 
           default:
@@ -689,6 +691,7 @@ const ConversionContent = () => {
                 pagination={false}
                 bordered
               />
+              <Text>* +1 to +10 have 100% success rate</Text>
             </div>
             <div style={{ marginRight: 10, marginBottom: 10 }}>
               <Table
@@ -731,6 +734,11 @@ const ConversionContent = () => {
                 pagination={false}
                 bordered
               />
+              <Text>
+                * You can buy Conversion Weapon box via Trading House, or Cherry
+                store
+              </Text>
+              {tempComp("Conversion Weapon", WEAP_ENH_SUC_RATE)}
             </div>
             <div style={{ marginRight: 10, marginBottom: 10 }}>
               <Table
@@ -774,6 +782,7 @@ const ConversionContent = () => {
                 pagination={false}
                 bordered
               />
+              <Text>* +1 to +10 have 100% success rate</Text>
             </div>
             <div style={{ marginRight: 10, marginBottom: 10 }}>
               <Table
@@ -817,6 +826,7 @@ const ConversionContent = () => {
                 pagination={false}
                 bordered
               />
+              <Text>* +1 to +10 have 100% success rate</Text>
             </div>
             <div style={{ marginRight: 10, marginBottom: 10 }}>
               <Table
