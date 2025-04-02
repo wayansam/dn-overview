@@ -17,14 +17,7 @@ import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { CONVERSION_TYPE } from "../../constants/InGame.constants";
 import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
-import {
-  KilosT1ArmorCraftMaterial,
-  KilosT1ArmorEnhanceMaterialTable,
-  KilosT2ArmorEnhanceMaterialTable,
-  NeedleOfIntelectCraftMaterial,
-} from "../../data/KilosData";
 import { ConversionCalculator } from "../../interface/Common.interface";
-import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
 import { columnsResource } from "../../utils/common.util";
 
 const { Text } = Typography;
@@ -255,11 +248,6 @@ const ConversionContent = () => {
       editable: true,
     },
   ];
-
-  // const encTable = [
-  //   ...KilosT1ArmorEnhanceMaterialTable,
-  //   ...KilosT2ArmorEnhanceMaterialTable,
-  // ];
 
   const handleSave = (row: ConversionCalculator) => {
     const newData = [...dataSource];
@@ -532,98 +520,6 @@ const ConversionContent = () => {
       </div>
     );
   };
-
-  const columnsArmorT1: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrow, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrow}(Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "Joys & Sorrow",
-      dataIndex: "joySorrow",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-
-  const columnsArmorT2: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>HG Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrowHG, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrowHG}(HG Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "HG Joys & Sorrow",
-      dataIndex: "joySorrowHG",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
 
   const getStatContent = () => {
     const itemStat: CollapseProps["items"] = [

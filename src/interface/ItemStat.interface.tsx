@@ -91,3 +91,31 @@ export interface LunarJadeEnhancementStats {
   phyDef?: number;
   magDef?: number;
 }
+
+export interface ConversionStats {
+  encLevel: number;
+  phyMagAtk?: number;
+  phyMagAtkPercent?: number;
+  attAtkPercent?: number;
+
+  crt?: number;
+  crtPercent?: number;
+  cdm?: number;
+  fd?: number;
+
+  str?: number;
+  agi?: number;
+  int?: number;
+  vit?: number;
+  strPercent?: number;
+  agiPercent?: number;
+  intPercent?: number;
+  vitPercent?: number;
+
+  defMagdef?: number;
+  defMagdefPercent?: number;
+  hp?: number;
+  hpPercent?: number;
+  moveSpeedPercent?: number;
+  moveSpeedPercentTown?: number; //(?)
+}
