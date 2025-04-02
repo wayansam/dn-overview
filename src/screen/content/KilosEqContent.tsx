@@ -357,7 +357,7 @@ const KilosEqContent = () => {
       const found = dataSource.find((dt) => dt.key === item);
 
       if (found) {
-        const { equipment, from, to, max, min, evoTier2, craft } = found;
+        const { equipment, from, to,  evoTier2, craft } = found;
         let tempSlice: KilosArmorCraftMaterial[] = [];
         switch (equipment) {
           case EQUIPMENT.HELM:

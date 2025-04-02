@@ -195,7 +195,7 @@ const SkillJadeContent = () => {
   };
 
   const successComp = (arr: number[]) => {
-    return succRangeDm.length > 0 ? (
+    return arr.length > 0 ? (
       <>
         <Text>Succes rate from the smaller enhancement</Text>
         <Text>{arr.map((it) => `${it}%`).join(", ")}</Text>

@@ -75,7 +75,7 @@ export const dataConversionCalculator: ConversionCalculator[] = [
     to: 1,
   },
   {
-    key: "12",
+    key: "10",
     equipment: CONVERSION_TYPE.RING,
     min: 0,
     max: 12,
