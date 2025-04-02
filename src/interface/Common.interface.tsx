@@ -1,4 +1,8 @@
-import { EQUIPMENT, ITEM_RARITY } from "../constants/InGame.constants";
+import {
+  EQUIPMENT,
+  ITEM_RARITY,
+  CONVERSION_TYPE,
+} from "../constants/InGame.constants";
 
 export interface ExtraPayload {
   lunarScreen?: {
@@ -45,4 +49,13 @@ export interface KilosCalculator {
   to: number;
   evoTier2: boolean;
   craft: boolean;
+}
+
+export interface ConversionCalculator {
+  key: string;
+  equipment: CONVERSION_TYPE;
+  min: number;
+  max: number;
+  from: number;
+  to: number;
 }

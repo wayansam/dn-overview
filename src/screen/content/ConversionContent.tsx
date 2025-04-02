@@ -14,14 +14,14 @@ import {
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import { dataKilosCalculator } from "../../data/KilosCalculatorData";
+import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
 import {
   KilosT1ArmorCraftMaterial,
   KilosT1ArmorEnhanceMaterialTable,
   KilosT2ArmorEnhanceMaterialTable,
   NeedleOfIntelectCraftMaterial,
 } from "../../data/KilosData";
-import { KilosCalculator } from "../../interface/Common.interface";
+import { ConversionCalculator } from "../../interface/Common.interface";
 import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
 import { columnsResource } from "../../utils/common.util";
 
@@ -39,7 +39,13 @@ interface TableMaterialList {
 }
 
 const getLabel = (item: number) => {
-  return item <= 20 ? `Tier 1 +${item}` : `Tier 2 +${item - 20}`;
+  if (item === 0) {
+    return "Buy";
+  }
+  if (item === 12) {
+    return "Evo Legend";
+  }
+  return `+${item - 1}`;
 };
 
 const opt = (start: number, end: number) =>
@@ -50,10 +56,8 @@ const opt = (start: number, end: number) =>
 
 enum TAB {
   EQ = "Equipment",
-  CR = "Craft",
   FR = "From",
   TO = "To",
-  EVO2 = "Evo Tier 2",
 }
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
@@ -77,9 +81,9 @@ interface EditableCellProps {
   title: React.ReactNode;
   editable: boolean;
   children: React.ReactNode;
-  dataIndex: keyof KilosCalculator;
-  record: KilosCalculator;
-  handleSave: (record: KilosCalculator) => void;
+  dataIndex: keyof ConversionCalculator;
+  record: ConversionCalculator;
+  handleSave: (record: ConversionCalculator) => void;
 }
 
 const EditableCell: React.FC<EditableCellProps> = ({
@@ -93,8 +97,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [selectItem, setSelectItem] = useState<number>(0);
-  const [evoItem, setEvoItem] = useState<boolean>(false);
-  const [craftItem, setCraftItem] = useState<boolean>(false);
   const form = useContext(EditableContext)!;
 
   useEffect(() => {
@@ -103,12 +105,6 @@ const EditableCell: React.FC<EditableCellProps> = ({
     }
     if (record?.to && title === TAB.TO) {
       setSelectItem(record.to);
-    }
-    if (title === TAB.EVO2) {
-      setEvoItem(record?.evoTier2);
-    }
-    if (title === TAB.CR) {
-      setCraftItem(record?.craft);
     }
   }, [record, title]);
 
@@ -146,105 +142,75 @@ const EditableCell: React.FC<EditableCellProps> = ({
   };
 
   if (editable) {
-    switch (title) {
-      case TAB.EVO2:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setEvoItem(e);
-                handleSave({ ...record, evoTier2: e });
-              }}
-              checked={evoItem}
-            />
-          </div>
-        );
-        break;
-      case TAB.CR:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setCraftItem(e);
-                handleSave({ ...record, craft: e });
-              }}
-              checked={craftItem}
-            />
-          </div>
-        );
-        break;
-
-      default:
-        childNode = editing ? (
-          <>
-            {title === TAB.FR && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findTo <= findFr ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-            {title === TAB.TO && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findFr >= findTo ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-          </>
-        ) : (
-          <div
-            className="editable-cell-value-wrap"
-            style={{
-              paddingRight: 24,
-              color:
-                (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-                  ? "red"
-                  : "unset",
-              minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
-              paddingTop: 1,
-              paddingBottom: 1,
-            }}
-            onClick={toggleEdit}
-          >
-            {renderCustom(children)}
-          </div>
-        );
-        break;
-    }
+    childNode = editing ? (
+      <>
+        {title === TAB.FR && (
+          <Select
+            defaultValue={selectItem}
+            style={{ width: 120 }}
+            onChange={handleChange}
+            options={opt(record.min, record.max)}
+            onBlur={saveSelect}
+            autoFocus
+            status={findTo <= findFr ? "error" : undefined}
+            size="small"
+          ></Select>
+        )}
+        {title === TAB.TO && (
+          <Select
+            defaultValue={selectItem}
+            style={{ width: 120 }}
+            onChange={handleChange}
+            options={opt(record.min, record.max)}
+            onBlur={saveSelect}
+            autoFocus
+            status={findFr >= findTo ? "error" : undefined}
+            size="small"
+          ></Select>
+        )}
+      </>
+    ) : (
+      <div
+        className="editable-cell-value-wrap"
+        style={{
+          paddingRight: 24,
+          color:
+            (title === TAB.FR || title === TAB.TO) && findTo <= findFr
+              ? "red"
+              : "unset",
+          minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
+          paddingTop: 1,
+          paddingBottom: 1,
+        }}
+        onClick={toggleEdit}
+      >
+        {renderCustom(children)}
+      </div>
+    );
   }
 
   return <td {...restProps}>{childNode}</td>;
 };
 
 type ColumnTypes = (
-  | ColumnGroupType<KilosCalculator>
-  | ColumnType<KilosCalculator>
+  | ColumnGroupType<ConversionCalculator>
+  | ColumnType<ConversionCalculator>
 )[];
 
-const KilosEqContent = () => {
+const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [dataSource, setDataSource] =
-    useState<KilosCalculator[]>(dataKilosCalculator);
+  const [dataSource, setDataSource] = useState<ConversionCalculator[]>(
+    dataConversionCalculator
+  );
   const [selectFrom, setSelectFrom] = useState<number>(0);
-  const [selectTo, setSelectTo] = useState<number>(20);
+  const [selectTo, setSelectTo] = useState<number>(1);
   const [checkedChange, setCheckedChange] = useState(false);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedEvo, setCheckedEvo] = useState(false);
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
-    selectedRows: KilosCalculator[]
+    selectedRows: ConversionCalculator[]
   ) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
@@ -270,11 +236,6 @@ const KilosEqContent = () => {
       dataIndex: "equipment",
     },
     {
-      title: TAB.CR,
-      dataIndex: "craft",
-      editable: true,
-    },
-    {
       title: TAB.FR,
       dataIndex: "from",
       editable: true,
@@ -284,19 +245,14 @@ const KilosEqContent = () => {
       dataIndex: "to",
       editable: true,
     },
-    {
-      title: TAB.EVO2,
-      dataIndex: "evoTier2",
-      editable: true,
-    },
   ];
 
-  const encTable = [
-    ...KilosT1ArmorEnhanceMaterialTable,
-    ...KilosT2ArmorEnhanceMaterialTable,
-  ];
+  // const encTable = [
+  //   ...KilosT1ArmorEnhanceMaterialTable,
+  //   ...KilosT2ArmorEnhanceMaterialTable,
+  // ];
 
-  const handleSave = (row: KilosCalculator) => {
+  const handleSave = (row: ConversionCalculator) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
     const item = newData[index];
@@ -313,7 +269,7 @@ const KilosEqContent = () => {
     }
     return {
       ...col,
-      onCell: (record: KilosCalculator) => ({
+      onCell: (record: ConversionCalculator) => ({
         record,
         editable: col.editable,
         dataIndex: col.dataIndex,
@@ -323,125 +279,123 @@ const KilosEqContent = () => {
     };
   });
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  // const invalidDtSrc = useMemo(() => {
+  //   let flag = false;
+  //   selectedRowKeys.forEach((item) => {
+  //     const found = dataSource.find((dt) => dt.key === item);
+  //     if (!flag && found) {
+  //       if (found.to <= found.from) {
+  //         flag = true;
+  //       }
+  //     }
+  //   });
+  //   return flag;
+  // }, [selectedRowKeys, dataSource]);
 
-  const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Helm Fragment": 0,
-      "Upper Fragment": 0,
-      "Lower Fragment": 0,
-      "Gloves Fragment": 0,
-      "Shoes Fragment": 0,
-      "Joys & Sorrow of Kilos": 0,
-      "High Grade Joys & Sorrow of Kilos": 0,
-      "Thread of Intellect": 0,
-      Gold: 0,
-      "Needle of Intellect": 0,
-    };
-    if (invalidDtSrc) {
-      return temp;
-    }
+  // const tableResource: TableMaterialList = useMemo(() => {
+  //   let temp: TableMaterialList = {
+  //     "Helm Fragment": 0,
+  //     "Upper Fragment": 0,
+  //     "Lower Fragment": 0,
+  //     "Gloves Fragment": 0,
+  //     "Shoes Fragment": 0,
+  //     "Joys & Sorrow of Kilos": 0,
+  //     "High Grade Joys & Sorrow of Kilos": 0,
+  //     "Thread of Intellect": 0,
+  //     Gold: 0,
+  //     "Needle of Intellect": 0,
+  //   };
+  //   if (invalidDtSrc) {
+  //     return temp;
+  //   }
 
-    selectedRowKeys.map((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
+  //   selectedRowKeys.map((item) => {
+  //     const found = dataSource.find((dt) => dt.key === item);
 
-      if (found) {
-        const { equipment, from, to, max, min, evoTier2, craft } = found;
-        let tempSlice: KilosArmorCraftMaterial[] = [];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = encTable.slice(from, to);
-            break;
+  //     if (found) {
+  //       const { equipment, from, to, max, min, evoTier2, craft } = found;
+  //       let tempSlice: KilosArmorCraftMaterial[] = [];
+  //       switch (equipment) {
+  //         case EQUIPMENT.HELM:
+  //         case EQUIPMENT.UPPER:
+  //         case EQUIPMENT.LOWER:
+  //         case EQUIPMENT.GLOVE:
+  //         case EQUIPMENT.SHOES:
+  //           tempSlice = encTable.slice(from, to);
+  //           break;
 
-          default:
-            break;
-        }
+  //         default:
+  //           break;
+  //       }
 
-        let tempFragment = 0;
-        let tempJoySorrow = 0;
-        let tempHGJoySorrow = 0;
-        let tempThreadIntel = 0;
-        let tempGold = 0;
+  //       let tempFragment = 0;
+  //       let tempJoySorrow = 0;
+  //       let tempHGJoySorrow = 0;
+  //       let tempThreadIntel = 0;
+  //       let tempGold = 0;
 
-        tempSlice.forEach((slicedItem) => {
-          tempFragment += slicedItem.eqTypeFragment;
-          tempJoySorrow += slicedItem.joySorrow;
-          tempHGJoySorrow += slicedItem.joySorrowHG;
-          tempThreadIntel += slicedItem.threadIntelect;
-          tempGold += slicedItem.gold;
-        });
+  //       tempSlice.forEach((slicedItem) => {
+  //         tempFragment += slicedItem.eqTypeFragment;
+  //         tempJoySorrow += slicedItem.joySorrow;
+  //         tempHGJoySorrow += slicedItem.joySorrowHG;
+  //         tempThreadIntel += slicedItem.threadIntelect;
+  //         tempGold += slicedItem.gold;
+  //       });
 
-        if (craft) {
-          tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
-          tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
-          tempGold += KilosT1ArmorCraftMaterial.gold;
-        }
+  //       if (craft) {
+  //         tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
+  //         tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
+  //         tempGold += KilosT1ArmorCraftMaterial.gold;
+  //       }
 
-        temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
-        temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
-        temp["Thread of Intellect"] += tempThreadIntel;
-        temp["Gold"] += tempGold;
-        temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            temp["Helm Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.UPPER:
-            temp["Upper Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.LOWER:
-            temp["Lower Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.GLOVE:
-            temp["Gloves Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.SHOES:
-            temp["Shoes Fragment"] += tempFragment;
-            break;
+  //       temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
+  //       temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
+  //       temp["Thread of Intellect"] += tempThreadIntel;
+  //       temp["Gold"] += tempGold;
+  //       temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
+  //       switch (equipment) {
+  //         case EQUIPMENT.HELM:
+  //           temp["Helm Fragment"] += tempFragment;
+  //           break;
+  //         case EQUIPMENT.UPPER:
+  //           temp["Upper Fragment"] += tempFragment;
+  //           break;
+  //         case EQUIPMENT.LOWER:
+  //           temp["Lower Fragment"] += tempFragment;
+  //           break;
+  //         case EQUIPMENT.GLOVE:
+  //           temp["Gloves Fragment"] += tempFragment;
+  //           break;
+  //         case EQUIPMENT.SHOES:
+  //           temp["Shoes Fragment"] += tempFragment;
+  //           break;
 
-          default:
-            break;
-        }
-      }
-    });
-    if (checkedChange) {
-      temp["Joys & Sorrow of Kilos"] +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
-      temp["Thread of Intellect"] +=
-        temp["Needle of Intellect"] *
-        NeedleOfIntelectCraftMaterial.threadIntelect;
-      temp.Gold +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
-      temp["Needle of Intellect"] = 0;
-    }
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
+  //         default:
+  //           break;
+  //       }
+  //     }
+  //   });
+  //   if (checkedChange) {
+  //     temp["Joys & Sorrow of Kilos"] +=
+  //       temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
+  //     temp["Thread of Intellect"] +=
+  //       temp["Needle of Intellect"] *
+  //       NeedleOfIntelectCraftMaterial.threadIntelect;
+  //     temp.Gold +=
+  //       temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
+  //     temp["Needle of Intellect"] = 0;
+  //   }
+  //   return temp;
+  // }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
       ...item,
       from: selectFrom,
       to: selectTo,
-      craft: checkedCraft,
-      evoTier2: checkedEvo,
     }));
     setDataSource(newData);
-  }, [selectFrom, selectTo, checkedCraft, checkedEvo]);
+  }, [selectFrom, selectTo]);
 
   const getCalculator = () => {
     return (
@@ -461,7 +415,7 @@ const KilosEqContent = () => {
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {invalidDtSrc && (
+          {/* {invalidDtSrc && (
             <div>
               <Alert
                 banner
@@ -534,8 +488,9 @@ const KilosEqContent = () => {
                 Change Needle to Craft mats
               </Tooltip>
             </Checkbox>
-          </div>
-          <Divider orientation="left">Material List</Divider>
+          </div> */}
+
+          {/* <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
             dataSource={Object.entries(tableResource).map(([key, value]) => ({
@@ -545,7 +500,7 @@ const KilosEqContent = () => {
             columns={columnsResource}
             pagination={false}
             bordered
-          />
+          /> */}
         </div>
       </div>
     );
@@ -643,40 +598,98 @@ const KilosEqContent = () => {
     },
   ];
 
+  const getStatContent = () => {
+    const itemStat: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Armor",
+        children: (
+          <div style={{ marginRight: 10 }}>
+            {/* <Table
+              size={"small"}
+              dataSource={BDBaofaTalismanStatTable}
+              columns={columnsBaofaMats}
+              pagination={false}
+              bordered
+            /> */}
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Weapon",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+      {
+        key: "3",
+        label: "Accesories",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+      {
+        key: "4",
+        label: "WTD",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <Collapse items={itemStat} size="small" />
+      </div>
+    );
+  };
+
+  const getMatsContent = () => {
+    const itemMats: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Armor",
+        children: (
+          <div style={{ marginRight: 10 }}>
+            {/* <Table
+              size={"small"}
+              dataSource={BDBaofaTalismanStatTable}
+              columns={columnsBaofaMats}
+              pagination={false}
+              bordered
+            /> */}
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Weapon",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+      {
+        key: "3",
+        label: "Accesories",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+      {
+        key: "4",
+        label: "WTD",
+        children: <div style={{ marginRight: 10 }}></div>,
+      },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <Collapse items={itemMats} size="small" />
+      </div>
+    );
+  };
+
   const items: CollapseProps["items"] = [
     {
       key: "1",
-      label: "Armor Tier 1 Craft Reference",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={KilosT1ArmorEnhanceMaterialTable}
-              columns={columnsArmorT1}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
+      label: "Stats",
+      children: getStatContent(),
     },
     {
       key: "2",
-      label: "Armor Tier 2 Craft Reference",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={KilosT2ArmorEnhanceMaterialTable}
-              columns={columnsArmorT2}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
+      label: "Mats",
+      children: getMatsContent(),
     },
     {
       key: "3",
@@ -691,4 +704,4 @@ const KilosEqContent = () => {
   );
 };
 
-export default KilosEqContent;
+export default ConversionContent;

@@ -28,6 +28,7 @@ import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import NamedEODEqContent from "./NamedEODEqContent";
 import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
+import ConversionContent from "./ConversionContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -79,6 +80,9 @@ const MainContent = () => {
 
       case TAB_KEY.talismanEternal:
         return <ExternalTalismanContent />;
+
+      case TAB_KEY.miscConversion:
+        return <ConversionContent />;
 
       case TAB_KEY.setting:
         return <SettingContent />;

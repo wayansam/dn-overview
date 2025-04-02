@@ -99,3 +99,19 @@ export enum LUNAR_JADE_TYPE {
   ATT = "Attack",
   DEF = "Defense",
 }
+
+export enum CONVERSION_TYPE {
+  HELM = "Helm",
+  UPPER = "Upper",
+  LOWER = "Lower",
+  GLOVE = "Glove",
+  SHOES = "Shoes",
+  MAIN_WEAPON = "Main Weapon",
+  SECOND_WEAPON = "Second Weapon",
+  NECKLACE = "Necklace",
+  EARRING = "Earring",
+  RING = "Ring",
+  WING = "Wing",
+  TAIL = "Tail",
+  DECAL = "Decal",
+}
