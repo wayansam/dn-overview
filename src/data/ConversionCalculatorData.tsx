@@ -119,7 +119,7 @@ export const dataConversionCalculator: ConversionCalculator[] = [
 
 export const conversionHelmStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 3000,
     phyMagAtkPercent: 12.0,
     fd: 160,
@@ -130,7 +130,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 5.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 15000,
     phyMagAtkPercent: 12.0,
     fd: 170,
@@ -141,7 +141,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 6.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 30000,
     phyMagAtkPercent: 12.5,
     fd: 190,
@@ -152,7 +152,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 7.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 45000,
     phyMagAtkPercent: 13.0,
     fd: 210,
@@ -163,7 +163,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 8.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 60000,
     phyMagAtkPercent: 13.5,
     fd: 230,
@@ -174,7 +174,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 9.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 75000,
     phyMagAtkPercent: 14.0,
     fd: 250,
@@ -185,7 +185,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 10.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 90000,
     phyMagAtkPercent: 14.5,
     fd: 270,
@@ -196,7 +196,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 11.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 105000,
     phyMagAtkPercent: 15.0,
     fd: 290,
@@ -207,7 +207,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 12.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 120000,
     phyMagAtkPercent: 15.5,
     fd: 310,
@@ -218,7 +218,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 13.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 135000,
     phyMagAtkPercent: 16.0,
     fd: 330,
@@ -229,7 +229,7 @@ export const conversionHelmStats: ConversionStats[] = [
     hpPercent: 14.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 150000,
     phyMagAtkPercent: 17.0,
     fd: 350,
@@ -239,10 +239,26 @@ export const conversionHelmStats: ConversionStats[] = [
     vit: 2500,
     hpPercent: 15.0,
   },
+  {
+    encLevel: "Legend",
+    phyMagAtk: 260000,
+    phyMagAtkPercent: 17.0,
+    fd: 350,
+    str: 0,
+    agi: 0,
+    int: 0,
+    vit: 0,
+    strPercent: 2,
+    agiPercent: 2,
+    intPercent: 2,
+    vitPercent: 15,
+    hp: 2100000,
+    hpPercent: 45.0,
+  },
 ];
 export const conversionUpperStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     attAtkPercent: 0,
     crtPercent: 10.0,
     fd: 150,
@@ -256,7 +272,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 10.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     attAtkPercent: 0,
     crtPercent: 10.0,
     fd: 170,
@@ -270,7 +286,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 10.5,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     attAtkPercent: 1.0,
     crtPercent: 10.0,
     fd: 190,
@@ -284,7 +300,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 11.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     attAtkPercent: 1.5,
     crtPercent: 10.0,
     fd: 210,
@@ -298,7 +314,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 11.5,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     attAtkPercent: 2.0,
     crtPercent: 10.0,
     fd: 230,
@@ -312,7 +328,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 12.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     attAtkPercent: 3.0,
     crtPercent: 10.0,
     fd: 250,
@@ -326,7 +342,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 12.5,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     attAtkPercent: 3.5,
     crtPercent: 10.0,
     fd: 270,
@@ -340,7 +356,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 13.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     attAtkPercent: 4.0,
     crtPercent: 10.0,
     fd: 290,
@@ -354,7 +370,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 13.5,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     attAtkPercent: 4.5,
     crtPercent: 10.0,
     fd: 310,
@@ -368,7 +384,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 14.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     attAtkPercent: 5.0,
     crtPercent: 10.0,
     fd: 330,
@@ -382,7 +398,7 @@ export const conversionUpperStats: ConversionStats[] = [
     vitPercent: 14.5,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     attAtkPercent: 7.0,
     crtPercent: 10.0,
     fd: 350,
@@ -395,10 +411,27 @@ export const conversionUpperStats: ConversionStats[] = [
     intPercent: 15.0,
     vitPercent: 15.0,
   },
+  {
+    encLevel: "Legend",
+    phyMagAtkPercent: 16.5,
+    attAtkPercent: 12.0,
+    crtPercent: 11.0,
+    fd: 350,
+    str: 0,
+    agi: 0,
+    int: 0,
+    vit: 0,
+    strPercent: 15.0,
+    agiPercent: 15.0,
+    intPercent: 15.0,
+    vitPercent: 15.0,
+    hp: 2100000,
+    hpPercent: 35.0,
+  },
 ];
 export const conversionLowerStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtkPercent: 0.0,
     attAtkPercent: 17.0,
     str: 100,
@@ -407,7 +440,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 100,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtkPercent: 0.0,
     attAtkPercent: 17.5,
     str: 120,
@@ -416,7 +449,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 120,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtkPercent: 1.0,
     attAtkPercent: 18.0,
     str: 500,
@@ -425,7 +458,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 500,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtkPercent: 1.5,
     attAtkPercent: 18.5,
     str: 750,
@@ -434,7 +467,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 750,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtkPercent: 2.0,
     attAtkPercent: 19.0,
     str: 1000,
@@ -443,7 +476,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 1000,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtkPercent: 2.5,
     attAtkPercent: 20.0,
     str: 1250,
@@ -452,7 +485,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 1250,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtkPercent: 3.0,
     attAtkPercent: 21.0,
     str: 1500,
@@ -461,7 +494,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 1500,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtkPercent: 3.5,
     attAtkPercent: 22.0,
     str: 1750,
@@ -470,7 +503,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 1750,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtkPercent: 4.0,
     attAtkPercent: 23.0,
     str: 2000,
@@ -479,7 +512,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 2000,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtkPercent: 4.5,
     attAtkPercent: 24.0,
     str: 2250,
@@ -488,7 +521,7 @@ export const conversionLowerStats: ConversionStats[] = [
     vit: 2250,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtkPercent: 5.0,
     attAtkPercent: 25.0,
     str: 2500,
@@ -496,10 +529,23 @@ export const conversionLowerStats: ConversionStats[] = [
     int: 2500,
     vit: 2500,
   },
+  {
+    encLevel: "Legend",
+    phyMagAtkPercent: 16.5,
+    attAtkPercent: 25.0,
+    crtPercent: 8,
+    fd: 300,
+    str: 0,
+    agi: 0,
+    int: 0,
+    vit: 0,
+    hp: 2100000,
+    hpPercent: 16.0,
+  },
 ];
 export const conversionGloveStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtkPercent: 0.0,
     attAtkPercent: 0.0,
     crtPercent: 10.0,
@@ -511,7 +557,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 15.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtkPercent: 0.0,
     attAtkPercent: 0.0,
     crtPercent: 10.0,
@@ -523,7 +569,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 16.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtkPercent: 1.0,
     attAtkPercent: 1.0,
     crtPercent: 10.0,
@@ -535,7 +581,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 17.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtkPercent: 1.5,
     attAtkPercent: 1.5,
     crtPercent: 10.0,
@@ -547,7 +593,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 18.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtkPercent: 2.0,
     attAtkPercent: 2.0,
     crtPercent: 10.0,
@@ -559,7 +605,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 19.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtkPercent: 2.5,
     attAtkPercent: 3.0,
     crtPercent: 10.0,
@@ -571,7 +617,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 20.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtkPercent: 3.0,
     attAtkPercent: 3.5,
     crtPercent: 10.0,
@@ -583,7 +629,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 21.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtkPercent: 3.5,
     attAtkPercent: 4.0,
     crtPercent: 10.0,
@@ -595,7 +641,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 22.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtkPercent: 4.0,
     attAtkPercent: 4.5,
     crtPercent: 10.0,
@@ -607,7 +653,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 23.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtkPercent: 4.5,
     attAtkPercent: 5.0,
     crtPercent: 10.0,
@@ -619,7 +665,7 @@ export const conversionGloveStats: ConversionStats[] = [
     hpPercent: 24.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtkPercent: 5.0,
     attAtkPercent: 7.0,
     crtPercent: 10.0,
@@ -630,10 +676,23 @@ export const conversionGloveStats: ConversionStats[] = [
     vit: 100,
     hpPercent: 25.0,
   },
+  {
+    encLevel: "Legend",
+    phyMagAtkPercent: 11.0,
+    attAtkPercent: 13.5,
+    crtPercent: 11.0,
+    fd: 350,
+    str: 5500,
+    agi: 5500,
+    int: 5500,
+    vit: 5500,
+    hp: 2100000,
+    hpPercent: 25.0,
+  },
 ];
 export const conversionShoesStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtkPercent: 11.0,
     attAtkPercent: 0.0,
     fd: 160,
@@ -645,7 +704,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtkPercent: 11.5,
     attAtkPercent: 0.0,
     fd: 170,
@@ -657,7 +716,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtkPercent: 12.0,
     attAtkPercent: 1.0,
     fd: 190,
@@ -669,7 +728,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtkPercent: 12.5,
     attAtkPercent: 1.5,
     fd: 210,
@@ -681,7 +740,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtkPercent: 13.0,
     attAtkPercent: 2.0,
     fd: 230,
@@ -693,7 +752,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtkPercent: 13.5,
     attAtkPercent: 3.0,
     fd: 250,
@@ -705,7 +764,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtkPercent: 14.0,
     attAtkPercent: 3.5,
     fd: 270,
@@ -717,7 +776,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtkPercent: 14.5,
     attAtkPercent: 4.0,
     fd: 290,
@@ -729,7 +788,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtkPercent: 15.0,
     attAtkPercent: 4.5,
     fd: 310,
@@ -741,7 +800,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtkPercent: 15.5,
     attAtkPercent: 5.0,
     fd: 330,
@@ -753,7 +812,7 @@ export const conversionShoesStats: ConversionStats[] = [
     moveSpeedPercent: 15.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtkPercent: 16.0,
     attAtkPercent: 7.0,
     fd: 350,
@@ -764,6 +823,23 @@ export const conversionShoesStats: ConversionStats[] = [
     hpPercent: 15.0,
     moveSpeedPercent: 15.0,
   },
+  {
+    encLevel: "Legend",
+    phyMagAtkPercent: 16.0,
+    attAtkPercent: 14.5,
+    fd: 1050,
+    str: 0,
+    agi: 0,
+    int: 0,
+    vit: 0,
+    strPercent: 2,
+    agiPercent: 2,
+    intPercent: 2,
+    vitPercent: 3,
+    hp: 1100000,
+    hpPercent: 16.0,
+    moveSpeedPercent: 15.0,
+  },
 ];
 
 export const conversionMainStats: ConversionStats[] = [];
@@ -771,7 +847,7 @@ export const conversionSecondStats: ConversionStats[] = [];
 
 export const conversionNecklaceStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtkPercent: 0,
     attAtkPercent: 4.0,
     fd: 150,
@@ -779,10 +855,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 3000,
+    defMagdef: 0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtkPercent: 1.0,
     attAtkPercent: 4.0,
     fd: 200,
@@ -790,10 +866,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 6000,
+    defMagdef: 3000,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtkPercent: 2.0,
     attAtkPercent: 4.0,
     fd: 300,
@@ -801,10 +877,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 9000,
+    defMagdef: 6000,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtkPercent: 3.0,
     attAtkPercent: 4.0,
     fd: 400,
@@ -812,10 +888,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 12000,
+    defMagdef: 9000,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtkPercent: 4.0,
     attAtkPercent: 4.0,
     fd: 500,
@@ -823,10 +899,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 15000,
+    defMagdef: 12000,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtkPercent: 5.0,
     attAtkPercent: 4.0,
     fd: 600,
@@ -834,10 +910,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 18000,
+    defMagdef: 15000,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtkPercent: 6.0,
     attAtkPercent: 4.0,
     fd: 700,
@@ -845,10 +921,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 21000,
+    defMagdef: 18000,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtkPercent: 7.0,
     attAtkPercent: 4.0,
     fd: 800,
@@ -856,10 +932,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 24000,
+    defMagdef: 21000,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtkPercent: 8.0,
     attAtkPercent: 4.0,
     fd: 900,
@@ -867,10 +943,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 27000,
+    defMagdef: 24000,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtkPercent: 9.0,
     attAtkPercent: 4.0,
     fd: 1000,
@@ -878,10 +954,10 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 30000,
+    defMagdef: 27000,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtkPercent: 10.0,
     attAtkPercent: 4.0,
     fd: 1100,
@@ -889,12 +965,12 @@ export const conversionNecklaceStats: ConversionStats[] = [
     agi: 1000,
     int: 1000,
     vit: 1000,
-    defMagdef: 33000,
+    defMagdef: 30000,
   },
 ];
 export const conversionEarringStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 48000,
     phyMagAtkPercent: 0,
     crtPercent: 7.0,
@@ -904,7 +980,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 50000,
     phyMagAtkPercent: 1.0,
     crtPercent: 7.0,
@@ -914,7 +990,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 5.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 55000,
     phyMagAtkPercent: 2.0,
     crtPercent: 7.0,
@@ -924,7 +1000,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 10.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 60000,
     phyMagAtkPercent: 3.0,
     crtPercent: 7.0,
@@ -934,7 +1010,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 15.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 65000,
     phyMagAtkPercent: 4.0,
     crtPercent: 7.0,
@@ -944,7 +1020,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 20.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 70000,
     phyMagAtkPercent: 5.0,
     crtPercent: 7.0,
@@ -954,7 +1030,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 25.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 75000,
     phyMagAtkPercent: 6.0,
     crtPercent: 7.0,
@@ -964,7 +1040,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 30.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 80000,
     phyMagAtkPercent: 7.0,
     crtPercent: 7.0,
@@ -974,7 +1050,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 35.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 85000,
     phyMagAtkPercent: 8.0,
     crtPercent: 7.0,
@@ -984,7 +1060,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 40.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 90000,
     phyMagAtkPercent: 9.0,
     crtPercent: 7.0,
@@ -994,7 +1070,7 @@ export const conversionEarringStats: ConversionStats[] = [
     hpPercent: 45.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 95000,
     phyMagAtkPercent: 10.0,
     crtPercent: 7.0,
@@ -1006,7 +1082,7 @@ export const conversionEarringStats: ConversionStats[] = [
 ];
 export const conversionRingStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 5000,
     phyMagAtkPercent: 0,
     attAtkPercent: 8.0,
@@ -1014,7 +1090,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 7100,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 10000,
     phyMagAtkPercent: 1.0,
     attAtkPercent: 8.0,
@@ -1022,7 +1098,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 10000,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 15000,
     phyMagAtkPercent: 2.0,
     attAtkPercent: 8.0,
@@ -1030,7 +1106,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 20000,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 20000,
     phyMagAtkPercent: 3.0,
     attAtkPercent: 8.0,
@@ -1038,7 +1114,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 30000,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 25000,
     phyMagAtkPercent: 4.0,
     attAtkPercent: 8.0,
@@ -1046,7 +1122,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 40000,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 30000,
     phyMagAtkPercent: 5.0,
     attAtkPercent: 8.0,
@@ -1054,7 +1130,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 50000,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 35000,
     phyMagAtkPercent: 6.0,
     attAtkPercent: 8.0,
@@ -1062,7 +1138,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 60000,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 40000,
     phyMagAtkPercent: 7.0,
     attAtkPercent: 8.0,
@@ -1070,7 +1146,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 70000,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 45000,
     phyMagAtkPercent: 8.0,
     attAtkPercent: 8.0,
@@ -1078,7 +1154,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 80000,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 50000,
     phyMagAtkPercent: 9.0,
     attAtkPercent: 8.0,
@@ -1086,7 +1162,7 @@ export const conversionRingStats: ConversionStats[] = [
     cdm: 90000,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 55000,
     phyMagAtkPercent: 10.0,
     attAtkPercent: 8.0,
@@ -1097,7 +1173,7 @@ export const conversionRingStats: ConversionStats[] = [
 
 export const conversionWingStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 15000,
     phyMagAtkPercent: 7.0,
     crt: 8000,
@@ -1108,7 +1184,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 45000,
     phyMagAtkPercent: 8.0,
     crt: 10000,
@@ -1119,7 +1195,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 70000,
     phyMagAtkPercent: 9.5,
     crt: 12000,
@@ -1130,7 +1206,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 100000,
     phyMagAtkPercent: 11.0,
     crt: 14000,
@@ -1141,7 +1217,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 125000,
     phyMagAtkPercent: 13.5,
     crt: 16000,
@@ -1152,7 +1228,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 150000,
     phyMagAtkPercent: 16.0,
     crt: 20000,
@@ -1163,7 +1239,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 175000,
     phyMagAtkPercent: 18.5,
     crt: 21000,
@@ -1174,7 +1250,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 210000,
     phyMagAtkPercent: 21.0,
     crt: 22000,
@@ -1185,7 +1261,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 245000,
     phyMagAtkPercent: 23.5,
     crt: 23000,
@@ -1196,7 +1272,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 270000,
     phyMagAtkPercent: 26.0,
     crt: 24000,
@@ -1207,7 +1283,7 @@ export const conversionWingStats: ConversionStats[] = [
     moveSpeedPercentTown: 20.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 300000,
     phyMagAtkPercent: 28.0,
     crt: 25000,
@@ -1220,9 +1296,9 @@ export const conversionWingStats: ConversionStats[] = [
 ];
 export const conversionTailStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 0,
-    phyMagAtkPercent: 7.0,
+    phyMagAtkPercent: 0.0,
     attAtkPercent: 7.0,
     fd: 300,
     str: 450,
@@ -1232,7 +1308,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 35000,
     phyMagAtkPercent: 3.0,
     attAtkPercent: 7.5,
@@ -1244,7 +1320,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 60000,
     phyMagAtkPercent: 5.0,
     attAtkPercent: 8.0,
@@ -1256,7 +1332,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 85000,
     phyMagAtkPercent: 7.0,
     attAtkPercent: 8.5,
@@ -1268,7 +1344,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 110000,
     phyMagAtkPercent: 9.0,
     attAtkPercent: 9.0,
@@ -1280,7 +1356,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 135000,
     phyMagAtkPercent: 11.5,
     attAtkPercent: 10.0,
@@ -1292,7 +1368,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 160000,
     phyMagAtkPercent: 14.0,
     attAtkPercent: 11.0,
@@ -1304,7 +1380,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 185000,
     phyMagAtkPercent: 16.5,
     attAtkPercent: 12.0,
@@ -1316,7 +1392,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 210000,
     phyMagAtkPercent: 19.0,
     attAtkPercent: 13.0,
@@ -1328,7 +1404,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 240000,
     phyMagAtkPercent: 21.5,
     attAtkPercent: 14.0,
@@ -1340,7 +1416,7 @@ export const conversionTailStats: ConversionStats[] = [
     defMagdefPercent: 7.0,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 270000,
     phyMagAtkPercent: 24.0,
     attAtkPercent: 15.0,
@@ -1354,16 +1430,16 @@ export const conversionTailStats: ConversionStats[] = [
 ];
 export const conversionDecalStats: ConversionStats[] = [
   {
-    encLevel: 0,
+    encLevel: "0",
     phyMagAtk: 11000,
     attAtkPercent: 7.0,
     crt: 10000,
     cdm: 0,
-    fd: 200,
+    fd: 0,
     defMagdef: 4500,
   },
   {
-    encLevel: 1,
+    encLevel: "1",
     phyMagAtk: 35000,
     attAtkPercent: 7.5,
     crt: 14000,
@@ -1372,7 +1448,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 2,
+    encLevel: "2",
     phyMagAtk: 60000,
     attAtkPercent: 8.0,
     crt: 18000,
@@ -1381,7 +1457,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 3,
+    encLevel: "3",
     phyMagAtk: 85000,
     attAtkPercent: 11.0,
     crt: 22000,
@@ -1390,7 +1466,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 4,
+    encLevel: "4",
     phyMagAtk: 110000,
     attAtkPercent: 13.0,
     crt: 26000,
@@ -1399,7 +1475,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 5,
+    encLevel: "5",
     phyMagAtk: 135000,
     attAtkPercent: 15.0,
     crt: 30000,
@@ -1408,7 +1484,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 6,
+    encLevel: "6",
     phyMagAtk: 160000,
     attAtkPercent: 17.0,
     crt: 34000,
@@ -1417,7 +1493,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 7,
+    encLevel: "7",
     phyMagAtk: 185000,
     attAtkPercent: 19.0,
     crt: 38000,
@@ -1426,7 +1502,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 8,
+    encLevel: "8",
     phyMagAtk: 210000,
     attAtkPercent: 22.0,
     crt: 42000,
@@ -1435,7 +1511,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 9,
+    encLevel: "9",
     phyMagAtk: 240000,
     attAtkPercent: 24.0,
     crt: 46000,
@@ -1444,7 +1520,7 @@ export const conversionDecalStats: ConversionStats[] = [
     defMagdef: 4500,
   },
   {
-    encLevel: 10,
+    encLevel: "10",
     phyMagAtk: 280000,
     attAtkPercent: 26.0,
     crt: 50000,

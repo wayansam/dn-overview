@@ -16,9 +16,28 @@ import {
 import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { CONVERSION_TYPE } from "../../constants/InGame.constants";
-import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
+import {
+  dataConversionCalculator,
+  conversionHelmStats,
+  conversionUpperStats,
+  conversionLowerStats,
+  conversionGloveStats,
+  conversionShoesStats,
+  conversionMainStats,
+  conversionSecondStats,
+  conversionNecklaceStats,
+  conversionEarringStats,
+  conversionRingStats,
+  conversionWingStats,
+  conversionTailStats,
+  conversionDecalStats,
+} from "../../data/ConversionCalculatorData";
 import { ConversionCalculator } from "../../interface/Common.interface";
-import { columnsResource } from "../../utils/common.util";
+import { columnsResource, getTextEmpty } from "../../utils/common.util";
+import {
+  ConversionStats,
+  columnConversionFlag,
+} from "../../interface/ItemStat.interface";
 
 const { Text } = Typography;
 
@@ -522,36 +541,701 @@ const ConversionContent = () => {
   };
 
   const getStatContent = () => {
+    const getColumnsStats = ({
+      phyMagAtkFlag,
+      phyMagAtkPercentFlag,
+      attAtkPercentFlag,
+      crtFlag,
+      crtPercentFlag,
+      cdmFlag,
+      fdFlag,
+      strFlag,
+      agiFlag,
+      intFlag,
+      vitFlag,
+      strPercentFlag,
+      agiPercentFlag,
+      intPercentFlag,
+      vitPercentFlag,
+      defMagdefFlag,
+      defMagdefPercentFlag,
+      hpFlag,
+      hpPercentFlag,
+      moveSpeedPercentFlag,
+      moveSpeedPercentTownFlag,
+    }: columnConversionFlag): ColumnsType<ConversionStats> => {
+      const temp: ColumnsType<ConversionStats> = [];
+      const smallItemTitle: string[] = [];
+      if (phyMagAtkFlag) {
+        smallItemTitle.push("ATK");
+        temp.push({
+          title: "Attack",
+          responsive: ["sm"],
+          render: (_, { phyMagAtk }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (phyMagAtkPercentFlag) {
+        smallItemTitle.push("ATK(%)");
+        temp.push({
+          title: "Attack(%)",
+          responsive: ["sm"],
+          render: (_, { phyMagAtkPercent }) => (
+            <div>
+              <Text>
+                {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
+              </Text>
+            </div>
+          ),
+        });
+      }
+      if (attAtkPercentFlag) {
+        smallItemTitle.push("ATT(%)");
+        temp.push({
+          title: "Attribute(%)",
+          responsive: ["sm"],
+          render: (_, { attAtkPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (crtFlag) {
+        smallItemTitle.push("CRT");
+        temp.push({
+          title: "CRT",
+          responsive: ["sm"],
+          render: (_, { crt }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: crt })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (crtPercentFlag) {
+        smallItemTitle.push("CRT(%)");
+        temp.push({
+          title: "CRT(%)",
+          responsive: ["sm"],
+          render: (_, { crtPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: crtPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (cdmFlag) {
+        smallItemTitle.push("CDM");
+        temp.push({
+          title: "CDM",
+          responsive: ["sm"],
+          render: (_, { cdm }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: cdm })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (fdFlag) {
+        smallItemTitle.push("FD");
+        temp.push({
+          title: "FD",
+          responsive: ["sm"],
+          render: (_, { fd }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: fd })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (strFlag) {
+        smallItemTitle.push("STR");
+        temp.push({
+          title: "STR",
+          responsive: ["sm"],
+          render: (_, { str }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: str })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (agiFlag) {
+        smallItemTitle.push("AGI");
+        temp.push({
+          title: "AGI",
+          responsive: ["sm"],
+          render: (_, { agi }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: agi })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (intFlag) {
+        smallItemTitle.push("INT");
+        temp.push({
+          title: "INT",
+          responsive: ["sm"],
+          render: (_, { int }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: int })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (vitFlag) {
+        smallItemTitle.push("VIT");
+        temp.push({
+          title: "VIT",
+          responsive: ["sm"],
+          render: (_, { vit }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: vit })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (strPercentFlag) {
+        smallItemTitle.push("STR(%)");
+        temp.push({
+          title: "STR(%)",
+          responsive: ["sm"],
+          render: (_, { strPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: strPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (agiPercentFlag) {
+        smallItemTitle.push("AGI(%)");
+        temp.push({
+          title: "AGI(%)",
+          responsive: ["sm"],
+          render: (_, { agiPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: agiPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (intPercentFlag) {
+        smallItemTitle.push("INT(%)");
+        temp.push({
+          title: "INT(%)",
+          responsive: ["sm"],
+          render: (_, { intPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: intPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (vitPercentFlag) {
+        smallItemTitle.push("VIT(%)");
+        temp.push({
+          title: "VIT(%)",
+          responsive: ["sm"],
+          render: (_, { vitPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: vitPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (defMagdefFlag) {
+        smallItemTitle.push("Phy Def", "Mag Def");
+        temp.push(
+          {
+            title: "Phy Def",
+            responsive: ["sm"],
+            render: (_, { defMagdef }) => (
+              <div>
+                <Text>{getTextEmpty({ txt: defMagdef })}</Text>
+              </div>
+            ),
+          },
+          {
+            title: "Mag Def",
+            responsive: ["sm"],
+            render: (_, { defMagdef }) => (
+              <div>
+                <Text>{getTextEmpty({ txt: defMagdef })}</Text>
+              </div>
+            ),
+          }
+        );
+      }
+      if (defMagdefPercentFlag) {
+        smallItemTitle.push("Phy Def(%)", "Mag Def(%)");
+        temp.push(
+          {
+            title: "Phy Def(%)",
+            responsive: ["sm"],
+            render: (_, { defMagdefPercent }) => (
+              <div>
+                <Text>
+                  {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
+                </Text>
+              </div>
+            ),
+          },
+          {
+            title: "Mag Def(%)",
+            responsive: ["sm"],
+            render: (_, { defMagdefPercent }) => (
+              <div>
+                <Text>
+                  {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
+                </Text>
+              </div>
+            ),
+          }
+        );
+      }
+      if (hpFlag) {
+        smallItemTitle.push("HP");
+        temp.push({
+          title: "HP",
+          responsive: ["sm"],
+          render: (_, { hp }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: hp })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (hpPercentFlag) {
+        smallItemTitle.push("HP(%)");
+        temp.push({
+          title: "HP(%)",
+          responsive: ["sm"],
+          render: (_, { hpPercent }) => (
+            <div>
+              <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
+            </div>
+          ),
+        });
+      }
+      if (moveSpeedPercentFlag) {
+        smallItemTitle.push("Movespeed(%)");
+        temp.push({
+          title: "Movespeed(%)",
+          responsive: ["sm"],
+          render: (_, { moveSpeedPercent }) => (
+            <div>
+              <Text>
+                {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
+              </Text>
+            </div>
+          ),
+        });
+      }
+      if (moveSpeedPercentTownFlag) {
+        smallItemTitle.push("Movespeed Town(%)");
+        temp.push({
+          title: "Movespeed Town(%)",
+          responsive: ["sm"],
+          render: (_, { moveSpeedPercentTown }) => (
+            <div>
+              <Text>
+                {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
+              </Text>
+            </div>
+          ),
+        });
+      }
+      return [
+        {
+          title: "Enhancement",
+          dataIndex: "encLevel",
+        },
+        {
+          title: (
+            <div>
+              {smallItemTitle.map((it) => (
+                <p key={`title-${it}`}>{it}</p>
+              ))}
+            </div>
+          ),
+          responsive: ["xs"],
+          width: 150,
+          render: (
+            _,
+            {
+              phyMagAtk,
+              phyMagAtkPercent,
+              attAtkPercent,
+              crt,
+              crtPercent,
+              cdm,
+              fd,
+              str,
+              agi,
+              int,
+              vit,
+              strPercent,
+              agiPercent,
+              intPercent,
+              vitPercent,
+              defMagdef,
+              defMagdefPercent,
+              hp,
+              hpPercent,
+              moveSpeedPercent,
+              moveSpeedPercentTown,
+            }
+          ) => (
+            <div>
+              {phyMagAtkFlag && <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>}
+              {phyMagAtkPercentFlag && (
+                <p>
+                  ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
+                </p>
+              )}
+              {attAtkPercentFlag && (
+                <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
+              )}
+              {crtFlag && <p>CRT {getTextEmpty({ txt: crt })}</p>}
+              {crtPercentFlag && (
+                <p>CRT {getTextEmpty({ txt: crtPercent, tailText: "%" })}</p>
+              )}
+              {cdmFlag && <p>CRT {getTextEmpty({ txt: cdm })}</p>}
+              {fdFlag && <p>FD {getTextEmpty({ txt: fd })}</p>}
+              {strFlag && <p>STR {getTextEmpty({ txt: str })}</p>}
+              {agiFlag && <p>AGI {getTextEmpty({ txt: agi })}</p>}
+              {intFlag && <p>INT {getTextEmpty({ txt: int })}</p>}
+              {vitFlag && <p>VIT {getTextEmpty({ txt: vit })}</p>}
+              {strPercentFlag && (
+                <p>STR {getTextEmpty({ txt: strPercent, tailText: "%" })}</p>
+              )}
+              {agiPercentFlag && (
+                <p>AGI {getTextEmpty({ txt: agiPercent, tailText: "%" })}</p>
+              )}
+              {intPercentFlag && (
+                <p>INT {getTextEmpty({ txt: intPercent, tailText: "%" })}</p>
+              )}
+              {vitPercentFlag && (
+                <p>VIT {getTextEmpty({ txt: vitPercent, tailText: "%" })}</p>
+              )}
+              {defMagdefFlag && (
+                <>
+                  <p>Phy Def {getTextEmpty({ txt: defMagdef })}</p>
+                  <p>Mag Def {getTextEmpty({ txt: defMagdef })}</p>
+                </>
+              )}
+              {defMagdefPercentFlag && (
+                <>
+                  <p>
+                    Phy Def{" "}
+                    {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
+                  </p>
+                  <p>
+                    Mag Def{" "}
+                    {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
+                  </p>
+                </>
+              )}
+              {hpFlag && <p>HP {getTextEmpty({ txt: hp })}</p>}
+              {hpPercentFlag && (
+                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+              )}
+              {moveSpeedPercentFlag && (
+                <p>
+                  Movespeed{" "}
+                  {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
+                </p>
+              )}
+              {moveSpeedPercentTownFlag && (
+                <p>
+                  Movespeed Town{" "}
+                  {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
+                </p>
+              )}
+            </div>
+          ),
+        },
+        ...temp,
+      ];
+    };
+
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",
         label: "Armor",
         children: (
-          <div style={{ marginRight: 10 }}>
-            {/* <Table
+          <div
+            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+          >
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Helm"}
               size={"small"}
-              dataSource={BDBaofaTalismanStatTable}
-              columns={columnsBaofaMats}
+              dataSource={conversionHelmStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                strPercentFlag: true,
+                agiPercentFlag: true,
+                intPercentFlag: true,
+                vitPercentFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+              })}
               pagination={false}
               bordered
-            /> */}
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Upper"}
+              size={"small"}
+              dataSource={conversionUpperStats}
+              columns={getColumnsStats({
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                strPercentFlag: true,
+                agiPercentFlag: true,
+                intPercentFlag: true,
+                vitPercentFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Lower"}
+              size={"small"}
+              dataSource={conversionLowerStats}
+              columns={getColumnsStats({
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Glove"}
+              size={"small"}
+              dataSource={conversionGloveStats}
+              columns={getColumnsStats({
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Shoes"}
+              size={"small"}
+              dataSource={conversionShoesStats}
+              columns={getColumnsStats({
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                strPercentFlag: true,
+                agiPercentFlag: true,
+                intPercentFlag: true,
+                vitPercentFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+                moveSpeedPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
           </div>
         ),
       },
       {
         key: "2",
         label: "Weapon",
-        children: <div style={{ marginRight: 10 }}></div>,
+        children: (
+          <div
+            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+          >
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Main"}
+              size={"small"}
+              dataSource={conversionMainStats}
+              columns={getColumnsStats({})}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Second"}
+              size={"small"}
+              dataSource={conversionSecondStats}
+              columns={getColumnsStats({})}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
       },
       {
         key: "3",
         label: "Accesories",
-        children: <div style={{ marginRight: 10 }}></div>,
+        children: (
+          <div
+            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+          >
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Necklace"}
+              size={"small"}
+              dataSource={conversionNecklaceStats}
+              columns={getColumnsStats({
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                defMagdefFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Earring"}
+              size={"small"}
+              dataSource={conversionEarringStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtPercentFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Ring"}
+              size={"small"}
+              dataSource={conversionRingStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
       },
       {
         key: "4",
         label: "WTD",
-        children: <div style={{ marginRight: 10 }}></div>,
+        children: (
+          <div
+            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+          >
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Wing"}
+              size={"small"}
+              dataSource={conversionWingStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+                vitFlag: true,
+                moveSpeedPercentFlag: true,
+                moveSpeedPercentTownFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Tail"}
+              size={"small"}
+              dataSource={conversionTailStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                defMagdefPercentFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+            <Table
+              style={{ marginRight: 10, marginBottom: 10 }}
+              title={() => "Decal"}
+              size={"small"}
+              dataSource={conversionDecalStats}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                attAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+                defMagdefFlag: true,
+              })}
+              pagination={false}
+              bordered
+            />
+          </div>
+        ),
       },
     ];
 

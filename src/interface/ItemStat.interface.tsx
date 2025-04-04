@@ -93,7 +93,7 @@ export interface LunarJadeEnhancementStats {
 }
 
 export interface ConversionStats {
-  encLevel: number;
+  encLevel: string;
   phyMagAtk?: number;
   phyMagAtkPercent?: number;
   attAtkPercent?: number;
@@ -119,3 +119,5 @@ export interface ConversionStats {
   moveSpeedPercent?: number;
   moveSpeedPercentTown?: number; //(?)
 }
+
+export type columnConversionFlag = { [K in keyof ConversionStats as `${K}Flag`]?: boolean };
