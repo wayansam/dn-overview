@@ -20,9 +20,10 @@ const ListingCard = ({ title, data }: ListingCardProps) => {
     if (!value) {
       return;
     }
+    const sign = typeof value !== "number" || value < 0 ? "" : "+";
     const tempValue = format ? value.toLocaleString() : value;
     return (
-      <Text key={`item-${title}-${idx}`}>{`${title} +${tempValue}${
+      <Text key={`item-${title}-${idx}`}>{`${title} ${sign}${tempValue}${
         suffix ?? ""
       }`}</Text>
     );

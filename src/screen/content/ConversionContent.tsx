@@ -33,11 +33,16 @@ import {
   conversionDecalStats,
 } from "../../data/ConversionCalculatorData";
 import { ConversionCalculator } from "../../interface/Common.interface";
-import { columnsResource, getTextEmpty } from "../../utils/common.util";
+import {
+  columnsResource,
+  getTextEmpty,
+  getComparedData,
+} from "../../utils/common.util";
 import {
   ConversionStats,
   columnConversionFlag,
 } from "../../interface/ItemStat.interface";
+import ListingCard from "../../components/ListingCard";
 
 const { Text } = Typography;
 
@@ -209,6 +214,15 @@ type ColumnTypes = (
   | ColumnType<ConversionCalculator>
 )[];
 
+const CONV_FRAG = 3500;
+const WEAP_FRAG = 1;
+const EV_AST_STONE = 3;
+const EV_AST_POW_ARMOR = 1000;
+const EV_AST_POW_WEAP = 1500;
+const EV_AST_POW_ACC = 1150;
+const EV_AST_POW_WTD = 1300;
+const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
+
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<ConversionCalculator[]>(
@@ -216,18 +230,6 @@ const ConversionContent = () => {
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
-  const [checkedChange, setCheckedChange] = useState(false);
-  const [checkedCraft, setCheckedCraft] = useState(false);
-  const [checkedEvo, setCheckedEvo] = useState(false);
-
-  const CONV_FRAG = 3500;
-  const WEAP_FRAG = 1;
-  const EV_AST_STONE = 3;
-  const EV_AST_POW_ARMOR = 1000;
-  const EV_AST_POW_WEAP = 1500;
-  const EV_AST_POW_ACC = 1150;
-  const EV_AST_POW_WTD = 1300;
-  const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
 
   const onSelectChange = (
     newSelectedRowKeys: React.Key[],
@@ -321,7 +323,7 @@ const ConversionContent = () => {
       return temp;
     }
 
-    selectedRowKeys.map((item) => {
+    selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
 
       if (found) {
@@ -373,7 +375,129 @@ const ConversionContent = () => {
     });
 
     return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
+  function combineConversionStats(
+    a: ConversionStats,
+    b: ConversionStats,
+    operation: "add" | "minus"
+  ): ConversionStats {
+    const result: ConversionStats = { ...a };
+
+    const keys = Object.keys({ ...a, ...b }) as (keyof ConversionStats)[];
+
+    for (const key of keys) {
+      const valueA = a[key];
+      const valueB = b[key];
+
+      if (typeof valueA === "number" && typeof valueB === "number") {
+        const computed =
+          operation === "add" ? valueA + valueB : valueA - valueB;
+
+        (result as any)[key] = computed;
+      }
+    }
+
+    return result;
+  }
+
+  const statDif: ConversionStats = useMemo(() => {
+    let temp: ConversionStats = {
+      encLevel: "0",
+      phyMagAtk: 0,
+      phyMagAtkPercent: 0,
+      attAtkPercent: 0,
+
+      crt: 0,
+      crtPercent: 0,
+      cdm: 0,
+      fd: 0,
+
+      str: 0,
+      agi: 0,
+      int: 0,
+      vit: 0,
+      strPercent: 0,
+      agiPercent: 0,
+      intPercent: 0,
+      vitPercent: 0,
+
+      defMagdef: 0,
+      defMagdefPercent: 0,
+      hp: 0,
+      hpPercent: 0,
+      moveSpeedPercent: 0,
+      moveSpeedPercentTown: 0,
+    };
+    if (invalidDtSrc) {
+      return temp;
+    }
+
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { equipment, from, to } = found;
+
+        let tableHolder: ConversionStats[];
+        switch (equipment) {
+          case CONVERSION_TYPE.HELM:
+            tableHolder = conversionHelmStats;
+            break;
+          case CONVERSION_TYPE.UPPER:
+            tableHolder = conversionUpperStats;
+            break;
+          case CONVERSION_TYPE.LOWER:
+            tableHolder = conversionLowerStats;
+            break;
+          case CONVERSION_TYPE.GLOVE:
+            tableHolder = conversionGloveStats;
+            break;
+          case CONVERSION_TYPE.SHOES:
+            tableHolder = conversionShoesStats;
+            break;
+
+          case CONVERSION_TYPE.MAIN_WEAPON:
+            tableHolder = conversionMainStats;
+            break;
+          case CONVERSION_TYPE.SECOND_WEAPON:
+            tableHolder = conversionSecondStats;
+            break;
+
+          case CONVERSION_TYPE.NECKLACE:
+            tableHolder = conversionNecklaceStats;
+            break;
+          case CONVERSION_TYPE.EARRING:
+            tableHolder = conversionEarringStats;
+            break;
+          case CONVERSION_TYPE.RING:
+            tableHolder = conversionRingStats;
+            break;
+
+          case CONVERSION_TYPE.WING:
+            tableHolder = conversionWingStats;
+            break;
+          case CONVERSION_TYPE.TAIL:
+            tableHolder = conversionTailStats;
+            break;
+          case CONVERSION_TYPE.DECAL:
+            tableHolder = conversionDecalStats;
+            break;
+
+          default:
+            tableHolder = [];
+            break;
+        }
+        const { dt1, dt2 } = getComparedData(tableHolder, from, to);
+        if (dt2) {
+          const dt = dt1 ? combineConversionStats(dt2, dt1, "minus") : dt2;
+          temp = combineConversionStats(temp, dt, "add");
+        }
+      }
+    });
+
+    return temp;
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const tempComp = (str: string, arr: number[]) =>
     arr.length > 0 ? (
@@ -394,7 +518,7 @@ const ConversionContent = () => {
       main: undefined,
       second: undefined,
     };
-    selectedRowKeys.map((item) => {
+    selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
       if (found) {
         const { equipment, from, to } = found;
@@ -535,6 +659,140 @@ const ConversionContent = () => {
           />
           {weaponNotes?.main}
           {weaponNotes?.second}
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK",
+                value: statDif.phyMagAtk,
+                format: true,
+              },
+              {
+                title: "ATK",
+                value: statDif.phyMagAtkPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Ele",
+                value: statDif.attAtkPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "CRT",
+                value: statDif.crt,
+                format: true,
+              },
+              {
+                title: "CRT",
+                value: statDif.crtPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "CDM",
+                value: statDif.cdm,
+                format: true,
+              },
+              {
+                title: "FD",
+                value: statDif.fd,
+                format: true,
+              },
+              {
+                title: "STR",
+                value: statDif.str,
+                format: true,
+              },
+              {
+                title: "AGI",
+                value: statDif.agi,
+                format: true,
+              },
+              {
+                title: "INT",
+                value: statDif.int,
+                format: true,
+              },
+              {
+                title: "VIT",
+                value: statDif.vit,
+                format: true,
+              },
+              {
+                title: "STR",
+                value: statDif.strPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "AGI",
+                value: statDif.agiPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "INT",
+                value: statDif.intPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "VIT",
+                value: statDif.vitPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Phy Def",
+                value: statDif.defMagdef,
+                format: true,
+              },
+              {
+                title: "Mag Def",
+                value: statDif.defMagdef,
+                format: true,
+              },
+              {
+                title: "Phy Def",
+                value: statDif.defMagdefPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Mag Def",
+                value: statDif.defMagdefPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "HP",
+                value: statDif.hp,
+                format: true,
+              },
+              {
+                title: "HP",
+                value: statDif.hpPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Movespeed",
+                value: statDif.moveSpeedPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Movespeed Town",
+                value: statDif.moveSpeedPercentTown,
+                suffix: "%",
+                format: true,
+              },
+            ]}
+          />
         </div>
       </div>
     );
@@ -905,7 +1163,7 @@ const ConversionContent = () => {
               {crtPercentFlag && (
                 <p>CRT {getTextEmpty({ txt: crtPercent, tailText: "%" })}</p>
               )}
-              {cdmFlag && <p>CRT {getTextEmpty({ txt: cdm })}</p>}
+              {cdmFlag && <p>CDM {getTextEmpty({ txt: cdm })}</p>}
               {fdFlag && <p>FD {getTextEmpty({ txt: fd })}</p>}
               {strFlag && <p>STR {getTextEmpty({ txt: str })}</p>}
               {agiFlag && <p>AGI {getTextEmpty({ txt: agi })}</p>}
