@@ -226,7 +226,7 @@ const ConversionContent = () => {
   const EV_AST_POW_ARMOR = 1000;
   const EV_AST_POW_WEAP = 1500;
   const EV_AST_POW_ACC = 1150;
-  const EV_AST_POW_WTD = 1150;
+  const EV_AST_POW_WTD = 1300;
   const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
 
   const onSelectChange = (
@@ -1098,7 +1098,19 @@ const ConversionContent = () => {
               title={() => "Main"}
               size={"small"}
               dataSource={conversionMainStats}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtFlag: true,
+                crtPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+                vitFlag: true,
+                cdmFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -1107,7 +1119,13 @@ const ConversionContent = () => {
               title={() => "Second"}
               size={"small"}
               dataSource={conversionSecondStats}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -1127,8 +1145,10 @@ const ConversionContent = () => {
               size={"small"}
               dataSource={conversionNecklaceStats}
               columns={getColumnsStats({
+                phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
+                cdmFlag: true,
                 fdFlag: true,
                 strFlag: true,
                 agiFlag: true,
@@ -1147,6 +1167,8 @@ const ConversionContent = () => {
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtFlag: true,
                 crtPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
@@ -1167,6 +1189,7 @@ const ConversionContent = () => {
                 attAtkPercentFlag: true,
                 crtFlag: true,
                 cdmFlag: true,
+                fdFlag: true,
               })}
               pagination={false}
               bordered
@@ -1184,6 +1207,7 @@ const ConversionContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Wing"}
+              footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
               dataSource={conversionWingStats}
               columns={getColumnsStats({
@@ -1202,6 +1226,7 @@ const ConversionContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Tail"}
+              footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
               dataSource={conversionTailStats}
               columns={getColumnsStats({
@@ -1221,15 +1246,18 @@ const ConversionContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Decal"}
+              footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
               dataSource={conversionDecalStats}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 attAtkPercentFlag: true,
                 crtFlag: true,
+                crtPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
                 defMagdefFlag: true,
+                defMagdefPercentFlag: true,
               })}
               pagination={false}
               bordered
