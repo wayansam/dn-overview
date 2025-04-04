@@ -381,6 +381,75 @@ const getItems: (
       ),
       style: panelStyle,
     },
+    {
+      key: TAB_KEY.miscConversion,
+      label: TAB_KEY.miscConversion,
+      children: (
+        <div>
+          <p>
+            <b>
+              Armor, Accessories and WTD type Conversion can be obtain from
+              beginner guide mission.
+            </b>
+          </p>
+          <p>
+            <b>
+              Weapon type Conversion can be obtain via Cherry store &#40;NPC,
+              trade some point&#41; or buy from Trading House.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Mats Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment. &#40; 0 to 10, and evolve to legend&#41;
+          </p>
+          <p>
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab From, and To, but
+              remember your custom input will be override by The Settings if you
+              change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
+            </i>
+          </p>
+          <p>
+            <b>
+              <i>
+                When this created, Legend grade conversion for WTD type havent
+                released yet in SEA. The data used in this table is derived from
+                KDN patch note.
+              </i>
+            </b>
+          </p>
+          {/* <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/129/c/3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Eternal Talisman
+            </a>
+          </p> */}
+        </div>
+      ),
+      style: panelStyle,
+    },
   ];
 
   return [
