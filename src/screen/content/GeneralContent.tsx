@@ -1,7 +1,9 @@
 import { Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { CharacterInGameData } from "../../interface/Account.interface";
+import ReleaseNotes from "../../components/ReleaseNotes";
 const { Text } = Typography;
+
 const GeneralContent = () => {
   interface DataType {
     key: string;
@@ -80,6 +82,7 @@ const GeneralContent = () => {
         // dataSource={exampleAccount.characters}
         dataSource={[]}
       />
+      <ReleaseNotes onlyNew={true} />
     </div>
   );
 };
