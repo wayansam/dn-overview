@@ -8,6 +8,7 @@ import {
   Space,
   Switch,
   Typography,
+  Collapse,
 } from "antd";
 import { BaseType } from "antd/es/typography/Base";
 import Link from "antd/es/typography/Link";
@@ -36,6 +37,7 @@ const SettingContent = () => {
     U = "Update",
     P = "Planned",
     I = "In Progress",
+    D = "Done",
   }
 
   interface FeatureItem {
@@ -48,6 +50,28 @@ const SettingContent = () => {
   const dataNew: Array<FeatureItem> = [
     {
       key: keyUpdate.N,
+      label: "Conversion Costume Calculator",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "04-04-2025",
+    },
+  ];
+  
+  const dataSoon: Array<FeatureItem> = [
+    { key: keyUpdate.I, label: "Bone Dragon Armor & Weapon Calculator" },
+  ];
+
+  const dataPastFunc: Array<FeatureItem> = [
+    {
+      key: keyUpdate.D,
+      label:
+        "Equipment (Ancient, Kilos, Named EOD), Jade (Lunar, Skill, Erosion), Heraldry (Ancient Goddess), Talisman (Black Dragon, Eternal).",
+      date: "Not Recorded",
+    },
+    {
+      key: keyUpdate.D,
       label: "Dimensional Dragon Jade",
       link: {
         key: TAB_KEY.jadeSkill,
@@ -56,12 +80,7 @@ const SettingContent = () => {
       date: "03-02-2025",
     },
     {
-      key: keyUpdate.U,
-      label:
-        "Patch Note link for some existing item in Help bar (question mark in bottom right corner)",
-    },
-    {
-      key: keyUpdate.N,
+      key: keyUpdate.D,
       label: "Ancient Lunar Jade Enhancement Calculator",
       link: {
         key: TAB_KEY.jadeLunar,
@@ -74,15 +93,17 @@ const SettingContent = () => {
       },
       date: "23-02-2025",
     },
-    {
-      key: keyUpdate.U,
-      label:
-        "Success rate note on all of the skill jade",
-    },
   ];
-  const dataSoon: Array<FeatureItem> = [
-    { key: keyUpdate.P, label: "Conversion Costume Calculator" },
-    { key: keyUpdate.P, label: "Bone Dragon Armor & Weapon Calculator" },
+  const dataPastUpdate: Array<FeatureItem> = [
+    {
+      key: keyUpdate.D,
+      label:
+        "Patch Note link for some existing item in Help bar (question mark in bottom right corner)",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Success rate note on all of the skill jade",
+    },
   ];
 
   const getType = (item: FeatureItem): BaseType | undefined => {
@@ -221,6 +242,39 @@ const SettingContent = () => {
         <Space direction="horizontal">
           <List bordered dataSource={dataSoon} renderItem={renderItem} />
         </Space>
+
+        <Divider orientation="left">Release History</Divider>
+        <Collapse
+          items={[
+            {
+              key: "1",
+              label: "Functionality",
+              children: (
+                <Space direction="horizontal">
+                  <List
+                    bordered
+                    dataSource={dataPastFunc}
+                    renderItem={renderItem}
+                  />
+                </Space>
+              ),
+            },
+            {
+              key: "2",
+              label: "Update",
+              children: (
+                <Space direction="horizontal">
+                  <List
+                    bordered
+                    dataSource={dataPastUpdate}
+                    renderItem={renderItem}
+                  />
+                </Space>
+              ),
+            },
+          ]}
+          size="small"
+        />
 
         <Divider orientation="left">Have Something in Mind?</Divider>
         <Space direction="horizontal">
