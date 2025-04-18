@@ -9,6 +9,7 @@ export const TAB_KEY = {
   eqAncient: "Ancient",
   eqKilos: "Kilos",
   eqNamedEOD: "Named EOD",
+  eqBoneDragon: "Bone Dragon",
   jadeLunar: "Lunar Jade",
   jadeSkill: "Skill Jade",
   jadeErosion: "Erosion Jade",
@@ -44,6 +45,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.eqNamedEOD,
         name: TAB_KEY.eqNamedEOD,
+      },
+      {
+        key: TAB_KEY.eqBoneDragon,
+        name: TAB_KEY.eqBoneDragon,
       },
     ],
   },
