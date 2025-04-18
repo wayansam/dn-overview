@@ -2,6 +2,7 @@ import {
   ExperimentTwoTone,
   LoadingOutlined,
   QuestionCircleOutlined,
+  SmileOutlined,
 } from "@ant-design/icons";
 import {
   Col,
@@ -9,11 +10,12 @@ import {
   FloatButton,
   Grid,
   Image,
+  notification,
   Row,
   theme,
   Typography,
 } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import AncientEqContent from "./AncientEqContent";
@@ -37,6 +39,7 @@ const MainContent = () => {
   const {
     token: { colorBgContainer, colorText },
   } = theme.useToken();
+  const [api, contextHolder] = notification.useNotification();
 
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
@@ -48,6 +51,14 @@ const MainContent = () => {
   const [open, setOpen] = useState(false);
   const screens = useBreakpoint();
   const isShowingImg = !!(isImgEnabled && imgData);
+
+  const openNotification = () => {
+    api.open({
+      message: "Don't miss out",
+      description: "Reload this page once in a while to get it latest content.",
+      icon: <SmileOutlined style={{ color: "#108ee9" }} />,
+    });
+  };
 
   const content = useMemo(() => {
     switch (selectedSideBar.key) {
@@ -144,8 +155,15 @@ const MainContent = () => {
     <div></div>
   );
 
+  useEffect(() => {
+    console.log("test");
+
+    openNotification();
+  }, []);
+
   return (
     <>
+      {contextHolder}
       {screens.xs && isShowingImg && imgData?.onTop && imgComponent}
       <Row>
         <Col span={!screens.xs && isShowingImg ? 18 : 24}>
