@@ -427,25 +427,43 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
+          <p>Patch Note related :</p>
           <p>
-            <b>
-              <i>
-                When this created, Legend grade conversion for WTD type havent
-                released yet in SEA. The data used in this table is derived from
-                KDN patch note.
-              </i>
-            </b>
-          </p>
-          {/* <p>
-            Patch Note related{" "}
             <a
-              href="https://patchnote.dragonnest.com/sea/129/c/3"
+              href="https://patchnote.dragonnest.com/sea/144/c/5"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Eternal Talisman
+              Legend Conversion WTD & Enhancement Legend Conversion Armor
             </a>
-          </p> */}
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/126/c/12"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Legend Conversion Weapon
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/117/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Legend Conversion Accessories
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/111/c/1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Legend Conversion Armor
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
