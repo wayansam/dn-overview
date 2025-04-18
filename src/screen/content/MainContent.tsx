@@ -31,6 +31,7 @@ import NamedEODEqContent from "./NamedEODEqContent";
 import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ConversionContent from "./ConversionContent";
+import BoneDragonEqContent from "./BoneDragonEqContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -73,6 +74,9 @@ const MainContent = () => {
 
       case TAB_KEY.eqNamedEOD:
         return <NamedEODEqContent />;
+   
+      case TAB_KEY.eqBoneDragon:
+        return <BoneDragonEqContent />;
 
       case TAB_KEY.jadeLunar:
         return <LunarJadeCalculatorContent />;

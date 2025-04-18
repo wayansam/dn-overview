@@ -59,3 +59,12 @@ export interface ConversionCalculator {
   from: number;
   to: number;
 }
+
+export interface BoneCalculator {
+  key: string;
+  equipment: EQUIPMENT;
+  min: number;
+  max: number;
+  from: number;
+  to: number;
+}
