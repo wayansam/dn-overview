@@ -1,5 +1,7 @@
 import { EQUIPMENT } from "../constants/InGame.constants";
 import { BoneCalculator } from "../interface/Common.interface";
+import { BoneDragonEqEnhanceMaterial } from "../interface/Item.interface";
+import { BoneDragonStats } from "../interface/ItemStat.interface";
 
 export const dataBoneCalculator: BoneCalculator[] = [
   {
@@ -59,3 +61,16 @@ export const dataBoneCalculator: BoneCalculator[] = [
     to: 1,
   },
 ];
+
+export const BoneDragonEqEnhanceMaterialArmorTable: BoneDragonEqEnhanceMaterial[] =
+  [];
+export const BoneDragonEqEnhanceMaterialWeapTable: BoneDragonEqEnhanceMaterial[] =
+  [];
+
+export const BoneDragonStatsMainTable: BoneDragonStats[] = [];
+export const BoneDragonStatsSecondTable: BoneDragonStats[] = [];
+export const BoneDragonStatsHelmTable: BoneDragonStats[] = [];
+export const BoneDragonStatsUpperTable: BoneDragonStats[] = [];
+export const BoneDragonStatsLowerTable: BoneDragonStats[] = [];
+export const BoneDragonStatsGlovesTable: BoneDragonStats[] = [];
+export const BoneDragonStatsShoesTable: BoneDragonStats[] = [];

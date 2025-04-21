@@ -147,3 +147,15 @@ export interface LunarJadeEnhancementMats {
   gold: number;
   hgFragment: number;
 }
+
+export interface BoneDragonEqEnhanceMaterial {
+  encLevel: number;
+  boneFragment: number;
+  garnet: number;
+  essence: number;
+  gold: number;
+  jelly?: number;
+  successRatePercent: number;
+  breakNoJellyPercent: number;
+  enhanceFailDeduction?: number;
+}

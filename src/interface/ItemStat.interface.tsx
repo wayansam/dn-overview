@@ -120,4 +120,28 @@ export interface ConversionStats {
   moveSpeedPercentTown?: number; //(?)
 }
 
-export type columnConversionFlag = { [K in keyof ConversionStats as `${K}Flag`]?: boolean };
+export type columnConversionFlag = {
+  [K in keyof ConversionStats as `${K}Flag`]?: boolean;
+};
+
+export interface BoneDragonStats {
+  encLevel: string;
+  phyMagAtkMin?: number;
+  phyMagAtkMax?: number;
+  phyMagAtkPercent?: number;
+  attAtkPercent?: number;
+
+  crt?: number;
+  cdm?: number;
+  fd?: number;
+
+  def?: number;
+  magdef?: number;
+  hp?: number;
+  hpPercent?: number;
+  moveSpeedPercent?: number;
+}
+
+export type columnBoneDragonFlag = {
+  [K in keyof BoneDragonStats as `${K}Flag`]?: boolean;
+};

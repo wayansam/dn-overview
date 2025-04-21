@@ -245,21 +245,18 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
   });
 
   return (
-    <>
-      <p>test</p>
-      <Table
-        rowSelection={{
-          type: "checkbox",
-          ...rowSelection,
-        }}
-        components={components}
-        rowClassName={() => "editable-row"}
-        bordered
-        dataSource={dataSource}
-        columns={columns as ColumnTypes}
-        pagination={false}
-      />
-    </>
+    <Table
+      rowSelection={{
+        type: "checkbox",
+        ...rowSelection,
+      }}
+      components={components}
+      rowClassName={() => "editable-row"}
+      bordered
+      dataSource={dataSource}
+      columns={columns as ColumnTypes}
+      pagination={false}
+    />
   );
 };
 
