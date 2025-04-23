@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, {
   EquipmentTableCalculator,
+  getListOpt,
 } from "../../components/EquipmentTable";
 import { BoneCalculator } from "../../interface/Common.interface";
 import {
@@ -21,11 +22,38 @@ import {
   columnBoneDragonFlag,
 } from "../../interface/ItemStat.interface";
 import Table, { ColumnsType } from "antd/es/table";
-import { getTextEmpty } from "../../utils/common.util";
-import { Typography } from "antd";
+import {
+  columnsResource,
+  getComparedData,
+  getTextEmpty,
+} from "../../utils/common.util";
+import { Alert, Divider, Radio, Select, Typography } from "antd";
 import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
+import { EQUIPMENT } from "../../constants/InGame.constants";
+import ListingCard from "../../components/ListingCard";
 
 const { Text } = Typography;
+
+type SelectedStats = Exclude<
+  EQUIPMENT,
+  EQUIPMENT.NECKLACE | EQUIPMENT.EARRING | EQUIPMENT.RING
+>;
+type EquipmentExtraData = {
+  [key in SelectedStats]?: {
+    "Success Rate": Array<number | undefined>;
+    "Break Rate": Array<number | undefined>;
+    "Fail Deduction": Array<number | undefined>;
+  };
+};
+interface ExtraData extends EquipmentExtraData {
+  Jelly: number;
+}
+interface TableMaterialList {
+  "Bone Fragment": number;
+  Garnet: number;
+  Essence: number;
+  Gold: number;
+}
 
 const BoneDragonEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -56,6 +84,189 @@ const BoneDragonEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
+  const tableResource: { res1: TableMaterialList; res2: ExtraData } =
+    useMemo(() => {
+      let temp: TableMaterialList = {
+        "Bone Fragment": 0,
+        Garnet: 0,
+        Essence: 0,
+        Gold: 0,
+      };
+      let temp2: ExtraData = {
+        Jelly: 0,
+      };
+      if (invalidDtSrc) {
+        return { res1: temp, res2: temp2 };
+      }
+
+      selectedRowKeys.forEach((item) => {
+        const found = dataSource.find((dt) => dt.key === item);
+
+        if (found) {
+          const { equipment, from, to } = found;
+          let tempSlice: BoneDragonEqEnhanceMaterial[] = [];
+
+          switch (equipment) {
+            case EQUIPMENT.HELM:
+            case EQUIPMENT.UPPER:
+            case EQUIPMENT.LOWER:
+            case EQUIPMENT.GLOVE:
+            case EQUIPMENT.SHOES:
+              tempSlice = BoneDragonEqEnhanceMaterialArmorTable.slice(from, to);
+              break;
+
+            case EQUIPMENT.MAIN_WEAPON:
+            case EQUIPMENT.SECOND_WEAPON:
+              tempSlice = BoneDragonEqEnhanceMaterialWeapTable.slice(from, to);
+              break;
+
+            default:
+              break;
+          }
+
+          let boneFragmentTemp = 0;
+          let garnetTemp = 0;
+          let essenceTemp = 0;
+          let goldTemp = 0;
+          let jellyTemp = 0;
+          let srTemp: number[] = [];
+          let brTemp: number[] = [];
+          let deTemp: Array<number | undefined> = [];
+
+          tempSlice.forEach((slicedItem) => {
+            boneFragmentTemp += slicedItem.boneFragment;
+            garnetTemp += slicedItem.garnet;
+            essenceTemp += slicedItem.essence;
+            goldTemp += slicedItem.gold;
+            jellyTemp += slicedItem.jelly ?? 0;
+            srTemp.push(slicedItem.successRatePercent);
+            brTemp.push(slicedItem.breakNoJellyPercent);
+            deTemp.push(slicedItem.enhanceFailDeduction);
+          });
+
+          temp["Bone Fragment"] += boneFragmentTemp;
+          temp.Garnet += garnetTemp;
+          temp.Essence += essenceTemp;
+          temp.Gold += goldTemp;
+          temp2.Jelly += jellyTemp;
+
+          const exData = {
+            "Success Rate": srTemp,
+            "Break Rate": brTemp,
+            "Fail Deduction": deTemp,
+          };
+          switch (equipment) {
+            case EQUIPMENT.HELM:
+            case EQUIPMENT.UPPER:
+            case EQUIPMENT.LOWER:
+            case EQUIPMENT.GLOVE:
+            case EQUIPMENT.SHOES:
+            case EQUIPMENT.MAIN_WEAPON:
+            case EQUIPMENT.SECOND_WEAPON:
+              temp2[equipment] = exData;
+              break;
+
+            default:
+              break;
+          }
+        }
+      });
+
+      return { res1: temp, res2: temp2 };
+    }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
+  function combineBoneEqStats(
+    a: BoneDragonStats,
+    b: BoneDragonStats,
+    operation: "add" | "minus"
+  ): BoneDragonStats {
+    const result: BoneDragonStats = { ...a };
+
+    const keys = Object.keys({ ...a, ...b }) as (keyof BoneDragonStats)[];
+
+    for (const key of keys) {
+      const valueA = a[key];
+      const valueB = b[key];
+
+      if (typeof valueA === "number" && typeof valueB === "number") {
+        const computed =
+          operation === "add" ? valueA + valueB : valueA - valueB;
+
+        (result as any)[key] = computed;
+      }
+    }
+
+    return result;
+  }
+
+  const statDif: BoneDragonStats = useMemo(() => {
+    let temp: BoneDragonStats = {
+      encLevel: "0",
+      phyMagAtkMax: 0,
+      phyMagAtkMin: 0,
+      phyMagAtkPercent: 0,
+      attAtkPercent: 0,
+
+      crt: 0,
+      cdm: 0,
+      fd: 0,
+
+      def: 0,
+      magdef: 0,
+      hp: 0,
+      hpPercent: 0,
+      moveSpeedPercent: 0,
+    };
+    if (invalidDtSrc) {
+      return temp;
+    }
+
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { equipment, from, to } = found;
+
+        let tableHolder: BoneDragonStats[];
+        switch (equipment) {
+          case EQUIPMENT.HELM:
+            tableHolder = BoneDragonStatsHelmTable;
+            break;
+          case EQUIPMENT.UPPER:
+            tableHolder = BoneDragonStatsUpperTable;
+            break;
+          case EQUIPMENT.LOWER:
+            tableHolder = BoneDragonStatsLowerTable;
+            break;
+          case EQUIPMENT.GLOVE:
+            tableHolder = BoneDragonStatsGlovesTable;
+            break;
+          case EQUIPMENT.SHOES:
+            tableHolder = BoneDragonStatsShoesTable;
+            break;
+
+          case EQUIPMENT.MAIN_WEAPON:
+            tableHolder = BoneDragonStatsMainTable;
+            break;
+          case EQUIPMENT.SECOND_WEAPON:
+            tableHolder = BoneDragonStatsSecondTable;
+            break;
+
+          default:
+            tableHolder = [];
+            break;
+        }
+        const { dt1, dt2 } = getComparedData(tableHolder, from, to);
+        if (dt2) {
+          const dt = dt1 ? combineBoneEqStats(dt2, dt1, "minus") : dt2;
+          temp = combineBoneEqStats(temp, dt, "add");
+        }
+      }
+    });
+
+    return temp;
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -65,6 +276,166 @@ const BoneDragonEqContent = () => {
             setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
             setDataSource={setDataSource}
+          />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          {invalidDtSrc && (
+            <div>
+              <Alert
+                banner
+                message="From cannot exceed the To option"
+                type="error"
+              />
+            </div>
+          )}
+          <Divider orientation="left">Settings</Divider>
+          <div style={{ marginBottom: 4 }}>
+            Spesific Type
+            <Divider type="vertical" />
+            <Radio.Group
+              value={selectedRowKeys}
+              onChange={(e) => {
+                setSelectedRowKeys(e.target.value);
+              }}
+            >
+              <Radio.Button
+                value={["1", "2", "3", "4", "5"]}
+                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
+              >
+                Armor
+              </Radio.Button>
+              <Radio.Button
+                value={["6", "7"]}
+                onClick={() => setSelectedRowKeys(["6", "7"])}
+              >
+                Weapon
+              </Radio.Button>
+            </Radio.Group>
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            From
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectFrom}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectFrom(val);
+              }}
+              options={getListOpt(0, 20)}
+            />
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            To
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectTo}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectTo(val);
+              }}
+              options={getListOpt(0, 20)}
+            />
+          </div>
+          <Divider orientation="left">Material List</Divider>
+          <Table
+            size={"small"}
+            dataSource={Object.entries(tableResource.res1)
+              .filter(([_, value]) => {
+                if (typeof value === "number") {
+                  return value !== 0;
+                }
+                return value.amt !== 0;
+              })
+              .map(([key, value]) => ({
+                mats: key,
+                amount: value,
+              }))}
+            columns={columnsResource}
+            pagination={false}
+            bordered
+          />
+          <ListingCard
+            title="Extra Info"
+            data={[
+              {
+                title: "Min. Jelly used",
+                value: tableResource.res2.Jelly,
+                format: true,
+              },
+              // TODO: display enhance notes
+            ]}
+          />
+          <Divider orientation="left">Extra Info</Divider>
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK Max",
+                value: statDif.phyMagAtkMax,
+                format: true,
+              },
+              {
+                title: "ATK Min",
+                value: statDif.phyMagAtkMin,
+                format: true,
+              },
+              {
+                title: "ATK",
+                value: statDif.phyMagAtkPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Ele",
+                value: statDif.attAtkPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "CRT",
+                value: statDif.crt,
+                format: true,
+              },
+              {
+                title: "CDM",
+                value: statDif.cdm,
+                format: true,
+              },
+              {
+                title: "FD",
+                value: statDif.fd,
+                format: true,
+              },
+              {
+                title: "Phy Def",
+                value: statDif.def,
+                format: true,
+              },
+              {
+                title: "Mag Def",
+                value: statDif.magdef,
+                format: true,
+              },
+              {
+                title: "HP",
+                value: statDif.hp,
+                format: true,
+              },
+              {
+                title: "HP",
+                value: statDif.hpPercent,
+                suffix: "%",
+                format: true,
+              },
+              {
+                title: "Movespeed",
+                value: statDif.moveSpeedPercent,
+                suffix: "%",
+                format: true,
+              },
+            ]}
           />
         </div>
       </div>
@@ -466,32 +837,103 @@ const BoneDragonEqContent = () => {
           </div>
         ),
       },
-      // {
-      //   title: "Eq. Fragment",
-      //   dataIndex: "eqTypeFragment",
-      //   responsive: ["sm"],
-      // },
-      // {
-      //   title: "A. Knowledge",
-      //   dataIndex: "ancKnowledge",
-      //   responsive: ["sm"],
-      // },
-      // {
-      //   title: "A. Insignia",
-      //   dataIndex: "ancInsignia",
-      //   responsive: ["sm"],
-      // },
+      {
+        title: "Bone Fragment",
+        responsive: ["sm"],
+        render: (_, { boneFragment }) => (
+          <Text>
+            {getTextEmpty({
+              txt: boneFragment,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Garnet",
+        responsive: ["sm"],
+        render: (_, { garnet }) => (
+          <Text>
+            {getTextEmpty({
+              txt: garnet,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Essence",
+        responsive: ["sm"],
+        render: (_, { essence }) => (
+          <Text>
+            {getTextEmpty({
+              txt: essence,
+            })}
+          </Text>
+        ),
+      },
       {
         title: "Gold",
-        dataIndex: "gold",
         responsive: ["sm"],
+        render: (_, { gold }) => (
+          <Text>
+            {getTextEmpty({
+              txt: gold,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Jelly",
+        responsive: ["sm"],
+        render: (_, { jelly }) => (
+          <Text>
+            {getTextEmpty({
+              txt: jelly,
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Success Rate",
+        responsive: ["sm"],
+        render: (_, { successRatePercent }) => (
+          <Text>
+            {getTextEmpty({
+              txt: successRatePercent,
+              tailText: "%",
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Break Rate",
+        responsive: ["sm"],
+        render: (_, { breakNoJellyPercent }) => (
+          <Text>
+            {getTextEmpty({
+              txt: breakNoJellyPercent,
+              tailText: "%",
+            })}
+          </Text>
+        ),
+      },
+      {
+        title: "Fail Deduction",
+        responsive: ["sm"],
+        render: (_, { enhanceFailDeduction }) => (
+          <Text>
+            {getTextEmpty({
+              txt: enhanceFailDeduction,
+              tailText: "%",
+            })}
+          </Text>
+        ),
       },
     ];
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <Table
           style={{ marginRight: 10, marginBottom: 10 }}
-          title={() => "Main"}
+          title={() => "Armor"}
           size={"small"}
           dataSource={BoneDragonEqEnhanceMaterialArmorTable}
           columns={columnsMats}
@@ -500,7 +942,7 @@ const BoneDragonEqContent = () => {
         />
         <Table
           style={{ marginRight: 10, marginBottom: 10 }}
-          title={() => "Second"}
+          title={() => "Weapon"}
           size={"small"}
           dataSource={BoneDragonEqEnhanceMaterialWeapTable}
           columns={columnsMats}

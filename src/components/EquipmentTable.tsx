@@ -42,6 +42,20 @@ interface EquipmentTableProps<T extends EquipmentTableCalculator> {
   customLabeling?: (item: number) => string;
 }
 
+const getLabel = (item: number) => {
+  return `+${item}`;
+};
+
+export const getListOpt = (
+  start: number,
+  end: number,
+  customLabeling?: (item: number) => string
+) =>
+  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
+    label: customLabeling ? customLabeling(item) : getLabel(item),
+    value: item,
+  }));
+
 const EquipmentTable = <T extends EquipmentTableCalculator>({
   selectedRowKeys,
   setSelectedRowKeys,
@@ -49,18 +63,6 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
   setDataSource,
   customLabeling,
 }: EquipmentTableProps<T>) => {
-  const getLabel = (item: number) => {
-    return `+${item}`;
-  };
-
-  const opt = (start: number, end: number) =>
-    Array.from({ length: end + 1 - start }, (_, k) => k + start).map(
-      (item) => ({
-        label: customLabeling ? customLabeling(item) : getLabel(item),
-        value: item,
-      })
-    );
-
   interface EditableCellProps<T> {
     title: React.ReactNode;
     editable: boolean;
@@ -133,7 +135,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               defaultValue={selectItem}
               style={{ width: 120 }}
               onChange={handleChange}
-              options={opt(record.min, record.max)}
+              options={getListOpt(record.min, record.max)}
               onBlur={saveSelect}
               autoFocus
               status={findTo <= findFr ? "error" : undefined}
@@ -145,7 +147,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               defaultValue={selectItem}
               style={{ width: 120 }}
               onChange={handleChange}
-              options={opt(record.min, record.max)}
+              options={getListOpt(record.min, record.max)}
               onBlur={saveSelect}
               autoFocus
               status={findFr >= findTo ? "error" : undefined}
