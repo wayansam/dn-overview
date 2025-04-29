@@ -30,7 +30,7 @@ import {
 import { Alert, Divider, Radio, Select, Typography } from "antd";
 import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import ListingCard from "../../components/ListingCard";
+import ListingCard, { ItemList } from "../../components/ListingCard";
 
 const { Text } = Typography;
 
@@ -68,6 +68,32 @@ const BoneDragonEqContent = () => {
       const found = dataSource.find((dt) => dt.key === item);
       if (!flag && found) {
         if (found.to <= found.from) {
+          flag = true;
+        }
+      }
+    });
+    return flag;
+  }, [selectedRowKeys, dataSource]);
+
+  const warnDtSrc = useMemo(() => {
+    let flag = false;
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (!flag && found) {
+        if (found.to > 3) {
+          flag = true;
+        }
+      }
+    });
+    return flag;
+  }, [selectedRowKeys, dataSource]);
+
+  const dangerDtSrc = useMemo(() => {
+    let flag = false;
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (!flag && found) {
+        if (found.to > 5) {
           flag = true;
         }
       }
@@ -267,6 +293,47 @@ const BoneDragonEqContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
+  const extraInfo: ItemList[] = useMemo(() => {
+    const list: ItemList[] = [];
+    Object.entries(tableResource.res2).forEach(([key, value]) => {
+      if (key === "Jelly") {
+        list.push({
+          title: "Min. Jelly used",
+          value: tableResource.res2.Jelly,
+          format: true,
+        });
+      } else {
+        list.push(
+          ...[
+            {
+              title: key,
+              isHeader: !!value,
+            },
+            {
+              title: `${key} Success Rate`,
+              value: value?.["Success Rate"]
+                ?.map((it: any) => `${it}%`)
+                .join(", "),
+            },
+            {
+              title: `${key} Break Rate`,
+              value: value?.["Break Rate"]
+                ?.map((it: any) => `${it}%`)
+                .join(", "),
+            },
+            {
+              title: `${key} Fail Deduction`,
+              value: value?.["Fail Deduction"]
+                ?.map((it: any) => `${it}`)
+                .join(", "),
+            },
+          ]
+        );
+      }
+    });
+    return list;
+  }, [tableResource.res2]);
+
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -337,6 +404,24 @@ const BoneDragonEqContent = () => {
             />
           </div>
           <Divider orientation="left">Material List</Divider>
+          {warnDtSrc && (
+            <div>
+              <Alert
+                banner
+                message="Above +3, the enhancement might fail."
+                type="info"
+              />
+            </div>
+          )}
+          {dangerDtSrc && (
+            <div>
+              <Alert
+                banner
+                message="Above +5 even can break your item."
+                type="warning"
+              />
+            </div>
+          )}
           <Table
             size={"small"}
             dataSource={Object.entries(tableResource.res1)
@@ -354,18 +439,7 @@ const BoneDragonEqContent = () => {
             pagination={false}
             bordered
           />
-          <ListingCard
-            title="Extra Info"
-            data={[
-              {
-                title: "Min. Jelly used",
-                value: tableResource.res2.Jelly,
-                format: true,
-              },
-              // TODO: display enhance notes
-            ]}
-          />
-          <Divider orientation="left">Extra Info</Divider>
+          <ListingCard title="Extra Info" data={extraInfo} />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard

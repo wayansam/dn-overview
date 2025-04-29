@@ -1,8 +1,9 @@
 import { Card, Divider, Space, Typography } from "antd";
 const { Text } = Typography;
 
-interface ItemList {
+export interface ItemList {
   title: string;
+  isHeader?: boolean;
   suffix?: string;
   value?: string | number;
   format?: boolean;
@@ -14,9 +15,16 @@ interface ListingCardProps {
 
 const ListingCard = ({ title, data }: ListingCardProps) => {
   const getStatRender = (
-    { title, suffix, value, format }: ItemList,
+    { title, suffix, value, format, isHeader }: ItemList,
     idx: number
   ) => {
+    if (isHeader) {
+      return (
+        <Text strong key={`item-${title}-${idx}`}>
+          {title}
+        </Text>
+      );
+    }
     if (!value) {
       return;
     }
