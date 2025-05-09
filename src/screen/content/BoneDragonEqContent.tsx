@@ -282,7 +282,7 @@ const BoneDragonEqContent = () => {
             tableHolder = [];
             break;
         }
-        const { dt1, dt2 } = getComparedData(tableHolder, from, to);
+        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
         if (dt2) {
           const dt = dt1 ? combineBoneEqStats(dt2, dt1, "minus") : dt2;
           temp = combineBoneEqStats(temp, dt, "add");
@@ -544,7 +544,7 @@ const BoneDragonEqContent = () => {
                 {getTextEmpty({
                   txt:
                     phyMagAtkMin && phyMagAtkMax
-                      ? `${phyMagAtkMin} - ${phyMagAtkMax}`
+                      ? `${phyMagAtkMin.toLocaleString()} - ${phyMagAtkMax.toLocaleString()}`
                       : undefined,
                 })}
               </Text>
@@ -767,16 +767,13 @@ const BoneDragonEqContent = () => {
               columns={getColumnsStats({
                 phyMagAtkMinFlag: true,
                 phyMagAtkMaxFlag: true,
-                phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
-                crtFlag: true,
-                cdmFlag: true,
-                fdFlag: true,
                 defFlag: true,
                 magdefFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-                moveSpeedPercentFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
               })}
               pagination={false}
               bordered
@@ -786,7 +783,18 @@ const BoneDragonEqContent = () => {
               title={() => "Upper"}
               size={"small"}
               dataSource={BoneDragonStatsUpperTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                fdFlag: true,
+                defFlag: true,
+                magdefFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                attAtkPercentFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -832,7 +840,14 @@ const BoneDragonEqContent = () => {
               title={() => "Main"}
               size={"small"}
               dataSource={BoneDragonStatsMainTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -841,7 +856,14 @@ const BoneDragonEqContent = () => {
               title={() => "Second"}
               size={"small"}
               dataSource={BoneDragonStatsSecondTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+              })}
               pagination={false}
               bordered
             />
