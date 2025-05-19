@@ -803,7 +803,18 @@ const BoneDragonEqContent = () => {
               title={() => "Lower"}
               size={"small"}
               dataSource={BoneDragonStatsLowerTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                cdmFlag: true,
+                defFlag: true,
+                magdefFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                attAtkPercentFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -812,7 +823,17 @@ const BoneDragonEqContent = () => {
               title={() => "Glove"}
               size={"small"}
               dataSource={BoneDragonStatsGlovesTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                defFlag: true,
+                magdefFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                attAtkPercentFlag: true,
+              })}
               pagination={false}
               bordered
             />
@@ -821,7 +842,17 @@ const BoneDragonEqContent = () => {
               title={() => "Shoes"}
               size={"small"}
               dataSource={BoneDragonStatsShoesTable}
-              columns={getColumnsStats({})}
+              columns={getColumnsStats({
+                phyMagAtkMinFlag: true,
+                phyMagAtkMaxFlag: true,
+                defFlag: true,
+                magdefFlag: true,
+                hpFlag: true,
+                hpPercentFlag: true,
+                phyMagAtkPercentFlag: true,
+                crtFlag: true,
+                attAtkPercentFlag: true,
+              })}
               pagination={false}
               bordered
             />
