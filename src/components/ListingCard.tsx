@@ -7,6 +7,7 @@ export interface ItemList {
   suffix?: string;
   value?: string | number;
   format?: boolean;
+  children?: React.ReactNode;
 }
 interface ListingCardProps {
   title?: string;
@@ -15,14 +16,17 @@ interface ListingCardProps {
 
 const ListingCard = ({ title, data }: ListingCardProps) => {
   const getStatRender = (
-    { title, suffix, value, format, isHeader }: ItemList,
+    { title, suffix, value, format, isHeader, children }: ItemList,
     idx: number
   ) => {
     if (isHeader) {
       return (
-        <Text strong key={`item-${title}-${idx}`}>
-          {title}
-        </Text>
+        <div>
+          <Text strong key={`item-${title}-${idx}`}>
+            {title}
+          </Text>
+          {children}
+        </div>
       );
     }
     if (!value) {
@@ -31,9 +35,12 @@ const ListingCard = ({ title, data }: ListingCardProps) => {
     const sign = typeof value !== "number" || value < 0 ? "" : "+";
     const tempValue = format ? value.toLocaleString() : value;
     return (
-      <Text key={`item-${title}-${idx}`}>{`${title} ${sign}${tempValue}${
-        suffix ?? ""
-      }`}</Text>
+      <div>
+        <Text key={`item-${title}-${idx}`}>{`${title} ${sign}${tempValue}${
+          suffix ?? ""
+        }`}</Text>
+        {children}
+      </div>
     );
   };
   return (
