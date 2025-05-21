@@ -754,151 +754,166 @@ const BoneDragonEqContent = () => {
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",
-        label: "Armor",
+        label: "Helm",
         children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Helm"}
-              size={"small"}
-              dataSource={BoneDragonStatsHelmTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                attAtkPercentFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Upper"}
-              size={"small"}
-              dataSource={BoneDragonStatsUpperTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                fdFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                attAtkPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Lower"}
-              size={"small"}
-              dataSource={BoneDragonStatsLowerTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                cdmFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                attAtkPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Glove"}
-              size={"small"}
-              dataSource={BoneDragonStatsGlovesTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                attAtkPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Shoes"}
-              size={"small"}
-              dataSource={BoneDragonStatsShoesTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                attAtkPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsHelmTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              attAtkPercentFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
         ),
       },
       {
         key: "2",
-        label: "Weapon",
+        label: "Upper",
         children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Main"}
-              size={"small"}
-              dataSource={BoneDragonStatsMainTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                cdmFlag: true,
-                fdFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Second"}
-              size={"small"}
-              dataSource={BoneDragonStatsSecondTable}
-              columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
-                cdmFlag: true,
-                fdFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsUpperTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              fdFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "3",
+        label: "Lower",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsLowerTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              cdmFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "4",
+        label: "Glove",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsGlovesTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "5",
+        label: "Shoes",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsShoesTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "6",
+        label: "Main",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsMainTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              cdmFlag: true,
+              fdFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "7",
+        label: "Second",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonStatsSecondTable}
+            columns={getColumnsStats({
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              cdmFlag: true,
+              fdFlag: true,
+            })}
+            pagination={false}
+            bordered
+          />
         ),
       },
     ];
@@ -1050,32 +1065,67 @@ const BoneDragonEqContent = () => {
           <Text>
             {getTextEmpty({
               txt: enhanceFailDeduction,
-              tailText: "%",
             })}
           </Text>
         ),
       },
     ];
+    const itemMats: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Note",
+        children: (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Text>
+              * Beyond +10, there are downgrade intervals every 2 levels.
+            </Text>
+            <Text>
+              ** E.g. Enhance +10 to +11, failure dont have level downgrade.
+            </Text>
+            <Text>
+              ** E.g. Enhance +11 to +12, failure have level downgrade with
+              certain probability (become +10).
+            </Text>
+          </div>
+        ),
+      },
+      {
+        key: "2",
+        label: "Armor",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonEqEnhanceMaterialArmorTable}
+            columns={columnsMats}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "3",
+        label: "Weapon",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={BoneDragonEqEnhanceMaterialWeapTable}
+            columns={columnsMats}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+    ];
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Table
-          style={{ marginRight: 10, marginBottom: 10 }}
-          title={() => "Armor"}
-          size={"small"}
-          dataSource={BoneDragonEqEnhanceMaterialArmorTable}
-          columns={columnsMats}
-          pagination={false}
-          bordered
-        />
-        <Table
-          style={{ marginRight: 10, marginBottom: 10 }}
-          title={() => "Weapon"}
-          size={"small"}
-          dataSource={BoneDragonEqEnhanceMaterialWeapTable}
-          columns={columnsMats}
-          pagination={false}
-          bordered
-        />
+        <Collapse items={itemMats} size="small" defaultActiveKey={"1"} />
       </div>
     );
   };

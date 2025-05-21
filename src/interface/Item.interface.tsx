@@ -149,7 +149,7 @@ export interface LunarJadeEnhancementMats {
 }
 
 export interface BoneDragonEqEnhanceMaterial {
-  encLevel: number;
+  encLevel: string;
   boneFragment: number;
   garnet: number;
   essence: number;
