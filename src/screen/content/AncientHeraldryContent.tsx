@@ -159,7 +159,7 @@ const AncientHeraldryContent = () => {
             defaultValue={[0, 10]}
             max={10}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

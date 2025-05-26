@@ -250,7 +250,7 @@ const SkillJadeContent = () => {
             defaultValue={[0, 10]}
             max={15}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -349,7 +349,7 @@ const SkillJadeContent = () => {
             defaultValue={[0, 10]}
             max={15}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -448,7 +448,7 @@ const SkillJadeContent = () => {
             defaultValue={[0, 10]}
             max={15}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -547,7 +547,7 @@ const SkillJadeContent = () => {
             defaultValue={[0, 10]}
             max={15}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -633,7 +633,7 @@ const SkillJadeContent = () => {
             defaultValue={[0, 10]}
             max={15}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

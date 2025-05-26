@@ -86,7 +86,7 @@ const BlackDragonTalismanContent = () => {
     token: { colorBgContainer, colorText },
   } = theme.useToken();
 
-  const defaultRange: [number, number] = [0, 5];
+  const defaultRange: number[] = [0, 5];
   const [baofaRange, setBaofaRange] = useState(defaultRange);
   const [umbalaRange, setUmbalaRange] = useState(defaultRange);
   const [melukaRange, setMelukaRange] = useState(defaultRange);
@@ -653,7 +653,7 @@ const BlackDragonTalismanContent = () => {
   }, [baofaRange]);
 
   const getBaofaCalc = () => {
-    const onAfterChange = (value: [number, number]) => {
+    const onAfterChange = (value: number[]) => {
       setBaofaRange(value);
     };
 
@@ -667,7 +667,7 @@ const BlackDragonTalismanContent = () => {
             defaultValue={defaultRange}
             max={6}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -787,7 +787,7 @@ const BlackDragonTalismanContent = () => {
   }, [umbalaRange]);
 
   const getUmbalaCalc = () => {
-    const onAfterChange = (value: [number, number]) => {
+    const onAfterChange = (value: number[]) => {
       setUmbalaRange(value);
     };
 
@@ -801,7 +801,7 @@ const BlackDragonTalismanContent = () => {
             defaultValue={defaultRange}
             max={6}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -921,7 +921,7 @@ const BlackDragonTalismanContent = () => {
   }, [melukaRange]);
 
   const getMelukaCalc = () => {
-    const onAfterChange = (value: [number, number]) => {
+    const onAfterChange = (value: number[]) => {
       setMelukaRange(value);
     };
 
@@ -935,7 +935,7 @@ const BlackDragonTalismanContent = () => {
             defaultValue={defaultRange}
             max={6}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -1056,7 +1056,7 @@ const BlackDragonTalismanContent = () => {
   }, [titanRange]);
 
   const getTitanionCalc = () => {
-    const onAfterChange = (value: [number, number]) => {
+    const onAfterChange = (value: number[]) => {
       setTitanRange(value);
     };
 
@@ -1070,7 +1070,7 @@ const BlackDragonTalismanContent = () => {
             defaultValue={defaultRange}
             max={6}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

@@ -126,7 +126,7 @@ const ErosionJadeContent = () => {
             defaultValue={[0, 10]}
             max={20}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

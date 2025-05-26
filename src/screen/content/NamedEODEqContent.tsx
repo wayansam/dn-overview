@@ -244,7 +244,7 @@ const NamedEODEqContent = () => {
             defaultValue={[0, 5]}
             max={10}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

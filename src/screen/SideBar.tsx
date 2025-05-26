@@ -1,12 +1,4 @@
-import {
-  Button,
-  Divider,
-  Layout,
-  Space,
-  theme,
-  Grid,
-  Card,
-} from "antd";
+import { Button, Card, Divider, Grid, Layout, Space, theme } from "antd";
 import { useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
@@ -78,9 +70,9 @@ const SideBar = () => {
             <Card
               size="small"
               key={`card-${group.name}`}
-              bordered={false}
+              variant={"borderless"}
               style={{ paddingLeft: 0 }}
-              bodyStyle={{ paddingLeft: 0 }}
+              styles={{ body: { paddingLeft: 0 } }}
             >
               <Divider style={{ margin: 0 }} orientation={"left"}>
                 {group.name}
@@ -92,7 +84,7 @@ const SideBar = () => {
                     border: "none",
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
-                    textAlign: "right",
+                    justifyContent: "end",
                   }}
                   type={
                     selectedSideBar.key === item.key ? "primary" : "default"

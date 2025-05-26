@@ -476,7 +476,7 @@ const ExternalTalismanContent = () => {
             defaultValue={[0, 10]}
             max={10}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>
@@ -584,7 +584,7 @@ const ExternalTalismanContent = () => {
             defaultValue={[0, 5]}
             max={5}
             min={0}
-            onAfterChange={onAfterChange}
+            onChangeComplete={onAfterChange}
           />
         </div>
         <div>

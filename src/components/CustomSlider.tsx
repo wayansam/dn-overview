@@ -1,27 +1,21 @@
 import { Slider } from "antd";
 import React, { useState } from "react";
 
-interface RangeValue {
-  range?: [number, number];
-}
-
 interface CustomSliderProps {
   id?: string;
   value?: [number, number];
-  onChange?: (value: [number, number]) => void;
+  onChange?: (value: number[]) => void;
 }
 
 const CustomSlider: React.FC<CustomSliderProps> = (props) => {
   const { id, value, onChange } = props;
-  const [localRange, setLocalRange] = useState<[number, number]>(
-    value ?? [0, 0]
-  );
+  const [localRange, setLocalRange] = useState<number[]>(value ?? [0, 0]);
 
-  const triggerChange = (changedValue: { range?: [number, number] }) => {
+  const triggerChange = (changedValue: { range?: number[] }) => {
     onChange?.(changedValue?.range || localRange);
   };
 
-  const onChangeComplete = (value: [number, number]) => {
+  const onChangeComplete = (value: number[]) => {
     if (!("range" in value)) {
       setLocalRange(value);
     }
@@ -31,7 +25,7 @@ const CustomSlider: React.FC<CustomSliderProps> = (props) => {
   return (
     <span id={id}>
       <Slider
-        onAfterChange={onChangeComplete}
+        onChangeComplete={onChangeComplete}
         style={{ marginRight: 20 }}
         defaultValue={localRange}
         min={0}
