@@ -1421,6 +1421,19 @@ export const BoneDragonStatsUpperTable: BoneDragonStats[] = [
 ];
 export const BoneDragonStatsLowerTable: BoneDragonStats[] = [
   {
+    encLevel: "0",
+    phyMagAtkMin: 2882920,
+    phyMagAtkMax: 4118450,
+    cdm: 1810540,
+    def: 18700,
+    magdef: 18700,
+    hp: 13602872,
+    hpPercent: 16.2,
+    phyMagAtkPercent: 5.0,
+    crt: -50000,
+    attAtkPercent: 8.0,
+  },
+  {
     encLevel: "1",
     phyMagAtkMin: 2891429,
     phyMagAtkMax: 4130606,
@@ -1683,6 +1696,18 @@ export const BoneDragonStatsLowerTable: BoneDragonStats[] = [
 ];
 export const BoneDragonStatsGlovesTable: BoneDragonStats[] = [
   {
+    encLevel: "0",
+    phyMagAtkMin: 2567420,
+    phyMagAtkMax: 3667750,
+    def: 120584,
+    magdef: 13811,
+    hp: 10223861,
+    hpPercent: 12.0,
+    phyMagAtkPercent: 5.0,
+    crt: -50000,
+    attAtkPercent: 8.0,
+  },
+  {
     encLevel: "1",
     phyMagAtkMin: 2575004,
     phyMagAtkMax: 3678584,
@@ -1924,6 +1949,18 @@ export const BoneDragonStatsGlovesTable: BoneDragonStats[] = [
   },
 ];
 export const BoneDragonStatsShoesTable: BoneDragonStats[] = [
+  {
+    encLevel: "0",
+    phyMagAtkMin: 2567420,
+    phyMagAtkMax: 3667750,
+    def: 13811,
+    magdef: 120584,
+    hp: 10223861,
+    hpPercent: 12.0,
+    phyMagAtkPercent: 5.0,
+    crt: -50000,
+    attAtkPercent: 8.0,
+  },
   {
     encLevel: "1",
     phyMagAtkMin: 2575004,

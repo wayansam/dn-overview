@@ -11,17 +11,18 @@ export interface ItemList {
 }
 interface ListingCardProps {
   title?: string;
+  keyId?: string;
   data: Array<ItemList>;
 }
 
-const ListingCard = ({ title, data }: ListingCardProps) => {
+const ListingCard = ({ title, keyId, data }: ListingCardProps) => {
   const getStatRender = (
     { title, suffix, value, format, isHeader, children }: ItemList,
     idx: number
   ) => {
     if (isHeader) {
       return (
-        <div>
+        <div key={`item-container-${title}-${idx}`} style={{ width: 400 }}>
           <Text strong key={`item-${title}-${idx}`}>
             {title}
           </Text>
@@ -35,7 +36,7 @@ const ListingCard = ({ title, data }: ListingCardProps) => {
     const sign = typeof value !== "number" || value < 0 ? "" : "+";
     const tempValue = format ? value.toLocaleString() : value;
     return (
-      <div>
+      <div key={`item-container-${title}-${idx}`}>
         <Text key={`item-${title}-${idx}`}>{`${title} ${sign}${tempValue}${
           suffix ?? ""
         }`}</Text>
@@ -44,9 +45,13 @@ const ListingCard = ({ title, data }: ListingCardProps) => {
     );
   };
   return (
-    <div>
-      {title && <Divider orientation="left">{title}</Divider>}
-      <Card size="small" style={{ marginTop: 4 }}>
+    <div key={keyId}>
+      {title && (
+        <Divider key={`title-${keyId}`} orientation="left">
+          {title}
+        </Divider>
+      )}
+      <Card key={`card-${keyId}`} size="small" style={{ marginTop: 4 }}>
         <Space direction="vertical">
           {data.map((item, idx) => getStatRender(item, idx))}
         </Space>

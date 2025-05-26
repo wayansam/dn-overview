@@ -1,9 +1,10 @@
+import { Alert, Divider, Radio, Select, Typography } from "antd";
+import Collapse, { CollapseProps } from "antd/es/collapse";
+import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
-import EquipmentTable, {
-  EquipmentTableCalculator,
-  getListOpt,
-} from "../../components/EquipmentTable";
-import { BoneCalculator } from "../../interface/Common.interface";
+import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
+import ListingCard, { ItemList } from "../../components/ListingCard";
+import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   BoneDragonEqEnhanceMaterialArmorTable,
   BoneDragonEqEnhanceMaterialWeapTable,
@@ -16,21 +17,17 @@ import {
   BoneDragonStatsUpperTable,
   dataBoneCalculator,
 } from "../../data/BoneDragonEqData";
-import Collapse, { CollapseProps } from "antd/es/collapse";
+import { BoneCalculator } from "../../interface/Common.interface";
+import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
 import {
   BoneDragonStats,
   columnBoneDragonFlag,
 } from "../../interface/ItemStat.interface";
-import Table, { ColumnsType } from "antd/es/table";
 import {
   columnsResource,
   getComparedData,
   getTextEmpty,
 } from "../../utils/common.util";
-import { Alert, Divider, Radio, Select, Typography } from "antd";
-import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
-import { EQUIPMENT } from "../../constants/InGame.constants";
-import ListingCard, { ItemList } from "../../components/ListingCard";
 
 const { Text } = Typography;
 
@@ -295,6 +292,15 @@ const BoneDragonEqContent = () => {
 
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
+    const items: CollapseProps["items"] = [];
+    const panelStyle: React.CSSProperties = {
+      // marginRight: 8,
+      // marginLeft: 8,
+      // margin: 12,
+      // margin: -4,
+      // backgroundColor: "red",
+    };
+
     Object.entries(tableResource.res2).forEach(([key, value]) => {
       if (key === "Jelly") {
         list.push({
@@ -303,34 +309,72 @@ const BoneDragonEqContent = () => {
           format: true,
         });
       } else {
-        list.push(
-          ...[
-            {
-              title: key,
-              isHeader: !!value,
-            },
-            {
-              title: `${key} Success Rate`,
-              value: value?.["Success Rate"]
-                ?.map((it: any) => `${it}%`)
-                .join(", "),
-            },
-            {
-              title: `${key} Break Rate`,
-              value: value?.["Break Rate"]
-                ?.map((it: any) => `${it}%`)
-                .join(", "),
-            },
-            {
-              title: `${key} Fail Deduction`,
-              value: value?.["Fail Deduction"]
-                ?.map((it: any) => `${it}`)
-                .join(", "),
-            },
-          ]
-        );
+        // list.push(
+        //   ...[
+        //     {
+        //       title: key,
+        //       isHeader: !!value,
+        //     },
+        //     {
+        //       title: `${key} Success Rate`,
+        //       value: value?.["Success Rate"]
+        //         ?.map((it: any) => `${it}%`)
+        //         .join(", "),
+        //     },
+        //     {
+        //       title: `${key} Break Rate`,
+        //       value: value?.["Break Rate"]
+        //         ?.map((it: any) => `${it}%`)
+        //         .join(", "),
+        //     },
+        //     {
+        //       title: `${key} Fail Deduction`,
+        //       value: value?.["Fail Deduction"]
+        //         ?.map((it: any) => `${it}`)
+        //         .join(", "),
+        //     },
+        //   ]
+        // );
+        items.push({
+          key: key,
+          style: panelStyle,
+          label: <div>{key}</div>,
+          children: (
+            <ListingCard
+              // title="Extra Info"
+              data={[
+                {
+                  title: `${key} Success Rate`,
+                  value: value?.["Success Rate"]
+                    ?.map((it: any) => `${it}%`)
+                    .join(", "),
+                },
+                {
+                  title: `${key} Break Rate`,
+                  value: value?.["Break Rate"]
+                    ?.map((it: any) => `${it}%`)
+                    .join(", "),
+                },
+                {
+                  title: `${key} Fail Deduction`,
+                  value: value?.["Fail Deduction"]
+                    ?.map((it: any) => `${it}`)
+                    .join(", "),
+                },
+              ]}
+            />
+          ),
+        });
       }
     });
+    if (items.length > 0) {
+      list.push({
+        title: "Summary",
+        isHeader: true,
+
+        children: <Collapse key={"summary-item"} items={items} size="small" />,
+      });
+    }
     return list;
   }, [tableResource.res2]);
 
@@ -439,7 +483,7 @@ const BoneDragonEqContent = () => {
             pagination={false}
             bordered
           />
-          <ListingCard title="Extra Info" data={extraInfo} />
+          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard
