@@ -216,6 +216,65 @@ const getItems: (
       style: panelStyle,
     },
     {
+      key: TAB_KEY.eqBoneDragon,
+      label: TAB_KEY.eqBoneDragon,
+      children: (
+        <div>
+          <p>
+            <b>
+              Bone Armor & Weapon can be obtain via Trading House. Additionally,
+              Bone Armor can be obtained by evolving Ancient Armor T2 & Bone
+              Weapon from Bone Weapon Pouch.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Mats Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment &#40;0 to 20&#41;.
+          </p>
+          <p>
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab Specific Type, From,
+              and To, but remember your custom input will be override by The
+              Settings if you change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
+            </i>
+          </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/126/c/1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Bone Dragon Nest Equipment
+            </a>
+          </p>
+          <p>Special Thanks</p>
+          <p>
+            <i>~bananacredits~</i>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.eqKilos,
       label: TAB_KEY.eqKilos,
       children: (

@@ -1,7 +1,6 @@
-import { Divider, List, Space, Typography, Collapse } from "antd";
+import { Collapse, Divider, List, Space, Typography } from "antd";
 import { BaseType } from "antd/es/typography/Base";
 import Link from "antd/es/typography/Link";
-import { useEffect } from "react";
 import { TAB_KEY } from "../constants/Common.constants";
 import { useAppDispatch } from "../hooks";
 import { SideBarTab } from "../interface/Common.interface";
@@ -65,17 +64,24 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
   const dataNew: Array<FeatureItem> = [
     {
       key: keyUpdate.N,
-      label: "Conversion Costume Calculator",
+      label: "Bone Dragon Armor & Weapon Calculator",
       link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
+        key: TAB_KEY.eqBoneDragon,
+        name: TAB_KEY.eqBoneDragon,
       },
-      date: "04-04-2025",
+      date: "26-05-2025",
     },
   ];
 
   const dataSoon: Array<FeatureItem> = [
-    { key: keyUpdate.I, label: "Bone Dragon Armor & Weapon Calculator" },
+    {
+      key: keyUpdate.I,
+      label: "Conversion Costume Armor Legend Enhancement",
+    },
+    {
+      key: keyUpdate.P,
+      label: "Bestie Spirit & Mount Calculator",
+    },
   ];
 
   const dataPastFunc: Array<FeatureItem> = [
@@ -107,6 +113,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         },
       },
       date: "23-02-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Conversion Costume Calculator",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "04-04-2025",
     },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
