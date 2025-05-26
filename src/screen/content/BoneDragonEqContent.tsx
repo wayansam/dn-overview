@@ -1,9 +1,15 @@
-import { Alert, Divider, Radio, Select, Typography } from "antd";
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  MinusCircleOutlined,
+} from "@ant-design/icons";
+import { Alert, Divider, Radio, Select, Tag, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   BoneDragonEqEnhanceMaterialArmorTable,
@@ -293,12 +299,50 @@ const BoneDragonEqContent = () => {
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
     const items: CollapseProps["items"] = [];
-    const panelStyle: React.CSSProperties = {
-      // marginRight: 8,
-      // marginLeft: 8,
-      // margin: 12,
-      // margin: -4,
-      // backgroundColor: "red",
+
+    const getSuccessRateTag = (key: string, dt: number[]) => {
+      const another100 = dt.some((it) => it < 100);
+      return another100 ? (
+        <Tag
+          key={`tag-fail-${key}`}
+          icon={<ExclamationCircleOutlined />}
+          color="warning"
+        >
+          might fail
+        </Tag>
+      ) : (
+        <Tag
+          key={`tag-success-${key}`}
+          icon={<CheckCircleOutlined />}
+          color="success"
+        >
+          100% success
+        </Tag>
+      );
+    };
+    const getBreakTag = (key: string, dt: number[]) => {
+      const canBreak = dt.some((it) => it > 0);
+      return canBreak ? (
+        <Tag
+          key={`tag-break-${key}`}
+          icon={<MinusCircleOutlined />}
+          color="error"
+        >
+          might break
+        </Tag>
+      ) : undefined;
+    };
+    const getDeductTag = (key: string, dt: number[]) => {
+      const canReduce = dt.some((it) => it > 0);
+      return canReduce ? (
+        <Tag
+          key={`tag-minus-${key}`}
+          icon={<ExclamationCircleOutlined />}
+          color="error"
+        >
+          might -1
+        </Tag>
+      ) : undefined;
     };
 
     Object.entries(tableResource.res2).forEach(([key, value]) => {
@@ -309,54 +353,43 @@ const BoneDragonEqContent = () => {
           format: true,
         });
       } else {
-        // list.push(
-        //   ...[
-        //     {
-        //       title: key,
-        //       isHeader: !!value,
-        //     },
-        //     {
-        //       title: `${key} Success Rate`,
-        //       value: value?.["Success Rate"]
-        //         ?.map((it: any) => `${it}%`)
-        //         .join(", "),
-        //     },
-        //     {
-        //       title: `${key} Break Rate`,
-        //       value: value?.["Break Rate"]
-        //         ?.map((it: any) => `${it}%`)
-        //         .join(", "),
-        //     },
-        //     {
-        //       title: `${key} Fail Deduction`,
-        //       value: value?.["Fail Deduction"]
-        //         ?.map((it: any) => `${it}`)
-        //         .join(", "),
-        //     },
-        //   ]
-        // );
         items.push({
           key: key,
-          style: panelStyle,
-          label: <div>{key}</div>,
+          styles: {
+            header: {
+              padding: "4px 4px 0px 4px",
+            },
+            body: {
+              padding: "0px 4px",
+              marginTop: 8,
+              marginBottom: 8,
+            },
+          },
+          label: (
+            <div>
+              {`${key} `}
+              {getSuccessRateTag(key, value?.["Success Rate"])}
+              {getBreakTag(key, value?.["Break Rate"])}
+              {getDeductTag(key, value?.["Fail Deduction"])}
+            </div>
+          ),
           children: (
             <ListingCard
-              // title="Extra Info"
               data={[
                 {
-                  title: `${key} Success Rate`,
+                  title: `${key} Success Rate : `,
                   value: value?.["Success Rate"]
                     ?.map((it: any) => `${it}%`)
                     .join(", "),
                 },
                 {
-                  title: `${key} Break Rate`,
+                  title: `${key} Break Rate : `,
                   value: value?.["Break Rate"]
                     ?.map((it: any) => `${it}%`)
                     .join(", "),
                 },
                 {
-                  title: `${key} Fail Deduction`,
+                  title: `${key} Fail Deduction : `,
                   value: value?.["Fail Deduction"]
                     ?.map((it: any) => `${it}`)
                     .join(", "),
@@ -371,8 +404,9 @@ const BoneDragonEqContent = () => {
       list.push({
         title: "Summary",
         isHeader: true,
-
-        children: <Collapse key={"summary-item"} items={items} size="small" />,
+        children: (
+          <Collapse ghost key={"summary-item"} items={items} size="small" />
+        ),
       });
     }
     return list;
@@ -483,6 +517,8 @@ const BoneDragonEqContent = () => {
             pagination={false}
             bordered
           />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
@@ -554,6 +590,25 @@ const BoneDragonEqContent = () => {
                 format: true,
               },
             ]}
+          />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <TradingHouseCalc
+            data={[
+              {
+                name: "Bone Fragment",
+                amt: tableResource.res1["Bone Fragment"],
+              },
+              {
+                name: "Garnet",
+                amt: tableResource.res1.Garnet,
+              },
+              {
+                name: "Essence",
+                amt: tableResource.res1.Essence,
+              },
+            ]}
+            additionalTotal={tableResource.res1.Gold}
           />
         </div>
       </div>

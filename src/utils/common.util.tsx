@@ -1,4 +1,4 @@
-import { Typography, message } from "antd";
+import { Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { TableResource } from "../constants/Common.constants";
 import { ITEM_RARITY_COLOR } from "../constants/InGame.color.constants";
@@ -64,7 +64,10 @@ export const columnsResource: ColumnsType<TableResource> = [
     title: "Materials",
     dataIndex: "mats",
     render: (_, { mats, customLabel }) => (
-      <Text style={{ color: customLabel?.lunarStyle?.color ?? undefined }}>
+      <Text
+        key={`col-resource-name-${mats}`}
+        style={{ color: customLabel?.lunarStyle?.color ?? undefined }}
+      >
         {mats}
       </Text>
     ),
@@ -73,24 +76,25 @@ export const columnsResource: ColumnsType<TableResource> = [
     title: "Amount",
     dataIndex: "amount",
     width: 150,
-    render: (_, { amount }) => <Text>{amount.toLocaleString()}</Text>,
+    render: (_, { amount, mats }) => (
+      <Text key={`col-resource-value-${mats}`}>{amount.toLocaleString()}</Text>
+    ),
   },
 ];
 
 export const copyTextToClipboard = async (txt: string) => {
   try {
     await navigator.clipboard.writeText(txt);
-    console.log('Content copied to clipboard');
+    console.log("Content copied to clipboard");
     // messageApi.open({
     //   type: 'success',
     //   content: 'This is a success message',
     // });
-
   } catch (err) {
-    console.error('Failed to copy: ', err);
+    console.error("Failed to copy: ", err);
     // messageApi.open({
     //   type: 'error',
     //   content: 'This is an error message',
     // });
   }
-}
+};
