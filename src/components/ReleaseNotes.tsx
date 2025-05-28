@@ -71,15 +71,20 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "26-05-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Conversion Costume Armor Legend Enhancement",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "28-05-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
     {
       key: keyUpdate.I,
-      label: "Conversion Costume Armor Legend Enhancement",
-    },
-    {
-      key: keyUpdate.P,
       label: "Bestie Spirit & Mount Calculator",
     },
   ];

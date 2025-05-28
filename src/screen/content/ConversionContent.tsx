@@ -59,8 +59,8 @@ const getLabel = (item: number) => {
   if (item === 0) {
     return "Buy";
   }
-  if (item === 12) {
-    return "Evo Legend";
+  if (item >= 12) {
+    return `Legend +${item - 12}`;
   }
   return `+${item - 1}`;
 };
@@ -222,6 +222,8 @@ const EV_AST_POW_WEAP = 1500;
 const EV_AST_POW_ACC = 1150;
 const EV_AST_POW_WTD = 1300;
 const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
+const ENC_AST_POW_ARMOR = 450;
+const ENC_AST_STONE_ARMOR = 1;
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -329,12 +331,16 @@ const ConversionContent = () => {
       if (found) {
         const { equipment, from, to } = found;
         const isBuy = from === 0;
-        const isEvo = to === 12;
+        const isEnhUnique = to <= 11 && from <= 11;
+        const isEvo = to >= 12 && from <= 11;
         let frag =
-          (Math.min(to, 11) - Math.max(from, 1)) * CONV_FRAG +
+          (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
+            CONV_FRAG +
           (isBuy ? CONV_FRAG : 0);
 
         let lgFrag = 0;
+        let lgStone = 0;
+        let enhLRange = Math.min(to, 15) - Math.max(from, 1) - (isEvo ? 1 : 0);
         switch (equipment) {
           case CONVERSION_TYPE.HELM:
           case CONVERSION_TYPE.UPPER:
@@ -342,35 +348,50 @@ const ConversionContent = () => {
           case CONVERSION_TYPE.GLOVE:
           case CONVERSION_TYPE.SHOES:
             temp["Armor Fragment"] += frag;
-            lgFrag = EV_AST_POW_ARMOR;
+            if (isEvo) {
+              lgFrag += EV_AST_POW_ARMOR;
+              lgStone += EV_AST_STONE;
+            }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_ARMOR;
+              lgStone += enhLRange * ENC_AST_STONE_ARMOR;
+            }
             break;
 
           case CONVERSION_TYPE.MAIN_WEAPON:
           case CONVERSION_TYPE.SECOND_WEAPON:
-            lgFrag = EV_AST_POW_WEAP;
+            if (isEvo) {
+              lgFrag += EV_AST_POW_WEAP;
+              lgStone += EV_AST_STONE;
+            }
             break;
 
           case CONVERSION_TYPE.NECKLACE:
           case CONVERSION_TYPE.EARRING:
           case CONVERSION_TYPE.RING:
             temp["Acc Fragment"] += frag;
-            lgFrag = EV_AST_POW_ACC;
+            if (isEvo) {
+              lgFrag += EV_AST_POW_ACC;
+              lgStone += EV_AST_STONE;
+            }
             break;
 
           case CONVERSION_TYPE.WING:
           case CONVERSION_TYPE.TAIL:
           case CONVERSION_TYPE.DECAL:
             temp["Wtd Fragment"] += frag;
-            lgFrag = EV_AST_POW_WTD;
+            if (isEvo) {
+              lgFrag += EV_AST_POW_WTD;
+              lgStone += EV_AST_STONE;
+            }
             break;
 
           default:
             break;
         }
-        if (isEvo) {
-          temp["Astral Powder"] += lgFrag;
-          temp["Astral Stone"] += EV_AST_STONE;
-        }
+
+        temp["Astral Powder"] += lgFrag;
+        temp["Astral Stone"] += lgStone;
       }
     });
 
@@ -546,8 +567,13 @@ const ConversionContent = () => {
   useEffect(() => {
     const newData = dataSource.map((item) => ({
       ...item,
-      from: selectFrom,
-      to: selectTo,
+      from:
+        selectFrom < item.min
+          ? item.min
+          : selectFrom >= item.max
+          ? item.max
+          : selectFrom,
+      to: selectTo > item.max ? item.max : selectTo,
     }));
     setDataSource(newData);
   }, [selectFrom, selectTo]);
@@ -624,7 +650,7 @@ const ConversionContent = () => {
               onChange={(val) => {
                 setSelectFrom(val);
               }}
-              options={opt(0, 12)}
+              options={opt(0, 15)}
             />
           </div>
           <div style={{ marginBottom: 4 }}>
@@ -636,7 +662,7 @@ const ConversionContent = () => {
               onChange={(val) => {
                 setSelectTo(val);
               }}
-              options={opt(0, 12)}
+              options={opt(0, 15)}
             />
           </div>
           <Divider orientation="left">Material List</Divider>
@@ -1566,6 +1592,22 @@ const ConversionContent = () => {
                 dataSource={Object.entries({
                   "Astral Powder": EV_AST_POW_ARMOR,
                   "Astral Stone": EV_AST_STONE,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_ARMOR,
+                  "Astral Stone": ENC_AST_STONE_ARMOR,
                 }).map(([key, value]) => ({
                   mats: key,
                   amount: value,
