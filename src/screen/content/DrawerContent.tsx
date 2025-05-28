@@ -523,6 +523,16 @@ const getItems: (
               Legend Conversion Armor
             </a>
           </p>
+          <p>KR Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/kr/149/c/8"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Enhancement Legend Conversion Armor
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
