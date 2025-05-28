@@ -17,6 +17,7 @@ export const TAB_KEY = {
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
   miscConversion: "Conversion",
+  miscBestie: "Bestie",
 };
 
 export const TAB_GROUP_LIST: SideBarGroupTab[] = [
@@ -101,6 +102,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.miscConversion,
         name: TAB_KEY.miscConversion,
+      },
+      {
+        key: TAB_KEY.miscBestie,
+        name: TAB_KEY.miscBestie,
       },
     ],
   },
