@@ -32,6 +32,7 @@ import SettingContent from "./SettingContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ConversionContent from "./ConversionContent";
 import BoneDragonEqContent from "./BoneDragonEqContent";
+import BestieContent from "./BestieContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -98,6 +99,9 @@ const MainContent = () => {
 
       case TAB_KEY.miscConversion:
         return <ConversionContent />;
+      
+      case TAB_KEY.miscBestie:
+        return <BestieContent />;
 
       case TAB_KEY.setting:
         return <SettingContent />;

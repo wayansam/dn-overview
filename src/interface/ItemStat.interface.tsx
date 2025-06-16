@@ -145,3 +145,21 @@ export interface BoneDragonStats {
 export type columnBoneDragonFlag = {
   [K in keyof BoneDragonStats as `${K}Flag`]?: boolean;
 };
+
+export interface BestieStats {
+  encLevel: string;
+
+  phyMagAtk?: number;
+  phyMagAtkPercent?: number;
+  attAtkPercent?: number;
+  fd?: number;
+
+  // mount
+  crt?: number;
+  cdm?: number;
+  moveSpeedPercent?: number;
+
+  // spirit
+  hp?: number;
+  hpPercent?: number;
+}

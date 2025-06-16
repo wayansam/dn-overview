@@ -159,3 +159,10 @@ export interface BoneDragonEqEnhanceMaterial {
   breakNoJellyPercent: number;
   enhanceFailDeduction?: number;
 }
+
+export interface BestieGrowthMaterial {
+  encLevel: string;
+  faded: number;
+  shining: number;
+  unbeatable: number;
+}
