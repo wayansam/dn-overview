@@ -1,11 +1,14 @@
 import {
+  Button,
   Card,
   Collapse,
   CollapseProps,
   Divider,
   Form,
   Grid,
+  InputNumber,
   Radio,
+  Space,
   Table,
   Typography,
 } from "antd";
@@ -21,11 +24,13 @@ import {
 import { ColumnsType } from "antd/es/table";
 import { BestieStats } from "../../interface/ItemStat.interface";
 import { getTextEmpty } from "../../utils/common.util";
+import CustomSlider from "../../components/CustomSlider";
+import { BESTIE_TYPE } from "../../constants/InGame.constants";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
 interface FormEnhance {
-  type: "mount" | "spirit";
+  type: BESTIE_TYPE;
   listEnhance: Array<{
     range?: [number, number] | null;
     ver: number;
@@ -384,6 +389,48 @@ const BestieContent = () => {
     }
     let errorMsg: string[] = [];
 
+    console.log({ temp });
+
+    temp.forEach((enhItem, idx) => {
+      if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
+        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
+      } else if (
+        enhItem?.type &&
+        enhItem?.listEnhance &&
+        enhItem?.listEnhance.length > 0
+      ) {
+        enhItem?.listEnhance.forEach((item, i) => {
+          if (!item || !item?.range) {
+            errorMsg.push(
+              `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
+            );
+          } else if (item?.range) {
+            // mats
+            let tempFaded = 0;
+            let tempShining = 0;
+            let tempUnbeat = 0;
+
+            const isMount = enhItem?.type === BESTIE_TYPE.MNT;
+            const isV1 = i === 0;
+          } else {
+            errorMsg.push(
+              `The Range in Enhance ${idx + 1}, item ${
+                i + 1
+              } haven't inputted properly`
+            );
+          }
+        });
+      } else {
+        let msg = "";
+        if (!enhItem?.type) {
+          msg = "Type";
+        } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
+          msg = "List";
+        }
+        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`);
+      }
+    });
+
     return {
       growthData: {
         "Faded Bestie Star": 0,
@@ -413,8 +460,8 @@ const BestieContent = () => {
   useEffect(() => {
     setEnhanceDataSource(
       calcEnhanceDataSource([
-        { type: "mount", listEnhance: null },
-        { type: "spirit", listEnhance: null },
+        { type: BESTIE_TYPE.MNT, listEnhance: null },
+        { type: BESTIE_TYPE.SPT, listEnhance: null },
       ])
     );
   }, []);
@@ -427,7 +474,7 @@ const BestieContent = () => {
     if (screens.xs) {
       return 200;
     }
-    return 320;
+    return 400;
   };
 
   const getEnhanceCalculator = () => {
@@ -480,8 +527,81 @@ const BestieContent = () => {
                           <Radio.Button value={"spirit"}>spirit</Radio.Button>
                         </Radio.Group>
                       </Form.Item>
+
+                      <Form.Item label="List">
+                        <Form.List name={[field.name, "listEnhance"]}>
+                          {(subFields, subOpt) => (
+                            <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                rowGap: 18,
+                              }}
+                            >
+                              {subFields.map((subField, idx) => (
+                                <Card
+                                  key={subField.key}
+                                  size="small"
+                                  style={{ width: "100%" }}
+                                  id={`${subField.name}-card-${idx}`}
+                                >
+                                  <Space
+                                    direction="horizontal"
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      flexDirection: "row",
+                                      borderWidth: 1,
+                                    }}
+                                  >
+                                    <div>V.{idx + 1}</div>
+                                    <CloseOutlined
+                                      onClick={() => {
+                                        subOpt.remove(subField.name);
+                                      }}
+                                    />
+                                  </Space>
+
+                                  <Form.Item
+                                    noStyle
+                                    name={[subField.name, "range"]}
+                                  >
+                                    <CustomSlider
+                                      id={`${subField.name}-range-${idx}`}
+                                      max={30}
+                                      mark={{
+                                        0: "+0",
+                                        10: "+10",
+                                        20: "+20",
+                                        30: "+30",
+                                      }}
+                                    />
+                                  </Form.Item>
+                                </Card>
+                              ))}
+                              <Button
+                                type="dashed"
+                                onClick={() => subOpt.add()}
+                                block
+                                disabled={subFields && subFields.length >= 2}
+                              >
+                                + Add Enhancement
+                              </Button>
+                            </div>
+                          )}
+                        </Form.List>
+                      </Form.Item>
                     </Card>
                   ))}
+
+                  <Button
+                    type="dashed"
+                    onClick={() => add()}
+                    block
+                    disabled={fields && fields.length >= 2}
+                  >
+                    + Add Type
+                  </Button>
                 </div>
               )}
             </Form.List>

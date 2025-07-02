@@ -115,3 +115,8 @@ export enum CONVERSION_TYPE {
   TAIL = "Tail",
   DECAL = "Decal",
 }
+
+export enum BESTIE_TYPE {
+  MNT = "Mount",
+  SPT = "Spirit",
+}
