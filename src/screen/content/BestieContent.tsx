@@ -33,9 +33,11 @@ interface FormEnhance {
   type: BESTIE_TYPE;
   listEnhance: Array<{
     range?: [number, number] | null;
-    ver: number;
+    version: string;
   }> | null;
 }
+
+const BestieVersion = ["v1", "v2"];
 
 interface GrowthMaterialList {
   "Faded Bestie Star": number;
@@ -387,6 +389,12 @@ const BestieContent = () => {
     if (!temp || !Array.isArray(temp) || temp.length < 1) {
       return { errorDt: ["Empty List"] };
     }
+
+    // mats
+    let tempFaded = 0;
+    let tempShining = 0;
+    let tempUnbeat = 0;
+
     let errorMsg: string[] = [];
 
     console.log({ temp });
@@ -400,21 +408,40 @@ const BestieContent = () => {
         enhItem?.listEnhance.length > 0
       ) {
         enhItem?.listEnhance.forEach((item, i) => {
-          if (!item || !item?.range) {
+          if (!item || (!item?.version && !item?.range)) {
             errorMsg.push(
               `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
             );
-          } else if (item?.range) {
+          } else if (item?.version && item?.range) {
             // mats
-            let tempFaded = 0;
-            let tempShining = 0;
-            let tempUnbeat = 0;
+            let tempFadedC = 0;
+            let tempShiningC = 0;
+            let tempUnbeatC = 0;
 
             const isMount = enhItem?.type === BESTIE_TYPE.MNT;
-            const isV1 = i === 0;
+
+            const tempSliceMats = BestieGrowthTableMats.slice(
+              item?.range[0],
+              item?.range[1]
+            );
+            tempSliceMats.forEach((slicedItem) => {
+              tempFadedC += slicedItem.faded;
+              tempShiningC += slicedItem.shining;
+              tempUnbeatC += slicedItem.unbeatable;
+            });
+
+            tempFaded += tempFadedC;
+            tempShining += tempShiningC;
+            tempUnbeat += tempUnbeatC;
           } else {
+            let emsg = "";
+            if (!item?.version) {
+              emsg = "Version";
+            } else if (!item?.range) {
+              emsg = "Range";
+            }
             errorMsg.push(
-              `The Range in Enhance ${idx + 1}, item ${
+              `The ${emsg} in Enhance ${idx + 1}, item ${
                 i + 1
               } haven't inputted properly`
             );
@@ -433,9 +460,9 @@ const BestieContent = () => {
 
     return {
       growthData: {
-        "Faded Bestie Star": 0,
-        "Shining Bestie Star": 0,
-        "Unbeatable Bestie Star": 0,
+        "Faded Bestie Star": tempFaded,
+        "Shining Bestie Star": tempShining,
+        "Unbeatable Bestie Star": tempUnbeat,
       },
       statsData: {
         encLevel: "",
@@ -469,6 +496,7 @@ const BestieContent = () => {
   const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
     setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
   };
+  console.log({ enhanceDataSource });
 
   const getWidthSetting = () => {
     if (screens.xs) {
@@ -554,7 +582,21 @@ const BestieContent = () => {
                                       borderWidth: 1,
                                     }}
                                   >
-                                    <div>V.{idx + 1}</div>
+                                    <Form.Item
+                                      label="Version"
+                                      name={[subField.name, "version"]}
+                                      rules={[{ required: true }]}
+                                      id={`${subField.name}-version-${idx}`}
+                                    >
+                                      <Radio.Group>
+                                        {BestieVersion.map((it) => (
+                                          <Radio.Button value={it}>
+                                            {it.toUpperCase()}
+                                          </Radio.Button>
+                                        ))}
+                                      </Radio.Group>
+                                    </Form.Item>
+
                                     <CloseOutlined
                                       onClick={() => {
                                         subOpt.remove(subField.name);
@@ -583,7 +625,10 @@ const BestieContent = () => {
                                 type="dashed"
                                 onClick={() => subOpt.add()}
                                 block
-                                disabled={subFields && subFields.length >= 2}
+                                disabled={
+                                  subFields &&
+                                  subFields.length >= BestieVersion.length
+                                }
                               >
                                 + Add Enhancement
                               </Button>
