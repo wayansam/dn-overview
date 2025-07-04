@@ -419,7 +419,7 @@ const BestieContent = () => {
 
     temp.forEach((enhItem, idx) => {
       if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
-        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
+        errorMsg.push(`Nothing to calculate in Grow ${idx + 1}`);
       } else if (
         enhItem?.type &&
         enhItem?.listEnhance &&
@@ -428,7 +428,7 @@ const BestieContent = () => {
         enhItem?.listEnhance.forEach((item, i) => {
           if (!item || (!item?.version && !item?.range)) {
             errorMsg.push(
-              `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
+              `Nothing to calculate on Grow ${idx + 1} list ${i + 1}`
             );
           } else if (item?.version && item?.range) {
             // mats
@@ -513,7 +513,7 @@ const BestieContent = () => {
               emsg = "Range";
             }
             errorMsg.push(
-              `The ${emsg} in Enhance ${idx + 1}, item ${
+              `The ${emsg} in Grow ${idx + 1}, item ${
                 i + 1
               } haven't inputted properly`
             );
@@ -526,7 +526,7 @@ const BestieContent = () => {
         } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
           msg = "List";
         }
-        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`);
+        errorMsg.push(`Empty ${msg} in Grow ${idx + 1}`);
       }
     });
 
@@ -603,7 +603,7 @@ const BestieContent = () => {
                   {fields.map((field, index) => (
                     <Card
                       size="small"
-                      title={`Enhance ${field.name + 1}`}
+                      title={`Grow ${field.name + 1}`}
                       style={{ minWidth: getWidthSetting() }}
                       key={field.key}
                       id={`${field.name}-card-${index}`}

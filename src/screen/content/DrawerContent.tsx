@@ -537,6 +537,58 @@ const getItems: (
       ),
       style: panelStyle,
     },
+    {
+      key: TAB_KEY.miscBestie,
+      label: TAB_KEY.miscBestie,
+      children: (
+        <div>
+          <p>
+            <b>
+              Growing version 2 of the bestie star only available after the
+              version 1 is reach lv.30.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please filled in Grow type, then version and
+            range (current enhance level to your target).
+          </p>
+
+          <p>
+            <i>
+              Enhance list limited to 2 (because only 2 type, mount & spirit).
+              The list inside also limited to 2 since as per this page released,
+              only have version 1 & 2.
+            </i>
+          </p>
+          <p>
+            <i>
+              You can check which input is not correct in below warning message
+              (yellow text).
+            </i>
+          </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/133/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Bestie Star v.1 (First Release)
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/144/c/8"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Bestie Star v.2
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
   ];
 
   return [

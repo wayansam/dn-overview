@@ -63,15 +63,6 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
 
   const dataNew: Array<FeatureItem> = [
     {
-      key: keyUpdate.N,
-      label: "Bone Dragon Armor & Weapon Calculator",
-      link: {
-        key: TAB_KEY.eqBoneDragon,
-        name: TAB_KEY.eqBoneDragon,
-      },
-      date: "26-05-2025",
-    },
-    {
       key: keyUpdate.U,
       label: "Conversion Costume Armor Legend Enhancement",
       link: {
@@ -80,12 +71,33 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "28-05-2025",
     },
+    {
+      key: keyUpdate.N,
+      label: "Bestie Spirit & Mount Calculator",
+      link: {
+        key: TAB_KEY.miscBestie,
+        name: TAB_KEY.miscBestie,
+      },
+      date: "04-07-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
     {
-      key: keyUpdate.I,
-      label: "Bestie Spirit & Mount Calculator",
+      key: keyUpdate.P,
+      label: "VIP accessories",
+    },
+    {
+      key: keyUpdate.P,
+      label: "To Do List",
+    },
+    {
+      key: keyUpdate.P,
+      label: "Future feature (beta)",
+    },
+    {
+      key: keyUpdate.P,
+      label: "Gear Info",
     },
   ];
 
@@ -127,6 +139,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.miscConversion,
       },
       date: "04-04-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Bone Dragon Armor & Weapon Calculator",
+      link: {
+        key: TAB_KEY.eqBoneDragon,
+        name: TAB_KEY.eqBoneDragon,
+      },
+      date: "26-05-2025",
     },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
