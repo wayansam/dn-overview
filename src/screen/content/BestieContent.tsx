@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Card,
   Collapse,
@@ -23,9 +24,15 @@ import {
 } from "../../data/BestieCalculatorData";
 import { ColumnsType } from "antd/es/table";
 import { BestieStats } from "../../interface/ItemStat.interface";
-import { getTextEmpty } from "../../utils/common.util";
+import {
+  columnsResource,
+  getTextEmpty,
+  typedEntries,
+} from "../../utils/common.util";
 import CustomSlider from "../../components/CustomSlider";
 import { BESTIE_TYPE } from "../../constants/InGame.constants";
+import { TableResource } from "../../constants/Common.constants";
+import ListingCard from "../../components/ListingCard";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -378,7 +385,7 @@ const BestieContent = () => {
           pagination={false}
           bordered
           footer={() =>
-            "* Mats use one of the Bestie Star type only, not all. Same for both Mount & Spirit"
+            "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
           }
         />
       </div>
@@ -395,9 +402,20 @@ const BestieContent = () => {
     let tempShining = 0;
     let tempUnbeat = 0;
 
-    let errorMsg: string[] = [];
+    // stats
+    let phyMagAtk = 0;
+    let phyMagAtkPercent = 0;
+    let attAtkPercent = 0;
+    let fd = 0;
+    // mount
+    let crt = 0;
+    let cdm = 0;
+    let moveSpeedPercent = 0;
+    // spirit
+    let hp = 0;
+    let hpPercent = 0;
 
-    console.log({ temp });
+    let errorMsg: string[] = [];
 
     temp.forEach((enhItem, idx) => {
       if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
@@ -433,6 +451,60 @@ const BestieContent = () => {
             tempFaded += tempFadedC;
             tempShining += tempShiningC;
             tempUnbeat += tempUnbeatC;
+
+            // stats
+            let tempArrStats: BestieStats[] = [];
+
+            switch (item?.version) {
+              case BestieVersion[0]:
+                tempArrStats = isMount
+                  ? BestieMountV1TableStats
+                  : BestieSpiritV1TableStats;
+                break;
+              case BestieVersion[1]:
+                tempArrStats = isMount
+                  ? BestieMountV2TableStats
+                  : BestieSpiritV2TableStats;
+                break;
+
+              default:
+                break;
+            }
+
+            const dt1 =
+              tempArrStats.length >= item?.range[0]
+                ? tempArrStats[item?.range[0] - 1]
+                : undefined;
+            const dt2 =
+              tempArrStats.length >= item?.range[1]
+                ? tempArrStats[item?.range[1] - 1]
+                : undefined;
+            const minusHandler = (n1?: number, n2?: number) => {
+              return (n1 ?? 0) - (n2 ?? 0);
+            };
+
+            if (dt2) {
+              phyMagAtk += minusHandler(dt2.phyMagAtk, dt1?.phyMagAtk);
+              phyMagAtkPercent += minusHandler(
+                dt2.phyMagAtkPercent,
+                dt1?.phyMagAtkPercent
+              );
+              attAtkPercent += minusHandler(
+                dt2.attAtkPercent,
+                dt1?.attAtkPercent
+              );
+              fd += minusHandler(dt2.fd, dt1?.fd);
+
+              crt += minusHandler(dt2.crt, dt1?.crt);
+              cdm += minusHandler(dt2.cdm, dt1?.cdm);
+              moveSpeedPercent += minusHandler(
+                dt2.moveSpeedPercent,
+                dt1?.moveSpeedPercent
+              );
+
+              hp += minusHandler(dt2.hp, dt1?.hp);
+              hpPercent += minusHandler(dt2.hpPercent, dt1?.hpPercent);
+            }
           } else {
             let emsg = "";
             if (!item?.version) {
@@ -466,19 +538,19 @@ const BestieContent = () => {
       },
       statsData: {
         encLevel: "",
-        phyMagAtk: 0,
-        phyMagAtkPercent: 0,
-        attAtkPercent: 0,
-        fd: 0,
+        phyMagAtk,
+        phyMagAtkPercent,
+        attAtkPercent,
+        fd,
 
         // mount
-        crt: 0,
-        cdm: 0,
-        moveSpeedPercent: 0,
+        crt,
+        cdm,
+        moveSpeedPercent,
 
         // spirit
-        hp: 0,
-        hpPercent: 0,
+        hp,
+        hpPercent,
       },
       errorDt: errorMsg.length > 0 ? errorMsg : undefined,
     } as GrowthTableRes;
@@ -496,7 +568,6 @@ const BestieContent = () => {
   const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
     setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
   };
-  console.log({ enhanceDataSource });
 
   const getWidthSetting = () => {
     if (screens.xs) {
@@ -551,8 +622,12 @@ const BestieContent = () => {
                         id={`${field.name}-type-${index}`}
                       >
                         <Radio.Group>
-                          <Radio.Button value={"mount"}>mount</Radio.Button>
-                          <Radio.Button value={"spirit"}>spirit</Radio.Button>
+                          <Radio.Button value={BESTIE_TYPE.MNT}>
+                            mount
+                          </Radio.Button>
+                          <Radio.Button value={BESTIE_TYPE.SPT}>
+                            spirit
+                          </Radio.Button>
                         </Radio.Group>
                       </Form.Item>
 
@@ -651,6 +726,102 @@ const BestieContent = () => {
               )}
             </Form.List>
           </Form>
+          {enhanceDataSource.errorDt &&
+            enhanceDataSource.errorDt.length > 0 && (
+              <div style={{ marginTop: 4, maxWidth: getWidthSetting() }}>
+                <Space direction="vertical" size={"small"}>
+                  {enhanceDataSource.errorDt.map((it, x) => (
+                    <Text type="warning" key={`error-label-${x}`}>
+                      {it}
+                    </Text>
+                  ))}
+                </Space>
+              </div>
+            )}
+        </div>
+
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <Divider orientation="left">Growth Material List</Divider>
+          {enhanceDataSource.errorDt && (
+            <div>
+              <Alert
+                banner
+                message="Some of the item you input is not valid"
+                type="warning"
+              />
+            </div>
+          )}
+          <Table
+            size={"small"}
+            dataSource={
+              (enhanceDataSource.growthData
+                ? typedEntries(enhanceDataSource.growthData).map(
+                    ([key, value]) => ({
+                      mats: key,
+                      amount: value,
+                    })
+                  )
+                : []) as TableResource[]
+            }
+            columns={columnsResource}
+            pagination={false}
+            bordered
+            footer={() =>
+              "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
+            }
+          />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ListingCard
+            title="Status Increase"
+            data={[
+              {
+                title: "ATK",
+                value: enhanceDataSource.statsData?.phyMagAtk,
+                format: true,
+              },
+              {
+                title: "ATK",
+                value: enhanceDataSource.statsData?.phyMagAtkPercent,
+                suffix: "%",
+              },
+              {
+                title: "ATT",
+                value: enhanceDataSource.statsData?.attAtkPercent,
+                suffix: "%",
+              },
+              {
+                title: "FD",
+                value: enhanceDataSource.statsData?.fd,
+                format: true,
+              },
+              {
+                title: "CRT",
+                value: enhanceDataSource.statsData?.crt,
+                format: true,
+              },
+              {
+                title: "CDM",
+                value: enhanceDataSource.statsData?.cdm,
+                format: true,
+              },
+              {
+                title: "MvSpeed",
+                value: enhanceDataSource.statsData?.moveSpeedPercent,
+                suffix: "%",
+              },
+              {
+                title: "HP",
+                value: enhanceDataSource.statsData?.hp,
+                format: true,
+              },
+              {
+                title: "HP",
+                value: enhanceDataSource.statsData?.hpPercent,
+                suffix: "%",
+              },
+            ]}
+          />
         </div>
       </div>
     );

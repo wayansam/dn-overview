@@ -98,3 +98,7 @@ export const copyTextToClipboard = async (txt: string) => {
     // });
   }
 };
+
+export function typedEntries<T extends {}>(obj: T): [string, T[keyof T]][] {
+  return Object.entries(obj) as [string, T[keyof T]][];
+}

@@ -75,7 +75,7 @@ const MainContent = () => {
 
       case TAB_KEY.eqNamedEOD:
         return <NamedEODEqContent />;
-   
+
       case TAB_KEY.eqBoneDragon:
         return <BoneDragonEqContent />;
 
@@ -99,7 +99,7 @@ const MainContent = () => {
 
       case TAB_KEY.miscConversion:
         return <ConversionContent />;
-      
+
       case TAB_KEY.miscBestie:
         return <BestieContent />;
 
@@ -164,8 +164,6 @@ const MainContent = () => {
   );
 
   useEffect(() => {
-    console.log("test");
-
     openNotification();
   }, []);
 
