@@ -102,8 +102,8 @@ const BestieContent = () => {
           }
         ) => (
           <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>(
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>)
+            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
+            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
             <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
             <p>CRT {getTextEmpty({ txt: crt })}</p>
             <p>CDM {getTextEmpty({ txt: cdm })}</p>
@@ -203,8 +203,8 @@ const BestieContent = () => {
           { phyMagAtk, phyMagAtkPercent, attAtkPercent, fd, hp, hpPercent }
         ) => (
           <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>(
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>)
+            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
+            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
             <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
             <p>FD {getTextEmpty({ txt: fd })}</p>
             <p>HP {getTextEmpty({ txt: hp })}</p>
