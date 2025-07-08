@@ -5,8 +5,6 @@ import {
   CollapseProps,
   Divider,
   InputNumber,
-  Progress,
-  ProgressProps,
   Slider,
   Space,
   Typography,
@@ -281,7 +279,7 @@ const AncientHeraldryContent = () => {
     const fromStats = AncientGoddesHeraStatTable[from];
     const toStats = AncientGoddesHeraStatTable[to];
     return toStats.attackPercent - fromStats.attackPercent;
-  }, [AncientGoddesHeraStatTable, heraldryData]);
+  }, [heraldryData]);
 
   const getCalc = () => {
     const onAfterChange = (value: number[]) => {
