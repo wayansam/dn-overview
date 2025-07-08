@@ -1,29 +1,55 @@
-import { Card, Divider, InputNumber, Typography, Tooltip } from "antd";
+import {
+  Card,
+  Divider,
+  InputNumber,
+  Typography,
+  Tooltip,
+  ProgressProps,
+  Progress,
+} from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { copyTextToClipboard } from "../utils/common.util";
 import Link from "antd/es/typography/Link";
 import { InfoCircleOutlined } from "@ant-design/icons";
 const { Text } = Typography;
 
+const conicColors: ProgressProps["strokeColor"] = {
+  "0%": "#ffccc7",
+  "50%": "#ffe58f",
+  "100%": "#87d068",
+};
+
 interface CalcData {
   name: string;
   amt?: number;
   useCustomAmt?: boolean;
 }
-interface CalcDataMapped extends CalcData {
+export interface CalcDataMapped extends CalcData {
   partialHave: number;
   price: number;
   customAmt: number;
 }
 
 interface TradingHouseCalcProps {
+  customTitle?: string;
   data: CalcData[];
   additionalTotal?: number;
+  disableFilter?: boolean;
+  showProgress?: boolean;
+  progressPercent?: number;
+  copyFn?: (dt: CalcDataMapped[]) => void;
+  additionalHeaderItem?: React.ReactNode;
 }
 
 const TradingHouseCalc = ({
+  customTitle = "Buy from Trading House",
   data,
   additionalTotal = 0,
+  disableFilter,
+  showProgress,
+  progressPercent,
+  copyFn,
+  additionalHeaderItem,
 }: TradingHouseCalcProps) => {
   const [dt, setDt] = useState<CalcDataMapped[]>([]);
 
@@ -40,6 +66,12 @@ const TradingHouseCalc = ({
       })
     );
   }, [data]);
+
+  useEffect(() => {
+    if (copyFn) {
+      copyFn(dt);
+    }
+  }, [dt, copyFn]);
 
   const updateDt = (
     val: number | null,
@@ -60,18 +92,31 @@ const TradingHouseCalc = ({
   };
 
   const totalGold = useMemo(() => {
-    const temp = dt.reduce(
-      (sum, a) => sum + ((a.amt ?? 0) - a.partialHave) * a.price,
-      0
-    );
+    const temp = dt.reduce((sum, a) => {
+      const amt = a.useCustomAmt ? a.customAmt ?? 0 : a.amt ?? 0;
+      return sum + (amt - a.partialHave) * a.price;
+    }, 0);
     return temp + additionalTotal;
   }, [dt, additionalTotal]);
 
   return (
     <div style={{ flexGrow: 0.5 }}>
-      <Divider orientation="left">Buy from Trading House</Divider>
+      <Divider orientation="left">{customTitle}</Divider>
+      {showProgress && (
+        <Progress
+          percent={progressPercent}
+          strokeColor={conicColors}
+          style={{ marginTop: 4, marginLeft: 8, marginRight: 8 }}
+        />
+      )}
+
+      {additionalHeaderItem && (
+        <div style={{ marginTop: 4, marginLeft: 8, marginRight: 8 }}>
+          {additionalHeaderItem}
+        </div>
+      )}
       {dt
-        .filter((item) => item.amt && item.amt !== 0)
+        .filter((item) => disableFilter || (item.amt && item.amt !== 0))
         .map((it) => (
           <div key={`th-calc-${it.name}`}>
             <Card
@@ -134,6 +179,7 @@ const TradingHouseCalc = ({
                   <Text>
                     {" x "}
                     <InputNumber
+                      prefix="Gold"
                       min={0}
                       value={it.price}
                       onChange={(val) => {

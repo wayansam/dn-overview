@@ -4,6 +4,9 @@ import {
   Collapse,
   CollapseProps,
   Divider,
+  InputNumber,
+  Progress,
+  ProgressProps,
   Slider,
   Space,
   Typography,
@@ -11,7 +14,9 @@ import {
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
-import TradingHouseCalc from "../../components/TradingHouseCalc";
+import TradingHouseCalc, {
+  CalcDataMapped,
+} from "../../components/TradingHouseCalc";
 import {
   AncientGoddesHeraDisassemblyItemTable,
   AncientGoddesHeraRequiredItemTable,
@@ -46,10 +51,18 @@ interface AncientGoddessHeraTableMaterialList {
   "Ancients' Blueprint": number;
   Gold: number;
 }
+interface BuyMaterialList {
+  matsPercent: number;
+  msgTotal: string;
+  converterGold: number;
+}
 
 const AncientHeraldryContent = () => {
   const [heraldryData, setHeraldryData] = useState([0, 10]);
   const [convertToFrag, setConvertToFrag] = useState<boolean>(false);
+  const [dt, setDt] = useState<CalcDataMapped[]>([]);
+  const [invenAB, setinvenAB] = useState<number>(0);
+  const [invenABF, setinvenABF] = useState<number>(0);
 
   const columnsRequired: ColumnsType<AncientGoddesHeraRequiredItem> = [
     {
@@ -118,15 +131,17 @@ const AncientHeraldryContent = () => {
     const toMats = AncientGoddesHeraRequiredItemTable[to];
     let tempABF = toMats.abFrag - fromMats.abFrag;
     let tempAB = toMats.ab - fromMats.ab;
-    let tempGold = toMats.ab * 500;
+    let tempGold = 0;
 
     if (to > 5 && from < 6) {
       tempAB += tempABF / 10;
       tempABF = 0;
+      tempGold = (fromMats.abFrag / 10) * 500;
     }
     if (convertToFrag) {
       tempABF += tempAB * 10;
       tempAB = 0;
+      tempGold = toMats.ab * 500;
     }
     const temp: AncientGoddessHeraTableMaterialList = {
       "Ancients' Blueprint Fragment": tempABF,
@@ -135,6 +150,130 @@ const AncientHeraldryContent = () => {
     };
     return temp;
   }, [heraldryData, convertToFrag]);
+
+  const progressDataSource: BuyMaterialList = useMemo(() => {
+    const from = heraldryData[0];
+    const to = heraldryData[1];
+    const fromMats = AncientGoddesHeraRequiredItemTable[from];
+    const toMats = AncientGoddesHeraRequiredItemTable[to];
+    let tempGold = 0;
+    let tempPercent = 0;
+    let tempTotalAB = invenAB;
+    let tempMsg = "";
+    const foundAB = dt.find((it) => it.name === "Blueprint");
+    const foundABF = dt.find((it) => it.name === "Blueprint Frag");
+
+    const convertABFtoAB = (abFag: number) => {
+      const tempAB = Math.trunc(abFag / 10);
+      tempTotalAB += tempAB;
+      tempGold += tempAB * 500;
+    };
+
+    if (toMats.encLevel > 5) {
+      if (fromMats.encLevel <= 5) {
+        convertABFtoAB(fromMats.abFrag);
+      } else {
+        convertABFtoAB(fromMats.ab * 10);
+      }
+
+      convertABFtoAB(invenABF);
+
+      if (foundABF) {
+        convertABFtoAB(foundABF.customAmt);
+      }
+      if (foundAB) {
+        const a = Math.trunc(
+          ((tempTotalAB + foundAB.customAmt) * 100) / toMats.ab
+        );
+        tempMsg = `AB Collected: ${tempTotalAB + foundAB.customAmt} / ${
+          toMats.ab
+        }`;
+        tempPercent = Math.min(a, 100);
+      }
+    } else if (toMats.encLevel <= 5) {
+      if (foundABF) {
+        const total = fromMats.abFrag + foundABF.customAmt + invenABF;
+        const a = Math.trunc((total * 100) / toMats.abFrag);
+        tempMsg = `ABF Collected: ${total} / ${toMats.abFrag}`;
+        tempPercent = Math.min(a, 100);
+      }
+    }
+
+    const temp: BuyMaterialList = {
+      matsPercent: tempPercent,
+      converterGold: tempGold,
+      msgTotal: tempMsg,
+    };
+    return temp;
+  }, [dt, heraldryData, invenAB, invenABF]);
+
+  const progressData = useMemo(() => {
+    const fromMats = AncientGoddesHeraRequiredItemTable[heraldryData[0]];
+    const toMats = AncientGoddesHeraRequiredItemTable[heraldryData[1]];
+    if (toMats.encLevel <= 5) {
+      return [
+        {
+          name: "Blueprint Frag",
+          amt: fromMats.abFrag,
+          useCustomAmt: true,
+        },
+      ];
+    }
+    return [
+      {
+        name: "Blueprint",
+        amt: fromMats.ab,
+        useCustomAmt: true,
+      },
+      {
+        name: "Blueprint Frag",
+        amt: fromMats.abFrag,
+        useCustomAmt: true,
+      },
+    ];
+  }, [heraldryData]);
+
+  const additionalData = useMemo(() => {
+    const fromMats = AncientGoddesHeraRequiredItemTable[heraldryData[0]];
+    return (
+      <Space direction="vertical">
+        <Text>{progressDataSource.msgTotal}</Text>
+        {fromMats.ab !== 0 && <Text>AB Recovered: {fromMats.ab}</Text>}
+        {fromMats.abFrag !== 0 && <Text>ABF Recovered: {fromMats.abFrag}</Text>}
+        {progressDataSource.converterGold !== 0 && (
+          <Text>
+            Gold to convert ABF to AB: {progressDataSource.converterGold}
+          </Text>
+        )}
+
+        <Text>
+          AB in inventory
+          <InputNumber
+            min={0}
+            value={invenAB}
+            onChange={(val) => {
+              setinvenAB(val ?? 0);
+            }}
+            size="middle"
+            style={{ width: 120, marginLeft: 4 }}
+          />
+        </Text>
+        <Text>
+          ABF in inventory
+          <InputNumber
+            min={0}
+            value={invenABF}
+            onChange={(val) => {
+              setinvenABF(val ?? 0);
+            }}
+            size="middle"
+            style={{ width: 120, marginLeft: 4 }}
+          />
+        </Text>
+        <Text>Buy in TH:</Text>
+      </Space>
+    );
+  }, [heraldryData, progressDataSource, invenAB, invenABF]);
 
   const statRange = useMemo(() => {
     const from = heraldryData[0];
@@ -195,14 +334,14 @@ const AncientHeraldryContent = () => {
           </div>
         </div>
         <TradingHouseCalc
-          data={[
-            { name: "Blueprint", amt: ancDataSource["Ancients' Blueprint"] },
-            {
-              name: "Blueprint Frag",
-              amt: ancDataSource["Ancients' Blueprint Fragment"],
-            },
-          ]}
-          additionalTotal={ancDataSource.Gold}
+          customTitle="My Progress"
+          data={progressData}
+          additionalTotal={progressDataSource.converterGold}
+          showProgress
+          disableFilter
+          progressPercent={progressDataSource.matsPercent}
+          copyFn={setDt}
+          additionalHeaderItem={additionalData}
         />
       </div>
     );
