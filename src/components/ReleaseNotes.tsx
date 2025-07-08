@@ -80,11 +80,20 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "04-07-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement for Ancient Goddess Heraldry",
+      link: {
+        key: TAB_KEY.heraldryAncientGoddes,
+        name: TAB_KEY.heraldryAncientGoddes,
+      },
+      date: "08-07-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
     {
-      key: keyUpdate.P,
+      key: keyUpdate.I,
       label: "VIP accessories",
     },
     {
