@@ -166,3 +166,9 @@ export interface BestieGrowthMaterial {
   shining: number;
   unbeatable: number;
 }
+
+export interface IonaEqEnhanceMaterial {
+  encLevel: string;
+  whiteCore: number;
+  successRatePercent: number;
+}

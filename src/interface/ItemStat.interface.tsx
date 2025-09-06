@@ -1,5 +1,41 @@
 import { ITEM_RARITY } from "../constants/InGame.constants";
 
+export interface CommonItemStats {
+  encLevel: string;
+  phyMagAtk?: number;
+  phyMagAtkMin?: number;
+  phyMagAtkMax?: number;
+  phyMagAtkPercent?: number;
+  attAtkPercent?: number;
+
+  crt?: number;
+  crtPercent?: number;
+  cdm?: number;
+  fd?: number;
+
+  str?: number;
+  agi?: number;
+  int?: number;
+  vit?: number;
+  strPercent?: number;
+  agiPercent?: number;
+  intPercent?: number;
+  vitPercent?: number;
+
+  def?: number;
+  magdef?: number;
+  defPercent?: number;
+  magdefPercent?: number;
+
+  hp?: number;
+  hpPercent?: number;
+  moveSpeedPercent?: number;
+  moveSpeedPercentTown?: number; //(?)
+}
+
+export type columnCommonItemFlag = {
+  [K in keyof CommonItemStats as `${K}Flag`]?: boolean;
+};
 export interface NamedEODStat {
   encLevel: number;
   minAttack: number;
