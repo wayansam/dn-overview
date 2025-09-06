@@ -31,6 +31,15 @@ export interface LunarJadeCalculator {
   to: ITEM_RARITY;
 }
 
+export interface CommonEquipmentCalculator {
+  key: string;
+  equipment: EQUIPMENT;
+  min: number;
+  max: number;
+  from: number;
+  to: number;
+}
+
 export interface AncientCalculator {
   key: string;
   equipment: EQUIPMENT;
