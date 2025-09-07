@@ -275,6 +275,79 @@ const getItems: (
       style: panelStyle,
     },
     {
+      key: TAB_KEY.eqVIPAcc,
+      label: TAB_KEY.eqVIPAcc,
+      children: (
+        <div>
+          <p>
+            <b>
+              Iona Accessories can be obtain via Merchant Pania or Merchant
+              Farvana in certain towns. Additionally, Iona Accessories can be
+              obtained by exchanging your Argenta or Gerraint Accessories.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Mats Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment &#40;0 to 20&#41;.
+          </p>
+          <p>
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab Specific Type, From,
+              and To, but remember your custom input will be override by The
+              Settings if you change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
+            </i>
+          </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/111/c/10"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Iona Accessory
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/126/c/5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Iona Accessory New Level release (+4 to +9)
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/144/c/6"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Iona Accessory New Level release (+10 to +12)
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.eqKilos,
       label: TAB_KEY.eqKilos,
       children: (

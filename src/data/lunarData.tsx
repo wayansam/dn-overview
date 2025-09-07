@@ -176,7 +176,7 @@ export const LunarJadeCraftMaterialList: LunarJadeCraftMaterial[] = [
     lunarFragment: [LunarFragmentList.burning, LunarFragmentList.tailwind],
   },
   {
-    equipmentType: EQUIPMENT.RING,
+    equipmentType: EQUIPMENT.RING1,
     lunarFragment: [LunarFragmentList.holy, LunarFragmentList.pitch],
   },
 ];

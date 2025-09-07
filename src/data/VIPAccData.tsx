@@ -22,7 +22,7 @@ export const dataIonaCalculator: CommonEquipmentCalculator[] = [
   },
   {
     key: "3",
-    equipment: EQUIPMENT.RING,
+    equipment: EQUIPMENT.RING1,
     min: 0,
     max: 12,
     from: 0,
@@ -30,7 +30,7 @@ export const dataIonaCalculator: CommonEquipmentCalculator[] = [
   },
   {
     key: "4",
-    equipment: EQUIPMENT.RING,
+    equipment: EQUIPMENT.RING2,
     min: 0,
     max: 12,
     from: 0,

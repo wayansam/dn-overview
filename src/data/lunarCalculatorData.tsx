@@ -85,7 +85,7 @@ export const dataCalculator: LunarJadeCalculator[] = [
   },
   {
     key: "10",
-    equipment: EQUIPMENT.RING,
+    equipment: EQUIPMENT.RING1,
     min: 0,
     max: 4,
     defaultValue: 0,

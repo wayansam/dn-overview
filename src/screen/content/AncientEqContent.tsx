@@ -271,7 +271,7 @@ const AncientEqContent = () => {
         found &&
         (found.equipment === EQUIPMENT.NECKLACE ||
           found.equipment === EQUIPMENT.EARRING ||
-          found.equipment === EQUIPMENT.RING)
+          found.equipment === EQUIPMENT.RING1)
       ) {
         if (found.from > 10 || found.to > 10) {
           flag = true;
@@ -317,7 +317,7 @@ const AncientEqContent = () => {
             break;
           case EQUIPMENT.NECKLACE:
           case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING:
+          case EQUIPMENT.RING1:
             tempSlice = AncientAccessoryCraftMaterialTable.slice(from, to);
             break;
 
@@ -367,7 +367,7 @@ const AncientEqContent = () => {
             break;
           case EQUIPMENT.NECKLACE:
           case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING:
+          case EQUIPMENT.RING1:
             temp["Unknown Ancient Accessory Fragment"] += tempFragment;
             break;
 

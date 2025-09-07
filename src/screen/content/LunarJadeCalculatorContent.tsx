@@ -790,7 +790,7 @@ const LunarJadeCalculatorContent = () => {
       case "mid":
         const newDataMid = dataSource.map((item) => ({
           ...item,
-          defaultValue: item.equipment === EQUIPMENT.RING ? 2 : 1,
+          defaultValue: item.equipment === EQUIPMENT.RING1 ? 2 : 1,
         }));
         setDataSource(newDataMid);
         break;

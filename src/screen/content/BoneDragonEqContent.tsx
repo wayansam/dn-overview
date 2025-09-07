@@ -39,7 +39,7 @@ const { Text } = Typography;
 
 type SelectedStats = Exclude<
   EQUIPMENT,
-  EQUIPMENT.NECKLACE | EQUIPMENT.EARRING | EQUIPMENT.RING
+  EQUIPMENT.NECKLACE | EQUIPMENT.EARRING | EQUIPMENT.RING1 | EQUIPMENT.RING2
 >;
 type EquipmentExtraData = {
   [key in SelectedStats]?: {

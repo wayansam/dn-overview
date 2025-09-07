@@ -93,7 +93,8 @@ const VIPAccContent = () => {
           let tempSlice: IonaEqEnhanceMaterial[] = [];
 
           switch (equipment) {
-            case EQUIPMENT.RING:
+            case EQUIPMENT.RING1:
+            case EQUIPMENT.RING2:
             case EQUIPMENT.EARRING:
             case EQUIPMENT.NECKLACE:
               tempSlice = IonaEqEnhanceMaterialTable.slice(from, to);
@@ -116,7 +117,8 @@ const VIPAccContent = () => {
             "Success Rate": srTemp,
           };
           switch (equipment) {
-            case EQUIPMENT.RING:
+            case EQUIPMENT.RING1:
+            case EQUIPMENT.RING2:
             case EQUIPMENT.EARRING:
             case EQUIPMENT.NECKLACE:
               temp2[equipment] = exData;
@@ -147,7 +149,8 @@ const VIPAccContent = () => {
 
         let tableHolder: CommonItemStats[];
         switch (equipment) {
-          case EQUIPMENT.RING:
+          case EQUIPMENT.RING1:
+          case EQUIPMENT.RING2:
             tableHolder = IonaRingEnhancementStatsTable;
             break;
           case EQUIPMENT.EARRING:
@@ -162,7 +165,6 @@ const VIPAccContent = () => {
             break;
         }
         const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-        console.log({ dt1, dt2 });
 
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
@@ -270,7 +272,6 @@ const VIPAccContent = () => {
             />
           </div>
           <Divider orientation="left">Material List</Divider>
-
           <Table
             size={"small"}
             dataSource={Object.entries(tableResource.res1)
@@ -438,7 +439,7 @@ const VIPAccContent = () => {
             </Text>
             <Text>-or-</Text>
             <Text>
-              * Exchange Argenta or Getaint Accessories with Path of Iona
+              * Exchange Argenta or Geraint Accessories with Path of Iona
               (purchased with 10 Iona Core).
             </Text>
             <Text>

@@ -92,7 +92,8 @@ export enum EQUIPMENT {
   SECOND_WEAPON = "Second Weapon",
   NECKLACE = "Necklace",
   EARRING = "Earring",
-  RING = "Ring",
+  RING1 = "Ring 1",
+  RING2 = "Ring 2",
 }
 
 export enum LUNAR_JADE_TYPE {

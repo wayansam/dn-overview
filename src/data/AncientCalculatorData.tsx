@@ -76,7 +76,7 @@ export const dataAncCalculator: AncientCalculator[] = [
   },
   {
     key: "10",
-    equipment: EQUIPMENT.RING,
+    equipment: EQUIPMENT.RING1,
     min: 1,
     max: 20,
     from: 0,
@@ -84,7 +84,7 @@ export const dataAncCalculator: AncientCalculator[] = [
   },
   {
     key: "11",
-    equipment: EQUIPMENT.RING,
+    equipment: EQUIPMENT.RING1,
     min: 1,
     max: 20,
     from: 0,
