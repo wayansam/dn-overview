@@ -160,14 +160,23 @@ const getItems: (
             </b>
           </p>
           <p>To use the calculator, please drag the pointer.</p>
+          <p>Patch Note related :</p>
           <p>
-            Patch Note related{" "}
             <a
               href="https://patchnote.dragonnest.com/sea/138/c/3"
               target="_blank"
               rel="noopener noreferrer"
             >
               Dimensional Dragon Jade
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/160/c/4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Otherworldly Dragon Jade
             </a>
           </p>
         </div>

@@ -41,12 +41,18 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     }
     return;
   };
-  const renderItem = (item: FeatureItem) => (
-    <List.Item>
-      <Typography.Text type={getType(item)}>[{item.key}] </Typography.Text>
+  const renderItem = (item: FeatureItem, idx: number) => (
+    <List.Item key={`item-${item.key}-${item.label}`}>
+      <Typography.Text
+        key={`item-tag-${item.key}-${idx}-${item.label}`}
+        type={getType(item)}
+      >
+        [{item.key}]{" "}
+      </Typography.Text>
       {`${item.label} `}
       {item?.link && (
         <Link
+          key={`item-link-${item.key}-${item.label}`}
           onClick={() => {
             if (item?.link) {
               dispatch(setSelectedSideBar(item.link));
@@ -57,35 +63,36 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
           [Check Out]
         </Link>
       )}
-      {item?.date && <Typography.Text> [{item.date}] </Typography.Text>}
+      {item?.date && (
+        <Typography.Text key={`item-date-${item.key}-${item.label}`}>
+          {" "}
+          [{item.date}]{" "}
+        </Typography.Text>
+      )}
     </List.Item>
   );
 
   const dataNew: Array<FeatureItem> = [
     {
       key: keyUpdate.N,
-      label: "Bestie Spirit & Mount Calculator",
-      link: {
-        key: TAB_KEY.miscBestie,
-        name: TAB_KEY.miscBestie,
-      },
-      date: "04-07-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement for Ancient Goddess Heraldry",
-      link: {
-        key: TAB_KEY.heraldryAncientGoddes,
-        name: TAB_KEY.heraldryAncientGoddes,
-      },
-      date: "08-07-2025",
-    },
-    {
-      key: keyUpdate.N,
       label: "VIP accessories",
       link: {
         key: TAB_KEY.eqVIPAcc,
         name: TAB_KEY.eqVIPAcc,
+      },
+      date: "07-09-2025",
+    },
+    {
+      key: keyUpdate.N,
+      label: "Otherworldly Dragon Jade",
+      link: {
+        key: TAB_KEY.jadeSkill,
+        name: TAB_KEY.jadeSkill,
+        payload: {
+          skillJadeScreen: {
+            tabOpen: ["8"],
+          },
+        },
       },
       date: "07-09-2025",
     },
@@ -119,6 +126,11 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       link: {
         key: TAB_KEY.jadeSkill,
         name: TAB_KEY.jadeSkill,
+        payload: {
+          skillJadeScreen: {
+            tabOpen: ["7"],
+          },
+        },
       },
       date: "03-02-2025",
     },
@@ -163,6 +175,24 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "28-05-2025",
     },
+    {
+      key: keyUpdate.D,
+      label: "Bestie Spirit & Mount Calculator",
+      link: {
+        key: TAB_KEY.miscBestie,
+        name: TAB_KEY.miscBestie,
+      },
+      date: "04-07-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Enhancement for Ancient Goddess Heraldry",
+      link: {
+        key: TAB_KEY.heraldryAncientGoddes,
+        name: TAB_KEY.heraldryAncientGoddes,
+      },
+      date: "08-07-2025",
+    },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
     {
@@ -180,7 +210,12 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     <div>
       <Divider orientation="left">What's New</Divider>
       <Space direction="horizontal">
-        <List bordered dataSource={dataNew} renderItem={renderItem} />
+        <List
+          bordered
+          dataSource={dataNew}
+          renderItem={renderItem}
+          key={"list-new"}
+        />
       </Space>
 
       {!onlyNew && (

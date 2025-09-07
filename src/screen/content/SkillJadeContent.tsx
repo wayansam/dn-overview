@@ -1,6 +1,7 @@
 import { Collapse, CollapseProps, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
+import { useRef } from "react";
 import SkillJadeCalcComp from "../../components/SkillJadeCalcComp";
 import {
   AncientDJSkillMaterialTable,
@@ -10,6 +11,7 @@ import {
   DMFDJSkillMaterialTable,
   DMFDJSkillStatTable,
 } from "../../data/SkillJadeData";
+import { useAppSelector } from "../../hooks";
 import { SkillJadeEnhanceMaterial } from "../../interface/Item.interface";
 import { SkillJadeStat } from "../../interface/ItemStat.interface";
 import { getTextEmpty } from "../../utils/common.util";
@@ -17,6 +19,10 @@ import { getTextEmpty } from "../../utils/common.util";
 const { Text } = Typography;
 
 const SkillJadeContent = () => {
+  const skillJadeScreen = useAppSelector(
+    (state) => state.UIState.selectedSideBar.payload?.skillJadeScreen
+  );
+  const activeKey = useRef(skillJadeScreen?.tabOpen || ["8"]);
   const getColumnsStats = (showCd?: boolean): ColumnsType<SkillJadeStat> => {
     const cdData: ColumnsType<SkillJadeStat> = showCd
       ? [
@@ -302,7 +308,11 @@ const SkillJadeContent = () => {
 
   return (
     <div>
-      <Collapse items={items} size="small" defaultActiveKey={["8"]} />
+      <Collapse
+        items={items}
+        size="small"
+        defaultActiveKey={activeKey.current}
+      />
     </div>
   );
 };

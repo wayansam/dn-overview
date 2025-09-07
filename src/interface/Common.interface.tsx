@@ -1,11 +1,14 @@
 import {
+  CONVERSION_TYPE,
   EQUIPMENT,
   ITEM_RARITY,
-  CONVERSION_TYPE,
 } from "../constants/InGame.constants";
 
 export interface ExtraPayload {
   lunarScreen?: {
+    tabOpen: string[];
+  };
+  skillJadeScreen?: {
     tabOpen: string[];
   };
 }
