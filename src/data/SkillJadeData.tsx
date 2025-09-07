@@ -187,7 +187,7 @@ export const AncientDJSkillMaterialTable: SkillJadeEnhanceMaterial[] = [
   },
 ];
 
-export const DimensionalDJSkillMaterialTable: SkillJadeEnhanceMaterial[] = [
+export const DimeOtherDJSkillMaterialTable: SkillJadeEnhanceMaterial[] = [
   {
     encLevel: 1,
     lowerFragment: 2,
@@ -269,7 +269,7 @@ export const DimensionalDJSkillMaterialTable: SkillJadeEnhanceMaterial[] = [
   {
     encLevel: 14,
     lowerFragment: 0,
-    higherFragment: 5,
+    higherFragment: 4,
     gold: 1000,
   },
   {
@@ -478,7 +478,7 @@ export const AncientDJSkillStatTable: SkillJadeStat[] = [
   },
 ];
 
-export const DimensionalDJSkillStatTable: SkillJadeStat[] = [
+export const DimeOtherDJSkillStatTable: SkillJadeStat[] = [
   {
     encLevel: 0,
     attackPercent: 0,
