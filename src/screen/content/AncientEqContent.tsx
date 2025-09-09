@@ -15,8 +15,11 @@ import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
   AncientAccessoryCraftMaterialTable,
+  AncientAccessoryCraftMaterialTableV2,
   AncientArmorCraftMaterialTable,
+  AncientArmorCraftMaterialTableV2,
   AncientWeaponT2CraftMaterialTable,
+  AncientWeaponT2CraftMaterialTableV2,
 } from "../../data/AncientData";
 import { AncientCalculator } from "../../interface/Common.interface";
 import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
@@ -176,10 +179,24 @@ type ColumnTypes = (
   | ColumnType<AncientCalculator>
 )[];
 
+const versionOpt = [
+  {
+    label: "New",
+    value: "new",
+  },
+  {
+    label: "Old",
+    value: "old",
+  },
+];
+
 const AncientEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
     useState<AncientCalculator[]>(dataAncCalculator);
+  const [selectVersion, setSelectVersion] = useState<string>(
+    versionOpt[0].value
+  );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
 
@@ -309,16 +326,28 @@ const AncientEqContent = () => {
           case EQUIPMENT.LOWER:
           case EQUIPMENT.GLOVE:
           case EQUIPMENT.SHOES:
-            tempSlice = AncientArmorCraftMaterialTable.slice(from, to);
+            tempSlice = (
+              selectVersion === versionOpt[0].value
+                ? AncientArmorCraftMaterialTableV2
+                : AncientArmorCraftMaterialTable
+            ).slice(from, to);
             break;
           case EQUIPMENT.MAIN_WEAPON:
           case EQUIPMENT.SECOND_WEAPON:
-            tempSlice = AncientWeaponT2CraftMaterialTable.slice(from, to);
+            tempSlice = (
+              selectVersion === versionOpt[0].value
+                ? AncientWeaponT2CraftMaterialTableV2
+                : AncientWeaponT2CraftMaterialTable
+            ).slice(from, to);
             break;
           case EQUIPMENT.NECKLACE:
           case EQUIPMENT.EARRING:
           case EQUIPMENT.RING1:
-            tempSlice = AncientAccessoryCraftMaterialTable.slice(from, to);
+            tempSlice = (
+              selectVersion === versionOpt[0].value
+                ? AncientAccessoryCraftMaterialTableV2
+                : AncientAccessoryCraftMaterialTable
+            ).slice(from, to);
             break;
 
           default:
@@ -377,7 +406,7 @@ const AncientEqContent = () => {
       }
     });
     return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  }, [selectedRowKeys, dataSource, invalidDtSrc, selectVersion]);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
@@ -425,6 +454,18 @@ const AncientEqContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
+          <div style={{ marginBottom: 4 }}>
+            Version
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectVersion}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectVersion(val);
+              }}
+              options={versionOpt}
+            />
+          </div>
           <div style={{ marginBottom: 4 }}>
             Spesific Type
             <Divider type="vertical" />
@@ -635,9 +676,22 @@ const AncientEqContent = () => {
       key: "1",
       label: "Armor Craft Reference",
       children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
+              title={() => "New table"}
+              size={"small"}
+              dataSource={AncientArmorCraftMaterialTableV2}
+              columns={columnsArmor}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
+            <Table
+              title={() => "Old table"}
               size={"small"}
               dataSource={AncientArmorCraftMaterialTable}
               columns={columnsArmor}
@@ -652,9 +706,22 @@ const AncientEqContent = () => {
       key: "2",
       label: "Weapon Craft Reference",
       children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
+              title={() => "New table"}
+              size={"small"}
+              dataSource={AncientWeaponT2CraftMaterialTableV2}
+              columns={columnsWeapon}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
+            <Table
+              title={() => "Old table"}
               size={"small"}
               dataSource={AncientWeaponT2CraftMaterialTable}
               columns={columnsWeapon}
@@ -669,9 +736,22 @@ const AncientEqContent = () => {
       key: "3",
       label: "Accessories Craft Reference",
       children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
+        <div
+          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
+        >
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
+              title={() => "New table"}
+              size={"small"}
+              dataSource={AncientAccessoryCraftMaterialTableV2}
+              columns={columnsAccessory}
+              pagination={false}
+              bordered
+            />
+          </div>
+          <div style={{ marginRight: 10, marginBottom: 10 }}>
+            <Table
+              title={() => "Old table"}
               size={"small"}
               dataSource={AncientAccessoryCraftMaterialTable}
               columns={columnsAccessory}
