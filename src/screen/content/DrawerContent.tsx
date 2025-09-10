@@ -50,6 +50,16 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/156/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Ancient's Equipment cost change
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,

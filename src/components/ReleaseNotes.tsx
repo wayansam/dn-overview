@@ -96,6 +96,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "07-09-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Ancient's Equipment Cost Changes",
+      link: {
+        key: TAB_KEY.eqAncient,
+        name: TAB_KEY.eqAncient,
+      },
+      date: "10-09-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
