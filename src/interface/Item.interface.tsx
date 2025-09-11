@@ -172,3 +172,11 @@ export interface IonaEqEnhanceMaterial {
   whiteCore: number;
   successRatePercent: number;
 }
+
+export interface SpunGoldEqEnhanceMaterial {
+  encLevel: string;
+  shatteredCrystal: number;
+  foundationStone: number;
+  dimVestige: number;
+  gold: number;
+}

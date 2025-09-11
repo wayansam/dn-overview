@@ -10,6 +10,8 @@ export const TAB_KEY = {
   eqKilos: "Kilos",
   eqNamedEOD: "Named EOD",
   eqBoneDragon: "Bone Dragon",
+  eqVIPAcc: "VIP Accessories",
+  eqSpunGold: "Spun Gold",
   jadeLunar: "Lunar Jade",
   jadeSkill: "Skill Jade",
   jadeErosion: "Erosion Jade",
@@ -18,7 +20,6 @@ export const TAB_KEY = {
   talismanEternal: "Eternal",
   miscConversion: "Conversion",
   miscBestie: "Bestie",
-  eqVIPAcc: "VIP Accessories",
 };
 
 export const TAB_GROUP_LIST: SideBarGroupTab[] = [
@@ -55,6 +56,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.eqVIPAcc,
         name: TAB_KEY.eqVIPAcc,
+      },
+      {
+        key: TAB_KEY.eqSpunGold,
+        name: TAB_KEY.eqSpunGold,
       },
     ],
   },

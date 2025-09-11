@@ -34,6 +34,7 @@ import ConversionContent from "./ConversionContent";
 import BoneDragonEqContent from "./BoneDragonEqContent";
 import BestieContent from "./BestieContent";
 import VIPAccContent from "./VIPAccContent";
+import SpunGoldEqContent from "./SpunGoldEqContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -82,6 +83,9 @@ const MainContent = () => {
       
       case TAB_KEY.eqVIPAcc:
         return <VIPAccContent />;
+      
+      case TAB_KEY.eqSpunGold:
+        return <SpunGoldEqContent />;
 
       case TAB_KEY.jadeLunar:
         return <LunarJadeCalculatorContent />;
