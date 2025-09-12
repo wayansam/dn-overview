@@ -24,6 +24,7 @@ import {
   getSuccessRateTag,
   getTextEmpty,
 } from "../../utils/common.util";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
 
 const { Text } = Typography;
 
@@ -134,9 +135,7 @@ const VIPAccContent = () => {
     }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = {
-      encLevel: "0",
-    };
+    let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
       return temp;
     }
@@ -168,7 +167,7 @@ const VIPAccContent = () => {
 
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(dt, temp, "add");
+          temp = combineEqStats(temp, dt, "add");
         }
       }
     });
