@@ -437,7 +437,7 @@ const getItems: (
           </p>
           <p>
             Select the From &#38; To option in correct progression of the
-            equipment. &#40; 0 to 20 &#41;
+            equipment. &#40; 0 to 10 &#41;
           </p>
           <p>
             Calculated material only shown when you input the correct From, To
