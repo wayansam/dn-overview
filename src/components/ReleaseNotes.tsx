@@ -105,6 +105,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "10-09-2025",
     },
+    {
+      key: keyUpdate.N,
+      label: "Spun Gold Equipment",
+      link: {
+        key: TAB_KEY.eqSpunGold,
+        name: TAB_KEY.eqSpunGold,
+      },
+      date: "12-09-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

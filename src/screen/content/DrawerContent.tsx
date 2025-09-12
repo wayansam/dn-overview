@@ -416,6 +416,61 @@ const getItems: (
       style: panelStyle,
     },
     {
+      key: TAB_KEY.eqSpunGold,
+      label: TAB_KEY.eqSpunGold,
+      children: (
+        <div>
+          <p>
+            <b>
+              For the mentioned armor is evolved from Ancient Armor (tier 1 or
+              2) & weapon from Otherworldly Ancient Weapon, so you at least need
+              to have those item first.
+            </b>
+          </p>
+          <p>
+            To use the calculator, please select the equipment you want to
+            calculate.
+          </p>
+          <p>
+            You can always open Craft Reference if you are not sure about the
+            number.
+          </p>
+          <p>
+            Select the From &#38; To option in correct progression of the
+            equipment. &#40; 0 to 20 &#41;
+          </p>
+          <p>
+            Calculated material only shown when you input the correct From, To
+            and select the equipment.
+          </p>
+          <p>
+            <i>
+              You can always custom input everything in tab From, and To, but
+              remember your custom input will be override by The Settings if you
+              change it.
+            </i>
+          </p>
+          <p>
+            <i>
+              Best way to do this is setup everything in common from settings,
+              then adjust things you needed.
+            </i>
+          </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/160/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Spun Gold Equipment
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.heraldryAncientGoddes,
       label: TAB_KEY.heraldryAncientGoddes,
       children: (
