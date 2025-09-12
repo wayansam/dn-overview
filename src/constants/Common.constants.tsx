@@ -1,7 +1,7 @@
 import { Typography } from "antd";
 import { SideBarGroupTab } from "../interface/Common.interface";
 import { LunarFragmentData } from "../interface/Item.interface";
-const { Text } = Typography;
+import { CommonItemStats } from "../interface/ItemStat.interface";
 
 export const TAB_KEY = {
   mainGeneral: "General",
@@ -138,3 +138,36 @@ export interface TableResource {
     lunarStyle?: LunarFragmentData;
   };
 }
+
+export const EmptyCommonnStat: CommonItemStats = {
+  encLevel: "0",
+  phyMagAtk: 0,
+  phyMagAtkMin: 0,
+  phyMagAtkMax: 0,
+  phyMagAtkPercent: 0,
+  attAtkPercent: 0,
+
+  crt: 0,
+  crtPercent: 0,
+  cdm: 0,
+  fd: 0,
+
+  str: 0,
+  agi: 0,
+  int: 0,
+  vit: 0,
+  strPercent: 0,
+  agiPercent: 0,
+  intPercent: 0,
+  vitPercent: 0,
+
+  def: 0,
+  magdef: 0,
+  defPercent: 0,
+  magdefPercent: 0,
+
+  hp: 0,
+  hpPercent: 0,
+  moveSpeedPercent: 0,
+  moveSpeedPercentTown: 0,
+};

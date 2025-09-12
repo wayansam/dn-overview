@@ -29,6 +29,7 @@ import {
   SpunGoldStatsUpperTable,
   dataGoldSpunCalculator,
 } from "../../data/SpunGoldEqData";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
 
 const { Text } = Typography;
 
@@ -156,9 +157,7 @@ const SpunGoldEqContent = () => {
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = {
-      encLevel: "0",
-    };
+    let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
       return temp;
     }
@@ -201,7 +200,7 @@ const SpunGoldEqContent = () => {
         const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(dt, temp, "add");
+          temp = combineEqStats(temp, dt, "add");
         }
       }
     });
@@ -263,7 +262,7 @@ const SpunGoldEqContent = () => {
               onChange={(val) => {
                 setSelectFrom(val);
               }}
-              options={getListOpt(0, 20)}
+              options={getListOpt(0, 10)}
             />
           </div>
           <div style={{ marginBottom: 4 }}>
@@ -275,28 +274,10 @@ const SpunGoldEqContent = () => {
               onChange={(val) => {
                 setSelectTo(val);
               }}
-              options={getListOpt(0, 20)}
+              options={getListOpt(0, 10)}
             />
           </div>
           <Divider orientation="left">Material List</Divider>
-          {warnDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="Above +3, the enhancement might fail."
-                type="info"
-              />
-            </div>
-          )}
-          {dangerDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="Above +5 even can break your item."
-                type="warning"
-              />
-            </div>
-          )}
           <Table
             size={"small"}
             dataSource={Object.entries(tableResource.res1)
@@ -321,14 +302,6 @@ const SpunGoldEqContent = () => {
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <TradingHouseCalc
             data={[
-              {
-                name: "Shattered Crystal",
-                amt: tableResource.res1["Shattered Crystal"],
-              },
-              {
-                name: "Foundation Stone",
-                amt: tableResource.res1["Foundation Stone"],
-              },
               {
                 name: "Dim. Vestige",
                 amt: tableResource.res1["Dim. Vestige"],
@@ -459,6 +432,7 @@ const SpunGoldEqContent = () => {
               phyMagAtkPercentFlag: true,
               crtFlag: true,
               attAtkPercentFlag: true,
+              moveSpeedPercentFlag: true,
             })}
             pagination={false}
             bordered
@@ -592,29 +566,6 @@ const SpunGoldEqContent = () => {
     const itemMats: CollapseProps["items"] = [
       {
         key: "1",
-        label: "Note",
-        children: (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Text>
-              * Beyond +10, there are downgrade intervals every 2 levels.
-            </Text>
-            <Text>
-              ** E.g. Enhance +10 to +11, failure dont have level downgrade.
-            </Text>
-            <Text>
-              ** E.g. Enhance +11 to +12, failure have level downgrade with
-              certain probability (become +10).
-            </Text>
-          </div>
-        ),
-      },
-      {
-        key: "2",
         label: "Armor",
         children: (
           <Table
@@ -628,7 +579,7 @@ const SpunGoldEqContent = () => {
         ),
       },
       {
-        key: "3",
+        key: "2",
         label: "Weapon",
         children: (
           <Table
@@ -644,7 +595,7 @@ const SpunGoldEqContent = () => {
     ];
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemMats} size="small" defaultActiveKey={"1"} />
+        <Collapse items={itemMats} size="small" />
       </div>
     );
   };
