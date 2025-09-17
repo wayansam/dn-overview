@@ -3,7 +3,7 @@ import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
-import ListingCard, { ItemList } from "../../components/ListingCard";
+import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
@@ -34,7 +34,8 @@ import { EmptyCommonnStat } from "../../constants/Common.constants";
 const { Text } = Typography;
 
 interface TableMaterialList {
-  "Shattered Crystal": number;
+  "Shattered Armor Crystal": number;
+  "Shattered Weapon Crystal": number;
   "Foundation Stone": number;
   "Dim. Vestige": number;
   Gold: number;
@@ -61,32 +62,6 @@ const SpunGoldEqContent = () => {
     return flag;
   }, [selectedRowKeys, dataSource]);
 
-  const warnDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to > 3) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
-
-  const dangerDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to > 5) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
-
   useEffect(() => {
     const newData = dataSource.map((item) => ({
       ...item,
@@ -98,7 +73,8 @@ const SpunGoldEqContent = () => {
 
   const tableResource: { res1: TableMaterialList } = useMemo(() => {
     let temp: TableMaterialList = {
-      "Shattered Crystal": 0,
+      "Shattered Armor Crystal": 0,
+      "Shattered Weapon Crystal": 0,
       "Foundation Stone": 0,
       "Dim. Vestige": 0,
       Gold: 0,
@@ -137,7 +113,6 @@ const SpunGoldEqContent = () => {
         let foundationStoneTemp = 0;
         let dimVestigeTemp = 0;
         let goldTemp = 0;
-        let jellyTemp = 0;
 
         tempSlice.forEach((slicedItem) => {
           shatteredCrystalTemp += slicedItem.shatteredCrystal;
@@ -146,7 +121,24 @@ const SpunGoldEqContent = () => {
           goldTemp += slicedItem.gold;
         });
 
-        temp["Shattered Crystal"] += shatteredCrystalTemp;
+        switch (equipment) {
+          case EQUIPMENT.HELM:
+          case EQUIPMENT.UPPER:
+          case EQUIPMENT.LOWER:
+          case EQUIPMENT.GLOVE:
+          case EQUIPMENT.SHOES:
+            temp["Shattered Armor Crystal"] += shatteredCrystalTemp;
+            break;
+
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
+            temp["Shattered Weapon Crystal"] += shatteredCrystalTemp;
+            break;
+
+          default:
+            break;
+        }
+
         temp["Foundation Stone"] += foundationStoneTemp;
         temp["Dim. Vestige"] += dimVestigeTemp;
         temp.Gold += goldTemp;
