@@ -35,6 +35,7 @@ import BoneDragonEqContent from "./BoneDragonEqContent";
 import BestieContent from "./BestieContent";
 import VIPAccContent from "./VIPAccContent";
 import SpunGoldEqContent from "./SpunGoldEqContent";
+import CollapseJadeContent from "./CollapseJadeContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -95,6 +96,9 @@ const MainContent = () => {
 
       case TAB_KEY.jadeErosion:
         return <ErosionJadeContent />;
+      
+      case TAB_KEY.jadeCollapse:
+        return <CollapseJadeContent />;
 
       case TAB_KEY.heraldryAncientGoddes:
         return <AncientHeraldryContent />;

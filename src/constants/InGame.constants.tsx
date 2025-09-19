@@ -121,3 +121,8 @@ export enum BESTIE_TYPE {
   MNT = "Mount",
   SPT = "Spirit",
 }
+
+export enum COLLAPSE_JADE_TYPE {
+  ATT = "Attack",
+  DEF = "Defense",
+}

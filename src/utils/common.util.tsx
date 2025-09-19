@@ -618,7 +618,30 @@ export function combineEqStats(
 
   return result;
 }
-export const getStatDif = (statDif: CommonItemStats) => {
+export function multiplyEqStats(
+  a: CommonItemStats,
+  n: number
+): CommonItemStats {
+  const result: CommonItemStats = { ...a };
+
+  const keys = Object.keys({ ...result }) as (keyof CommonItemStats)[];
+
+  for (const key of keys) {
+    const valueA = a[key];
+
+    if (typeof valueA === "number") {
+      const computed = valueA * n;
+
+      (result as any)[key] = computed;
+    }
+  }
+
+  return result;
+}
+export const getStatDif = (statDif?: CommonItemStats) => {
+  if (!statDif) {
+    return [];
+  }
   return [
     {
       title: "ATK",

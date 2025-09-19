@@ -180,3 +180,11 @@ export interface SpunGoldEqEnhanceMaterial {
   dimVestige: number;
   gold: number;
 }
+
+export interface CollapseJadeCraftEnhanceMaterial {
+  encLevel: string;
+  collapseFragment: number;
+  foundationStone: number;
+  dimVestige: number;
+  gold: number;
+}
