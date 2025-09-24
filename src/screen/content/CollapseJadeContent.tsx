@@ -148,8 +148,6 @@ const CollapseJadeContent = () => {
   };
 
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
-    console.log({ temp });
-
     if (!temp || !Array.isArray(temp) || temp.length < 1) {
       return { errorDt: ["Empty List"] };
     }
@@ -173,12 +171,13 @@ const CollapseJadeContent = () => {
         enhItem?.listEnhance.length > 0
       ) {
         enhItem?.listEnhance.forEach((item, i) => {
-          if (!item || (!item?.amt && !item?.range)) {
+          if (!item || !item?.amt) {
             errorMsg.push(
               `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
             );
-          } else if (item?.amt && item?.range) {
+          } else if (item?.amt) {
             // mats
+            const range = item?.range ?? [0, 0];
             const { collapseFragment, foundationStone, dimVestige, gold } =
               CollapseJadeCraftMats;
             let tempCollapseFragmentC = item?.craft ? collapseFragment : 0;
@@ -189,8 +188,8 @@ const CollapseJadeContent = () => {
             const isAtt = enhItem?.type === COLLAPSE_JADE_TYPE.ATT;
 
             const tempSliceMats = CollapseJadeEnhanceMatsTable.slice(
-              item?.range[0] + 1,
-              item?.range[1] + 1
+              range[0],
+              range[1]
             );
 
             tempSliceMats.forEach((slicedItem) => {
@@ -212,8 +211,8 @@ const CollapseJadeContent = () => {
 
             const { dt1, dt2 } = getComparedData(
               tempArrStats,
-              item?.range[0] + 1,
-              item?.range[1] + 1
+              range[0] + 1,
+              range[1] + 1
             );
             if (dt2) {
               const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
@@ -224,8 +223,6 @@ const CollapseJadeContent = () => {
             let emsg = "";
             if (!item?.amt) {
               emsg = "Amount";
-            } else if (!item?.range) {
-              emsg = "Range";
             }
             errorMsg.push(
               `The ${emsg} in Enhance ${idx + 1}, item ${
@@ -513,15 +510,12 @@ const CollapseJadeContent = () => {
               size={"small"}
               dataSource={CollapseJadeAttackStatsTable}
               columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
-                attAtkPercentFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
+                phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
                 crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
               })}
               pagination={false}
               bordered
@@ -533,15 +527,13 @@ const CollapseJadeContent = () => {
               size={"small"}
               dataSource={CollapseJadeDefendStatsTable}
               columns={getColumnsStats({
-                phyMagAtkMinFlag: true,
-                phyMagAtkMaxFlag: true,
+                phyMagAtkFlag: true,
                 attAtkPercentFlag: true,
+                fdFlag: true,
                 defFlag: true,
                 magdefFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-                phyMagAtkPercentFlag: true,
-                crtFlag: true,
               })}
               pagination={false}
               bordered
