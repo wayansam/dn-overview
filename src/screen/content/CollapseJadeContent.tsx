@@ -472,7 +472,7 @@ const CollapseJadeContent = () => {
             bordered
           />
           <ListingCard
-            title="Status Increase"
+            title="Enhancement Status Increase "
             data={getStatDif(enhanceDataSource.statsData)}
           />
         </div>

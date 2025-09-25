@@ -114,6 +114,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "12-09-2025",
     },
+    {
+      key: keyUpdate.N,
+      label: "Collapse Dragon Jade",
+      link: {
+        key: TAB_KEY.jadeCollapse,
+        name: TAB_KEY.jadeCollapse,
+      },
+      date: "25-09-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

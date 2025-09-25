@@ -219,6 +219,42 @@ const getItems: (
       style: panelStyle,
     },
     {
+      key: TAB_KEY.jadeCollapse,
+      label: TAB_KEY.jadeCollapse,
+      children: (
+        <div>
+          <p>
+            To use the calculator, please filled in Jade type, then amount and
+            range (current enhance level to your target). Check the craft checkbox to include the material into calculation.
+          </p>
+          <p>
+            <i>
+              Enhance list limited to 2 (because only 2 type, attack & defense).
+              But the list inside you can put up to 20 depends on your current
+              plan.
+            </i>
+          </p>
+          <p>
+            <i>
+              You can check which input is not correct in below warning message
+              (yellow text).
+            </i>
+          </p>
+          <p>
+            Patch Note related{" "}
+            <a
+              href="https://patchnote.dragonnest.com/sea/160/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Collapse Dragon Jade
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.eqNamedEOD,
       label: TAB_KEY.eqNamedEOD,
       children: (
