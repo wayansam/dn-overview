@@ -3,7 +3,9 @@ import { CommonEquipmentCalculator } from "../interface/Common.interface";
 import { SpunGoldEqEnhanceMaterial } from "../interface/Item.interface";
 import { CommonItemStats } from "../interface/ItemStat.interface";
 
-export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
+export const dataGoldSpunCalculator: CommonEquipmentCalculator<{
+  craft: number;
+}>[] = [
   {
     key: "1",
     equipment: EQUIPMENT.HELM,
@@ -11,6 +13,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "2",
@@ -19,6 +22,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "3",
@@ -27,6 +31,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "4",
@@ -35,6 +40,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "5",
@@ -43,6 +49,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "6",
@@ -51,6 +58,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
   {
     key: "7",
@@ -59,6 +67,7 @@ export const dataGoldSpunCalculator: CommonEquipmentCalculator[] = [
     max: 10,
     from: 0,
     to: 1,
+    craft: 0,
   },
 ];
 
@@ -1112,3 +1121,25 @@ export const SpunGoldStatsShoesTable: CommonItemStats[] = [
     moveSpeedPercent: 3.5,
   },
 ];
+
+export const SpunGoldEvolverCraftArmorT1: SpunGoldEqEnhanceMaterial = {
+  encLevel: "",
+  shatteredCrystal: 1000,
+  foundationStone: 250,
+  dimVestige: 1000,
+  gold: 2500,
+};
+export const SpunGoldEvolverCraftArmorT2: SpunGoldEqEnhanceMaterial = {
+  encLevel: "",
+  shatteredCrystal: 100,
+  foundationStone: 25,
+  dimVestige: 100,
+  gold: 2500,
+};
+export const SpunGoldEvolverCraftWeapon: SpunGoldEqEnhanceMaterial = {
+  encLevel: "",
+  shatteredCrystal: 500,
+  foundationStone: 100,
+  dimVestige: 1000,
+  gold: 10000,
+};

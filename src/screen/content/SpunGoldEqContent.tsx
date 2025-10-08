@@ -2,7 +2,10 @@ import { Alert, Divider, Radio, Select, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
-import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
+import EquipmentTable, {
+  BasicOpt,
+  getListOpt,
+} from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EQUIPMENT } from "../../constants/InGame.constants";
@@ -20,6 +23,9 @@ import {
 import {
   SpunGoldEqEnhanceMaterialArmorTable,
   SpunGoldEqEnhanceMaterialWeapTable,
+  SpunGoldEvolverCraftArmorT1,
+  SpunGoldEvolverCraftArmorT2,
+  SpunGoldEvolverCraftWeapon,
   SpunGoldStatsGlovesTable,
   SpunGoldStatsHelmTable,
   SpunGoldStatsLowerTable,
@@ -41,15 +47,40 @@ interface TableMaterialList {
   Gold: number;
 }
 
+const SpunOption: BasicOpt[] = [
+  {
+    key: [
+      EQUIPMENT.HELM,
+      EQUIPMENT.UPPER,
+      EQUIPMENT.LOWER,
+      EQUIPMENT.GLOVE,
+      EQUIPMENT.SHOES,
+    ],
+    option: [
+      { label: "No", value: 0 },
+      { label: "Tier 1", value: 1 },
+      { label: "Tier 2", value: 2 },
+    ],
+  },
+  {
+    key: [EQUIPMENT.MAIN_WEAPON, EQUIPMENT.SECOND_WEAPON],
+    option: [
+      { label: "No", value: 0 },
+      { label: "Tier 2", value: 2 },
+    ],
+  },
+];
+
 const SpunGoldEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [dataSource, setDataSource] = useState<CommonEquipmentCalculator[]>(
-    dataGoldSpunCalculator
-  );
+  const [dataSource, setDataSource] = useState<
+    CommonEquipmentCalculator<{ craft: number }>[]
+  >(dataGoldSpunCalculator);
   const [selectFrom, setSelectFrom] = useState<number>(0);
-  const [selectTo, setSelectTo] = useState<number>(1);
+  const [selectTo, setSelectTo] = useState<number>(0);
+  const [selectCr, setSelectCr] = useState<number>(0);
 
-  const invalidDtSrc = useMemo(() => {
+  const invalidEnhanceSteps = useMemo(() => {
     let flag = false;
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
@@ -63,13 +94,26 @@ const SpunGoldEqContent = () => {
   }, [selectedRowKeys, dataSource]);
 
   useEffect(() => {
+    const getCraftValue = (
+      eq: EQUIPMENT,
+      selected: number,
+      current: number
+    ) => {
+      const craftOpt = SpunOption.find((it) => it.key.includes(eq));
+      if (craftOpt) {
+        const found = craftOpt?.option?.find((i) => i.value === selected);
+        return found ? found.value : current;
+      }
+      return 0;
+    };
     const newData = dataSource.map((item) => ({
       ...item,
       from: selectFrom,
       to: selectTo,
+      craft: getCraftValue(item.equipment, selectCr, item.craft),
     }));
     setDataSource(newData);
-  }, [selectFrom, selectTo]);
+  }, [selectFrom, selectTo, selectCr]);
 
   const tableResource: { res1: TableMaterialList } = useMemo(() => {
     let temp: TableMaterialList = {
@@ -80,16 +124,13 @@ const SpunGoldEqContent = () => {
       Gold: 0,
     };
 
-    if (invalidDtSrc) {
-      return { res1: temp };
-    }
-
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
 
       if (found) {
-        const { equipment, from, to } = found;
+        const { equipment, from, to, craft } = found;
         let tempSlice: SpunGoldEqEnhanceMaterial[] = [];
+        let tempCraft: SpunGoldEqEnhanceMaterial | undefined = undefined;
 
         switch (equipment) {
           case EQUIPMENT.HELM:
@@ -97,22 +138,35 @@ const SpunGoldEqContent = () => {
           case EQUIPMENT.LOWER:
           case EQUIPMENT.GLOVE:
           case EQUIPMENT.SHOES:
-            tempSlice = SpunGoldEqEnhanceMaterialArmorTable.slice(from, to);
+            if (!invalidEnhanceSteps) {
+              tempSlice = SpunGoldEqEnhanceMaterialArmorTable.slice(from, to);
+            }
+            if (craft === 1) {
+              tempCraft = SpunGoldEvolverCraftArmorT1;
+            }
+            if (craft === 2) {
+              tempCraft = SpunGoldEvolverCraftArmorT2;
+            }
             break;
 
           case EQUIPMENT.MAIN_WEAPON:
           case EQUIPMENT.SECOND_WEAPON:
-            tempSlice = SpunGoldEqEnhanceMaterialWeapTable.slice(from, to);
+            if (!invalidEnhanceSteps) {
+              tempSlice = SpunGoldEqEnhanceMaterialWeapTable.slice(from, to);
+            }
+            if (craft === 2) {
+              tempCraft = SpunGoldEvolverCraftWeapon;
+            }
             break;
 
           default:
             break;
         }
 
-        let shatteredCrystalTemp = 0;
-        let foundationStoneTemp = 0;
-        let dimVestigeTemp = 0;
-        let goldTemp = 0;
+        let shatteredCrystalTemp = tempCraft?.shatteredCrystal ?? 0;
+        let foundationStoneTemp = tempCraft?.foundationStone ?? 0;
+        let dimVestigeTemp = tempCraft?.dimVestige ?? 0;
+        let goldTemp = tempCraft?.gold ?? 0;
 
         tempSlice.forEach((slicedItem) => {
           shatteredCrystalTemp += slicedItem.shatteredCrystal;
@@ -146,11 +200,11 @@ const SpunGoldEqContent = () => {
     });
 
     return { res1: temp };
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
 
   const statDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
-    if (invalidDtSrc) {
+    if (invalidEnhanceSteps) {
       return temp;
     }
 
@@ -198,7 +252,7 @@ const SpunGoldEqContent = () => {
     });
 
     return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
 
   const getCalculator = () => {
     return (
@@ -209,10 +263,13 @@ const SpunGoldEqContent = () => {
             setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
             setDataSource={setDataSource}
+            craftData={{
+              list: SpunOption,
+            }}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {invalidDtSrc && (
+          {invalidEnhanceSteps && (
             <div>
               <Alert
                 banner
@@ -267,6 +324,18 @@ const SpunGoldEqContent = () => {
                 setSelectTo(val);
               }}
               options={getListOpt(0, 10)}
+            />
+          </div>
+          <div style={{ marginBottom: 4 }}>
+            Craft
+            <Divider type="vertical" />
+            <Select
+              defaultValue={selectTo}
+              style={{ width: 120 }}
+              onChange={(val) => {
+                setSelectCr(val);
+              }}
+              options={SpunOption[0].option}
             />
           </div>
           <Divider orientation="left">Material List</Divider>

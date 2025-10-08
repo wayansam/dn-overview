@@ -2,9 +2,11 @@ import { Form, FormInstance, Select } from "antd";
 import Table, { ColumnGroupType, ColumnType } from "antd/es/table";
 import React, { useContext } from "react";
 import { useEffect, useState } from "react";
+import { EQUIPMENT } from "../constants/InGame.constants";
 
 enum TAB {
   EQ = "Equipment",
+  CR = "Craft",
   FR = "From",
   TO = "To",
 }
@@ -32,6 +34,13 @@ export interface EquipmentTableCalculator {
   max: number;
   from: number;
   to: number;
+  craft?: number;
+  equipment: EQUIPMENT;
+}
+
+export interface BasicOpt {
+  option: Array<{ label: string; value: number }>;
+  key: EQUIPMENT[];
 }
 
 interface EquipmentTableProps<T extends EquipmentTableCalculator> {
@@ -40,6 +49,9 @@ interface EquipmentTableProps<T extends EquipmentTableCalculator> {
   dataSource: T[];
   setDataSource: React.Dispatch<React.SetStateAction<T[]>>;
   customLabeling?: (item: number) => string;
+  craftData?: {
+    list: BasicOpt[];
+  };
 }
 
 const getLabel = (item: number) => {
@@ -62,6 +74,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
   dataSource,
   setDataSource,
   customLabeling,
+  craftData,
 }: EquipmentTableProps<T>) => {
   interface EditableCellProps<T> {
     title: React.ReactNode;
@@ -84,6 +97,9 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
     const [editing, setEditing] = useState(false);
     const [selectItem, setSelectItem] = useState<number>(0);
     const form = useContext(EditableContext)!;
+    const craftOpt = (craftData?.list ?? []).find((it) =>
+      it.key.includes(record?.equipment)
+    );
 
     useEffect(() => {
       if (record?.from && title === TAB.FR) {
@@ -91,6 +107,9 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
       }
       if (record?.to && title === TAB.TO) {
         setSelectItem(record.to);
+      }
+      if (record?.craft && title === TAB.CR) {
+        setSelectItem(record.craft ?? 0);
       }
     }, [record, title]);
 
@@ -111,6 +130,9 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
       if (title === TAB.TO) {
         handleSave({ ...record, to: selectItem });
       }
+      if (title === TAB.CR) {
+        handleSave({ ...record, craft: selectItem });
+      }
     };
 
     let childNode = children;
@@ -121,7 +143,14 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
     const renderCustom = (cust: any) => {
       if (Array.isArray(cust) && cust.length > 0) {
         if (typeof cust[1] === "number") {
-          return getLabel(cust[1]);
+          const found = (craftOpt?.option ?? []).find(
+            (it) => it.value === cust[1]
+          );
+          if (title === TAB.CR) {
+            return found ? found.label : "No Option";
+          } else {
+            return getLabel(cust[1]);
+          }
         }
       }
       return cust;
@@ -154,6 +183,17 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               size="small"
             ></Select>
           )}
+          {title === TAB.CR && (
+            <Select
+              defaultValue={selectItem}
+              style={{ width: 120 }}
+              onChange={handleChange}
+              options={craftOpt?.option}
+              onBlur={saveSelect}
+              autoFocus
+              size="small"
+            ></Select>
+          )}
         </>
       ) : (
         <div
@@ -164,7 +204,10 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               (title === TAB.FR || title === TAB.TO) && findTo <= findFr
                 ? "red"
                 : "unset",
-            minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
+            minWidth:
+              title === TAB.FR || title === TAB.TO || title === TAB.CR
+                ? 120
+                : undefined,
             paddingTop: 1,
             paddingBottom: 1,
           }}
@@ -207,6 +250,15 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
       title: TAB.EQ,
       dataIndex: "equipment",
     },
+    ...(craftData
+      ? [
+          {
+            title: TAB.CR,
+            dataIndex: "craft",
+            editable: true,
+          },
+        ]
+      : []),
     {
       title: TAB.FR,
       dataIndex: "from",
