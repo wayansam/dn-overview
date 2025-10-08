@@ -477,7 +477,7 @@ const getItems: (
           </p>
           <p>
             Calculated material only shown when you input the correct From, To
-            and select the equipment.
+            and select the equipment. Additionally, you can include materials for crafting the evolver from Ancient Equipment. 
           </p>
           <p>
             <i>

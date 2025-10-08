@@ -123,6 +123,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "25-09-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Spun Gold Equipment - Evolver Mats calculator",
+      link: {
+        key: TAB_KEY.eqSpunGold,
+        name: TAB_KEY.eqSpunGold,
+      },
+      date: "08-10-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
