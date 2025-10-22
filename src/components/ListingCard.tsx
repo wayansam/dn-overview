@@ -34,7 +34,12 @@ const ListingCard = ({ title, keyId, data }: ListingCardProps) => {
       return;
     }
     const sign = typeof value !== "number" || value < 0 ? "" : "+";
-    const tempValue = format ? value.toLocaleString() : value;
+
+    const tempValue = format
+      ? value.toLocaleString()
+      : typeof value === "number"
+      ? value.toFixed(2)
+      : value;
     return (
       <div key={`item-container-${title}-${idx}`}>
         <Text key={`item-${title}-${idx}`}>{`${title} ${sign}${tempValue}${
