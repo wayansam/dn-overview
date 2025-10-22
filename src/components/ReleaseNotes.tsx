@@ -74,56 +74,6 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
 
   const dataNew: Array<FeatureItem> = [
     {
-      key: keyUpdate.N,
-      label: "VIP accessories",
-      link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
-      },
-      date: "07-09-2025",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Otherworldly Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeSkill,
-        name: TAB_KEY.jadeSkill,
-        payload: {
-          skillJadeScreen: {
-            tabOpen: ["8"],
-          },
-        },
-      },
-      date: "07-09-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Ancient's Equipment Cost Changes",
-      link: {
-        key: TAB_KEY.eqAncient,
-        name: TAB_KEY.eqAncient,
-      },
-      date: "10-09-2025",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Spun Gold Equipment",
-      link: {
-        key: TAB_KEY.eqSpunGold,
-        name: TAB_KEY.eqSpunGold,
-      },
-      date: "12-09-2025",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Collapse Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeCollapse,
-        name: TAB_KEY.jadeCollapse,
-      },
-      date: "25-09-2025",
-    },
-    {
       key: keyUpdate.U,
       label: "Spun Gold Equipment - Evolver Mats calculator",
       link: {
@@ -132,7 +82,16 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "08-10-2025",
     },
-  ];
+    {
+      key: keyUpdate.U,
+      label: "Bestie Spirit & Mount v3",
+      link: {
+        key: TAB_KEY.miscBestie,
+        name: TAB_KEY.miscBestie,
+      },
+      date: "22-10-2025",
+    },
+  ]
 
   const dataSoon: Array<FeatureItem> = [
     {
@@ -228,6 +187,56 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.heraldryAncientGoddes,
       },
       date: "08-07-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "VIP accessories",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "07-09-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Otherworldly Dragon Jade",
+      link: {
+        key: TAB_KEY.jadeSkill,
+        name: TAB_KEY.jadeSkill,
+        payload: {
+          skillJadeScreen: {
+            tabOpen: ["8"],
+          },
+        },
+      },
+      date: "07-09-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Ancient's Equipment Cost Changes",
+      link: {
+        key: TAB_KEY.eqAncient,
+        name: TAB_KEY.eqAncient,
+      },
+      date: "10-09-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Spun Gold Equipment",
+      link: {
+        key: TAB_KEY.eqSpunGold,
+        name: TAB_KEY.eqSpunGold,
+      },
+      date: "12-09-2025",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Collapse Dragon Jade",
+      link: {
+        key: TAB_KEY.jadeCollapse,
+        name: TAB_KEY.jadeCollapse,
+      },
+      date: "25-09-2025",
     },
   ];
   const dataPastUpdate: Array<FeatureItem> = [

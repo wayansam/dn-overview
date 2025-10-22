@@ -37,14 +37,14 @@ const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
 interface FormEnhance {
-  type: BESTIE_TYPE;
+  type: BESTIE_TYPE | null;
   listEnhance: Array<{
     range?: [number, number] | null;
     version: string;
   }> | null;
 }
 
-const BestieVersion = ["v1", "v2"];
+const BestieVersion = ["v1", "v2", "v3"];
 
 interface GrowthMaterialList {
   "Faded Bestie Star": number;
@@ -291,7 +291,7 @@ const BestieContent = () => {
       },
       {
         key: "2",
-        label: "2nd",
+        label: "2nd & 3rd",
         children: (
           <div
             style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
@@ -330,7 +330,7 @@ const BestieContent = () => {
       },
       {
         key: "2",
-        label: "2nd",
+        label: "2nd & 3rd",
         children: (
           <div
             style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
@@ -462,6 +462,7 @@ const BestieContent = () => {
                   : BestieSpiritV1TableStats;
                 break;
               case BestieVersion[1]:
+              case BestieVersion[2]:
                 tempArrStats = isMount
                   ? BestieMountV2TableStats
                   : BestieSpiritV2TableStats;
@@ -558,10 +559,7 @@ const BestieContent = () => {
 
   useEffect(() => {
     setEnhanceDataSource(
-      calcEnhanceDataSource([
-        { type: BESTIE_TYPE.MNT, listEnhance: null },
-        { type: BESTIE_TYPE.SPT, listEnhance: null },
-      ])
+      calcEnhanceDataSource([{ type: null, listEnhance: null }])
     );
   }, []);
 

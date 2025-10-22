@@ -768,6 +768,15 @@ const getItems: (
               Bestie Star v.2
             </a>
           </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/162/c/3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Bestie Star v.3
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
