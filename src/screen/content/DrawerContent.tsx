@@ -225,7 +225,8 @@ const getItems: (
         <div>
           <p>
             To use the calculator, please filled in Jade type, then amount and
-            range (current enhance level to your target). Check the craft checkbox to include the material into calculation.
+            range (current enhance level to your target). Check the craft
+            checkbox to include the material into calculation.
           </p>
           <p>
             <i>
@@ -477,7 +478,8 @@ const getItems: (
           </p>
           <p>
             Calculated material only shown when you input the correct From, To
-            and select the equipment. Additionally, you can include materials for crafting the evolver from Ancient Equipment. 
+            and select the equipment. Additionally, you can include materials
+            for crafting the evolver from Ancient Equipment.
           </p>
           <p>
             <i>
@@ -672,20 +674,11 @@ const getItems: (
           <p>Patch Note related :</p>
           <p>
             <a
-              href="https://patchnote.dragonnest.com/sea/144/c/5"
+              href="https://patchnote.dragonnest.com/sea/111/c/1"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Legend Conversion WTD & Enhancement Legend Conversion Armor
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/126/c/12"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Legend Conversion Weapon
+              Legend Conversion Armor
             </a>
           </p>
           <p>
@@ -699,11 +692,30 @@ const getItems: (
           </p>
           <p>
             <a
-              href="https://patchnote.dragonnest.com/sea/111/c/1"
+              href="https://patchnote.dragonnest.com/sea/126/c/12"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Legend Conversion Armor
+              Legend Conversion Weapon
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/144/c/5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Legend Conversion WTD & Enhancement Legend Conversion Armor (+1 to
+              +3)
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/162/c/5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Enhancement Legend Conversion Accessories (+1 to +3)
             </a>
           </p>
           <p>KR Patch Note related :</p>

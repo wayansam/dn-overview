@@ -224,6 +224,8 @@ const EV_AST_POW_WTD = 1300;
 const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
 const ENC_AST_POW_ARMOR = 450;
 const ENC_AST_STONE_ARMOR = 1;
+const ENC_AST_POW_ACC = 500;
+const ENC_AST_STONE_ACC = 3;
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -373,6 +375,10 @@ const ConversionContent = () => {
             if (isEvo) {
               lgFrag += EV_AST_POW_ACC;
               lgStone += EV_AST_STONE;
+            }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_ACC;
+              lgStone += enhLRange * ENC_AST_STONE_ACC;
             }
             break;
 
@@ -1699,6 +1705,22 @@ const ConversionContent = () => {
                 dataSource={Object.entries({
                   "Astral Powder": EV_AST_POW_ACC,
                   "Astral Stone": EV_AST_STONE,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_ACC,
+                  "Astral Stone": ENC_AST_STONE_ACC,
                 }).map(([key, value]) => ({
                   mats: key,
                   amount: value,

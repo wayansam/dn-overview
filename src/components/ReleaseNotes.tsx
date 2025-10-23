@@ -91,7 +91,16 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "22-10-2025",
     },
-  ]
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Legend Conversion Accessories (+1 to +3)",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "23-10-2025",
+    },
+  ];
 
   const dataSoon: Array<FeatureItem> = [
     {
