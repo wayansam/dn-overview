@@ -100,6 +100,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "23-10-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Iona Accessories (+13 to +15)",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "30-10-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

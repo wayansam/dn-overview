@@ -399,6 +399,15 @@ const getItems: (
               Iona Accessory New Level release (+10 to +12)
             </a>
           </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/162/c/4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Iona Accessory New Level release (+13 to +15)
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,
