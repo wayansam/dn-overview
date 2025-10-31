@@ -91,6 +91,22 @@ export const columnsResource: ColumnsType<TableResource> = [
   },
 ];
 
+export const getCustomColumnResource = ({
+  customMatsTitle,
+  customAmountTitle,
+}: {
+  customMatsTitle?: string;
+  customAmountTitle?: string;
+}): ColumnsType<TableResource> => {
+  return columnsResource.map((it, idx) => {
+    if (idx === 0 && customMatsTitle) {
+      return { ...it, title: customMatsTitle };
+    } else if (idx === 1 && customAmountTitle) {
+      return { ...it, title: customAmountTitle };
+    } else return it;
+  });
+};
+
 export const copyTextToClipboard = async (txt: string) => {
   try {
     await navigator.clipboard.writeText(txt);

@@ -36,6 +36,7 @@ import BestieContent from "./BestieContent";
 import VIPAccContent from "./VIPAccContent";
 import SpunGoldEqContent from "./SpunGoldEqContent";
 import CollapseJadeContent from "./CollapseJadeContent";
+import StageAoTContent from "./StageAoTContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -69,6 +70,9 @@ const MainContent = () => {
     switch (selectedSideBar.key) {
       case TAB_KEY.mainGeneral:
         return <GeneralContent />;
+ 
+      case TAB_KEY.stageArcOfTranscen:
+        return <StageAoTContent />;
 
       case TAB_KEY.eqAncient:
         return <AncientEqContent />;
