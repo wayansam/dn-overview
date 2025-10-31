@@ -1,8 +1,11 @@
 import { Button, Card, Divider, Grid, Layout, Space, theme } from "antd";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { setSelectedSideBar } from "../slice/UIState.reducer";
+import {
+  setIsCollapsedSideBar,
+  setSelectedSideBar,
+} from "../slice/UIState.reducer";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -16,6 +19,9 @@ const SideBar = () => {
   const selectedSideBar = useAppSelector(
     (state) => state.UIState.selectedSideBar
   );
+  const isCollapsedSideBar = useAppSelector(
+    (state) => state.UIState.isCollapsedSideBar
+  );
 
   const [isSmall, setIsSmall] = useState(false);
 
@@ -26,6 +32,16 @@ const SideBar = () => {
     return 250;
   };
 
+  const iscollapsed = useMemo(() => {
+    return isSmall ? isCollapsedSideBar : false;
+  }, [isCollapsedSideBar, isSmall]);
+
+  const setCollapse = (flag: boolean) => {
+    if (isSmall) {
+      dispatch(setIsCollapsedSideBar(flag));
+    }
+  };
+
   return (
     <Sider
       breakpoint="md"
@@ -34,8 +50,11 @@ const SideBar = () => {
         setIsSmall(broken);
       }}
       onCollapse={(collapsed, type) => {
-        // console.log({ collapsed, type });
+        if (type === "clickTrigger" || type === "responsive") {
+          dispatch(setIsCollapsedSideBar(collapsed));
+        }
       }}
+      collapsed={iscollapsed}
       style={
         isSmall
           ? {
@@ -46,6 +65,9 @@ const SideBar = () => {
           : undefined
       }
       width={getWidthSetting()}
+      tabIndex={0}
+      onBlur={() => setCollapse(true)}
+      onFocus={() => setCollapse(false)}
     >
       <div
         style={{

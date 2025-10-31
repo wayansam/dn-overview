@@ -12,13 +12,15 @@ interface UIState {
   isDarkMode: boolean;
   isImgEnabled: boolean;
   imgData: ImageData | null;
+  isCollapsedSideBar: boolean;
 }
 
 const initialState: UIState = {
   selectedSideBar: TAB_GROUP_LIST[0].children[0],
   isDarkMode: true,
   isImgEnabled: false,
-  imgData: null
+  imgData: null,
+  isCollapsedSideBar: true,
 };
 
 const UIStateSlice = createSlice({
@@ -34,14 +36,29 @@ const UIStateSlice = createSlice({
     setIsDarkMode: (state, action: PayloadAction<UIState["isDarkMode"]>) => {
       state.isDarkMode = action.payload;
     },
-    setIsImgEnabled: (state, action: PayloadAction<UIState["isImgEnabled"]>) => {
+    setIsImgEnabled: (
+      state,
+      action: PayloadAction<UIState["isImgEnabled"]>
+    ) => {
       state.isImgEnabled = action.payload;
     },
     setImgData: (state, action: PayloadAction<UIState["imgData"]>) => {
       state.imgData = action.payload;
     },
+    setIsCollapsedSideBar: (
+      state,
+      action: PayloadAction<UIState["isCollapsedSideBar"]>
+    ) => {
+      state.isCollapsedSideBar = action.payload;
+    },
   },
 });
 
 export const UIStateReducer = UIStateSlice.reducer;
-export const { setSelectedSideBar, setIsDarkMode, setIsImgEnabled, setImgData } = UIStateSlice.actions;
+export const {
+  setSelectedSideBar,
+  setIsDarkMode,
+  setIsImgEnabled,
+  setImgData,
+  setIsCollapsedSideBar,
+} = UIStateSlice.actions;
