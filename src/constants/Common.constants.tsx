@@ -6,6 +6,9 @@ import { CommonItemStats } from "../interface/ItemStat.interface";
 export const TAB_KEY = {
   mainGeneral: "General",
   setting: "Setting",
+  stageNSTG: "Night Shadow Training Ground",
+  stageArcOfTranscen: "Arc Of Transcendence",
+  stageFissionMaze: "Fission Maze",
   eqAncient: "Ancient",
   eqKilos: "Kilos",
   eqNamedEOD: "Named EOD",
@@ -31,6 +34,24 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.mainGeneral,
         name: TAB_KEY.mainGeneral,
+      },
+    ],
+  },
+  {
+    key: "STAGE",
+    name: "Stage",
+    children: [
+      {
+        key: TAB_KEY.stageFissionMaze,
+        name: TAB_KEY.stageFissionMaze,
+      },
+      {
+        key: TAB_KEY.stageNSTG,
+        name: TAB_KEY.stageNSTG,
+      },
+      {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
       },
     ],
   },

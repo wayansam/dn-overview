@@ -85,6 +85,11 @@ const SideBar = () => {
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
                     justifyContent: "end",
+                    wordWrap: "break-word",
+                    whiteSpace: "normal",
+                    textAlign: "right",
+                    minHeight: 32,
+                    height: "auto",
                   }}
                   type={
                     selectedSideBar.key === item.key ? "primary" : "default"
@@ -92,7 +97,7 @@ const SideBar = () => {
                   onClick={() => dispatch(setSelectedSideBar(item))}
                   size={"middle"}
                 >
-                  {item.name}
+                  <div style={{ margin: "2px 0px" }}>{item.name}</div>
                 </Button>
               ))}
             </Card>

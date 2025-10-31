@@ -3,7 +3,11 @@ import Title from "antd/es/typography/Title";
 import { useEffect } from "react";
 import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { setImgData, setIsDarkMode, setIsImgEnabled } from "../slice/UIState.reducer";
+import {
+  setImgData,
+  setIsDarkMode,
+  setIsImgEnabled,
+} from "../slice/UIState.reducer";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
 
@@ -17,7 +21,6 @@ const MainPage = () => {
   const imgEn = localStorage.getItem(LS_KEYS.img_enabled);
   const imgDt = localStorage.getItem(LS_KEYS.img_data);
   const imgDtJson = imgDt ? JSON.parse(imgDt) : null;
-
 
   useEffect(() => {
     dispatch(setIsDarkMode(dm === "true"));
@@ -59,6 +62,7 @@ const MainPage = () => {
               paddingLeft: 20,
               boxShadow: "5px 5px 5px 0px rgba(200,200,200,0.1)",
               zIndex: 2,
+              height: "auto",
             }}
           >
             <Title level={3}>{selectedSideBar.name}</Title>
