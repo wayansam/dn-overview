@@ -1,35 +1,131 @@
 import { Divider, Select, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
-import { CharacterInGameData } from "../../interface/Account.interface";
-import ReleaseNotes from "../../components/ReleaseNotes";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import ListingCard, { ItemList } from "../../components/ListingCard";
 import {
-  columnsResource,
-  getCustomColumnResource,
-} from "../../utils/common.util";
+  aotRewardS2FutureInit,
+  aotRewardS2FutureWeek,
+} from "../../data/StageAoTData";
+import { StageAotReward } from "../../interface/reward.interface";
+import { getCustomColumnResource } from "../../utils/common.util";
 const { Text } = Typography;
 
-const seasonOpt = [
-  {
-    label: "New",
-    value: "new",
-  },
-  {
-    label: "Old",
-    value: "old",
-  },
-];
+const floorPref = {
+  first: "First",
+  coins: "Coins",
+  shinyCoins: "Shiny Coins",
+  last: "Last",
+};
+const seasonKey = {
+  s2Future: "Season 2 [Future]",
+};
+
 const StageAoTContent = () => {
-  const [selectSeason, setSelectSeason] = useState<string>(seasonOpt[0].value);
-  const [selectFloor, setSelectFloor] = useState<number>(1);
+  const [selectSeason, setSelectSeason] = useState<string>();
+  const [selectedPref, setSelectedPref] = useState<string>(floorPref.first);
+  const [selectFloor, setSelectFloor] = useState<number>();
+
+  const seasonOpt = useMemo(() => {
+    return Object.entries(seasonKey).map(([_, value]) => ({
+      value: value,
+      label: value,
+    }));
+  }, [seasonKey]);
+
+  const prefOpt = useMemo(() => {
+    return Object.entries(floorPref).map(([_, value]) => ({
+      value: value,
+      label: value,
+    }));
+  }, [seasonKey]);
+
+  useEffect(() => {
+    if (seasonOpt.length > 0) setSelectSeason(seasonOpt[0].label);
+  }, [seasonOpt]);
+
+  const seasonData = useMemo((): {
+    first: StageAotReward[];
+    weekly: StageAotReward[];
+  } => {
+    switch (selectSeason) {
+      case seasonKey.s2Future:
+        return { first: aotRewardS2FutureInit, weekly: aotRewardS2FutureWeek };
+
+      default:
+        return { first: [], weekly: [] };
+    }
+  }, [selectSeason]);
+
+  const foundC = useMemo(() => {
+    return seasonData.weekly.find(
+      (item) => item.rewards["Hero Coins"] !== undefined
+    );
+  }, [seasonData.weekly]);
+
+  const foundSC = useMemo(() => {
+    return seasonData.weekly.find(
+      (item) => item.rewards["Shiny Hero Coins"] !== undefined
+    );
+  }, [seasonData.weekly]);
+
+  const titleList = useMemo((): ItemList[] => {
+    return seasonData.first
+      .filter((item) => item.title !== undefined)
+      .map((it) => ({
+        title: `Floor ${it.floor}: `,
+        value: it.title,
+      }));
+  }, [seasonData.first]);
+
+  const floorList = useMemo(() => {
+    if (seasonData.first.length < 1) {
+      setSelectFloor(undefined);
+      return [];
+    }
+
+    switch (selectedPref) {
+      case floorPref.first:
+        setSelectFloor(1);
+        break;
+      case floorPref.coins:
+        setSelectFloor(foundC ? foundC.floor : 1);
+        break;
+      case floorPref.shinyCoins:
+        setSelectFloor(foundSC ? foundSC.floor : 1);
+        break;
+      case floorPref.last:
+        setSelectFloor(seasonData.first.length);
+        break;
+
+      default:
+        setSelectFloor(undefined);
+        break;
+    }
+    return Array.from({ length: seasonData.first.length }, (_, k) => k + 1).map(
+      (item) => ({
+        label: item,
+        value: item,
+      })
+    );
+  }, [seasonData.first, selectedPref, foundC, foundSC]);
+
+  const selectedSeasonData = useMemo((): {
+    first?: StageAotReward;
+    weekly?: StageAotReward;
+  } => {
+    return {
+      first: seasonData.first.find((it) => it.floor === selectFloor),
+      weekly: seasonData.weekly.find((it) => it.floor === selectFloor),
+    };
+  }, [seasonData, selectFloor]);
+
   return (
     <div>
-      <Divider orientation="left">Settings</Divider>
+      <Divider orientation="left">Search</Divider>
       <div style={{ marginBottom: 4 }}>
         Season
         <Divider type="vertical" />
         <Select
-          defaultValue={selectSeason}
+          value={selectSeason}
           style={{ width: 200 }}
           onChange={(val) => {
             setSelectSeason(val);
@@ -38,19 +134,27 @@ const StageAoTContent = () => {
         />
       </div>
       <div style={{ marginBottom: 4 }}>
+        Preference
+        <Divider type="vertical" />
+        <Select
+          value={selectedPref}
+          style={{ width: 200 }}
+          onChange={(val) => {
+            setSelectedPref(val);
+          }}
+          options={prefOpt}
+        />
+      </div>
+      <div style={{ marginBottom: 4 }}>
         Floor
         <Divider type="vertical" />
         <Select
-          defaultValue={selectFloor}
-          style={{ width: 200 }}
+          value={selectFloor}
+          style={{ width: 100 }}
           onChange={(val) => {
             setSelectFloor(val);
           }}
-          options={[
-            { label: 1, value: 1 },
-            { label: 2, value: 2 },
-            { label: 3, value: 3 },
-          ]}
+          options={floorList}
         />
       </div>
 
@@ -60,7 +164,7 @@ const StageAoTContent = () => {
           <Table
             title={() => "First Clear"}
             size={"small"}
-            dataSource={Object.entries({ test: 1 })
+            dataSource={Object.entries(selectedSeasonData.first?.rewards ?? {})
               .filter(([_, value]) => {
                 if (typeof value === "number") {
                   return value !== 0;
@@ -79,7 +183,7 @@ const StageAoTContent = () => {
           <Table
             title={() => "Weekly Clear"}
             size={"small"}
-            dataSource={Object.entries({ test: 1 })
+            dataSource={Object.entries(selectedSeasonData.weekly?.rewards ?? {})
               .filter(([_, value]) => {
                 if (typeof value === "number") {
                   return value !== 0;
@@ -89,13 +193,16 @@ const StageAoTContent = () => {
                 mats: key,
                 amount: value,
               }))}
-            columns={columnsResource}
+            columns={getCustomColumnResource({ customMatsTitle: "Name" })}
             pagination={false}
             bordered
           />
         </div>
       </div>
       <Divider orientation="left">General Info</Divider>
+      <div>First floor with Hero Coins: {foundC?.floor ?? "-"}</div>
+      <div>First floor with Shiny Hero Coins: {foundSC?.floor ?? "-"}</div>
+      <ListingCard title="First Clear Title" data={titleList} />
     </div>
   );
 };
