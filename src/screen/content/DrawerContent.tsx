@@ -11,6 +11,25 @@ const getItems: (
 ) => CollapseProps["items"] = (panelStyle, key) => {
   const listHelp = [
     {
+      key: TAB_KEY.stageArcOfTranscen,
+      label: TAB_KEY.stageArcOfTranscen,
+      children: (
+        <div>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/153/c/3"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Arc of Transcendence Season 2 [Future]
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.eqAncient,
       label: TAB_KEY.eqAncient,
       children: (

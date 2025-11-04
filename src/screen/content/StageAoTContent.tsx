@@ -1,4 +1,4 @@
-import { Divider, Select, Table, Typography } from "antd";
+import { Button, Divider, Select, Table, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import {
@@ -7,7 +7,7 @@ import {
 } from "../../data/StageAoTData";
 import { StageAotReward } from "../../interface/reward.interface";
 import { getCustomColumnResource } from "../../utils/common.util";
-const { Text } = Typography;
+import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 
 const floorPref = {
   first: "First",
@@ -118,6 +118,20 @@ const StageAoTContent = () => {
     };
   }, [seasonData, selectFloor]);
 
+  const disableMove = useMemo(() => {
+    return {
+      disablePrev: !selectFloor || selectFloor <= 1,
+      disableNext: !selectFloor || selectFloor >= floorList.length,
+    };
+  }, [selectFloor, floorList]);
+
+  const moveOpt = (increase: boolean) => {
+    if (!selectFloor) {
+      return;
+    }
+    setSelectFloor(selectFloor + (increase ? 1 : -1));
+  };
+
   return (
     <div>
       <Divider orientation="left">Search</Divider>
@@ -148,6 +162,11 @@ const StageAoTContent = () => {
       <div style={{ marginBottom: 4 }}>
         Floor
         <Divider type="vertical" />
+        <Button
+          icon={<LeftOutlined />}
+          disabled={disableMove.disablePrev}
+          onClick={() => moveOpt(false)}
+        />
         <Select
           value={selectFloor}
           style={{ width: 100 }}
@@ -155,6 +174,11 @@ const StageAoTContent = () => {
             setSelectFloor(val);
           }}
           options={floorList}
+        />
+        <Button
+          icon={<RightOutlined />}
+          disabled={disableMove.disableNext}
+          onClick={() => moveOpt(true)}
         />
       </div>
 

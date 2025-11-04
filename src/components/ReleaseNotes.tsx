@@ -75,15 +75,6 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
   const dataNew: Array<FeatureItem> = [
     {
       key: keyUpdate.U,
-      label: "Spun Gold Equipment - Evolver Mats calculator",
-      link: {
-        key: TAB_KEY.eqSpunGold,
-        name: TAB_KEY.eqSpunGold,
-      },
-      date: "08-10-2025",
-    },
-    {
-      key: keyUpdate.U,
       label: "Bestie Spirit & Mount v3",
       link: {
         key: TAB_KEY.miscBestie,
@@ -106,6 +97,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       link: {
         key: TAB_KEY.eqVIPAcc,
         name: TAB_KEY.eqVIPAcc,
+      },
+      date: "30-10-2025",
+    },
+    {
+      key: keyUpdate.N,
+      label: "Arc of Transcendence, Season 2 [Future]",
+      link: {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
       },
       date: "30-10-2025",
     },
@@ -255,6 +255,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.jadeCollapse,
       },
       date: "25-09-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Spun Gold Equipment - Evolver Mats calculator",
+      link: {
+        key: TAB_KEY.eqSpunGold,
+        name: TAB_KEY.eqSpunGold,
+      },
+      date: "08-10-2025",
     },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
