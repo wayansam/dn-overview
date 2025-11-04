@@ -41,6 +41,12 @@ import StageAoTContent from "./StageAoTContent";
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 const MainContent = () => {
   const {
     token: { colorBgContainer, colorText },
@@ -66,11 +72,20 @@ const MainContent = () => {
     });
   };
 
+  useEffect(() => {
+    if (typeof window?.gtag === "function") {
+      window?.gtag("config", "G-XXXXXXXXXX", {
+        page_path: "/" + selectedSideBar.key,
+        page_title: selectedSideBar.key,
+      });
+    }
+  }, [selectedSideBar]);
+
   const content = useMemo(() => {
     switch (selectedSideBar.key) {
       case TAB_KEY.mainGeneral:
         return <GeneralContent />;
- 
+
       case TAB_KEY.stageArcOfTranscen:
         return <StageAoTContent />;
 
@@ -85,10 +100,10 @@ const MainContent = () => {
 
       case TAB_KEY.eqBoneDragon:
         return <BoneDragonEqContent />;
-      
+
       case TAB_KEY.eqVIPAcc:
         return <VIPAccContent />;
-      
+
       case TAB_KEY.eqSpunGold:
         return <SpunGoldEqContent />;
 
@@ -100,7 +115,7 @@ const MainContent = () => {
 
       case TAB_KEY.jadeErosion:
         return <ErosionJadeContent />;
-      
+
       case TAB_KEY.jadeCollapse:
         return <CollapseJadeContent />;
 
