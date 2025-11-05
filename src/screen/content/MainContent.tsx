@@ -77,6 +77,8 @@ const MainContent = () => {
       window?.gtag("event", "screen_view", {
         app_name: "dn-overview",
         screen_name: selectedSideBar.key,
+        page_path: "/dn-overview",
+        page_title: "selectedSideBar.key",
       });
     }
   }, [selectedSideBar]);
