@@ -74,9 +74,9 @@ const MainContent = () => {
 
   useEffect(() => {
     if (typeof window?.gtag === "function") {
-      window?.gtag("config", "G-XXXXXXXXXX", {
-        page_path: "/" + selectedSideBar.key,
-        page_title: selectedSideBar.key,
+      window?.gtag("event", "screen_view", {
+        app_name: "dn-overview",
+        screen_name: selectedSideBar.key,
       });
     }
   }, [selectedSideBar]);
