@@ -128,38 +128,6 @@ export interface LunarJadeEnhancementStats {
   magDef?: number;
 }
 
-export interface ConversionStats {
-  encLevel: string;
-  phyMagAtk?: number;
-  phyMagAtkPercent?: number;
-  attAtkPercent?: number;
-
-  crt?: number;
-  crtPercent?: number;
-  cdm?: number;
-  fd?: number;
-
-  str?: number;
-  agi?: number;
-  int?: number;
-  vit?: number;
-  strPercent?: number;
-  agiPercent?: number;
-  intPercent?: number;
-  vitPercent?: number;
-
-  defMagdef?: number;
-  defMagdefPercent?: number;
-  hp?: number;
-  hpPercent?: number;
-  moveSpeedPercent?: number;
-  moveSpeedPercentTown?: number; //(?)
-}
-
-export type columnConversionFlag = {
-  [K in keyof ConversionStats as `${K}Flag`]?: boolean;
-};
-
 export interface BoneDragonStats {
   encLevel: string;
   phyMagAtkMin?: number;

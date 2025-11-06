@@ -94,6 +94,9 @@ export enum EQUIPMENT {
   EARRING = "Earring",
   RING1 = "Ring 1",
   RING2 = "Ring 2",
+  WING = "Wing",
+  TAIL = "Tail",
+  DECAL = "Decal",
 }
 
 export enum LUNAR_JADE_TYPE {

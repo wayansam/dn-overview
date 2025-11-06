@@ -1,21 +1,15 @@
 import {
   Alert,
-  Checkbox,
   Collapse,
   CollapseProps,
   Divider,
-  Form,
-  FormInstance,
   Select,
-  Switch,
   Table,
-  Tooltip,
   Radio,
   Typography,
 } from "antd";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import { CONVERSION_TYPE } from "../../constants/InGame.constants";
+import React, { useEffect, useMemo, useState } from "react";
+import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   dataConversionCalculator,
   conversionHelmStats,
@@ -32,17 +26,18 @@ import {
   conversionTailStats,
   conversionDecalStats,
 } from "../../data/ConversionCalculatorData";
-import { ConversionCalculator } from "../../interface/Common.interface";
+import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import {
   columnsResource,
-  getTextEmpty,
   getComparedData,
+  getColumnsStats,
+  combineEqStats,
+  getStatDif,
 } from "../../utils/common.util";
-import {
-  ConversionStats,
-  columnConversionFlag,
-} from "../../interface/ItemStat.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
 import ListingCard from "../../components/ListingCard";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
+import EquipmentTable from "../../components/EquipmentTable";
 
 const { Text } = Typography;
 
@@ -71,149 +66,6 @@ const opt = (start: number, end: number) =>
     value: item,
   }));
 
-enum TAB {
-  EQ = "Equipment",
-  FR = "From",
-  TO = "To",
-}
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface EditableRowProps {
-  index: number;
-}
-
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof ConversionCalculator;
-  record: ConversionCalculator;
-  handleSave: (record: ConversionCalculator) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const [selectItem, setSelectItem] = useState<number>(0);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (record?.from && title === TAB.FR) {
-      setSelectItem(record.from);
-    }
-    if (record?.to && title === TAB.TO) {
-      setSelectItem(record.to);
-    }
-  }, [record, title]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const handleChange = (value: number) => {
-    setSelectItem(value);
-  };
-
-  const saveSelect = () => {
-    toggleEdit();
-    if (title === TAB.FR) {
-      handleSave({ ...record, from: selectItem });
-    }
-    if (title === TAB.TO) {
-      handleSave({ ...record, to: selectItem });
-    }
-  };
-
-  let childNode = children;
-
-  const findFr = record?.from ?? 0;
-  const findTo = record?.to ?? 0;
-
-  const renderCustom = (cust: any) => {
-    if (Array.isArray(cust) && cust.length > 0) {
-      if (typeof cust[1] === "number") {
-        return getLabel(cust[1]);
-      }
-    }
-    return cust;
-  };
-
-  if (editable) {
-    childNode = editing ? (
-      <>
-        {title === TAB.FR && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 120 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findTo <= findFr ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-        {title === TAB.TO && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 120 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findFr >= findTo ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-      </>
-    ) : (
-      <div
-        className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 24,
-          color:
-            (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-              ? "red"
-              : "unset",
-          minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
-          paddingTop: 1,
-          paddingBottom: 1,
-        }}
-        onClick={toggleEdit}
-      >
-        {renderCustom(children)}
-      </div>
-    );
-  }
-
-  return <td {...restProps}>{childNode}</td>;
-};
-
-type ColumnTypes = (
-  | ColumnGroupType<ConversionCalculator>
-  | ColumnType<ConversionCalculator>
-)[];
-
 const CONV_FRAG = 3500;
 const WEAP_FRAG = 1;
 const EV_AST_STONE = 3;
@@ -229,77 +81,11 @@ const ENC_AST_STONE_ACC = 3;
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [dataSource, setDataSource] = useState<ConversionCalculator[]>(
+  const [dataSource, setDataSource] = useState<CommonEquipmentCalculator[]>(
     dataConversionCalculator
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
-
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: ConversionCalculator[]
-  ) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  };
-
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
-    dataIndex: string;
-  })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-  ];
-
-  const handleSave = (row: ConversionCalculator) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setDataSource(newData);
-  };
-
-  const columns = columnsCalculator.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: ConversionCalculator) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -344,11 +130,11 @@ const ConversionContent = () => {
         let lgStone = 0;
         let enhLRange = Math.min(to, 15) - Math.max(from, 1) - (isEvo ? 1 : 0);
         switch (equipment) {
-          case CONVERSION_TYPE.HELM:
-          case CONVERSION_TYPE.UPPER:
-          case CONVERSION_TYPE.LOWER:
-          case CONVERSION_TYPE.GLOVE:
-          case CONVERSION_TYPE.SHOES:
+          case EQUIPMENT.HELM:
+          case EQUIPMENT.UPPER:
+          case EQUIPMENT.LOWER:
+          case EQUIPMENT.GLOVE:
+          case EQUIPMENT.SHOES:
             temp["Armor Fragment"] += frag;
             if (isEvo) {
               lgFrag += EV_AST_POW_ARMOR;
@@ -360,17 +146,18 @@ const ConversionContent = () => {
             }
             break;
 
-          case CONVERSION_TYPE.MAIN_WEAPON:
-          case CONVERSION_TYPE.SECOND_WEAPON:
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
             if (isEvo) {
               lgFrag += EV_AST_POW_WEAP;
               lgStone += EV_AST_STONE;
             }
             break;
 
-          case CONVERSION_TYPE.NECKLACE:
-          case CONVERSION_TYPE.EARRING:
-          case CONVERSION_TYPE.RING:
+          case EQUIPMENT.NECKLACE:
+          case EQUIPMENT.EARRING:
+          case EQUIPMENT.RING1:
+          case EQUIPMENT.RING2:
             temp["Acc Fragment"] += frag;
             if (isEvo) {
               lgFrag += EV_AST_POW_ACC;
@@ -382,9 +169,9 @@ const ConversionContent = () => {
             }
             break;
 
-          case CONVERSION_TYPE.WING:
-          case CONVERSION_TYPE.TAIL:
-          case CONVERSION_TYPE.DECAL:
+          case EQUIPMENT.WING:
+          case EQUIPMENT.TAIL:
+          case EQUIPMENT.DECAL:
             temp["Wtd Fragment"] += frag;
             if (isEvo) {
               lgFrag += EV_AST_POW_WTD;
@@ -404,58 +191,8 @@ const ConversionContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  function combineConversionStats(
-    a: ConversionStats,
-    b: ConversionStats,
-    operation: "add" | "minus"
-  ): ConversionStats {
-    const result: ConversionStats = { ...a };
-
-    const keys = Object.keys({ ...a, ...b }) as (keyof ConversionStats)[];
-
-    for (const key of keys) {
-      const valueA = a[key];
-      const valueB = b[key];
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        const computed =
-          operation === "add" ? valueA + valueB : valueA - valueB;
-
-        (result as any)[key] = computed;
-      }
-    }
-
-    return result;
-  }
-
-  const statDif: ConversionStats = useMemo(() => {
-    let temp: ConversionStats = {
-      encLevel: "0",
-      phyMagAtk: 0,
-      phyMagAtkPercent: 0,
-      attAtkPercent: 0,
-
-      crt: 0,
-      crtPercent: 0,
-      cdm: 0,
-      fd: 0,
-
-      str: 0,
-      agi: 0,
-      int: 0,
-      vit: 0,
-      strPercent: 0,
-      agiPercent: 0,
-      intPercent: 0,
-      vitPercent: 0,
-
-      defMagdef: 0,
-      defMagdefPercent: 0,
-      hp: 0,
-      hpPercent: 0,
-      moveSpeedPercent: 0,
-      moveSpeedPercentTown: 0,
-    };
+  const statDif: CommonItemStats = useMemo(() => {
+    let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
       return temp;
     }
@@ -466,48 +203,49 @@ const ConversionContent = () => {
       if (found) {
         const { equipment, from, to } = found;
 
-        let tableHolder: ConversionStats[];
+        let tableHolder: CommonItemStats[];
         switch (equipment) {
-          case CONVERSION_TYPE.HELM:
+          case EQUIPMENT.HELM:
             tableHolder = conversionHelmStats;
             break;
-          case CONVERSION_TYPE.UPPER:
+          case EQUIPMENT.UPPER:
             tableHolder = conversionUpperStats;
             break;
-          case CONVERSION_TYPE.LOWER:
+          case EQUIPMENT.LOWER:
             tableHolder = conversionLowerStats;
             break;
-          case CONVERSION_TYPE.GLOVE:
+          case EQUIPMENT.GLOVE:
             tableHolder = conversionGloveStats;
             break;
-          case CONVERSION_TYPE.SHOES:
+          case EQUIPMENT.SHOES:
             tableHolder = conversionShoesStats;
             break;
 
-          case CONVERSION_TYPE.MAIN_WEAPON:
+          case EQUIPMENT.MAIN_WEAPON:
             tableHolder = conversionMainStats;
             break;
-          case CONVERSION_TYPE.SECOND_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
             tableHolder = conversionSecondStats;
             break;
 
-          case CONVERSION_TYPE.NECKLACE:
+          case EQUIPMENT.NECKLACE:
             tableHolder = conversionNecklaceStats;
             break;
-          case CONVERSION_TYPE.EARRING:
+          case EQUIPMENT.EARRING:
             tableHolder = conversionEarringStats;
             break;
-          case CONVERSION_TYPE.RING:
+          case EQUIPMENT.RING1:
+          case EQUIPMENT.RING2:
             tableHolder = conversionRingStats;
             break;
 
-          case CONVERSION_TYPE.WING:
+          case EQUIPMENT.WING:
             tableHolder = conversionWingStats;
             break;
-          case CONVERSION_TYPE.TAIL:
+          case EQUIPMENT.TAIL:
             tableHolder = conversionTailStats;
             break;
-          case CONVERSION_TYPE.DECAL:
+          case EQUIPMENT.DECAL:
             tableHolder = conversionDecalStats;
             break;
 
@@ -517,8 +255,8 @@ const ConversionContent = () => {
         }
         const { dt1, dt2 } = getComparedData(tableHolder, from, to);
         if (dt2) {
-          const dt = dt1 ? combineConversionStats(dt2, dt1, "minus") : dt2;
-          temp = combineConversionStats(temp, dt, "add");
+          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+          temp = combineEqStats(temp, dt, "add");
         }
       }
     });
@@ -555,10 +293,10 @@ const ConversionContent = () => {
         );
 
         switch (equipment) {
-          case CONVERSION_TYPE.MAIN_WEAPON:
+          case EQUIPMENT.MAIN_WEAPON:
             temp.main = tempComp("Main Weapon", tempSlice);
             break;
-          case CONVERSION_TYPE.SECOND_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
             temp.second = tempComp("Second Weapon", tempSlice);
             break;
 
@@ -588,17 +326,12 @@ const ConversionContent = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              ...rowSelection,
-            }}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
+          <EquipmentTable
+            selectedRowKeys={selectedRowKeys}
+            setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
-            columns={columns as ColumnTypes}
-            pagination={false}
+            setDataSource={setDataSource}
+            customLabeling={(item) => getLabel(item)}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
@@ -693,567 +426,13 @@ const ConversionContent = () => {
           {weaponNotes?.second}
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard
-            title="Status Increase"
-            data={[
-              {
-                title: "ATK",
-                value: statDif.phyMagAtk,
-                format: true,
-              },
-              {
-                title: "ATK",
-                value: statDif.phyMagAtkPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Ele",
-                value: statDif.attAtkPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "CRT",
-                value: statDif.crt,
-                format: true,
-              },
-              {
-                title: "CRT",
-                value: statDif.crtPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "CDM",
-                value: statDif.cdm,
-                format: true,
-              },
-              {
-                title: "FD",
-                value: statDif.fd,
-                format: true,
-              },
-              {
-                title: "STR",
-                value: statDif.str,
-                format: true,
-              },
-              {
-                title: "AGI",
-                value: statDif.agi,
-                format: true,
-              },
-              {
-                title: "INT",
-                value: statDif.int,
-                format: true,
-              },
-              {
-                title: "VIT",
-                value: statDif.vit,
-                format: true,
-              },
-              {
-                title: "STR",
-                value: statDif.strPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "AGI",
-                value: statDif.agiPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "INT",
-                value: statDif.intPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "VIT",
-                value: statDif.vitPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Phy Def",
-                value: statDif.defMagdef,
-                format: true,
-              },
-              {
-                title: "Mag Def",
-                value: statDif.defMagdef,
-                format: true,
-              },
-              {
-                title: "Phy Def",
-                value: statDif.defMagdefPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Mag Def",
-                value: statDif.defMagdefPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "HP",
-                value: statDif.hp,
-                format: true,
-              },
-              {
-                title: "HP",
-                value: statDif.hpPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Movespeed",
-                value: statDif.moveSpeedPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Movespeed Town",
-                value: statDif.moveSpeedPercentTown,
-                suffix: "%",
-                format: true,
-              },
-            ]}
-          />
+          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
         </div>
       </div>
     );
   };
 
   const getStatContent = () => {
-    const getColumnsStats = ({
-      phyMagAtkFlag,
-      phyMagAtkPercentFlag,
-      attAtkPercentFlag,
-      crtFlag,
-      crtPercentFlag,
-      cdmFlag,
-      fdFlag,
-      strFlag,
-      agiFlag,
-      intFlag,
-      vitFlag,
-      strPercentFlag,
-      agiPercentFlag,
-      intPercentFlag,
-      vitPercentFlag,
-      defMagdefFlag,
-      defMagdefPercentFlag,
-      hpFlag,
-      hpPercentFlag,
-      moveSpeedPercentFlag,
-      moveSpeedPercentTownFlag,
-    }: columnConversionFlag): ColumnsType<ConversionStats> => {
-      const temp: ColumnsType<ConversionStats> = [];
-      const smallItemTitle: string[] = [];
-      if (phyMagAtkFlag) {
-        smallItemTitle.push("ATK");
-        temp.push({
-          title: "Attack",
-          responsive: ["sm"],
-          render: (_, { phyMagAtk }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (phyMagAtkPercentFlag) {
-        smallItemTitle.push("ATK(%)");
-        temp.push({
-          title: "Attack(%)",
-          responsive: ["sm"],
-          render: (_, { phyMagAtkPercent }) => (
-            <div>
-              <Text>
-                {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-      if (attAtkPercentFlag) {
-        smallItemTitle.push("ATT(%)");
-        temp.push({
-          title: "Attribute(%)",
-          responsive: ["sm"],
-          render: (_, { attAtkPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (crtFlag) {
-        smallItemTitle.push("CRT");
-        temp.push({
-          title: "CRT",
-          responsive: ["sm"],
-          render: (_, { crt }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: crt })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (crtPercentFlag) {
-        smallItemTitle.push("CRT(%)");
-        temp.push({
-          title: "CRT(%)",
-          responsive: ["sm"],
-          render: (_, { crtPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: crtPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (cdmFlag) {
-        smallItemTitle.push("CDM");
-        temp.push({
-          title: "CDM",
-          responsive: ["sm"],
-          render: (_, { cdm }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: cdm })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (fdFlag) {
-        smallItemTitle.push("FD");
-        temp.push({
-          title: "FD",
-          responsive: ["sm"],
-          render: (_, { fd }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: fd })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (strFlag) {
-        smallItemTitle.push("STR");
-        temp.push({
-          title: "STR",
-          responsive: ["sm"],
-          render: (_, { str }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: str })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (agiFlag) {
-        smallItemTitle.push("AGI");
-        temp.push({
-          title: "AGI",
-          responsive: ["sm"],
-          render: (_, { agi }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: agi })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (intFlag) {
-        smallItemTitle.push("INT");
-        temp.push({
-          title: "INT",
-          responsive: ["sm"],
-          render: (_, { int }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: int })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (vitFlag) {
-        smallItemTitle.push("VIT");
-        temp.push({
-          title: "VIT",
-          responsive: ["sm"],
-          render: (_, { vit }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: vit })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (strPercentFlag) {
-        smallItemTitle.push("STR(%)");
-        temp.push({
-          title: "STR(%)",
-          responsive: ["sm"],
-          render: (_, { strPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: strPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (agiPercentFlag) {
-        smallItemTitle.push("AGI(%)");
-        temp.push({
-          title: "AGI(%)",
-          responsive: ["sm"],
-          render: (_, { agiPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: agiPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (intPercentFlag) {
-        smallItemTitle.push("INT(%)");
-        temp.push({
-          title: "INT(%)",
-          responsive: ["sm"],
-          render: (_, { intPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: intPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (vitPercentFlag) {
-        smallItemTitle.push("VIT(%)");
-        temp.push({
-          title: "VIT(%)",
-          responsive: ["sm"],
-          render: (_, { vitPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: vitPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (defMagdefFlag) {
-        smallItemTitle.push("Phy Def", "Mag Def");
-        temp.push(
-          {
-            title: "Phy Def",
-            responsive: ["sm"],
-            render: (_, { defMagdef }) => (
-              <div>
-                <Text>{getTextEmpty({ txt: defMagdef })}</Text>
-              </div>
-            ),
-          },
-          {
-            title: "Mag Def",
-            responsive: ["sm"],
-            render: (_, { defMagdef }) => (
-              <div>
-                <Text>{getTextEmpty({ txt: defMagdef })}</Text>
-              </div>
-            ),
-          }
-        );
-      }
-      if (defMagdefPercentFlag) {
-        smallItemTitle.push("Phy Def(%)", "Mag Def(%)");
-        temp.push(
-          {
-            title: "Phy Def(%)",
-            responsive: ["sm"],
-            render: (_, { defMagdefPercent }) => (
-              <div>
-                <Text>
-                  {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
-                </Text>
-              </div>
-            ),
-          },
-          {
-            title: "Mag Def(%)",
-            responsive: ["sm"],
-            render: (_, { defMagdefPercent }) => (
-              <div>
-                <Text>
-                  {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
-                </Text>
-              </div>
-            ),
-          }
-        );
-      }
-      if (hpFlag) {
-        smallItemTitle.push("HP");
-        temp.push({
-          title: "HP",
-          responsive: ["sm"],
-          render: (_, { hp }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: hp })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (hpPercentFlag) {
-        smallItemTitle.push("HP(%)");
-        temp.push({
-          title: "HP(%)",
-          responsive: ["sm"],
-          render: (_, { hpPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (moveSpeedPercentFlag) {
-        smallItemTitle.push("Movespeed(%)");
-        temp.push({
-          title: "Movespeed(%)",
-          responsive: ["sm"],
-          render: (_, { moveSpeedPercent }) => (
-            <div>
-              <Text>
-                {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-      if (moveSpeedPercentTownFlag) {
-        smallItemTitle.push("Movespeed Town(%)");
-        temp.push({
-          title: "Movespeed Town(%)",
-          responsive: ["sm"],
-          render: (_, { moveSpeedPercentTown }) => (
-            <div>
-              <Text>
-                {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-      return [
-        {
-          title: "Enhancement",
-          dataIndex: "encLevel",
-        },
-        {
-          title: (
-            <div>
-              {smallItemTitle.map((it) => (
-                <p key={`title-${it}`}>{it}</p>
-              ))}
-            </div>
-          ),
-          responsive: ["xs"],
-          width: 150,
-          render: (
-            _,
-            {
-              phyMagAtk,
-              phyMagAtkPercent,
-              attAtkPercent,
-              crt,
-              crtPercent,
-              cdm,
-              fd,
-              str,
-              agi,
-              int,
-              vit,
-              strPercent,
-              agiPercent,
-              intPercent,
-              vitPercent,
-              defMagdef,
-              defMagdefPercent,
-              hp,
-              hpPercent,
-              moveSpeedPercent,
-              moveSpeedPercentTown,
-            }
-          ) => (
-            <div>
-              {phyMagAtkFlag && <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>}
-              {phyMagAtkPercentFlag && (
-                <p>
-                  ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-                </p>
-              )}
-              {attAtkPercentFlag && (
-                <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-              )}
-              {crtFlag && <p>CRT {getTextEmpty({ txt: crt })}</p>}
-              {crtPercentFlag && (
-                <p>CRT {getTextEmpty({ txt: crtPercent, tailText: "%" })}</p>
-              )}
-              {cdmFlag && <p>CDM {getTextEmpty({ txt: cdm })}</p>}
-              {fdFlag && <p>FD {getTextEmpty({ txt: fd })}</p>}
-              {strFlag && <p>STR {getTextEmpty({ txt: str })}</p>}
-              {agiFlag && <p>AGI {getTextEmpty({ txt: agi })}</p>}
-              {intFlag && <p>INT {getTextEmpty({ txt: int })}</p>}
-              {vitFlag && <p>VIT {getTextEmpty({ txt: vit })}</p>}
-              {strPercentFlag && (
-                <p>STR {getTextEmpty({ txt: strPercent, tailText: "%" })}</p>
-              )}
-              {agiPercentFlag && (
-                <p>AGI {getTextEmpty({ txt: agiPercent, tailText: "%" })}</p>
-              )}
-              {intPercentFlag && (
-                <p>INT {getTextEmpty({ txt: intPercent, tailText: "%" })}</p>
-              )}
-              {vitPercentFlag && (
-                <p>VIT {getTextEmpty({ txt: vitPercent, tailText: "%" })}</p>
-              )}
-              {defMagdefFlag && (
-                <>
-                  <p>Phy Def {getTextEmpty({ txt: defMagdef })}</p>
-                  <p>Mag Def {getTextEmpty({ txt: defMagdef })}</p>
-                </>
-              )}
-              {defMagdefPercentFlag && (
-                <>
-                  <p>
-                    Phy Def{" "}
-                    {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
-                  </p>
-                  <p>
-                    Mag Def{" "}
-                    {getTextEmpty({ txt: defMagdefPercent, tailText: "%" })}
-                  </p>
-                </>
-              )}
-              {hpFlag && <p>HP {getTextEmpty({ txt: hp })}</p>}
-              {hpPercentFlag && (
-                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-              )}
-              {moveSpeedPercentFlag && (
-                <p>
-                  Movespeed{" "}
-                  {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-                </p>
-              )}
-              {moveSpeedPercentTownFlag && (
-                <p>
-                  Movespeed Town{" "}
-                  {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
-                </p>
-              )}
-            </div>
-          ),
-        },
-        ...temp,
-      ];
-    };
-
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",
@@ -1444,7 +623,8 @@ const ConversionContent = () => {
                 agiFlag: true,
                 intFlag: true,
                 vitFlag: true,
-                defMagdefFlag: true,
+                defFlag: true,
+                magdefFlag: true,
               })}
               pagination={false}
               bordered
@@ -1528,7 +708,8 @@ const ConversionContent = () => {
                 agiFlag: true,
                 intFlag: true,
                 vitFlag: true,
-                defMagdefPercentFlag: true,
+                defPercentFlag: true,
+                magdefPercentFlag: true,
               })}
               pagination={false}
               bordered
@@ -1546,8 +727,10 @@ const ConversionContent = () => {
                 crtPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
-                defMagdefFlag: true,
-                defMagdefPercentFlag: true,
+                defFlag: true,
+                magdefFlag: true,
+                defPercentFlag: true,
+                magdefPercentFlag: true,
               })}
               pagination={false}
               bordered

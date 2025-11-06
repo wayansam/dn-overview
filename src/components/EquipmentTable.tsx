@@ -149,7 +149,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
           if (title === TAB.CR) {
             return found ? found.label : "No Option";
           } else {
-            return getLabel(cust[1]);
+            return customLabeling ? customLabeling(cust[1]) : getLabel(cust[1]);
           }
         }
       }
@@ -164,7 +164,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               defaultValue={selectItem}
               style={{ width: 120 }}
               onChange={handleChange}
-              options={getListOpt(record.min, record.max)}
+              options={getListOpt(record.min, record.max, customLabeling)}
               onBlur={saveSelect}
               autoFocus
               status={findTo <= findFr ? "error" : undefined}
@@ -176,7 +176,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
               defaultValue={selectItem}
               style={{ width: 120 }}
               onChange={handleChange}
-              options={getListOpt(record.min, record.max)}
+              options={getListOpt(record.min, record.max, customLabeling)}
               onBlur={saveSelect}
               autoFocus
               status={findFr >= findTo ? "error" : undefined}
