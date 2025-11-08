@@ -5,10 +5,11 @@ import {
 } from "@ant-design/icons";
 import { Tag, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { TableResource } from "../constants/Common.constants";
+import { EmptyCommonnStat, TableResource } from "../constants/Common.constants";
 import { ITEM_RARITY_COLOR } from "../constants/InGame.color.constants";
 import { ITEM_RARITY } from "../constants/InGame.constants";
 import {
+  columnCommonItemDesc,
   columnCommonItemFlag,
   CommonItemStats,
 } from "../interface/ItemStat.interface";
@@ -157,10 +158,14 @@ export const getColumnsStats = ({
 }: columnCommonItemFlag): ColumnsType<CommonItemStats> => {
   const temp: ColumnsType<CommonItemStats> = [];
   const smallItemTitle: string[] = [];
+
+  const a = getAllStatDesc();
+
   if (phyMagAtkFlag) {
-    smallItemTitle.push("ATK");
+    const { long, short } = getStatDesc("phyMagAtk");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Attack",
+      title: long,
       responsive: ["sm"],
       render: (_, { phyMagAtk }) => (
         <div>
@@ -170,9 +175,10 @@ export const getColumnsStats = ({
     });
   }
   if (phyMagAtkMinFlag && phyMagAtkMaxFlag) {
-    smallItemTitle.push("ATK");
+    const { long, short } = getStatDesc("phyMagAtk");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Attack",
+      title: long,
       responsive: ["sm"],
       render: (_, { phyMagAtkMin, phyMagAtkMax }) => (
         <div>
@@ -189,9 +195,10 @@ export const getColumnsStats = ({
     });
   }
   if (phyMagAtkPercentFlag) {
-    smallItemTitle.push("ATK(%)");
+    const { long, short } = getStatDesc("phyMagAtkPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Attack(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { phyMagAtkPercent }) => (
         <div>
@@ -201,9 +208,10 @@ export const getColumnsStats = ({
     });
   }
   if (attAtkPercentFlag) {
-    smallItemTitle.push("ATT(%)");
+    const { long, short } = getStatDesc("attAtkPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Attribute(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { attAtkPercent }) => (
         <div>
@@ -213,9 +221,10 @@ export const getColumnsStats = ({
     });
   }
   if (crtFlag) {
-    smallItemTitle.push("CRT");
+    const { long, short } = getStatDesc("crt");
+    smallItemTitle.push(short);
     temp.push({
-      title: "CRT",
+      title: long,
       responsive: ["sm"],
       render: (_, { crt }) => (
         <div>
@@ -225,9 +234,10 @@ export const getColumnsStats = ({
     });
   }
   if (crtPercentFlag) {
-    smallItemTitle.push("CRT(%)");
+    const { long, short } = getStatDesc("crtPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "CRT(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { crtPercent }) => (
         <div>
@@ -237,9 +247,10 @@ export const getColumnsStats = ({
     });
   }
   if (cdmFlag) {
-    smallItemTitle.push("CDM");
+    const { long, short } = getStatDesc("cdm");
+    smallItemTitle.push(short);
     temp.push({
-      title: "CDM",
+      title: long,
       responsive: ["sm"],
       render: (_, { cdm }) => (
         <div>
@@ -249,9 +260,10 @@ export const getColumnsStats = ({
     });
   }
   if (fdFlag) {
-    smallItemTitle.push("FD");
+    const { long, short } = getStatDesc("fd");
+    smallItemTitle.push(short);
     temp.push({
-      title: "FD",
+      title: long,
       responsive: ["sm"],
       render: (_, { fd }) => (
         <div>
@@ -261,9 +273,10 @@ export const getColumnsStats = ({
     });
   }
   if (strFlag) {
-    smallItemTitle.push("STR");
+    const { long, short } = getStatDesc("str");
+    smallItemTitle.push(short);
     temp.push({
-      title: "STR",
+      title: long,
       responsive: ["sm"],
       render: (_, { str }) => (
         <div>
@@ -273,9 +286,10 @@ export const getColumnsStats = ({
     });
   }
   if (agiFlag) {
-    smallItemTitle.push("AGI");
+    const { long, short } = getStatDesc("agi");
+    smallItemTitle.push(short);
     temp.push({
-      title: "AGI",
+      title: long,
       responsive: ["sm"],
       render: (_, { agi }) => (
         <div>
@@ -285,9 +299,10 @@ export const getColumnsStats = ({
     });
   }
   if (intFlag) {
-    smallItemTitle.push("INT");
+    const { long, short } = getStatDesc("int");
+    smallItemTitle.push(short);
     temp.push({
-      title: "INT",
+      title: long,
       responsive: ["sm"],
       render: (_, { int }) => (
         <div>
@@ -297,9 +312,10 @@ export const getColumnsStats = ({
     });
   }
   if (vitFlag) {
-    smallItemTitle.push("VIT");
+    const { long, short } = getStatDesc("vit");
+    smallItemTitle.push(short);
     temp.push({
-      title: "VIT",
+      title: long,
       responsive: ["sm"],
       render: (_, { vit }) => (
         <div>
@@ -309,9 +325,10 @@ export const getColumnsStats = ({
     });
   }
   if (strPercentFlag) {
-    smallItemTitle.push("STR(%)");
+    const { long, short } = getStatDesc("strPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "STR(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { strPercent }) => (
         <div>
@@ -321,9 +338,10 @@ export const getColumnsStats = ({
     });
   }
   if (agiPercentFlag) {
-    smallItemTitle.push("AGI(%)");
+    const { long, short } = getStatDesc("agiPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "AGI(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { agiPercent }) => (
         <div>
@@ -333,9 +351,10 @@ export const getColumnsStats = ({
     });
   }
   if (intPercentFlag) {
-    smallItemTitle.push("INT(%)");
+    const { long, short } = getStatDesc("intPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "INT(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { intPercent }) => (
         <div>
@@ -345,9 +364,10 @@ export const getColumnsStats = ({
     });
   }
   if (vitPercentFlag) {
-    smallItemTitle.push("VIT(%)");
+    const { long, short } = getStatDesc("vitPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "VIT(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { vitPercent }) => (
         <div>
@@ -357,9 +377,10 @@ export const getColumnsStats = ({
     });
   }
   if (defFlag) {
-    smallItemTitle.push("Phy Def");
+    const { long, short } = getStatDesc("def");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Phy Def",
+      title: long,
       responsive: ["sm"],
       render: (_, { def }) => (
         <div>
@@ -369,9 +390,10 @@ export const getColumnsStats = ({
     });
   }
   if (magdefFlag) {
-    smallItemTitle.push("Mag Def");
+    const { long, short } = getStatDesc("magdef");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Mag Def",
+      title: long,
       responsive: ["sm"],
       render: (_, { magdef }) => (
         <div>
@@ -381,9 +403,10 @@ export const getColumnsStats = ({
     });
   }
   if (defPercentFlag) {
-    smallItemTitle.push("Phy Def(%)");
+    const { long, short } = getStatDesc("defPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Phy Def(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { defPercent }) => (
         <div>
@@ -393,9 +416,10 @@ export const getColumnsStats = ({
     });
   }
   if (magdefPercentFlag) {
-    smallItemTitle.push("Mag Def(%)");
+    const { long, short } = getStatDesc("magdefPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Mag Def(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { magdefPercent }) => (
         <div>
@@ -405,9 +429,10 @@ export const getColumnsStats = ({
     });
   }
   if (hpFlag) {
-    smallItemTitle.push("HP");
+    const { long, short } = getStatDesc("hp");
+    smallItemTitle.push(short);
     temp.push({
-      title: "HP",
+      title: long,
       responsive: ["sm"],
       render: (_, { hp }) => (
         <div>
@@ -417,9 +442,10 @@ export const getColumnsStats = ({
     });
   }
   if (hpPercentFlag) {
-    smallItemTitle.push("HP(%)");
+    const { long, short } = getStatDesc("hpPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "HP(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { hpPercent }) => (
         <div>
@@ -429,9 +455,10 @@ export const getColumnsStats = ({
     });
   }
   if (moveSpeedPercentFlag) {
-    smallItemTitle.push("Movespeed(%)");
+    const { long, short } = getStatDesc("moveSpeedPercent");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Movespeed(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { moveSpeedPercent }) => (
         <div>
@@ -441,9 +468,10 @@ export const getColumnsStats = ({
     });
   }
   if (moveSpeedPercentTownFlag) {
-    smallItemTitle.push("Movespeed(%)");
+    const { long, short } = getStatDesc("moveSpeedPercentTown");
+    smallItemTitle.push(short);
     temp.push({
-      title: "Movespeed(%)",
+      title: long,
       responsive: ["sm"],
       render: (_, { moveSpeedPercentTown }) => (
         <div>
@@ -660,141 +688,215 @@ export const getStatDif = (statDif?: CommonItemStats) => {
   }
   return [
     {
-      title: "ATK",
+      title: getStatDesc("phyMagAtk").short,
       value: statDif.phyMagAtk,
       format: true,
     },
     {
-      title: "ATK Min",
+      title: getStatDesc("phyMagAtkMin").short,
       value: statDif.phyMagAtkMin,
       format: true,
     },
     {
-      title: "ATK Max",
+      title: getStatDesc("phyMagAtkMax").short,
       value: statDif.phyMagAtkMax,
       format: true,
     },
     {
-      title: "ATK",
+      title: getStatDesc("phyMagAtkPercent").short,
       value: statDif.phyMagAtkPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "Ele",
+      title: getStatDesc("attAtkPercent").short,
       value: statDif.attAtkPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "CRT",
+      title: getStatDesc("crt").short,
       value: statDif.crt,
       format: true,
     },
     {
-      title: "CRT",
+      title: getStatDesc("crtPercent").short,
       value: statDif.crtPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "CDM",
+      title: getStatDesc("cdm").short,
       value: statDif.cdm,
       format: true,
     },
     {
-      title: "FD",
+      title: getStatDesc("fd").short,
       value: statDif.fd,
       format: true,
     },
     {
-      title: "STR",
+      title: getStatDesc("str").short,
       value: statDif.str,
       format: true,
     },
     {
-      title: "AGI",
+      title: getStatDesc("agi").short,
       value: statDif.agi,
       format: true,
     },
     {
-      title: "INT",
+      title: getStatDesc("int").short,
       value: statDif.int,
       format: true,
     },
     {
-      title: "VIT",
+      title: getStatDesc("vit").short,
       value: statDif.vit,
       format: true,
     },
     {
-      title: "STR",
+      title: getStatDesc("strPercent").short,
       value: statDif.strPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "AGI",
+      title: getStatDesc("agiPercent").short,
       value: statDif.agiPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "INT",
+      title: getStatDesc("intPercent").short,
       value: statDif.intPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "VIT",
+      title: getStatDesc("vitPercent").short,
       value: statDif.vitPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "Phy Def",
+      title: getStatDesc("def").short,
       value: statDif.def,
       format: true,
     },
     {
-      title: "Mag Def",
+      title: getStatDesc("magdef").short,
       value: statDif.magdef,
       format: true,
     },
     {
-      title: "Phy Def",
+      title: getStatDesc("defPercent").short,
       value: statDif.defPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "Mag Def",
+      title: getStatDesc("magdefPercent").short,
       value: statDif.magdefPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "HP",
+      title: getStatDesc("hp").short,
       value: statDif.hp,
       format: true,
     },
     {
-      title: "HP",
+      title: getStatDesc("hpPercent").short,
       value: statDif.hpPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "Movespeed",
+      title: getStatDesc("moveSpeedPercent").short,
       value: statDif.moveSpeedPercent,
       suffix: "%",
       format: true,
     },
     {
-      title: "Movespeed Town",
+      title: getStatDesc("moveSpeedPercentTown").short,
       value: statDif.moveSpeedPercentTown,
       suffix: "%",
       format: true,
     },
   ];
+};
+
+export const getStatDesc = (
+  key: keyof CommonItemStats
+): { long: string; short: string } => {
+  switch (key) {
+    case "phyMagAtk":
+      return { long: "Attack", short: "ATK" };
+    case "phyMagAtkMin":
+      return { long: "Attack Min", short: "ATK Min" };
+    case "phyMagAtkMax":
+      return { long: "Attack Max", short: "ATK Max" };
+    case "phyMagAtkPercent":
+      return { long: "Attack(%)", short: "ATK(%)" };
+    case "attAtkPercent":
+      return { long: "Attribute(%)", short: "ATT(%)" };
+    case "crt":
+      return { long: "CRT", short: "CRT" };
+    case "crtPercent":
+      return { long: "CRT(%)", short: "CRT(%)" };
+    case "cdm":
+      return { long: "CDM", short: "CDM" };
+    case "fd":
+      return { long: "FD", short: "FD" };
+    case "str":
+      return { long: "STR", short: "STR" };
+    case "agi":
+      return { long: "AGI", short: "AGI" };
+    case "int":
+      return { long: "INT", short: "INT" };
+    case "vit":
+      return { long: "VIT", short: "VIT" };
+    case "strPercent":
+      return { long: "STR(%)", short: "STR(%)" };
+    case "agiPercent":
+      return { long: "AGI(%)", short: "AGI(%)" };
+    case "intPercent":
+      return { long: "INT(%)", short: "INT(%)" };
+    case "vitPercent":
+      return { long: "VIT(%)", short: "VIT(%)" };
+    case "def":
+      return { long: "Phy Def", short: "Phy Def" };
+    case "defPercent":
+      return { long: "Phy Def(%)", short: "Phy Def(%)" };
+    case "magdef":
+      return { long: "Mag Def", short: "Mag Def" };
+    case "magdefPercent":
+      return { long: "Mag Def(%)", short: "Mag Def(%)" };
+    case "hp":
+      return { long: "HP", short: "HP" };
+    case "hpPercent":
+      return { long: "HP(%)", short: "HP(%)" };
+    case "moveSpeedPercent":
+      return { long: "Movespeed(%)", short: "Movespeed(%)" };
+    case "moveSpeedPercentTown":
+      return { long: "Movespeed Town(%)", short: "Movespeed Town(%)" };
+
+    default:
+      return { long: "-", short: "-" };
+  }
+};
+
+export const getAllStatDesc = (): columnCommonItemDesc => {
+  const result: columnCommonItemDesc = {};
+  const keys = Object.keys({
+    ...EmptyCommonnStat,
+  }) as (keyof CommonItemStats)[];
+
+  for (const key of keys) {
+    const value = getStatDesc(key);
+    (result as any)[key] = value;
+  }
+
+  return result;
 };

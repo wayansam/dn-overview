@@ -36,6 +36,12 @@ export interface CommonItemStats {
 export type columnCommonItemFlag = {
   [K in keyof CommonItemStats as `${K}Flag`]?: boolean;
 };
+export type columnCommonItemDesc = {
+  [K in keyof CommonItemStats as `${K}Desc`]?: {
+    long: string;
+    short: string;
+  };
+};
 export interface NamedEODStat {
   encLevel: number;
   minAttack: number;

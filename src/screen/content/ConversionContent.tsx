@@ -38,6 +38,7 @@ import { CommonItemStats } from "../../interface/ItemStat.interface";
 import ListingCard from "../../components/ListingCard";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import EquipmentTable from "../../components/EquipmentTable";
+import ChartsCard, { ChartItem } from "../../components/ChartsCard";
 
 const { Text } = Typography;
 
@@ -191,6 +192,44 @@ const ConversionContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
+  const getRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {
+    switch (equipment) {
+      case EQUIPMENT.HELM:
+        return conversionHelmStats;
+      case EQUIPMENT.UPPER:
+        return conversionUpperStats;
+      case EQUIPMENT.LOWER:
+        return conversionLowerStats;
+      case EQUIPMENT.GLOVE:
+        return conversionGloveStats;
+      case EQUIPMENT.SHOES:
+        return conversionShoesStats;
+
+      case EQUIPMENT.MAIN_WEAPON:
+        return conversionMainStats;
+      case EQUIPMENT.SECOND_WEAPON:
+        return conversionSecondStats;
+
+      case EQUIPMENT.NECKLACE:
+        return conversionNecklaceStats;
+      case EQUIPMENT.EARRING:
+        return conversionEarringStats;
+      case EQUIPMENT.RING1:
+      case EQUIPMENT.RING2:
+        return conversionRingStats;
+
+      case EQUIPMENT.WING:
+        return conversionWingStats;
+      case EQUIPMENT.TAIL:
+        return conversionTailStats;
+      case EQUIPMENT.DECAL:
+        return conversionDecalStats;
+
+      default:
+        return [];
+    }
+  };
+
   const statDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
@@ -203,56 +242,8 @@ const ConversionContent = () => {
       if (found) {
         const { equipment, from, to } = found;
 
-        let tableHolder: CommonItemStats[];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            tableHolder = conversionHelmStats;
-            break;
-          case EQUIPMENT.UPPER:
-            tableHolder = conversionUpperStats;
-            break;
-          case EQUIPMENT.LOWER:
-            tableHolder = conversionLowerStats;
-            break;
-          case EQUIPMENT.GLOVE:
-            tableHolder = conversionGloveStats;
-            break;
-          case EQUIPMENT.SHOES:
-            tableHolder = conversionShoesStats;
-            break;
+        const tableHolder = getRscTable(equipment);
 
-          case EQUIPMENT.MAIN_WEAPON:
-            tableHolder = conversionMainStats;
-            break;
-          case EQUIPMENT.SECOND_WEAPON:
-            tableHolder = conversionSecondStats;
-            break;
-
-          case EQUIPMENT.NECKLACE:
-            tableHolder = conversionNecklaceStats;
-            break;
-          case EQUIPMENT.EARRING:
-            tableHolder = conversionEarringStats;
-            break;
-          case EQUIPMENT.RING1:
-          case EQUIPMENT.RING2:
-            tableHolder = conversionRingStats;
-            break;
-
-          case EQUIPMENT.WING:
-            tableHolder = conversionWingStats;
-            break;
-          case EQUIPMENT.TAIL:
-            tableHolder = conversionTailStats;
-            break;
-          case EQUIPMENT.DECAL:
-            tableHolder = conversionDecalStats;
-            break;
-
-          default:
-            tableHolder = [];
-            break;
-        }
         const { dt1, dt2 } = getComparedData(tableHolder, from, to);
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
@@ -321,6 +312,16 @@ const ConversionContent = () => {
     }));
     setDataSource(newData);
   }, [selectFrom, selectTo]);
+
+  const chartItems = useMemo((): ChartItem[] => {
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+      }
+    });
+    return [];
+  }, []);
 
   const getCalculator = () => {
     return (
@@ -427,6 +428,9 @@ const ConversionContent = () => {
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ChartsCard title="Status Increase" data={[]} />
         </div>
       </div>
     );
