@@ -1,9 +1,11 @@
 import { Line } from "@ant-design/charts";
-import { Card, Divider, Select } from "antd";
+import { Card, Divider, Grid, Select } from "antd";
 import { useEffect, useMemo } from "react";
 import { EQUIPMENT } from "../constants/InGame.constants";
 import { useAppSelector } from "../hooks";
 import { getAllStatDesc } from "../utils/common.util";
+
+const { useBreakpoint } = Grid;
 
 export interface ChartItem {
   enhance: string;
@@ -25,6 +27,7 @@ const ChartsCard = ({
   statVal,
   setStatVal,
 }: ChartsCardProps) => {
+  const screens = useBreakpoint();
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
 
   const config = useMemo(
@@ -65,7 +68,7 @@ const ChartsCard = ({
     }
   }, []);
   return (
-    <div key={keyId} style={{ minWidth: 400 }}>
+    <div key={keyId} style={{ minWidth: screens?.xs ? 200 : 400 }}>
       {title && (
         <Divider key={`title-${keyId}`} orientation="left">
           {title}
