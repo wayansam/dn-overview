@@ -5,7 +5,11 @@ import {
 } from "@ant-design/icons";
 import { Tag, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { EmptyCommonnStat, TableResource } from "../constants/Common.constants";
+import {
+  EmptyCommonnStat,
+  EmptyCommonStatDesc,
+  TableResource,
+} from "../constants/Common.constants";
 import { ITEM_RARITY_COLOR } from "../constants/InGame.color.constants";
 import { ITEM_RARITY } from "../constants/InGame.constants";
 import {
@@ -159,10 +163,36 @@ export const getColumnsStats = ({
   const temp: ColumnsType<CommonItemStats> = [];
   const smallItemTitle: string[] = [];
 
-  const a = getAllStatDesc();
+  const {
+    phyMagAtkDesc,
+    phyMagAtkMinDesc,
+    phyMagAtkMaxDesc,
+    phyMagAtkPercentDesc,
+    attAtkPercentDesc,
+    crtDesc,
+    crtPercentDesc,
+    cdmDesc,
+    fdDesc,
+    strDesc,
+    agiDesc,
+    intDesc,
+    vitDesc,
+    strPercentDesc,
+    agiPercentDesc,
+    intPercentDesc,
+    vitPercentDesc,
+    defDesc,
+    magdefDesc,
+    defPercentDesc,
+    magdefPercentDesc,
+    hpDesc,
+    hpPercentDesc,
+    moveSpeedPercentDesc,
+    moveSpeedPercentTownDesc,
+  } = getAllStatDesc();
 
-  if (phyMagAtkFlag) {
-    const { long, short } = getStatDesc("phyMagAtk");
+  if (phyMagAtkFlag && phyMagAtkDesc) {
+    const { long, short } = phyMagAtkDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -174,8 +204,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (phyMagAtkMinFlag && phyMagAtkMaxFlag) {
-    const { long, short } = getStatDesc("phyMagAtk");
+  if (phyMagAtkMinFlag && phyMagAtkMaxFlag && phyMagAtkDesc) {
+    const { long, short } = phyMagAtkDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -194,8 +224,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (phyMagAtkPercentFlag) {
-    const { long, short } = getStatDesc("phyMagAtkPercent");
+  if (phyMagAtkPercentFlag && phyMagAtkPercentDesc) {
+    const { long, short } = phyMagAtkPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -207,8 +237,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (attAtkPercentFlag) {
-    const { long, short } = getStatDesc("attAtkPercent");
+  if (attAtkPercentFlag && attAtkPercentDesc) {
+    const { long, short } = attAtkPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -220,8 +250,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (crtFlag) {
-    const { long, short } = getStatDesc("crt");
+  if (crtFlag && crtDesc) {
+    const { long, short } = crtDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -233,8 +263,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (crtPercentFlag) {
-    const { long, short } = getStatDesc("crtPercent");
+  if (crtPercentFlag && crtPercentDesc) {
+    const { long, short } = crtPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -246,8 +276,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (cdmFlag) {
-    const { long, short } = getStatDesc("cdm");
+  if (cdmFlag && cdmDesc) {
+    const { long, short } = cdmDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -259,8 +289,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (fdFlag) {
-    const { long, short } = getStatDesc("fd");
+  if (fdFlag && fdDesc) {
+    const { long, short } = fdDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -272,8 +302,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (strFlag) {
-    const { long, short } = getStatDesc("str");
+  if (strFlag && strDesc) {
+    const { long, short } = strDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -285,8 +315,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (agiFlag) {
-    const { long, short } = getStatDesc("agi");
+  if (agiFlag && agiDesc) {
+    const { long, short } = agiDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -298,8 +328,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (intFlag) {
-    const { long, short } = getStatDesc("int");
+  if (intFlag && intDesc) {
+    const { long, short } = intDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -311,8 +341,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (vitFlag) {
-    const { long, short } = getStatDesc("vit");
+  if (vitFlag && vitDesc) {
+    const { long, short } = vitDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -324,8 +354,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (strPercentFlag) {
-    const { long, short } = getStatDesc("strPercent");
+  if (strPercentFlag && strPercentDesc) {
+    const { long, short } = strPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -337,8 +367,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (agiPercentFlag) {
-    const { long, short } = getStatDesc("agiPercent");
+  if (agiPercentFlag && agiPercentDesc) {
+    const { long, short } = agiPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -350,8 +380,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (intPercentFlag) {
-    const { long, short } = getStatDesc("intPercent");
+  if (intPercentFlag && intPercentDesc) {
+    const { long, short } = intPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -363,8 +393,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (vitPercentFlag) {
-    const { long, short } = getStatDesc("vitPercent");
+  if (vitPercentFlag && vitPercentDesc) {
+    const { long, short } = vitPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -376,8 +406,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (defFlag) {
-    const { long, short } = getStatDesc("def");
+  if (defFlag && defDesc) {
+    const { long, short } = defDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -389,8 +419,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (magdefFlag) {
-    const { long, short } = getStatDesc("magdef");
+  if (magdefFlag && magdefDesc) {
+    const { long, short } = magdefDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -402,8 +432,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (defPercentFlag) {
-    const { long, short } = getStatDesc("defPercent");
+  if (defPercentFlag && defPercentDesc) {
+    const { long, short } = defPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -415,8 +445,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (magdefPercentFlag) {
-    const { long, short } = getStatDesc("magdefPercent");
+  if (magdefPercentFlag && magdefPercentDesc) {
+    const { long, short } = magdefPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -428,8 +458,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (hpFlag) {
-    const { long, short } = getStatDesc("hp");
+  if (hpFlag && hpDesc) {
+    const { long, short } = hpDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -441,8 +471,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (hpPercentFlag) {
-    const { long, short } = getStatDesc("hpPercent");
+  if (hpPercentFlag && hpPercentDesc) {
+    const { long, short } = hpPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -454,8 +484,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (moveSpeedPercentFlag) {
-    const { long, short } = getStatDesc("moveSpeedPercent");
+  if (moveSpeedPercentFlag && moveSpeedPercentDesc) {
+    const { long, short } = moveSpeedPercentDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -467,8 +497,8 @@ export const getColumnsStats = ({
       ),
     });
   }
-  if (moveSpeedPercentTownFlag) {
-    const { long, short } = getStatDesc("moveSpeedPercentTown");
+  if (moveSpeedPercentTownFlag && moveSpeedPercentTownDesc) {
+    const { long, short } = moveSpeedPercentTownDesc;
     smallItemTitle.push(short);
     temp.push({
       title: long,
@@ -529,10 +559,15 @@ export const getColumnsStats = ({
         }
       ) => (
         <div>
-          {phyMagAtkFlag && <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>}
+          {phyMagAtkFlag && (
+            <p>
+              {`${phyMagAtkDesc?.short} `}
+              {getTextEmpty({ txt: phyMagAtk })}
+            </p>
+          )}
           {phyMagAtkMinFlag && phyMagAtkMaxFlag && (
             <p>
-              ATK{" "}
+              {`${phyMagAtkDesc?.short} `}
               {getTextEmpty({
                 txt:
                   phyMagAtkMin && phyMagAtkMax
@@ -542,51 +577,134 @@ export const getColumnsStats = ({
             </p>
           )}
           {phyMagAtkPercentFlag && (
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
+            <p>
+              {`${phyMagAtkPercentDesc?.short} `}
+              {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
+            </p>
           )}
           {attAtkPercentFlag && (
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
+            <p>
+              {`${attAtkPercentDesc?.short} `}
+              {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}
+            </p>
           )}
-          {crtFlag && <p>CRT {getTextEmpty({ txt: crt })}</p>}
+          {crtFlag && (
+            <p>
+              {`${crtDesc?.short} `}
+              {getTextEmpty({ txt: crt })}
+            </p>
+          )}
           {crtPercentFlag && (
-            <p>CRT {getTextEmpty({ txt: crtPercent, tailText: "%" })}</p>
+            <p>
+              {`${crtPercentDesc?.short} `}
+              {getTextEmpty({ txt: crtPercent, tailText: "%" })}
+            </p>
           )}
-          {cdmFlag && <p>CDM {getTextEmpty({ txt: cdm })}</p>}
-          {fdFlag && <p>FD {getTextEmpty({ txt: fd })}</p>}
-          {strFlag && <p>STR {getTextEmpty({ txt: str })}</p>}
-          {agiFlag && <p>AGI {getTextEmpty({ txt: agi })}</p>}
-          {intFlag && <p>INT {getTextEmpty({ txt: int })}</p>}
-          {vitFlag && <p>VIT {getTextEmpty({ txt: vit })}</p>}
+          {cdmFlag && (
+            <p>
+              {`${cdmDesc?.short} `}
+              {getTextEmpty({ txt: cdm })}
+            </p>
+          )}
+          {fdFlag && (
+            <p>
+              {`${fdDesc?.short} `}
+              {getTextEmpty({ txt: fd })}
+            </p>
+          )}
+          {strFlag && (
+            <p>
+              {`${strDesc?.short} `}
+              {getTextEmpty({ txt: str })}
+            </p>
+          )}
+          {agiFlag && (
+            <p>
+              {`${agiDesc?.short} `}
+              {getTextEmpty({ txt: agi })}
+            </p>
+          )}
+          {intFlag && (
+            <p>
+              {`${intDesc?.short} `}
+              {getTextEmpty({ txt: int })}
+            </p>
+          )}
+          {vitFlag && (
+            <p>
+              {`${vitDesc?.short} `}
+              {getTextEmpty({ txt: vit })}
+            </p>
+          )}
           {strPercentFlag && (
-            <p>STR {getTextEmpty({ txt: strPercent, tailText: "%" })}</p>
+            <p>
+              {`${strPercentDesc?.short} `}
+              {getTextEmpty({ txt: strPercent, tailText: "%" })}
+            </p>
           )}
           {agiPercentFlag && (
-            <p>AGI {getTextEmpty({ txt: agiPercent, tailText: "%" })}</p>
+            <p>
+              {`${agiPercentDesc?.short} `}
+              {getTextEmpty({ txt: agiPercent, tailText: "%" })}
+            </p>
           )}
           {intPercentFlag && (
-            <p>INT {getTextEmpty({ txt: intPercent, tailText: "%" })}</p>
+            <p>
+              {`${intPercentDesc?.short} `}
+              {getTextEmpty({ txt: intPercent, tailText: "%" })}
+            </p>
           )}
           {vitPercentFlag && (
-            <p>VIT {getTextEmpty({ txt: vitPercent, tailText: "%" })}</p>
+            <p>
+              {`${vitPercentDesc?.short} `}
+              {getTextEmpty({ txt: vitPercent, tailText: "%" })}
+            </p>
           )}
-          {defFlag && <p>Phy Def {getTextEmpty({ txt: def })}</p>}
-          {magdefFlag && <p>Mag Def {getTextEmpty({ txt: magdef })}</p>}
-          {defPercentFlag && <p>Phy Def {getTextEmpty({ txt: defPercent })}</p>}
+          {defFlag && (
+            <p>
+              {`${defDesc?.short} `}
+              {getTextEmpty({ txt: def })}
+            </p>
+          )}
+          {magdefFlag && (
+            <p>
+              {`${magdefDesc?.short} `}
+              {getTextEmpty({ txt: magdef })}
+            </p>
+          )}
+          {defPercentFlag && (
+            <p>
+              {`${defPercentDesc?.short} `}
+              {getTextEmpty({ txt: defPercent })}
+            </p>
+          )}
           {magdefPercentFlag && (
-            <p>Mag Def {getTextEmpty({ txt: magdefPercent })}</p>
+            <p>
+              {`${magdefPercentDesc?.short} `}
+              {getTextEmpty({ txt: magdefPercent })}
+            </p>
           )}
-          {hpFlag && <p>HP {getTextEmpty({ txt: hp })}</p>}
+          {hpFlag && (
+            <p>
+              {`${hpDesc?.short} `}
+              {getTextEmpty({ txt: hp })}
+            </p>
+          )}
           {hpPercentFlag && (
-            <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+            <p>
+              {`${hpPercentDesc?.short} `}
+              {getTextEmpty({ txt: hpPercent, tailText: "%" })}
+            </p>
           )}
           {moveSpeedPercentFlag && (
             <p>
-              Movespeed {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
+              {`${moveSpeedPercentDesc?.short} `}
+              {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
             </p>
           )}
           {moveSpeedPercentTownFlag && (
             <p>
-              Movespeed Town{" "}
+              {`${moveSpeedPercentTownDesc?.short} `}
               {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
             </p>
           )}
@@ -888,15 +1006,14 @@ export const getStatDesc = (
 };
 
 export const getAllStatDesc = (): columnCommonItemDesc => {
-  const result: columnCommonItemDesc = {};
+  let result: columnCommonItemDesc = { ...EmptyCommonStatDesc };
   const keys = Object.keys({
     ...EmptyCommonnStat,
   }) as (keyof CommonItemStats)[];
 
   for (const key of keys) {
     const value = getStatDesc(key);
-    (result as any)[key] = value;
+    (result as any)[`${key}Desc`] = value;
   }
-
   return result;
 };

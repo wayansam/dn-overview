@@ -8,18 +8,8 @@ import EquipmentTable, {
 } from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import { CommonEquipmentCalculator } from "../../interface/Common.interface";
-import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
-import {
-  columnsResource,
-  combineEqStats,
-  getColumnsStats,
-  getComparedData,
-  getStatDif,
-  getTextEmpty,
-} from "../../utils/common.util";
 import {
   SpunGoldEqEnhanceMaterialArmorTable,
   SpunGoldEqEnhanceMaterialWeapTable,
@@ -35,7 +25,17 @@ import {
   SpunGoldStatsUpperTable,
   dataGoldSpunCalculator,
 } from "../../data/SpunGoldEqData";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
+import { CommonEquipmentCalculator } from "../../interface/Common.interface";
+import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
+import {
+  columnsResource,
+  combineEqStats,
+  getColumnsStats,
+  getComparedData,
+  getStatDif,
+  getTextEmpty,
+} from "../../utils/common.util";
 
 const { Text } = Typography;
 

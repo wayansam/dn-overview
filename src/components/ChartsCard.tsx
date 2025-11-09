@@ -1,7 +1,9 @@
 import { Line } from "@ant-design/charts";
-import { Card, Divider, Space, Typography } from "antd";
+import { Card, Divider, Select } from "antd";
+import { useEffect, useMemo } from "react";
 import { EQUIPMENT } from "../constants/InGame.constants";
 import { useAppSelector } from "../hooks";
+import { getAllStatDesc } from "../utils/common.util";
 
 export interface ChartItem {
   enhance: string;
@@ -12,42 +14,56 @@ interface ChartsCardProps {
   title?: string;
   keyId?: string;
   data: Array<ChartItem>;
+  statVal?: { label: string; value: string };
+  setStatVal?: (s?: { label: string; value: string }) => void;
 }
 
-const ChartsCard = ({ title, keyId }: ChartsCardProps) => {
+const ChartsCard = ({
+  title,
+  keyId,
+  data,
+  statVal,
+  setStatVal,
+}: ChartsCardProps) => {
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
-  const data = [
-    { enhance: "1991", value: 3, type: "A" },
-    { enhance: "1991", value: 3, type: "B" },
-    { enhance: "1992", value: 6, type: "A" },
-    { enhance: "1992", value: 4, type: "B" },
-    { enhance: "1993", value: 3.5, type: "B" },
-    { enhance: "1994", value: 5, type: "B" },
-    { enhance: "1995", value: 4.9, type: "B" },
-    { enhance: "1996", value: 6, type: "B" },
-    { enhance: "1997", value: 7, type: "B" },
-    { enhance: "1998", value: 9, type: "B" },
-    { enhance: "1999", value: 13, type: "B" },
-  ];
-  const config = {
-    data,
-    xField: "enhance",
-    yField: "value",
-    point: {
-      shapeField: "square",
-      sizeField: 4,
-    },
-    interaction: {
-      tooltip: {
-        marker: false,
+
+  const config = useMemo(
+    () => ({
+      data,
+      height: 500,
+      xField: "enhance",
+      yField: "value",
+      point: {
+        shapeField: "square",
+        sizeField: 4,
       },
-    },
-    style: {
-      lineWidth: 2,
-    },
-    theme: { type: isDarkMode ? "dark" : "light" },
-    colorField: "type",
-  };
+      interaction: {
+        tooltip: {
+          marker: false,
+        },
+      },
+      style: {
+        lineWidth: 2,
+      },
+      theme: { type: isDarkMode ? "dark" : "light" },
+      colorField: "type",
+    }),
+    [data]
+  );
+
+  const allDesc = Object.entries(getAllStatDesc())
+    .map(([key, value]) => ({
+      label: value.long,
+      value: key,
+    }))
+    .filter((it) => it.label !== "-");
+
+  useEffect(() => {
+    if (allDesc.length > 0) {
+      const stat = allDesc[0];
+      setStatVal?.(stat);
+    }
+  }, []);
   return (
     <div key={keyId} style={{ minWidth: 400 }}>
       {title && (
@@ -55,6 +71,19 @@ const ChartsCard = ({ title, keyId }: ChartsCardProps) => {
           {title}
         </Divider>
       )}
+      <div style={{ marginBottom: 4 }}>
+        Stat:
+        <Divider type="vertical" />
+        <Select
+          value={statVal?.label}
+          style={{ width: 200 }}
+          onChange={(val) => {
+            const found = allDesc.find((it) => it.value === val);
+            setStatVal?.(found);
+          }}
+          options={allDesc}
+        />
+      </div>
       <Card key={`card-${keyId}`} size="small" style={{ marginTop: 4 }}>
         <Line {...config} />
       </Card>

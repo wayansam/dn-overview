@@ -1,7 +1,9 @@
-import { Typography } from "antd";
 import { SideBarGroupTab } from "../interface/Common.interface";
 import { LunarFragmentData } from "../interface/Item.interface";
-import { CommonItemStats } from "../interface/ItemStat.interface";
+import {
+  columnCommonItemDesc,
+  CommonItemStats,
+} from "../interface/ItemStat.interface";
 
 export const TAB_KEY = {
   mainGeneral: "General",
@@ -196,4 +198,36 @@ export const EmptyCommonnStat: CommonItemStats = {
   hpPercent: 0,
   moveSpeedPercent: 0,
   moveSpeedPercentTown: 0,
+};
+
+export const EmptyCommonStatDesc: columnCommonItemDesc = {
+  phyMagAtkDesc: { long: "", short: "" },
+  phyMagAtkMinDesc: { long: "", short: "" },
+  phyMagAtkMaxDesc: { long: "", short: "" },
+  phyMagAtkPercentDesc: { long: "", short: "" },
+  attAtkPercentDesc: { long: "", short: "" },
+  crtDesc: { long: "", short: "" },
+  crtPercentDesc: { long: "", short: "" },
+  cdmDesc: { long: "", short: "" },
+  fdDesc: { long: "", short: "" },
+  strDesc: { long: "", short: "" },
+  agiDesc: { long: "", short: "" },
+  intDesc: { long: "", short: "" },
+  vitDesc: { long: "", short: "" },
+  strPercentDesc: { long: "", short: "" },
+  agiPercentDesc: { long: "", short: "" },
+  intPercentDesc: { long: "", short: "" },
+  vitPercentDesc: { long: "", short: "" },
+  defDesc: { long: "", short: "" },
+  magdefDesc: { long: "", short: "" },
+  defPercentDesc: { long: "", short: "" },
+  magdefPercentDesc: { long: "", short: "" },
+  hpDesc: { long: "", short: "" },
+  hpPercentDesc: { long: "", short: "" },
+  moveSpeedPercentDesc: { long: "", short: "" },
+  moveSpeedPercentTownDesc: { long: "", short: "" },
+  encLevelDesc: {
+    long: "",
+    short: "",
+  },
 };

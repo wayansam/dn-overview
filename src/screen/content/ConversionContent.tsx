@@ -3,42 +3,42 @@ import {
   Collapse,
   CollapseProps,
   Divider,
+  Radio,
   Select,
   Table,
-  Radio,
   Typography,
 } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
-import { EQUIPMENT } from "../../constants/InGame.constants";
-import {
-  dataConversionCalculator,
-  conversionHelmStats,
-  conversionUpperStats,
-  conversionLowerStats,
-  conversionGloveStats,
-  conversionShoesStats,
-  conversionMainStats,
-  conversionSecondStats,
-  conversionNecklaceStats,
-  conversionEarringStats,
-  conversionRingStats,
-  conversionWingStats,
-  conversionTailStats,
-  conversionDecalStats,
-} from "../../data/ConversionCalculatorData";
-import { CommonEquipmentCalculator } from "../../interface/Common.interface";
-import {
-  columnsResource,
-  getComparedData,
-  getColumnsStats,
-  combineEqStats,
-  getStatDif,
-} from "../../utils/common.util";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
+import ChartsCard, { ChartItem } from "../../components/ChartsCard";
+import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
-import EquipmentTable from "../../components/EquipmentTable";
-import ChartsCard, { ChartItem } from "../../components/ChartsCard";
+import { EQUIPMENT } from "../../constants/InGame.constants";
+import {
+  conversionDecalStats,
+  conversionEarringStats,
+  conversionGloveStats,
+  conversionHelmStats,
+  conversionLowerStats,
+  conversionMainStats,
+  conversionNecklaceStats,
+  conversionRingStats,
+  conversionSecondStats,
+  conversionShoesStats,
+  conversionTailStats,
+  conversionUpperStats,
+  conversionWingStats,
+  dataConversionCalculator,
+} from "../../data/ConversionCalculatorData";
+import { CommonEquipmentCalculator } from "../../interface/Common.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
+import {
+  columnsResource,
+  combineEqStats,
+  getColumnsStats,
+  getComparedData,
+  getStatDif,
+} from "../../utils/common.util";
 
 const { Text } = Typography;
 
@@ -87,6 +87,9 @@ const ConversionContent = () => {
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
+  const [selectStat, setSelectStat] = useState<
+    { label: string; value: string } | undefined
+  >();
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -314,14 +317,34 @@ const ConversionContent = () => {
   }, [selectFrom, selectTo]);
 
   const chartItems = useMemo((): ChartItem[] => {
+    const stat = selectStat?.value.replace("Desc", "") as keyof CommonItemStats;
+    const holder: ChartItem[] = [];
+
     selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
 
       if (found) {
+        const { equipment, from, to } = found;
+        const tableHolder = [{ ...EmptyCommonnStat, encLevel: "Buy" }].concat(
+          getRscTable(equipment)
+        );
+        const clippedTable = tableHolder.slice(from, to + 1);
+        clippedTable.forEach((it) => {
+          const val =
+            it[stat] !== undefined && typeof it?.[stat] === "number"
+              ? (it[stat] as number)
+              : 0;
+
+          holder.push({
+            enhance: it.encLevel,
+            value: val,
+            type: equipment,
+          });
+        });
       }
     });
-    return [];
-  }, []);
+    return holder;
+  }, [selectStat, selectedRowKeys, dataSource]);
 
   const getCalculator = () => {
     return (
@@ -430,7 +453,12 @@ const ConversionContent = () => {
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ChartsCard title="Status Increase" data={[]} />
+          <ChartsCard
+            title="Status Charts"
+            data={chartItems}
+            statVal={selectStat}
+            setStatVal={setSelectStat}
+          />
         </div>
       </div>
     );
