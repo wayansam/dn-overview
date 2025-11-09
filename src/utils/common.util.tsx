@@ -165,8 +165,6 @@ export const getColumnsStats = ({
 
   const {
     phyMagAtkDesc,
-    phyMagAtkMinDesc,
-    phyMagAtkMaxDesc,
     phyMagAtkPercentDesc,
     attAtkPercentDesc,
     crtDesc,
