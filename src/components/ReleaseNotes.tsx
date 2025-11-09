@@ -109,6 +109,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "4-11-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Conversion charts",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "09-11-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
@@ -275,6 +284,11 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     {
       key: keyUpdate.D,
       label: "Success rate note on all of the skill jade",
+    },
+    {
+      key: keyUpdate.D,
+      label: "Make Chart Visualization",
+      date: "09-11-2025",
     },
   ];
 
