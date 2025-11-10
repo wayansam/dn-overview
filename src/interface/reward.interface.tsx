@@ -11,6 +11,8 @@ export interface StageAotReward {
     "Butterfly Bubble Coral"?: number;
     "Dragon Fire Flambé Cake"?: number;
     "Warrior Equipment Protection Magic Jelly"?: number;
+    "Rune Fragment"?: number;
+    "Rune Crystal"?: number;
 
     // weekly
     "High Grade Lunar Eclipse Fragment (6 types)"?: number;
@@ -21,5 +23,6 @@ export interface StageAotReward {
 
     // season
     "Future Spacetime Cluster"?: number;
+    "Ark Stone Fragment"?: number;
   };
 }

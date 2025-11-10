@@ -118,6 +118,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "09-11-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "Arc of Transcendence, Season 3 [Past]",
+      link: {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
+      },
+      date: "4-11-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

@@ -25,6 +25,15 @@ const getItems: (
               Arc of Transcendence Season 2 [Future]
             </a>
           </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/166/c/5"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Arc of Transcendence Season 3 [Past]
+            </a>
+          </p>
         </div>
       ),
       style: panelStyle,

@@ -4,6 +4,8 @@ import ListingCard, { ItemList } from "../../components/ListingCard";
 import {
   aotRewardS2FutureInit,
   aotRewardS2FutureWeek,
+  aotRewardS3PastInit,
+  aotRewardS3PastWeek,
 } from "../../data/StageAoTData";
 import { StageAotReward } from "../../interface/reward.interface";
 import { getCustomColumnResource } from "../../utils/common.util";
@@ -16,6 +18,7 @@ const floorPref = {
   last: "Last",
 };
 const seasonKey = {
+  s3Past: "Season 3 [Past]",
   s2Future: "Season 2 [Future]",
 };
 
@@ -49,6 +52,8 @@ const StageAoTContent = () => {
     switch (selectSeason) {
       case seasonKey.s2Future:
         return { first: aotRewardS2FutureInit, weekly: aotRewardS2FutureWeek };
+      case seasonKey.s3Past:
+        return { first: aotRewardS3PastInit, weekly: aotRewardS3PastWeek };
 
       default:
         return { first: [], weekly: [] };
