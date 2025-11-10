@@ -6,6 +6,7 @@ import {
   setIsCollapsedSideBar,
   setSelectedSideBar,
 } from "../slice/UIState.reducer";
+import { LS_KEYS } from "../constants/localStorage.constants";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -22,6 +23,7 @@ const SideBar = () => {
   const isCollapsedSideBar = useAppSelector(
     (state) => state.UIState.isCollapsedSideBar
   );
+  const isKeepScreen = useAppSelector((state) => state.UIState.isKeepScreen);
 
   const [isSmall, setIsSmall] = useState(false);
 
@@ -116,7 +118,15 @@ const SideBar = () => {
                   type={
                     selectedSideBar.key === item.key ? "primary" : "default"
                   }
-                  onClick={() => dispatch(setSelectedSideBar(item))}
+                  onClick={() => {
+                    dispatch(setSelectedSideBar(item));
+                    if (isKeepScreen) {
+                      localStorage.setItem(
+                        LS_KEYS.last_screen,
+                        JSON.stringify(item)
+                      );
+                    }
+                  }}
                   size={"middle"}
                 >
                   <div style={{ margin: "2px 0px" }}>{item.name}</div>

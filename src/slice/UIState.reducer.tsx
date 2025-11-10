@@ -13,6 +13,7 @@ interface UIState {
   isImgEnabled: boolean;
   imgData: ImageData | null;
   isCollapsedSideBar: boolean;
+  isKeepScreen: boolean;
 }
 
 const initialState: UIState = {
@@ -21,6 +22,7 @@ const initialState: UIState = {
   isImgEnabled: false,
   imgData: null,
   isCollapsedSideBar: true,
+  isKeepScreen: false,
 };
 
 const UIStateSlice = createSlice({
@@ -51,6 +53,12 @@ const UIStateSlice = createSlice({
     ) => {
       state.isCollapsedSideBar = action.payload;
     },
+    setIsKeepScreen: (
+      state,
+      action: PayloadAction<UIState["isKeepScreen"]>
+    ) => {
+      state.isKeepScreen = action.payload;
+    },
   },
 });
 
@@ -61,4 +69,5 @@ export const {
   setIsImgEnabled,
   setImgData,
   setIsCollapsedSideBar,
+  setIsKeepScreen,
 } = UIStateSlice.actions;

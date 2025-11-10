@@ -58,7 +58,6 @@ const MainContent = () => {
   );
   const isImgEnabled = useAppSelector((state) => state.UIState.isImgEnabled);
   const imgData = useAppSelector((state) => state.UIState.imgData);
-  const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
 
   const [open, setOpen] = useState(false);
   const screens = useBreakpoint();

@@ -299,6 +299,11 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       label: "Make Chart Visualization",
       date: "09-11-2025",
     },
+    {
+      key: keyUpdate.D,
+      label: "Add preference 'Stay on last opened screen'",
+      date: "10-11-2025",
+    },
   ];
 
   return (

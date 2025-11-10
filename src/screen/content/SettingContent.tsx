@@ -1,13 +1,4 @@
-import {
-  Button,
-  Card,
-  Divider,
-  Form,
-  Input,
-  List,
-  Space,
-  Switch,
-} from "antd";
+import { Button, Card, Divider, Form, Input, List, Space, Switch } from "antd";
 import Link from "antd/es/typography/Link";
 import { useEffect } from "react";
 import { LS_KEYS } from "../../constants/localStorage.constants";
@@ -16,14 +7,17 @@ import {
   setImgData,
   setIsDarkMode,
   setIsImgEnabled,
+  setIsKeepScreen,
 } from "../../slice/UIState.reducer";
 import ReleaseNotes from "../../components/ReleaseNotes";
+import { TAB_KEY } from "../../constants/Common.constants";
 
 const SettingContent = () => {
   const dispatch = useAppDispatch();
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
   const isImgEnabled = useAppSelector((state) => state.UIState.isImgEnabled);
   const imgData = useAppSelector((state) => state.UIState.imgData);
+  const isKeepScreen = useAppSelector((state) => state.UIState.isKeepScreen);
 
   const [form] = Form.useForm();
 
@@ -56,6 +50,25 @@ const SettingContent = () => {
               checked={isDarkMode}
             />
             Dark Mode
+          </Space>
+          <Space direction="horizontal">
+            <Switch
+              onChange={(e) => {
+                localStorage.setItem(LS_KEYS.keep_screen, JSON.stringify(e));
+                dispatch(setIsKeepScreen(e));
+                if (e) {
+                  localStorage.setItem(
+                    LS_KEYS.last_screen,
+                    JSON.stringify({
+                      key: TAB_KEY.setting,
+                      name: TAB_KEY.setting,
+                    })
+                  );
+                }
+              }}
+              checked={isKeepScreen}
+            />
+            Stay on last opened screen on open / reload
           </Space>
           <Space direction="horizontal">
             <Switch
