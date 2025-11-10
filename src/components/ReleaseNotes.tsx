@@ -125,7 +125,7 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         key: TAB_KEY.stageArcOfTranscen,
         name: TAB_KEY.stageArcOfTranscen,
       },
-      date: "4-11-2025",
+      date: "10-11-2025",
     },
   ];
 
