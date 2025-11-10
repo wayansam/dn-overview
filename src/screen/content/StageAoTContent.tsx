@@ -1,4 +1,4 @@
-import { Button, Divider, Select, Table, Typography } from "antd";
+import { Button, Divider, Select, Table } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import {
@@ -32,14 +32,14 @@ const StageAoTContent = () => {
       value: value,
       label: value,
     }));
-  }, [seasonKey]);
+  }, []);
 
   const prefOpt = useMemo(() => {
     return Object.entries(floorPref).map(([_, value]) => ({
       value: value,
       label: value,
     }));
-  }, [seasonKey]);
+  }, []);
 
   useEffect(() => {
     if (seasonOpt.length > 0) setSelectSeason(seasonOpt[0].label);
@@ -198,6 +198,7 @@ const StageAoTContent = () => {
                 if (typeof value === "number") {
                   return value !== 0;
                 }
+                return false
               })
               .map(([key, value]) => ({
                 mats: key,
@@ -217,6 +218,7 @@ const StageAoTContent = () => {
                 if (typeof value === "number") {
                   return value !== 0;
                 }
+                return false;
               })
               .map(([key, value]) => ({
                 mats: key,

@@ -51,7 +51,7 @@ const ChartsCard = ({
       theme: { type: isDarkMode ? "dark" : "light" },
       colorField: "type",
     }),
-    [data]
+    [data, isDarkMode]
   );
 
   const allDesc = Object.entries(getAllStatDesc())
