@@ -188,3 +188,10 @@ export interface CollapseJadeCraftEnhanceMaterial {
   dimVestige: number;
   gold: number;
 }
+
+export interface DeeplyVariantJadeEnhanceMaterial {
+  encLevel: number;
+  deepRootedLonging: number;
+  twistedRoot?: number;
+  gold: number;
+}

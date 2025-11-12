@@ -284,6 +284,50 @@ const getItems: (
       style: panelStyle,
     },
     {
+      key: TAB_KEY.jadeDeepVariant,
+      label: TAB_KEY.jadeDeepVariant,
+      children: (
+        <div>
+          <p>
+            <b>
+              This jade slot only available on certain type of equipment, please
+              refer to patch note below.
+            </b>
+          </p>
+          <p>Go to blacksmith to craft this jade.</p>
+          <p>Only Corupted Origin is tradable, other materials is not.</p>
+          <p>
+            <b>~Unique Section~</b>
+          </p>
+          <p>To use the calculator, please drag the pointer.</p>
+          <p>Hover to setting option to find out about what it needed.</p>
+          <p>
+            <b>~Legend/Ancient Section~</b>
+          </p>
+          <p>
+            To use the calculator, please filled in the range (current enhance
+            level to your target).
+          </p>
+          <p>
+            Enhancement can be done on Legend grade and Ancient grade. If you
+            evolve the Legend to Ancient, the enhancement level will be
+            maintained.
+          </p>
+          <p>Patch Note related :</p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/166/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Deeply Rooted Variant Dragon Jade
+            </a>
+          </p>
+        </div>
+      ),
+      style: panelStyle,
+    },
+    {
       key: TAB_KEY.eqNamedEOD,
       label: TAB_KEY.eqNamedEOD,
       children: (

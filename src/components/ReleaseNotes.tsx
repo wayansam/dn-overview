@@ -74,33 +74,6 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
 
   const dataNew: Array<FeatureItem> = [
     {
-      key: keyUpdate.U,
-      label: "Bestie Spirit & Mount v3",
-      link: {
-        key: TAB_KEY.miscBestie,
-        name: TAB_KEY.miscBestie,
-      },
-      date: "22-10-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Legend Conversion Accessories (+1 to +3)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "23-10-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Iona Accessories (+13 to +15)",
-      link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
-      },
-      date: "30-10-2025",
-    },
-    {
       key: keyUpdate.N,
       label: "Arc of Transcendence, Season 2 [Future]",
       link: {
@@ -126,6 +99,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.stageArcOfTranscen,
       },
       date: "10-11-2025",
+    },
+    {
+      key: keyUpdate.N,
+      label: "Deeply Rooted Variant Jade",
+      link: {
+        key: TAB_KEY.jadeDeepVariant,
+        name: TAB_KEY.jadeDeepVariant,
+      },
+      date: "12-11-2025",
     },
   ];
 
@@ -282,6 +264,33 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.eqSpunGold,
       },
       date: "08-10-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Bestie Spirit & Mount v3",
+      link: {
+        key: TAB_KEY.miscBestie,
+        name: TAB_KEY.miscBestie,
+      },
+      date: "22-10-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Legend Conversion Accessories (+1 to +3)",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "23-10-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Iona Accessories (+13 to +15)",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "30-10-2025",
     },
   ];
   const dataPastUpdate: Array<FeatureItem> = [

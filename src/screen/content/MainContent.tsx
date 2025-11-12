@@ -37,6 +37,7 @@ import VIPAccContent from "./VIPAccContent";
 import SpunGoldEqContent from "./SpunGoldEqContent";
 import CollapseJadeContent from "./CollapseJadeContent";
 import StageAoTContent from "./StageAoTContent";
+import DeeplyVarJadeContent from "./DeeplyVarJadeContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -49,7 +50,7 @@ declare global {
 
 const MainContent = () => {
   const {
-    token: { colorBgContainer, colorText },
+    token: { colorBgContainer },
   } = theme.useToken();
   const [api, contextHolder] = notification.useNotification();
 
@@ -119,6 +120,9 @@ const MainContent = () => {
 
       case TAB_KEY.jadeCollapse:
         return <CollapseJadeContent />;
+
+      case TAB_KEY.jadeDeepVariant:
+        return <DeeplyVarJadeContent />;
 
       case TAB_KEY.heraldryAncientGoddes:
         return <AncientHeraldryContent />;
