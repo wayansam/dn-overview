@@ -323,6 +323,10 @@ const getItems: (
               Deeply Rooted Variant Dragon Jade
             </a>
           </p>
+          <p>Special Thanks</p>
+          <p>
+            <i>~BananaCredits~</i>
+          </p>
         </div>
       ),
       style: panelStyle,
@@ -396,7 +400,7 @@ const getItems: (
           </p>
           <p>Special Thanks</p>
           <p>
-            <i>~bananacredits~</i>
+            <i>~BananaCredits~</i>
           </p>
         </div>
       ),
