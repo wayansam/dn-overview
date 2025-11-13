@@ -9,7 +9,7 @@ export const TAB_KEY = {
   mainGeneral: "General",
   setting: "Setting",
   stageNSTG: "Night Shadow Training Ground",
-  stageArcOfTranscen: "Arc of Transcendence",
+  stageArcOfTranscen: "Ark of Transcendence",
   stageFissionMaze: "Fission Maze",
   eqAncient: "Ancient",
   eqKilos: "Kilos",
