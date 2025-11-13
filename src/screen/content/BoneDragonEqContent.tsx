@@ -1,9 +1,4 @@
-import {
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
-  MinusCircleOutlined,
-} from "@ant-design/icons";
-import { Alert, Divider, Radio, Select, Tag, Typography } from "antd";
+import { Alert, Divider, Radio, Select, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
@@ -25,15 +20,19 @@ import {
 } from "../../data/BoneDragonEqData";
 import { BoneCalculator } from "../../interface/Common.interface";
 import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
-import {
-  BoneDragonStats,
-  columnBoneDragonFlag,
-} from "../../interface/ItemStat.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
+  combineEqStats,
+  getBreakTag,
+  getColumnsStats,
   getComparedData,
+  getDeductTag,
+  getStatDif,
+  getSuccessRateTag,
   getTextEmpty,
 } from "../../utils/common.util";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
 
 const { Text } = Typography;
 
@@ -204,48 +203,8 @@ const BoneDragonEqContent = () => {
       return { res1: temp, res2: temp2 };
     }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  function combineBoneEqStats(
-    a: BoneDragonStats,
-    b: BoneDragonStats,
-    operation: "add" | "minus"
-  ): BoneDragonStats {
-    const result: BoneDragonStats = { ...a };
-
-    const keys = Object.keys({ ...a, ...b }) as (keyof BoneDragonStats)[];
-
-    for (const key of keys) {
-      const valueA = a[key];
-      const valueB = b[key];
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        const computed =
-          operation === "add" ? valueA + valueB : valueA - valueB;
-
-        (result as any)[key] = computed;
-      }
-    }
-
-    return result;
-  }
-
-  const statDif: BoneDragonStats = useMemo(() => {
-    let temp: BoneDragonStats = {
-      encLevel: "0",
-      phyMagAtkMax: 0,
-      phyMagAtkMin: 0,
-      phyMagAtkPercent: 0,
-      attAtkPercent: 0,
-
-      crt: 0,
-      cdm: 0,
-      fd: 0,
-
-      def: 0,
-      magdef: 0,
-      hp: 0,
-      hpPercent: 0,
-      moveSpeedPercent: 0,
-    };
+  const statDif: CommonItemStats = useMemo(() => {
+    let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
       return temp;
     }
@@ -256,7 +215,7 @@ const BoneDragonEqContent = () => {
       if (found) {
         const { equipment, from, to } = found;
 
-        let tableHolder: BoneDragonStats[];
+        let tableHolder: CommonItemStats[];
         switch (equipment) {
           case EQUIPMENT.HELM:
             tableHolder = BoneDragonStatsHelmTable;
@@ -287,8 +246,8 @@ const BoneDragonEqContent = () => {
         }
         const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
         if (dt2) {
-          const dt = dt1 ? combineBoneEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineBoneEqStats(temp, dt, "add");
+          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+          temp = combineEqStats(temp, dt, "add");
         }
       }
     });
@@ -299,51 +258,6 @@ const BoneDragonEqContent = () => {
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
     const items: CollapseProps["items"] = [];
-
-    const getSuccessRateTag = (key: string, dt: number[]) => {
-      const another100 = dt.some((it) => it < 100);
-      return another100 ? (
-        <Tag
-          key={`tag-fail-${key}`}
-          icon={<ExclamationCircleOutlined />}
-          color="warning"
-        >
-          might fail
-        </Tag>
-      ) : (
-        <Tag
-          key={`tag-success-${key}`}
-          icon={<CheckCircleOutlined />}
-          color="success"
-        >
-          100% success
-        </Tag>
-      );
-    };
-    const getBreakTag = (key: string, dt: number[]) => {
-      const canBreak = dt.some((it) => it > 0);
-      return canBreak ? (
-        <Tag
-          key={`tag-break-${key}`}
-          icon={<MinusCircleOutlined />}
-          color="error"
-        >
-          might break
-        </Tag>
-      ) : undefined;
-    };
-    const getDeductTag = (key: string, dt: number[]) => {
-      const canReduce = dt.some((it) => it > 0);
-      return canReduce ? (
-        <Tag
-          key={`tag-minus-${key}`}
-          icon={<ExclamationCircleOutlined />}
-          color="error"
-        >
-          might -1
-        </Tag>
-      ) : undefined;
-    };
 
     Object.entries(tableResource.res2).forEach(([key, value]) => {
       if (key === "Jelly") {
@@ -524,72 +438,7 @@ const BoneDragonEqContent = () => {
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard
             title="Status Increase"
-            data={[
-              {
-                title: "ATK Max",
-                value: statDif.phyMagAtkMax,
-                format: true,
-              },
-              {
-                title: "ATK Min",
-                value: statDif.phyMagAtkMin,
-                format: true,
-              },
-              {
-                title: "ATK",
-                value: statDif.phyMagAtkPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Ele",
-                value: statDif.attAtkPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "CRT",
-                value: statDif.crt,
-                format: true,
-              },
-              {
-                title: "CDM",
-                value: statDif.cdm,
-                format: true,
-              },
-              {
-                title: "FD",
-                value: statDif.fd,
-                format: true,
-              },
-              {
-                title: "Phy Def",
-                value: statDif.def,
-                format: true,
-              },
-              {
-                title: "Mag Def",
-                value: statDif.magdef,
-                format: true,
-              },
-              {
-                title: "HP",
-                value: statDif.hp,
-                format: true,
-              },
-              {
-                title: "HP",
-                value: statDif.hpPercent,
-                suffix: "%",
-                format: true,
-              },
-              {
-                title: "Movespeed",
-                value: statDif.moveSpeedPercent,
-                suffix: "%",
-                format: true,
-              },
-            ]}
+            data={getStatDif(statDif)}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
@@ -616,240 +465,6 @@ const BoneDragonEqContent = () => {
   };
 
   const getStatContent = () => {
-    const getColumnsStats = ({
-      phyMagAtkMinFlag,
-      phyMagAtkMaxFlag,
-      phyMagAtkPercentFlag,
-      attAtkPercentFlag,
-      crtFlag,
-      cdmFlag,
-      fdFlag,
-      defFlag,
-      magdefFlag,
-      hpFlag,
-      hpPercentFlag,
-      moveSpeedPercentFlag,
-    }: columnBoneDragonFlag): ColumnsType<BoneDragonStats> => {
-      const temp: ColumnsType<BoneDragonStats> = [];
-      const smallItemTitle: string[] = [];
-      if (phyMagAtkMinFlag && phyMagAtkMaxFlag) {
-        smallItemTitle.push("ATK");
-        temp.push({
-          title: "Attack",
-          responsive: ["sm"],
-          render: (_, { phyMagAtkMin, phyMagAtkMax }) => (
-            <div>
-              <Text>
-                {getTextEmpty({
-                  txt:
-                    phyMagAtkMin && phyMagAtkMax
-                      ? `${phyMagAtkMin.toLocaleString()} - ${phyMagAtkMax.toLocaleString()}`
-                      : undefined,
-                })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-      if (phyMagAtkPercentFlag) {
-        smallItemTitle.push("ATK(%)");
-        temp.push({
-          title: "Attack(%)",
-          responsive: ["sm"],
-          render: (_, { phyMagAtkPercent }) => (
-            <div>
-              <Text>
-                {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-      if (attAtkPercentFlag) {
-        smallItemTitle.push("ATT(%)");
-        temp.push({
-          title: "Attribute(%)",
-          responsive: ["sm"],
-          render: (_, { attAtkPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (crtFlag) {
-        smallItemTitle.push("CRT");
-        temp.push({
-          title: "CRT",
-          responsive: ["sm"],
-          render: (_, { crt }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: crt })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (cdmFlag) {
-        smallItemTitle.push("CDM");
-        temp.push({
-          title: "CDM",
-          responsive: ["sm"],
-          render: (_, { cdm }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: cdm })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (fdFlag) {
-        smallItemTitle.push("FD");
-        temp.push({
-          title: "FD",
-          responsive: ["sm"],
-          render: (_, { fd }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: fd })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (defFlag) {
-        smallItemTitle.push("Phy Def");
-        temp.push({
-          title: "Phy Def",
-          responsive: ["sm"],
-          render: (_, { def }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: def })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (magdefFlag) {
-        smallItemTitle.push("Mag Def");
-        temp.push({
-          title: "Mag Def",
-          responsive: ["sm"],
-          render: (_, { magdef }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: magdef })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (hpFlag) {
-        smallItemTitle.push("HP");
-        temp.push({
-          title: "HP",
-          responsive: ["sm"],
-          render: (_, { hp }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: hp })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (hpPercentFlag) {
-        smallItemTitle.push("HP(%)");
-        temp.push({
-          title: "HP(%)",
-          responsive: ["sm"],
-          render: (_, { hpPercent }) => (
-            <div>
-              <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-            </div>
-          ),
-        });
-      }
-      if (moveSpeedPercentFlag) {
-        smallItemTitle.push("Movespeed(%)");
-        temp.push({
-          title: "Movespeed(%)",
-          responsive: ["sm"],
-          render: (_, { moveSpeedPercent }) => (
-            <div>
-              <Text>
-                {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-              </Text>
-            </div>
-          ),
-        });
-      }
-
-      return [
-        {
-          title: "Enhancement",
-          dataIndex: "encLevel",
-        },
-        {
-          title: (
-            <div>
-              {smallItemTitle.map((it) => (
-                <p key={`title-${it}`}>{it}</p>
-              ))}
-            </div>
-          ),
-          responsive: ["xs"],
-          width: 150,
-          render: (
-            _,
-            {
-              phyMagAtkMin,
-              phyMagAtkMax,
-              phyMagAtkPercent,
-              attAtkPercent,
-              crt,
-              cdm,
-              fd,
-              def,
-              magdef,
-              hp,
-              hpPercent,
-              moveSpeedPercent,
-            }
-          ) => (
-            <div>
-              {phyMagAtkMinFlag && phyMagAtkMaxFlag && (
-                <p>
-                  ATK{" "}
-                  {getTextEmpty({
-                    txt:
-                      phyMagAtkMin && phyMagAtkMax
-                        ? `${phyMagAtkMin} - ${phyMagAtkMax}`
-                        : undefined,
-                  })}
-                </p>
-              )}
-              {phyMagAtkPercentFlag && (
-                <p>
-                  ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-                </p>
-              )}
-              {attAtkPercentFlag && (
-                <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-              )}
-              {crtFlag && <p>CRT {getTextEmpty({ txt: crt })}</p>}
-              {cdmFlag && <p>CDM {getTextEmpty({ txt: cdm })}</p>}
-              {fdFlag && <p>FD {getTextEmpty({ txt: fd })}</p>}
-              {defFlag && <p>Phy Def {getTextEmpty({ txt: def })}</p>}
-              {magdefFlag && <p>Mag Def {getTextEmpty({ txt: magdef })}</p>}
-              {hpFlag && <p>HP {getTextEmpty({ txt: hp })}</p>}
-              {hpPercentFlag && (
-                <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-              )}
-              {moveSpeedPercentFlag && (
-                <p>
-                  Movespeed{" "}
-                  {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-                </p>
-              )}
-            </div>
-          ),
-        },
-        ...temp,
-      ];
-    };
-
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",

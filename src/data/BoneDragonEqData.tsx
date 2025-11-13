@@ -1,7 +1,7 @@
 import { EQUIPMENT } from "../constants/InGame.constants";
 import { BoneCalculator } from "../interface/Common.interface";
 import { BoneDragonEqEnhanceMaterial } from "../interface/Item.interface";
-import { BoneDragonStats } from "../interface/ItemStat.interface";
+import { CommonItemStats } from "../interface/ItemStat.interface";
 
 export const dataBoneCalculator: BoneCalculator[] = [
   {
@@ -508,7 +508,7 @@ export const BoneDragonEqEnhanceMaterialWeapTable: BoneDragonEqEnhanceMaterial[]
       enhanceFailDeduction: 1,
     },
   ];
-export const BoneDragonStatsMainTable: BoneDragonStats[] = [
+export const BoneDragonStatsMainTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 3761604,
@@ -699,7 +699,7 @@ export const BoneDragonStatsMainTable: BoneDragonStats[] = [
     fd: 1200,
   },
 ];
-export const BoneDragonStatsSecondTable: BoneDragonStats[] = [
+export const BoneDragonStatsSecondTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 3712703,
@@ -890,7 +890,7 @@ export const BoneDragonStatsSecondTable: BoneDragonStats[] = [
     fd: 1200,
   },
 ];
-export const BoneDragonStatsHelmTable: BoneDragonStats[] = [
+export const BoneDragonStatsHelmTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 2642136,
@@ -1144,7 +1144,7 @@ export const BoneDragonStatsHelmTable: BoneDragonStats[] = [
     crt: -50000,
   },
 ];
-export const BoneDragonStatsUpperTable: BoneDragonStats[] = [
+export const BoneDragonStatsUpperTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 2982525,
@@ -1419,7 +1419,7 @@ export const BoneDragonStatsUpperTable: BoneDragonStats[] = [
     attAtkPercent: 8.0,
   },
 ];
-export const BoneDragonStatsLowerTable: BoneDragonStats[] = [
+export const BoneDragonStatsLowerTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 2882920,
@@ -1694,7 +1694,7 @@ export const BoneDragonStatsLowerTable: BoneDragonStats[] = [
     attAtkPercent: 8.0,
   },
 ];
-export const BoneDragonStatsGlovesTable: BoneDragonStats[] = [
+export const BoneDragonStatsGlovesTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 2567420,
@@ -1948,7 +1948,7 @@ export const BoneDragonStatsGlovesTable: BoneDragonStats[] = [
     attAtkPercent: 8.0,
   },
 ];
-export const BoneDragonStatsShoesTable: BoneDragonStats[] = [
+export const BoneDragonStatsShoesTable: CommonItemStats[] = [
   {
     encLevel: "0",
     phyMagAtkMin: 2567420,

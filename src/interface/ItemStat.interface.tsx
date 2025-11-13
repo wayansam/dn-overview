@@ -134,28 +134,6 @@ export interface LunarJadeEnhancementStats {
   magDef?: number;
 }
 
-export interface BoneDragonStats {
-  encLevel: string;
-  phyMagAtkMin?: number;
-  phyMagAtkMax?: number;
-  phyMagAtkPercent?: number;
-  attAtkPercent?: number;
-
-  crt?: number;
-  cdm?: number;
-  fd?: number;
-
-  def?: number;
-  magdef?: number;
-  hp?: number;
-  hpPercent?: number;
-  moveSpeedPercent?: number;
-}
-
-export type columnBoneDragonFlag = {
-  [K in keyof BoneDragonStats as `${K}Flag`]?: boolean;
-};
-
 export interface BestieStats {
   encLevel: string;
 
