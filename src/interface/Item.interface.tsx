@@ -194,4 +194,5 @@ export interface DeeplyVariantJadeEnhanceMaterial {
   deepRootedLonging: number;
   twistedRoot?: number;
   gold: number;
+  successRatePercent?: number;
 }

@@ -153,300 +153,350 @@ export const DeeplyVariantLJadeEnhanceMaterialTable: DeeplyVariantJadeEnhanceMat
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 2,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 3,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 4,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 5,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 6,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 7,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 8,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 9,
       deepRootedLonging: 20,
       twistedRoot: 4,
       gold: 50000,
+      successRatePercent: 100
     },
     {
       encLevel: 10,
       deepRootedLonging: 30,
       twistedRoot: 5,
       gold: 50000,
+      successRatePercent: 15
     },
     {
       encLevel: 11,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 12,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 13,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 14,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 15,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 16,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 17,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 18,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 19,
       deepRootedLonging: 35,
       twistedRoot: 5,
       gold: 70000,
+      successRatePercent: 100
     },
     {
       encLevel: 20,
       deepRootedLonging: 40,
       twistedRoot: 6,
       gold: 70000,
+      successRatePercent: 10
     },
     {
       encLevel: 21,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 22,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 23,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 24,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 25,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 26,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 27,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 28,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 29,
       deepRootedLonging: 45,
       twistedRoot: 6,
       gold: 100000,
+      successRatePercent: 100
     },
     {
       encLevel: 30,
       deepRootedLonging: 50,
       twistedRoot: 7,
       gold: 100000,
+      successRatePercent: 7
     },
     {
       encLevel: 31,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 32,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 33,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 34,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 35,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 36,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 37,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 38,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 39,
       deepRootedLonging: 55,
       twistedRoot: 7,
       gold: 150000,
+      successRatePercent: 100
     },
     {
       encLevel: 40,
       deepRootedLonging: 60,
       twistedRoot: 8,
       gold: 150000,
+      successRatePercent: 5
     },
     {
       encLevel: 41,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 42,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 43,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 44,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 45,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 46,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 47,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 48,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 49,
       deepRootedLonging: 65,
       twistedRoot: 8,
       gold: 200000,
+      successRatePercent: 100
     },
     {
       encLevel: 50,
       deepRootedLonging: 70,
       twistedRoot: 10,
       gold: 200000,
+      successRatePercent: 3
     },
   ];
 

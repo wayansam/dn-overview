@@ -8,6 +8,7 @@ export interface ItemList {
   value?: string | number;
   format?: boolean;
   children?: React.ReactNode;
+  removeWidth?: boolean;
 }
 interface ListingCardProps {
   title?: string;
@@ -17,12 +18,15 @@ interface ListingCardProps {
 
 const ListingCard = ({ title, keyId, data }: ListingCardProps) => {
   const getStatRender = (
-    { title, suffix, value, format, isHeader, children }: ItemList,
+    { title, suffix, value, format, isHeader, children, removeWidth }: ItemList,
     idx: number
   ) => {
     if (isHeader) {
       return (
-        <div key={`item-container-${title}-${idx}`} style={{ width: 400 }}>
+        <div
+          key={`item-container-${title}-${idx}`}
+          style={{ width: removeWidth ? "unset" : 400 }}
+        >
           <Text strong key={`item-${title}-${idx}`}>
             {title}
           </Text>

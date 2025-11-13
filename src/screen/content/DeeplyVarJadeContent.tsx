@@ -20,6 +20,7 @@ import {
   getColumnsStats,
   getComparedData,
   getStatDif,
+  getSuccessRateTag,
   getTextEmpty,
 } from "../../utils/common.util";
 import {
@@ -28,7 +29,7 @@ import {
   DeeplyVariantUJadeEnhanceMaterialTable,
   DeeplyVariantUJadeStatsTable,
 } from "../../data/DeeplyVarJadeData";
-import ListingCard from "../../components/ListingCard";
+import ListingCard, { ItemList } from "../../components/ListingCard";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 const { Text } = Typography;
@@ -56,6 +57,11 @@ interface DeeplyVariantTableMaterialList {
   Gold: number;
   "Contaminated Will": number;
   "Corrupted Origin": number;
+}
+
+interface ExtraData {
+  enhance: string;
+  sRate: string;
 }
 
 const DeeplyVarJadeContent = () => {
@@ -95,14 +101,24 @@ const DeeplyVarJadeContent = () => {
             <p>Deeply Rooted Fragment of Longing</p>
             {isLJade && <p>Twisted Root</p>}
             <p>Gold</p>
+            {isLJade && <p>Success Rate</p>}
           </div>
         ),
         responsive: ["xs"],
-        render: (_, { deepRootedLonging, twistedRoot, gold }) => (
+        render: (
+          _,
+          { deepRootedLonging, twistedRoot, gold, successRatePercent }
+        ) => (
           <div>
             <p>{deepRootedLonging}(Fragment)</p>
             {isLJade && <p>{twistedRoot}(Root)</p>}
             <p>{getTextEmpty({ txt: gold })}(g)</p>
+            {isLJade && (
+              <p>
+                {getTextEmpty({ txt: successRatePercent, tailText: "%" })}
+                (Success%)
+              </p>
+            )}
           </div>
         ),
       },
@@ -123,6 +139,7 @@ const DeeplyVarJadeContent = () => {
       {
         title: "Gold",
         dataIndex: "gold",
+        width: 100,
         responsive: ["sm"],
         render: (_, { gold }) => (
           <div>
@@ -130,6 +147,22 @@ const DeeplyVarJadeContent = () => {
           </div>
         ),
       },
+      ...(isLJade
+        ? ([
+            {
+              title: "Success Rate",
+              responsive: ["sm"],
+              render: (_, { successRatePercent }) => (
+                <Text>
+                  {getTextEmpty({
+                    txt: successRatePercent,
+                    tailText: "%",
+                  })}
+                </Text>
+              ),
+            },
+          ] as ColumnsType<DeeplyVariantJadeEnhanceMaterial>)
+        : []),
     ];
   };
 
@@ -379,7 +412,10 @@ const DeeplyVarJadeContent = () => {
     return selectStart >= selectEnd;
   }, [selectStart, selectEnd]);
 
-  const encLDataSource: DeeplyVariantTableMaterialList = useMemo(() => {
+  const encLDataSource: {
+    res1: DeeplyVariantTableMaterialList;
+    res2: Array<ExtraData>;
+  } = useMemo(() => {
     let temp: DeeplyVariantTableMaterialList = {
       "Collapse Dimension Energy": 0,
       "Deeply Rooted Fragment of Longing": 0,
@@ -388,6 +424,7 @@ const DeeplyVarJadeContent = () => {
       "Contaminated Will": 0,
       "Corrupted Origin": 0,
     };
+    let exData: ExtraData[] = [];
     if (!isError) {
       let tempDeepFrag = 0;
       let tempTwist = 0;
@@ -400,13 +437,40 @@ const DeeplyVarJadeContent = () => {
         tempDeepFrag += slicedItem.deepRootedLonging;
         tempTwist += slicedItem.twistedRoot ?? 0;
         tempGold += slicedItem.gold;
+        if (slicedItem.successRatePercent !== 100) {
+          exData.push({
+            enhance: `${slicedItem.encLevel}`,
+            sRate: `${slicedItem.successRatePercent}%`,
+          });
+        }
       });
       temp["Deeply Rooted Fragment of Longing"] = tempDeepFrag;
       temp["Twisted Root"] = tempTwist;
       temp.Gold = tempGold;
     }
-    return temp;
+    return { res1: temp, res2: exData };
   }, [isError, selectStart, selectEnd]);
+
+  const extraInfo: ItemList[] = useMemo(() => {
+    const list: ItemList[] = [];
+    list.push({
+      title: "Summary ",
+      isHeader: true,
+      removeWidth: true,
+      children: getSuccessRateTag("sRate", [
+        encLDataSource.res2.length !== 0 ? 0 : 100,
+      ]),
+    });
+    if (encLDataSource.res2.length !== 0) {
+      encLDataSource.res2.forEach((it) => {
+        list.push({
+          title: `enhancing to +${it.enhance} have`,
+          value: `${it.sRate} success rate`,
+        });
+      });
+    }
+    return list;
+  }, [encLDataSource.res2]);
 
   const lStatDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
@@ -468,7 +532,7 @@ const DeeplyVarJadeContent = () => {
           <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
-            dataSource={Object.entries(encLDataSource)
+            dataSource={Object.entries(encLDataSource.res1)
               .filter(([_, value]) => {
                 if (typeof value === "number") {
                   return value !== 0;
@@ -485,6 +549,9 @@ const DeeplyVarJadeContent = () => {
           />
         </div>
 
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
+        </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard title="Status Increase" data={getStatDif(lStatDif)} />
         </div>
@@ -518,7 +585,7 @@ const DeeplyVarJadeContent = () => {
       label: "Mats - Unique Grade",
       children: (
         <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
+          <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
               dataSource={DeeplyVariantUJadeEnhanceMaterialTable}
