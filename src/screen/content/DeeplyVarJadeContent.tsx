@@ -13,7 +13,16 @@ import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import ListingCard, { ItemList } from "../../components/ListingCard";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
+import {
+  DeeplyVariantLJadeEnhanceMaterialTable,
+  DeeplyVariantLJadeStatsTable,
+  DeeplyVariantUJadeEnhanceMaterialTable,
+  DeeplyVariantUJadeStatsTable,
+} from "../../data/DeeplyVarJadeData";
 import { DeeplyVariantJadeEnhanceMaterial } from "../../interface/Item.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
   combineEqStats,
@@ -23,15 +32,6 @@ import {
   getSuccessRateTag,
   getTextEmpty,
 } from "../../utils/common.util";
-import {
-  DeeplyVariantLJadeEnhanceMaterialTable,
-  DeeplyVariantLJadeStatsTable,
-  DeeplyVariantUJadeEnhanceMaterialTable,
-  DeeplyVariantUJadeStatsTable,
-} from "../../data/DeeplyVarJadeData";
-import ListingCard, { ItemList } from "../../components/ListingCard";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -184,6 +184,7 @@ const DeeplyVarJadeContent = () => {
     if (checkedCraft) {
       tempDeepFrag += 200;
       tempEnergy += 2;
+      tempGold += 200000;
     }
     if (checkedEvoL) {
       tempWill += 1;
