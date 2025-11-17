@@ -109,6 +109,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "12-11-2025",
     },
+    {
+      key: keyUpdate.U,
+      label: "VIP Accessories charts",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "17-11-2025",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

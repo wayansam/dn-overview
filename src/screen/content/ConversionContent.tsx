@@ -12,24 +12,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
 import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
+import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import {
-  conversionDecalStats,
-  conversionEarringStats,
-  conversionGloveStats,
-  conversionHelmStats,
-  conversionLowerStats,
-  conversionMainStats,
-  conversionNecklaceStats,
-  conversionRingStats,
-  conversionSecondStats,
-  conversionShoesStats,
-  conversionTailStats,
-  conversionUpperStats,
-  conversionWingStats,
-  dataConversionCalculator,
-} from "../../data/ConversionCalculatorData";
+import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
@@ -39,6 +24,7 @@ import {
   getComparedData,
   getStatDif,
 } from "../../utils/common.util";
+import { getResource } from "../../utils/resource.util";
 
 const { Text } = Typography;
 
@@ -87,9 +73,10 @@ const ConversionContent = () => {
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
-  const [selectStat, setSelectStat] = useState<
-    { label: string; value: string } | undefined
-  >();
+  const [selectStat, setSelectStat] = useState<{
+    label: string;
+    value: string;
+  }>();
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -195,44 +182,6 @@ const ConversionContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  const getRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {
-    switch (equipment) {
-      case EQUIPMENT.HELM:
-        return conversionHelmStats;
-      case EQUIPMENT.UPPER:
-        return conversionUpperStats;
-      case EQUIPMENT.LOWER:
-        return conversionLowerStats;
-      case EQUIPMENT.GLOVE:
-        return conversionGloveStats;
-      case EQUIPMENT.SHOES:
-        return conversionShoesStats;
-
-      case EQUIPMENT.MAIN_WEAPON:
-        return conversionMainStats;
-      case EQUIPMENT.SECOND_WEAPON:
-        return conversionSecondStats;
-
-      case EQUIPMENT.NECKLACE:
-        return conversionNecklaceStats;
-      case EQUIPMENT.EARRING:
-        return conversionEarringStats;
-      case EQUIPMENT.RING1:
-      case EQUIPMENT.RING2:
-        return conversionRingStats;
-
-      case EQUIPMENT.WING:
-        return conversionWingStats;
-      case EQUIPMENT.TAIL:
-        return conversionTailStats;
-      case EQUIPMENT.DECAL:
-        return conversionDecalStats;
-
-      default:
-        return [];
-    }
-  };
-
   const statDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
@@ -244,9 +193,7 @@ const ConversionContent = () => {
 
       if (found) {
         const { equipment, from, to } = found;
-
-        const tableHolder = getRscTable(equipment);
-
+        const tableHolder = getResource(TAB_KEY.miscConversion, equipment);
         const { dt1, dt2 } = getComparedData(tableHolder, from, to);
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
@@ -326,7 +273,7 @@ const ConversionContent = () => {
       if (found) {
         const { equipment, from, to } = found;
         const tableHolder = [{ ...EmptyCommonnStat, encLevel: "Buy" }].concat(
-          getRscTable(equipment)
+          getResource(TAB_KEY.miscConversion, equipment)
         );
         const clippedTable = tableHolder.slice(from, to + 1);
         clippedTable.forEach((it) => {
@@ -477,7 +424,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Helm"}
               size={"small"}
-              dataSource={conversionHelmStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.HELM)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -500,7 +447,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Upper"}
               size={"small"}
-              dataSource={conversionUpperStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.UPPER)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -524,7 +471,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Lower"}
               size={"small"}
-              dataSource={conversionLowerStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.LOWER)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -544,7 +491,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Glove"}
               size={"small"}
-              dataSource={conversionGloveStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.GLOVE)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -564,7 +511,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Shoes"}
               size={"small"}
-              dataSource={conversionShoesStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.SHOES)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -598,7 +545,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Main"}
               size={"small"}
-              dataSource={conversionMainStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.MAIN_WEAPON
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -619,7 +569,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Second"}
               size={"small"}
-              dataSource={conversionSecondStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.SECOND_WEAPON
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -644,7 +597,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Necklace"}
               size={"small"}
-              dataSource={conversionNecklaceStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.NECKLACE
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -665,7 +621,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Earring"}
               size={"small"}
-              dataSource={conversionEarringStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.EARRING
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -684,7 +643,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Ring"}
               size={"small"}
-              dataSource={conversionRingStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.RING1)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -711,7 +670,7 @@ const ConversionContent = () => {
               title={() => "Wing"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionWingStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.WING)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -730,7 +689,7 @@ const ConversionContent = () => {
               title={() => "Tail"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionTailStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.TAIL)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -751,7 +710,7 @@ const ConversionContent = () => {
               title={() => "Decal"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionDecalStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.DECAL)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 attAtkPercentFlag: true,
