@@ -56,6 +56,10 @@ const VIPAccContent = () => {
     label: string;
     value: string;
   }>();
+  const [selectPrev, setSelectPrev] = useState<{
+    label: string;
+    value: string;
+  }>();
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -220,15 +224,19 @@ const VIPAccContent = () => {
         const { equipment, from, to } = found;
         const tableHolder = getResource(TAB_KEY.eqVIPAcc, equipment);
         const clippedTable = tableHolder.slice(from, to + 1);
-        clippedTable.forEach((it) => {
+        let prevStatVal: number = 0;
+        clippedTable.forEach((it, idx) => {
           const val =
             it[stat] !== undefined && typeof it?.[stat] === "number"
               ? (it[stat] as number)
               : 0;
 
+          const dif = idx !== 0 ? val - prevStatVal : 0;
+          prevStatVal = val;
           holder.push({
             enhance: it.encLevel,
-            value: val,
+            total: val,
+            step: dif,
             type: equipment,
           });
         });
@@ -314,6 +322,8 @@ const VIPAccContent = () => {
             data={chartItems}
             statVal={selectStat}
             setStatVal={setSelectStat}
+            statPrev={selectPrev}
+            setStatPrev={setSelectPrev}
           />
         </div>
       </div>
