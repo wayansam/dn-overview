@@ -65,6 +65,10 @@ const ENC_AST_POW_ARMOR = 450;
 const ENC_AST_STONE_ARMOR = 1;
 const ENC_AST_POW_ACC = 500;
 const ENC_AST_STONE_ACC = 3;
+const ENC_AST_POW_WEAP = 600;
+const ENC_AST_STONE_WEAP = 3;
+const ENC_AST_POW_WTD = 550;
+const ENC_AST_STONE_WTD = 3;
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -118,7 +122,7 @@ const ConversionContent = () => {
         const isEvo = to >= 12 && from <= 11;
         let frag =
           (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
-            CONV_FRAG +
+          CONV_FRAG +
           (isBuy ? CONV_FRAG : 0);
 
         let lgFrag = 0;
@@ -147,6 +151,10 @@ const ConversionContent = () => {
               lgFrag += EV_AST_POW_WEAP;
               lgStone += EV_AST_STONE;
             }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_WEAP;
+              lgStone += enhLRange * ENC_AST_STONE_WEAP;
+            }
             break;
 
           case EQUIPMENT.NECKLACE:
@@ -171,6 +179,10 @@ const ConversionContent = () => {
             if (isEvo) {
               lgFrag += EV_AST_POW_WTD;
               lgStone += EV_AST_STONE;
+            }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_WTD;
+              lgStone += enhLRange * ENC_AST_STONE_WTD;
             }
             break;
 
@@ -260,8 +272,8 @@ const ConversionContent = () => {
         selectFrom < item.min
           ? item.min
           : selectFrom >= item.max
-          ? item.max
-          : selectFrom,
+            ? item.max
+            : selectFrom,
       to: selectTo > item.max ? item.max : selectTo,
     }));
     setDataSource(newData);
@@ -590,6 +602,7 @@ const ConversionContent = () => {
                 attAtkPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
+                crtFlag: true,
               })}
               pagination={false}
               bordered
@@ -855,6 +868,22 @@ const ConversionContent = () => {
                 bordered
               />
             </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_WEAP,
+                  "Astral Stone": ENC_AST_STONE_WEAP,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
           </div>
         ),
       },
@@ -950,6 +979,22 @@ const ConversionContent = () => {
                 dataSource={Object.entries({
                   "Astral Powder": EV_AST_POW_WTD,
                   "Astral Stone": EV_AST_STONE,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_WTD,
+                  "Astral Stone": ENC_AST_STONE_WTD,
                 }).map(([key, value]) => ({
                   mats: key,
                   amount: value,

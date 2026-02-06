@@ -803,6 +803,24 @@ const getItems: (
               Enhancement Legend Conversion Accessories (+1 to +3)
             </a>
           </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/171/c/2"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Enhancement Legend Conversion Weapon (+1 to +3)
+            </a>
+          </p>
+          <p>
+            <a
+              href="https://patchnote.dragonnest.com/sea/174/c/15"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Enhancement Legend Conversion WTD (+1 to +3)
+            </a>
+          </p>
           <p>KR Patch Note related :</p>
           <p>
             <a
