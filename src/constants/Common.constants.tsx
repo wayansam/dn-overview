@@ -7,7 +7,8 @@ import {
 
 export const TAB_KEY = {
   mainGeneral: "General",
-  setting: "Setting",
+  releaseHistory: "Release History",
+  feedback: "Feedback",
   stageNSTG: "Night Shadow Training Ground",
   stageArcOfTranscen: "Ark of Transcendence",
   stageFissionMaze: "Fission Maze",
@@ -157,8 +158,12 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
     name: "Utility",
     children: [
       {
-        key: TAB_KEY.setting,
-        name: TAB_KEY.setting,
+        key: TAB_KEY.releaseHistory,
+        name: TAB_KEY.releaseHistory,
+      },
+      {
+        key: TAB_KEY.feedback,
+        name: TAB_KEY.feedback,
       },
     ],
   },

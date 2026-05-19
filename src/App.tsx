@@ -1,5 +1,4 @@
 import { Provider } from "react-redux";
-import "./App.css";
 import MainPage from "./screen/MainPage";
 import store from "./store";
 

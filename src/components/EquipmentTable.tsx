@@ -223,10 +223,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
 
   type ColumnTypes = (ColumnGroupType<T> | ColumnType<T>)[];
 
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: T[]
-  ) => {
+  const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 

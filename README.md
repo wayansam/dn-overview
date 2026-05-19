@@ -1,46 +1,50 @@
-# Getting Started with Create React App
+# DN Overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A rate, item enhance, and drop rate calculator for the Dragon Nest SEA MMO game.
 
-## Available Scripts
+**Live site:** https://wayansam.github.io/dn-overview
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Ancient equipment enhancement rates
+- Bestie (companion) calculations
+- Skill Jade planning
+- Talisman enhancements
+- Equipment drop rate analysis
+- Trading house conversions
+- VIP account calculations
+- Dark mode support
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Tech Stack
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) — build tool and dev server
+- [Ant Design 5](https://ant.design/) — UI component library
+- [Redux Toolkit](https://redux-toolkit.js.org/) + [Redux Saga](https://redux-saga.js.org/) — state management
+- [@ant-design/charts](https://charts.ant.design/) — data visualization
 
-### `npm test`
+## Getting Started
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# Install dependencies
+bun install
 
-### `npm run build`
+# Start dev server (http://localhost:3000)
+bun run dev
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Production build (outputs to dist/)
+bun run build
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+# Preview production build locally
+bun run preview
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Deployment
 
-### `npm run eject`
+The app is deployed to GitHub Pages via the `gh-pages` branch.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+bun run deploy
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+This runs `vite build` then publishes `dist/` to GitHub Pages.

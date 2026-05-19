@@ -1004,7 +1004,7 @@ export const getStatDesc = (
 };
 
 export const getAllStatDesc = (): columnCommonItemDesc => {
-  let result: columnCommonItemDesc = { ...EmptyCommonStatDesc };
+  const result: columnCommonItemDesc = { ...EmptyCommonStatDesc };
   const keys = Object.keys({
     ...EmptyCommonnStat,
   }) as (keyof CommonItemStats)[];

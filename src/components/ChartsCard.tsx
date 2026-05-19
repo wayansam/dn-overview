@@ -93,33 +93,38 @@ const ChartsCard = ({
           {title}
         </Divider>
       )}
-      <div style={{ marginBottom: 4 }}>
-        Stat:
-        <Divider type="vertical" />
-        <Select
-          value={statVal?.label}
-          style={{ width: 200 }}
-          onChange={(val) => {
-            const found = allDesc.find((it) => it.value === val);
-            setStatVal?.(found);
-          }}
-          options={allDesc}
-        />
+
+      {/* Selectors — label left, select right */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <span style={{ fontSize: 13, color: "var(--muted-foreground)", whiteSpace: "nowrap" }}>Stat</span>
+          <Select
+            value={statVal?.label}
+            style={{ width: 200 }}
+            onChange={(val) => {
+              const found = allDesc.find((it) => it.value === val);
+              setStatVal?.(found);
+            }}
+            options={allDesc}
+            size="small"
+          />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <span style={{ fontSize: 13, color: "var(--muted-foreground)", whiteSpace: "nowrap" }}>Preview</span>
+          <Select
+            value={statPrev?.label}
+            style={{ width: 200 }}
+            onChange={(val) => {
+              const found = previewOpt.find((it) => it.value === val);
+              setStatPrev?.(found);
+            }}
+            options={previewOpt}
+            size="small"
+          />
+        </div>
       </div>
-      <div style={{ marginBottom: 4 }}>
-        Preview:
-        <Divider type="vertical" />
-        <Select
-          value={statPrev?.label}
-          style={{ width: 200 }}
-          onChange={(val) => {
-            const found = previewOpt.find((it) => it.value === val);
-            setStatPrev?.(found);
-          }}
-          options={previewOpt}
-        />
-      </div>
-      <Card key={`card-${keyId}`} size="small" style={{ marginTop: 4 }}>
+
+      <Card key={`card-${keyId}`} size="small">
         <Line {...config} />
       </Card>
     </div>

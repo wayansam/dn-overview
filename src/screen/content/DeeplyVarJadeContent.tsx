@@ -1,18 +1,9 @@
-import {
-  Card,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Grid,
-  Select,
-  Slider,
-  Tooltip,
-  Typography,
-} from "antd";
-import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
-import { SliderMarks } from "antd/es/slider";
-import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import { Select, Tooltip } from "antd";
+import { Package } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import {
@@ -21,206 +12,100 @@ import {
   DeeplyVariantUJadeEnhanceMaterialTable,
   DeeplyVariantUJadeStatsTable,
 } from "../../data/DeeplyVarJadeData";
-import { DeeplyVariantJadeEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
-  getColumnsStats,
   getComparedData,
   getStatDif,
   getSuccessRateTag,
-  getTextEmpty,
 } from "../../utils/common.util";
-const { Text } = Typography;
-const { useBreakpoint } = Grid;
 
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
+const uOpts = Array.from({ length: 11 }, (_, i) => ({ label: `+${i}`, value: i }));
+const lOpts = Array.from({ length: 51 }, (_, i) => ({ label: `+${i}`, value: i }));
 
-const marks: SliderMarks = {
-  0: "+0",
-  5: "+5",
-  10: "+10",
-};
-
-interface DeeplyVariantTableMaterialList {
-  "Collapse Dimension Energy": number;
-  "Deeply Rooted Fragment of Longing": number;
-  "Twisted Root": number;
-  Gold: number;
-  "Contaminated Will": number;
-  "Corrupted Origin": number;
+interface MatRow {
+  name: string;
+  amount: number;
 }
 
-interface ExtraData {
-  enhance: string;
-  sRate: string;
-}
+const renderRefTable = (
+  headers: string[],
+  rows: (string | number | undefined)[][]
+) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th
+              key={h}
+              className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap"
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? cell.toLocaleString()
+                  : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
 const DeeplyVarJadeContent = () => {
-  const screens = useBreakpoint();
-  const [deepData, setDeepData] = useState([0, 10]);
+  const [uFrom, setUFrom] = useState(0);
+  const [uTo, setUTo] = useState(10);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedEvoL, setCheckedEvoL] = useState(false);
   const [checkedEvoA, setCheckedEvoA] = useState(false);
-  const [selectStart, setSelectStart] = useState<number>(0);
-  const [selectEnd, setSelectEnd] = useState<number>(1);
+  const [lFrom, setLFrom] = useState(0);
+  const [lTo, setLTo] = useState(1);
 
-  const enhanceList = useMemo(() => {
-    return Array.from({ length: 51 }, (_, k) => k).map((item) => ({
-      label: `+${item}`,
-      value: item,
-    }));
-  }, []);
+  const lIsError = lFrom >= lTo;
 
-  const getWidthSetting = () => {
-    if (screens.xs) {
-      return 200;
-    }
-    return 350;
-  };
-
-  const getColumnsMats = (
-    isLJade?: boolean
-  ): ColumnsType<DeeplyVariantJadeEnhanceMaterial> => {
-    return [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Deeply Rooted Fragment of Longing</p>
-            {isLJade && <p>Twisted Root</p>}
-            <p>Gold</p>
-            {isLJade && <p>Success Rate</p>}
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (
-          _,
-          { deepRootedLonging, twistedRoot, gold, successRatePercent }
-        ) => (
-          <div>
-            <p>{deepRootedLonging}(Fragment)</p>
-            {isLJade && <p>{twistedRoot}(Root)</p>}
-            <p>{getTextEmpty({ txt: gold })}(g)</p>
-            {isLJade && (
-              <p>
-                {getTextEmpty({ txt: successRatePercent, tailText: "%" })}
-                (Success%)
-              </p>
-            )}
-          </div>
-        ),
-      },
-      {
-        title: "Deeply Rooted Fragment of Longing",
-        dataIndex: "deepRootedLonging",
-        responsive: ["sm"],
-      },
-      ...(isLJade
-        ? ([
-            {
-              title: "Twisted Root",
-              dataIndex: "twistedRoot",
-              responsive: ["sm"],
-            },
-          ] as ColumnsType<DeeplyVariantJadeEnhanceMaterial>)
-        : []),
-      {
-        title: "Gold",
-        dataIndex: "gold",
-        width: 100,
-        responsive: ["sm"],
-        render: (_, { gold }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: gold })}</Text>
-          </div>
-        ),
-      },
-      ...(isLJade
-        ? ([
-            {
-              title: "Success Rate",
-              responsive: ["sm"],
-              render: (_, { successRatePercent }) => (
-                <Text>
-                  {getTextEmpty({
-                    txt: successRatePercent,
-                    tailText: "%",
-                  })}
-                </Text>
-              ),
-            },
-          ] as ColumnsType<DeeplyVariantJadeEnhanceMaterial>)
-        : []),
-    ];
-  };
-
-  const encUDataSource: DeeplyVariantTableMaterialList = useMemo(() => {
-    const tempSlice = DeeplyVariantUJadeEnhanceMaterialTable.slice(
-      deepData[0],
-      deepData[1]
-    );
-    let tempEnergy = 0;
-    let tempDeepFrag = 0;
-    let tempGold = 0;
-    let tempWill = 0;
-    let tempOri = 0;
-
-    tempSlice.forEach((slicedItem) => {
-      tempDeepFrag += slicedItem.deepRootedLonging;
-      tempGold += slicedItem.gold;
+  const uMats = useMemo((): MatRow[] => {
+    const sliced = DeeplyVariantUJadeEnhanceMaterialTable.slice(uFrom, uTo);
+    let deepFrag = 0;
+    let gold = 0;
+    sliced.forEach((r) => {
+      deepFrag += r.deepRootedLonging;
+      gold += r.gold;
     });
     if (checkedCraft) {
-      tempDeepFrag += 200;
-      tempEnergy += 2;
-      tempGold += 200000;
+      deepFrag += 200;
+      gold += 200000;
     }
-    if (checkedEvoL) {
-      tempWill += 1;
-    }
-    if (checkedEvoA) {
-      tempOri += 1;
-    }
-    const temp: DeeplyVariantTableMaterialList = {
-      "Collapse Dimension Energy": tempEnergy,
-      "Deeply Rooted Fragment of Longing": tempDeepFrag,
-      "Twisted Root": 0,
-      Gold: tempGold,
-      "Contaminated Will": tempWill,
-      "Corrupted Origin": tempOri,
-    };
-    return temp;
-  }, [deepData, checkedCraft, checkedEvoL, checkedEvoA]);
-
-  const onChangeCraft = (e: CheckboxChangeEvent) => {
-    setCheckedCraft(e.target.checked);
-  };
-  const onChangeEvoL = (e: CheckboxChangeEvent) => {
-    setCheckedEvoL(e.target.checked);
-  };
-  const onChangeEvoA = (e: CheckboxChangeEvent) => {
-    setCheckedEvoA(e.target.checked);
-  };
+    const rows: MatRow[] = [];
+    const energy = checkedCraft ? 2 : 0;
+    const will = checkedEvoL ? 1 : 0;
+    const origin = checkedEvoA ? 1 : 0;
+    if (energy > 0) rows.push({ name: "Collapse Dimension Energy", amount: energy });
+    if (deepFrag > 0) rows.push({ name: "Deeply Rooted Fragment of Longing", amount: deepFrag });
+    if (gold > 0) rows.push({ name: "Gold", amount: gold });
+    if (will > 0) rows.push({ name: "Contaminated Will", amount: will });
+    if (origin > 0) rows.push({ name: "Corrupted Origin", amount: origin });
+    return rows;
+  }, [uFrom, uTo, checkedCraft, checkedEvoL, checkedEvoA]);
 
   const uStatDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
-    let tableHolder = DeeplyVariantUJadeStatsTable;
-
     const { dt1, dt2 } = getComparedData(
-      tableHolder,
-      deepData[0] + 1,
-      deepData[1] + 1
+      DeeplyVariantUJadeStatsTable,
+      uFrom + 1,
+      uTo + 1
     );
     if (dt2) {
       if (checkedCraft) {
@@ -234,391 +119,348 @@ const DeeplyVarJadeContent = () => {
       temp = { ...temp, attAtkPercent: 5 };
     }
     return temp;
-  }, [checkedCraft, checkedEvoL, checkedEvoA, deepData]);
+  }, [uFrom, uTo, checkedCraft, checkedEvoL, checkedEvoA]);
 
-  const getCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setDeepData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={marks}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedCraft} onChange={onChangeCraft}>
-              <Tooltip
-                title="200 deep fragment longing, 2 collapse Dim.Energy"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include craft mats
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedEvoL} onChange={onChangeEvoL}>
-              <Tooltip
-                title="1 Contaminated Will"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include Legend evolver
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedEvoA} onChange={onChangeEvoA}>
-              <Tooltip
-                title="1 Corrupted Origin"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include Ancient evolver
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(encUDataSource)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard title="Status Increase" data={getStatDif(uStatDif)} />
-          {checkedEvoL && (
-            <Card
-              size={"small"}
-              style={{ maxWidth: getWidthSetting(), marginTop: 4 }}
-            >
-              <Text>
-                *1 Skill ATK up Add on Stats [cm3/ ult/ 50 spec/ secondary/
-                main] +50%
-              </Text>
-            </Card>
-          )}
-          {checkedEvoA && (
-            <Card
-              size={"small"}
-              style={{ maxWidth: getWidthSetting(), marginTop: 4 }}
-            >
-              <Text>
-                *3 Critical hit additional damage Add on Stats [cm3/ ult/ 50
-                spec/ secondary/ main] from [all class] with [1/3/5/7/10]%
-              </Text>
-            </Card>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const getLStats = () => {
-    const col = getColumnsStats({
-      phyMagAtkFlag: true,
-      cdmFlag: true,
-      fdFlag: true,
-      hpFlag: true,
-      attAtkPercentFlag: true,
-    });
-    const its: CollapseProps["items"] = [];
-    for (let i = 0; i < 5; i++) {
-      const start = i * 10;
-      const end = (i + 1) * 10;
-      its.push({
-        key: `${start + 1}`,
-        label: `${start + 1}-${end}`,
-        children: (
-          <Table
-            size={"small"}
-            dataSource={DeeplyVariantLJadeStatsTable.slice(start, end)}
-            columns={col}
-            pagination={false}
-            bordered
-          />
-        ),
-      });
-    }
-    return (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <Collapse items={its} size="small" />
-      </div>
-    );
-  };
-
-  const getLMats = () => {
-    const col = getColumnsMats(true);
-    const its: CollapseProps["items"] = [];
-    for (let i = 0; i < 5; i++) {
-      const start = i * 10;
-      const end = (i + 1) * 10;
-      its.push({
-        key: `${start + 1}`,
-        label: `${start + 1}-${end}`,
-        children: (
-          <Table
-            size={"small"}
-            dataSource={DeeplyVariantLJadeEnhanceMaterialTable.slice(
-              start,
-              end
-            )}
-            columns={col}
-            pagination={false}
-            bordered
-          />
-        ),
-      });
-    }
-    return (
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <Collapse items={its} size="small" />
-      </div>
-    );
-  };
-
-  const isError = useMemo(() => {
-    if (selectStart === undefined || selectEnd === undefined) {
-      return true;
-    }
-    return selectStart >= selectEnd;
-  }, [selectStart, selectEnd]);
-
-  const encLDataSource: {
-    res1: DeeplyVariantTableMaterialList;
-    res2: Array<ExtraData>;
-  } = useMemo(() => {
-    let temp: DeeplyVariantTableMaterialList = {
-      "Collapse Dimension Energy": 0,
-      "Deeply Rooted Fragment of Longing": 0,
-      "Twisted Root": 0,
-      Gold: 0,
-      "Contaminated Will": 0,
-      "Corrupted Origin": 0,
-    };
-    let exData: ExtraData[] = [];
-    if (!isError) {
-      let tempDeepFrag = 0;
-      let tempTwist = 0;
-      let tempGold = 0;
-      const tempSlice = DeeplyVariantLJadeEnhanceMaterialTable.slice(
-        selectStart,
-        selectEnd
-      );
-      tempSlice.forEach((slicedItem) => {
-        tempDeepFrag += slicedItem.deepRootedLonging;
-        tempTwist += slicedItem.twistedRoot ?? 0;
-        tempGold += slicedItem.gold;
-        if (slicedItem.successRatePercent !== 100) {
-          exData.push({
-            enhance: `${slicedItem.encLevel}`,
-            sRate: `${slicedItem.successRatePercent}%`,
-          });
-        }
-      });
-      temp["Deeply Rooted Fragment of Longing"] = tempDeepFrag;
-      temp["Twisted Root"] = tempTwist;
-      temp.Gold = tempGold;
-    }
-    return { res1: temp, res2: exData };
-  }, [isError, selectStart, selectEnd]);
-
-  const extraInfo: ItemList[] = useMemo(() => {
-    const list: ItemList[] = [];
-    list.push({
-      title: "Summary ",
-      isHeader: true,
-      removeWidth: true,
-      children: getSuccessRateTag("sRate", [
-        encLDataSource.res2.length !== 0 ? 0 : 100,
-      ]),
-    });
-    if (encLDataSource.res2.length !== 0) {
-      encLDataSource.res2.forEach((it) => {
-        list.push({
-          title: `enhancing to +${it.enhance} have`,
-          value: `${it.sRate} success rate`,
+  const lMats = useMemo((): {
+    rows: MatRow[];
+    failEnhances: Array<{ enhance: string; sRate: string }>;
+  } => {
+    if (lIsError) return { rows: [], failEnhances: [] };
+    const sliced = DeeplyVariantLJadeEnhanceMaterialTable.slice(lFrom, lTo);
+    let deepFrag = 0;
+    let twisted = 0;
+    let gold = 0;
+    const failEnhances: Array<{ enhance: string; sRate: string }> = [];
+    sliced.forEach((r) => {
+      deepFrag += r.deepRootedLonging;
+      twisted += r.twistedRoot ?? 0;
+      gold += r.gold;
+      if (r.successRatePercent !== 100) {
+        failEnhances.push({
+          enhance: `${r.encLevel}`,
+          sRate: `${r.successRatePercent}%`,
         });
-      });
-    }
-    return list;
-  }, [encLDataSource.res2]);
+      }
+    });
+    const rows: MatRow[] = [];
+    if (deepFrag > 0)
+      rows.push({ name: "Deeply Rooted Fragment of Longing", amount: deepFrag });
+    if (twisted > 0) rows.push({ name: "Twisted Root", amount: twisted });
+    if (gold > 0) rows.push({ name: "Gold", amount: gold });
+    return { rows, failEnhances };
+  }, [lFrom, lTo, lIsError]);
 
   const lStatDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
-    let tableHolder = [
-      {
-        ...DeeplyVariantUJadeStatsTable[10],
-        attAtkPercent: 5,
-      } as CommonItemStats,
-    ].concat(DeeplyVariantLJadeStatsTable);
-
-    if (!isError && selectStart !== undefined && selectEnd !== undefined) {
-      const { dt1, dt2 } = getComparedData(
-        tableHolder,
-        selectStart + 1,
-        selectEnd + 1
-      );
-      if (dt2) {
-        const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-        temp = combineEqStats(temp, dt, "add");
-      }
+    if (lIsError) return temp;
+    const tableHolder: CommonItemStats[] = [
+      { ...DeeplyVariantUJadeStatsTable[10], attAtkPercent: 5 },
+      ...DeeplyVariantLJadeStatsTable,
+    ];
+    const { dt1, dt2 } = getComparedData(tableHolder, lFrom + 1, lTo + 1);
+    if (dt2) {
+      const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+      temp = combineEqStats(temp, dt, "add");
     }
-
     return temp;
-  }, [isError, selectStart, selectEnd]);
+  }, [lFrom, lTo, lIsError]);
 
-  const getLCalc = () => {
+  const lExtraInfo: ItemList[] = useMemo(() => {
+    const list: ItemList[] = [];
+    list.push({
+      title: "Summary",
+      isHeader: true,
+      removeWidth: true,
+      children: getSuccessRateTag("sRate", [
+        lMats.failEnhances.length !== 0 ? 0 : 100,
+      ]),
+    });
+    lMats.failEnhances.forEach((it) => {
+      list.push({
+        title: `Enhancing to +${it.enhance} has`,
+        value: `${it.sRate} success rate`,
+      });
+    });
+    return list;
+  }, [lMats]);
+
+  const renderMatsList = (rows: MatRow[]) => {
+    if (rows.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+          <Package className="h-10 w-10 opacity-30" />
+          <p className="text-sm">No materials required</p>
+        </div>
+      );
+    }
     return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Enhance</Divider>
-          <div style={{ marginBottom: 4, color: isError ? "red" : "unset" }}>
-            Enhance
-            <Divider type="vertical" />
-            <Select
-              value={selectStart}
-              style={{ width: 100, marginBottom: 4 }}
-              onChange={(val) => {
-                setSelectStart(val);
-              }}
-              options={enhanceList}
-            />
-            {` - `}
-            <Select
-              value={selectEnd}
-              style={{ width: 100, marginBottom: 4 }}
-              onChange={(val) => {
-                setSelectEnd(val);
-              }}
-              options={enhanceList}
-            />
+      <div className="divide-y">
+        {rows.map((r) => (
+          <div
+            key={r.name}
+            className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors"
+          >
+            <span className="text-sm">{r.name}</span>
+            <span className="text-sm font-medium tabular-nums">
+              {r.amount.toLocaleString()}
+            </span>
           </div>
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(encLDataSource.res1)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard title="Status Increase" data={getStatDif(lStatDif)} />
-        </div>
+        ))}
       </div>
     );
   };
 
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Stats - Unique Grade",
-      children: (
-        <Table
-          style={{ marginRight: 10, marginBottom: 10 }}
-          size={"small"}
-          dataSource={DeeplyVariantUJadeStatsTable}
-          columns={getColumnsStats({
-            phyMagAtkFlag: true,
-            cdmFlag: true,
-            fdFlag: true,
-            hpFlag: true,
-            attAtkPercentFlag: true,
-          })}
-          pagination={false}
-          bordered
-        />
-      ),
-    },
-    {
-      key: "2",
-      label: "Mats - Unique Grade",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={DeeplyVariantUJadeEnhanceMaterialTable}
-              columns={getColumnsMats()}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Calculate - Unique Grade",
-      children: getCalc(),
-    },
-    {
-      key: "4",
-      label: "Stats - Legend / Ancient Grade",
-      children: getLStats(),
-    },
-    {
-      key: "5",
-      label: "Mats - Legend / Ancient Grade",
-      children: getLMats(),
-    },
-    {
-      key: "6",
-      label: "Calculate - Legend / Ancient Grade",
-      children: getLCalc(),
-    },
-  ];
   return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["3", "6"]} />
-    </div>
+    <Tabs defaultValue="calculator" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="calculator">Calculator</TabsTrigger>
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      {/* ── CALCULATOR ── */}
+      <TabsContent value="calculator">
+        <Tabs defaultValue="unique" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="unique">Unique Grade</TabsTrigger>
+            <TabsTrigger value="legend">Legend / Ancient</TabsTrigger>
+          </TabsList>
+
+          {/* Unique Grade */}
+          <TabsContent value="unique" className="space-y-4">
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">From</span>
+                    <Select
+                      value={uFrom}
+                      options={uOpts}
+                      onChange={setUFrom}
+                      style={{ width: 80 }}
+                      size="small"
+                    />
+                    <span className="text-sm text-muted-foreground">To</span>
+                    <Select
+                      value={uTo}
+                      options={uOpts}
+                      onChange={setUTo}
+                      style={{ width: 80 }}
+                      size="small"
+                    />
+                  </div>
+
+                  <div className="w-px h-5 bg-border hidden sm:block" />
+
+                  <Tooltip
+                    title="200 deep fragment longing, 2 collapse Dim. Energy, 200,000 Gold"
+                    color="blue"
+                    placement="bottom"
+                  >
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <Checkbox
+                        checked={checkedCraft}
+                        onCheckedChange={(v) => setCheckedCraft(Boolean(v))}
+                      />
+                      <span className="text-sm">Include craft mats</span>
+                    </label>
+                  </Tooltip>
+
+                  <Tooltip
+                    title="1 Contaminated Will"
+                    color="blue"
+                    placement="bottom"
+                  >
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <Checkbox
+                        checked={checkedEvoL}
+                        onCheckedChange={(v) => setCheckedEvoL(Boolean(v))}
+                      />
+                      <span className="text-sm">Include Legend evolver</span>
+                    </label>
+                  </Tooltip>
+
+                  <Tooltip
+                    title="1 Corrupted Origin"
+                    color="blue"
+                    placement="bottom"
+                  >
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <Checkbox
+                        checked={checkedEvoA}
+                        onCheckedChange={(v) => setCheckedEvoA(Boolean(v))}
+                      />
+                      <span className="text-sm">Include Ancient evolver</span>
+                    </label>
+                  </Tooltip>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Required Materials</CardTitle>
+                </CardHeader>
+                <CardContent className="px-0 pb-2">
+                  {renderMatsList(uMats)}
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-4">
+                <ListingCard title="Status Increase" data={getStatDif(uStatDif)} />
+                {checkedEvoL && (
+                  <Card>
+                    <CardContent className="pt-4">
+                      <p className="text-sm text-muted-foreground">
+                        *1 Skill ATK up Add on Stats [cm3 / ult / 50 spec /
+                        secondary / main] +50%
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+                {checkedEvoA && (
+                  <Card>
+                    <CardContent className="pt-4">
+                      <p className="text-sm text-muted-foreground">
+                        *3 Critical hit additional damage Add on Stats [cm3 /
+                        ult / 50 spec / secondary / main] from [all class] with
+                        [1/3/5/7/10]%
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Legend / Ancient Grade */}
+          <TabsContent value="legend" className="space-y-4">
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">From</span>
+                    <Select
+                      value={lFrom}
+                      options={lOpts}
+                      onChange={setLFrom}
+                      style={{ width: 80 }}
+                      size="small"
+                      status={lIsError ? "error" : undefined}
+                    />
+                    <span className="text-sm text-muted-foreground">To</span>
+                    <Select
+                      value={lTo}
+                      options={lOpts}
+                      onChange={setLTo}
+                      style={{ width: 80 }}
+                      size="small"
+                      status={lIsError ? "error" : undefined}
+                    />
+                  </div>
+                  {lIsError && (
+                    <span className="text-sm text-destructive">
+                      From must be less than To
+                    </span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Required Materials</CardTitle>
+                </CardHeader>
+                <CardContent className="px-0 pb-2">
+                  {renderMatsList(lMats.rows)}
+                </CardContent>
+              </Card>
+
+              <div className="flex flex-col gap-4">
+                <ListingCard
+                  keyId="l-extra-info"
+                  title="Extra Info"
+                  data={lExtraInfo}
+                />
+                <ListingCard title="Status Increase" data={getStatDif(lStatDif)} />
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+
+      {/* ── REFERENCE ── */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="u-mats" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="u-mats">U Grade Mats</TabsTrigger>
+            <TabsTrigger value="u-stats">U Grade Stats</TabsTrigger>
+            <TabsTrigger value="l-mats">L/A Mats</TabsTrigger>
+            <TabsTrigger value="l-stats">L/A Stats</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="u-mats">
+            {renderRefTable(
+              ["Enhancement", "Deep Fragment of Longing", "Gold"],
+              DeeplyVariantUJadeEnhanceMaterialTable.map((r) => [
+                `+${r.encLevel}`,
+                r.deepRootedLonging,
+                r.gold,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="u-stats">
+            {renderRefTable(
+              ["Enhancement", "ATK", "CDM", "FD", "HP"],
+              DeeplyVariantUJadeStatsTable.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.cdm,
+                r.fd,
+                r.hp,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="l-mats">
+            {renderRefTable(
+              [
+                "Enhancement",
+                "Deep Fragment of Longing",
+                "Twisted Root",
+                "Gold",
+                "Success Rate",
+              ],
+              DeeplyVariantLJadeEnhanceMaterialTable.map((r) => [
+                `+${r.encLevel}`,
+                r.deepRootedLonging,
+                r.twistedRoot,
+                r.gold,
+                r.successRatePercent !== undefined
+                  ? `${r.successRatePercent}%`
+                  : "-",
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="l-stats">
+            {renderRefTable(
+              ["Enhancement", "ATK", "Att ATK%", "CDM", "FD", "HP"],
+              DeeplyVariantLJadeStatsTable.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : "-",
+                r.cdm,
+                r.fd,
+                r.hp,
+              ])
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

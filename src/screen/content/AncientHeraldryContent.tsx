@@ -1,17 +1,9 @@
-import {
-  Card,
-  Checkbox,
-  Collapse,
-  CollapseProps,
-  Divider,
-  InputNumber,
-  Slider,
-  Space,
-  Typography,
-} from "antd";
-import { SliderMarks } from "antd/es/slider";
-import Table, { ColumnsType } from "antd/es/table";
+import { InputNumber, Select } from "antd";
+import { Package } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TradingHouseCalc, {
   CalcDataMapped,
 } from "../../components/TradingHouseCalc";
@@ -20,111 +12,55 @@ import {
   AncientGoddesHeraRequiredItemTable,
   AncientGoddesHeraStatTable,
 } from "../../data/AncientsGoddessHeraData";
-import {
-  AncientGoddesHeraDisassemblyItem,
-  AncientGoddesHeraRequiredItem,
-} from "../../interface/Item.interface";
-import { AncientGoddesHeraStat } from "../../interface/ItemStat.interface";
-import { columnsResource } from "../../utils/common.util";
 
-const { Text } = Typography;
+const enhOpts = Array.from({ length: 11 }, (_, i) => ({
+  label: `+${i}`,
+  value: i,
+}));
 
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
-
-const marks: SliderMarks = {
-  0: "Don't have",
-  5: "lv.5",
-  10: "lv.10",
-};
-
-interface AncientGoddessHeraTableMaterialList {
-  "Ancients' Blueprint Fragment": number;
-  "Ancients' Blueprint": number;
-  Gold: number;
-}
-interface BuyMaterialList {
-  matsPercent: number;
-  msgTotal: string;
-  converterGold: number;
-}
+const renderRefTable = (headers: string[], rows: (string | number | undefined)[][]) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th key={h} className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap">
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? cell.toLocaleString()
+                  : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
 const AncientHeraldryContent = () => {
-  const [heraldryData, setHeraldryData] = useState([0, 10]);
-  const [convertToFrag, setConvertToFrag] = useState<boolean>(false);
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(10);
+  const [convertToFrag, setConvertToFrag] = useState(false);
+  const [invenAB, setInvenAB] = useState(0);
+  const [invenABF, setInvenABF] = useState(0);
   const [dt, setDt] = useState<CalcDataMapped[]>([]);
-  const [invenAB, setinvenAB] = useState<number>(0);
-  const [invenABF, setinvenABF] = useState<number>(0);
 
-  const columnsRequired: ColumnsType<AncientGoddesHeraRequiredItem> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Ancients' Blueprint</p>
-          <p>Ancients' Blueprint Fragment</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { ab, abFrag }) => (
-        <div>
-          <p>{ab}</p>
-          <p>{abFrag}</p>
-        </div>
-      ),
-    },
-    {
-      title: "Ancients' Blueprint",
-      dataIndex: "ab",
-      responsive: ["sm"],
-      render: (_, { ab }) => <Text>{ab.toLocaleString()}</Text>,
-    },
-    {
-      title: "Ancients' Blueprint Fragment",
-      dataIndex: "abFrag",
-      responsive: ["sm"],
-      render: (_, { abFrag }) => <Text>{abFrag.toLocaleString()}</Text>,
-    },
-  ];
+  const isError = from >= to;
 
-  const columnsDisassembly: ColumnsType<AncientGoddesHeraDisassemblyItem> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: "Ancients' Blueprint Fragment",
-      dataIndex: "abFrag",
-      render: (_, { abFrag }) => <Text>{abFrag.toLocaleString()}</Text>,
-    },
-  ];
-  const columnsStat: ColumnsType<AncientGoddesHeraStat> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: "Skill Stats",
-      render: (_, { attackPercent }) => (
-        <div>
-          <Text style={{ margin: 0 }}>{attackPercent}%</Text>
-        </div>
-      ),
-    },
-  ];
-
-  const ancDataSource: AncientGoddessHeraTableMaterialList = useMemo(() => {
-    const from = heraldryData[0];
-    const to = heraldryData[1];
+  const mats = useMemo(() => {
+    if (isError) return { abFrag: 0, ab: 0, gold: 0 };
     const fromMats = AncientGoddesHeraRequiredItemTable[from];
     const toMats = AncientGoddesHeraRequiredItemTable[to];
     let tempABF = toMats.abFrag - fromMats.abFrag;
@@ -141,31 +77,51 @@ const AncientHeraldryContent = () => {
       tempAB = 0;
       tempGold = toMats.ab * 500;
     }
-    const temp: AncientGoddessHeraTableMaterialList = {
-      "Ancients' Blueprint Fragment": tempABF,
-      "Ancients' Blueprint": tempAB,
-      Gold: tempGold,
-    };
-    return temp;
-  }, [heraldryData, convertToFrag]);
+    return { abFrag: tempABF, ab: tempAB, gold: tempGold };
+  }, [from, to, isError, convertToFrag]);
 
-  const progressDataSource: BuyMaterialList = useMemo(() => {
-    const from = heraldryData[0];
-    const to = heraldryData[1];
+  const matRows = [
+    { name: "Ancients' Blueprint Fragment", amount: mats.abFrag },
+    { name: "Ancients' Blueprint", amount: mats.ab },
+    { name: "Gold", amount: mats.gold },
+  ].filter((r) => r.amount > 0);
+
+  const statGain = useMemo(() => {
+    if (isError) return 0;
+    return (
+      AncientGoddesHeraStatTable[to].attackPercent -
+      AncientGoddesHeraStatTable[from].attackPercent
+    );
+  }, [from, to, isError]);
+
+  const progressData = useMemo(() => {
     const fromMats = AncientGoddesHeraRequiredItemTable[from];
     const toMats = AncientGoddesHeraRequiredItemTable[to];
-    let tempGold = 0;
-    let tempPercent = 0;
+    if (toMats.encLevel <= 5) {
+      return [{ name: "Blueprint Frag", amt: fromMats.abFrag, useCustomAmt: true }];
+    }
+    return [
+      { name: "Blueprint", amt: fromMats.ab, useCustomAmt: true },
+      { name: "Blueprint Frag", amt: fromMats.abFrag, useCustomAmt: true },
+    ];
+  }, [from, to]);
+
+  const progressInfo = useMemo(() => {
+    const fromMats = AncientGoddesHeraRequiredItemTable[from];
+    const toMats = AncientGoddesHeraRequiredItemTable[to];
+    let converterGold = 0;
+    let matsPercent = 0;
+    let msgTotal = "";
     let tempTotalAB = invenAB;
-    let tempMsg = "";
+
+    const convertABFtoAB = (abFrag: number) => {
+      const ab = Math.trunc(abFrag / 10);
+      tempTotalAB += ab;
+      converterGold += ab * 500;
+    };
+
     const foundAB = dt.find((it) => it.name === "Blueprint");
     const foundABF = dt.find((it) => it.name === "Blueprint Frag");
-
-    const convertABFtoAB = (abFag: number) => {
-      const tempAB = Math.trunc(abFag / 10);
-      tempTotalAB += tempAB;
-      tempGold += tempAB * 500;
-    };
 
     if (toMats.encLevel > 5) {
       if (fromMats.encLevel <= 5) {
@@ -173,240 +129,222 @@ const AncientHeraldryContent = () => {
       } else {
         convertABFtoAB(fromMats.ab * 10);
       }
-
       convertABFtoAB(invenABF);
-
-      if (foundABF) {
-        convertABFtoAB(foundABF.customAmt);
-      }
+      if (foundABF) convertABFtoAB(foundABF.customAmt);
       if (foundAB) {
-        const a = Math.trunc(
-          ((tempTotalAB + foundAB.customAmt) * 100) / toMats.ab
-        );
-        tempMsg = `AB Collected: ${tempTotalAB + foundAB.customAmt} / ${
-          toMats.ab
-        }`;
-        tempPercent = Math.min(a, 100);
+        const a = Math.trunc(((tempTotalAB + foundAB.customAmt) * 100) / toMats.ab);
+        msgTotal = `AB Collected: ${tempTotalAB + foundAB.customAmt} / ${toMats.ab}`;
+        matsPercent = Math.min(a, 100);
       }
     } else if (toMats.encLevel <= 5) {
       if (foundABF) {
         const total = fromMats.abFrag + foundABF.customAmt + invenABF;
         const a = Math.trunc((total * 100) / toMats.abFrag);
-        tempMsg = `ABF Collected: ${total} / ${toMats.abFrag}`;
-        tempPercent = Math.min(a, 100);
+        msgTotal = `ABF Collected: ${total} / ${toMats.abFrag}`;
+        matsPercent = Math.min(a, 100);
       }
     }
 
-    const temp: BuyMaterialList = {
-      matsPercent: tempPercent,
-      converterGold: tempGold,
-      msgTotal: tempMsg,
-    };
-    return temp;
-  }, [dt, heraldryData, invenAB, invenABF]);
+    return { converterGold, matsPercent, msgTotal, fromMats };
+  }, [dt, from, to, invenAB, invenABF]);
 
-  const progressData = useMemo(() => {
-    const fromMats = AncientGoddesHeraRequiredItemTable[heraldryData[0]];
-    const toMats = AncientGoddesHeraRequiredItemTable[heraldryData[1]];
-    if (toMats.encLevel <= 5) {
-      return [
-        {
-          name: "Blueprint Frag",
-          amt: fromMats.abFrag,
-          useCustomAmt: true,
-        },
-      ];
-    }
-    return [
-      {
-        name: "Blueprint",
-        amt: fromMats.ab,
-        useCustomAmt: true,
-      },
-      {
-        name: "Blueprint Frag",
-        amt: fromMats.abFrag,
-        useCustomAmt: true,
-      },
-    ];
-  }, [heraldryData]);
-
-  const additionalData = useMemo(() => {
-    const fromMats = AncientGoddesHeraRequiredItemTable[heraldryData[0]];
-    return (
-      <Space direction="vertical">
-        <Text>{progressDataSource.msgTotal}</Text>
-        {fromMats.ab !== 0 && <Text>AB Recovered: {fromMats.ab}</Text>}
-        {fromMats.abFrag !== 0 && <Text>ABF Recovered: {fromMats.abFrag}</Text>}
-        {progressDataSource.converterGold !== 0 && (
-          <Text>
-            Gold to convert ABF to AB: {progressDataSource.converterGold}
-          </Text>
-        )}
-
-        <Text>
-          AB in inventory
-          <InputNumber
-            min={0}
-            value={invenAB}
-            onChange={(val) => {
-              setinvenAB(val ?? 0);
-            }}
-            size="middle"
-            style={{ width: 120, marginLeft: 4 }}
-          />
-        </Text>
-        <Text>
-          ABF in inventory
-          <InputNumber
-            min={0}
-            value={invenABF}
-            onChange={(val) => {
-              setinvenABF(val ?? 0);
-            }}
-            size="middle"
-            style={{ width: 120, marginLeft: 4 }}
-          />
-        </Text>
-        <Text>Buy in TH:</Text>
-      </Space>
-    );
-  }, [heraldryData, progressDataSource, invenAB, invenABF]);
-
-  const statRange = useMemo(() => {
-    const from = heraldryData[0];
-    const to = heraldryData[1];
-    const fromStats = AncientGoddesHeraStatTable[from];
-    const toStats = AncientGoddesHeraStatTable[to];
-    return toStats.attackPercent - fromStats.attackPercent;
-  }, [heraldryData]);
-
-  const getCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setHeraldryData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={marks}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(ancDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-          <div>
-            <Card size="small" style={{ marginTop: 4, marginBottom: 4 }}>
-              <Space direction="vertical">
-                <Text>Hero Skill +{statRange}%</Text>
-              </Space>
-            </Card>
-          </div>
-
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={convertToFrag}
-              onChange={(e) => {
-                setConvertToFrag(e.target.checked);
-              }}
-            >
-              Change Blueprint to Fragment
-            </Checkbox>
-          </div>
-        </div>
-        <TradingHouseCalc
-          customTitle="My Progress"
-          data={progressData}
-          additionalTotal={progressDataSource.converterGold}
-          showProgress
-          disableFilter
-          progressPercent={progressDataSource.matsPercent}
-          copyFn={setDt}
-          additionalHeaderItem={additionalData}
+  const additionalHeaderItem = (
+    <div className="space-y-2 text-sm">
+      {progressInfo.msgTotal && (
+        <p className="text-muted-foreground">{progressInfo.msgTotal}</p>
+      )}
+      {progressInfo.fromMats.ab !== 0 && (
+        <p className="text-muted-foreground">AB Recovered: {progressInfo.fromMats.ab.toLocaleString()}</p>
+      )}
+      {progressInfo.fromMats.abFrag !== 0 && (
+        <p className="text-muted-foreground">ABF Recovered: {progressInfo.fromMats.abFrag.toLocaleString()}</p>
+      )}
+      {progressInfo.converterGold !== 0 && (
+        <p className="text-muted-foreground">
+          Gold to convert ABF→AB: {progressInfo.converterGold.toLocaleString()}
+        </p>
+      )}
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground">AB in inventory</span>
+        <InputNumber
+          min={0}
+          value={invenAB}
+          onChange={(v) => setInvenAB(v ?? 0)}
+          size="small"
+          style={{ width: 100 }}
         />
       </div>
-    );
-  };
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Ancients' Goddess Heraldry Required Item Table",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={AncientGoddesHeraRequiredItemTable}
-              columns={columnsRequired}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "2",
-      label: "Ancients' Goddess Heraldry Disassembly Table",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={AncientGoddesHeraDisassemblyItemTable}
-              columns={columnsDisassembly}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Ancients' Goddess Heraldry Status Table",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={AncientGoddesHeraStatTable}
-              columns={columnsStat}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "4",
-      label: "Ancients' Goddess Heraldry Calculator",
-      children: getCalc(),
-    },
-  ];
-  return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["4"]} />
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground">ABF in inventory</span>
+        <InputNumber
+          min={0}
+          value={invenABF}
+          onChange={(v) => setInvenABF(v ?? 0)}
+          size="small"
+          style={{ width: 100 }}
+        />
+      </div>
+      <p className="text-muted-foreground">Buy in TH:</p>
     </div>
+  );
+
+  return (
+    <Tabs defaultValue="calculator" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="calculator">Calculator</TabsTrigger>
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      {/* ── CALCULATOR ── */}
+      <TabsContent value="calculator" className="space-y-4">
+        {/* Settings bar */}
+        <Card>
+          <CardContent className="pt-4">
+            <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">From</span>
+                <Select
+                  value={from}
+                  options={enhOpts}
+                  onChange={setFrom}
+                  style={{ width: 80 }}
+                  size="small"
+                  status={isError ? "error" : undefined}
+                />
+                <span className="text-sm text-muted-foreground">To</span>
+                <Select
+                  value={to}
+                  options={enhOpts}
+                  onChange={setTo}
+                  style={{ width: 80 }}
+                  size="small"
+                  status={isError ? "error" : undefined}
+                />
+              </div>
+              {isError && (
+                <span className="text-sm text-destructive">
+                  From must be less than To
+                </span>
+              )}
+
+              <div className="w-px h-5 bg-border hidden sm:block" />
+
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <Checkbox
+                  checked={convertToFrag}
+                  onCheckedChange={(v: boolean | "indeterminate") => setConvertToFrag(Boolean(v))}
+                />
+                <span className="text-sm">Convert Blueprint to Fragment</span>
+              </label>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Two-column grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Left: Materials */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Required Materials</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0 pb-2">
+              {isError || matRows.length === 0 ? (
+                <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+                  <Package className="h-10 w-10 opacity-30" />
+                  <p className="text-sm">
+                    {isError ? "Fix the range above" : "No materials required"}
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y">
+                  {matRows.map((r) => (
+                    <div
+                      key={r.name}
+                      className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors"
+                    >
+                      <span className="text-sm">{r.name}</span>
+                      <span className="text-sm font-medium tabular-nums">
+                        {r.amount.toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Right: Stats + My Progress */}
+          <div className="flex flex-col gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Status Increase</CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 pb-2">
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm">Hero Skill ATK</span>
+                  <span className="text-sm font-medium tabular-nums">
+                    +{statGain}%
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+
+            <TradingHouseCalc
+              customTitle="My Progress"
+              data={progressData}
+              additionalTotal={progressInfo.converterGold}
+              showProgress
+              disableFilter
+              progressPercent={progressInfo.matsPercent}
+              copyFn={setDt}
+              additionalHeaderItem={additionalHeaderItem}
+            />
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* ── REFERENCE ── */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="required" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="required">Required Items</TabsTrigger>
+            <TabsTrigger value="disassembly">Disassembly</TabsTrigger>
+            <TabsTrigger value="stats">Stats</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="required">
+            {renderRefTable(
+              ["Enhancement", "Ancients' Blueprint", "Ancients' Blueprint Fragment"],
+              AncientGoddesHeraRequiredItemTable.map((r) => [
+                `+${r.encLevel}`,
+                r.ab || "-",
+                r.abFrag || "-",
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="disassembly">
+            {renderRefTable(
+              ["Enhancement", "Ancients' Blueprint Fragment"],
+              AncientGoddesHeraDisassemblyItemTable.map((r) => [
+                `+${r.encLevel}`,
+                r.abFrag,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="stats">
+            {renderRefTable(
+              ["Enhancement", "Hero Skill ATK"],
+              AncientGoddesHeraStatTable.map((r) => [
+                `+${r.encLevel}`,
+                `${r.attackPercent}%`,
+              ])
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -1,18 +1,12 @@
-import {
-  Alert,
-  Checkbox,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Form,
-  FormInstance,
-  Select,
-  Switch,
-  Table,
-  Tooltip,
-} from "antd";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Alert, Select, Switch, Tooltip } from "antd";
+import { ArrowRight, Package, Shield } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -23,7 +17,6 @@ import {
 } from "../../data/KilosData";
 import { KilosCalculator } from "../../interface/Common.interface";
 import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
-import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -38,9 +31,8 @@ interface TableMaterialList {
   "Needle of Intellect": number;
 }
 
-const getLabel = (item: number) => {
-  return item <= 20 ? `Tier 1 +${item}` : `Tier 2 +${item - 20}`;
-};
+const getLabel = (item: number) =>
+  item <= 20 ? `T1 +${item}` : `T2 +${item - 20}`;
 
 const opt = (start: number, end: number) =>
   Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
@@ -48,646 +40,332 @@ const opt = (start: number, end: number) =>
     value: item,
   }));
 
-enum TAB {
-  EQ = "Equipment",
-  CR = "Craft",
-  FR = "From",
-  TO = "To",
-  EVO2 = "Evo Tier 2",
-}
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface EditableRowProps {
-  index: number;
-}
-
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof KilosCalculator;
-  record: KilosCalculator;
-  handleSave: (record: KilosCalculator) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const [selectItem, setSelectItem] = useState<number>(0);
-  const [evoItem, setEvoItem] = useState<boolean>(false);
-  const [craftItem, setCraftItem] = useState<boolean>(false);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (record?.from && title === TAB.FR) {
-      setSelectItem(record.from);
-    }
-    if (record?.to && title === TAB.TO) {
-      setSelectItem(record.to);
-    }
-    if (title === TAB.EVO2) {
-      setEvoItem(record?.evoTier2);
-    }
-    if (title === TAB.CR) {
-      setCraftItem(record?.craft);
-    }
-  }, [record, title]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const handleChange = (value: number) => {
-    setSelectItem(value);
-  };
-
-  const saveSelect = () => {
-    toggleEdit();
-    if (title === TAB.FR) {
-      handleSave({ ...record, from: selectItem });
-    }
-    if (title === TAB.TO) {
-      handleSave({ ...record, to: selectItem });
-    }
-  };
-
-  let childNode = children;
-
-  const findFr = record?.from ?? 0;
-  const findTo = record?.to ?? 0;
-
-  const renderCustom = (cust: any) => {
-    if (Array.isArray(cust) && cust.length > 0) {
-      if (typeof cust[1] === "number") {
-        return getLabel(cust[1]);
-      }
-    }
-    return cust;
-  };
-
-  if (editable) {
-    switch (title) {
-      case TAB.EVO2:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setEvoItem(e);
-                handleSave({ ...record, evoTier2: e });
-              }}
-              checked={evoItem}
-            />
-          </div>
-        );
-        break;
-      case TAB.CR:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setCraftItem(e);
-                handleSave({ ...record, craft: e });
-              }}
-              checked={craftItem}
-            />
-          </div>
-        );
-        break;
-
-      default:
-        childNode = editing ? (
-          <>
-            {title === TAB.FR && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findTo <= findFr ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-            {title === TAB.TO && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findFr >= findTo ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-          </>
-        ) : (
-          <div
-            className="editable-cell-value-wrap"
-            style={{
-              paddingRight: 24,
-              color:
-                (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-                  ? "red"
-                  : "unset",
-              minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
-              paddingTop: 1,
-              paddingBottom: 1,
-            }}
-            onClick={toggleEdit}
-          >
-            {renderCustom(children)}
-          </div>
-        );
-        break;
-    }
-  }
-
-  return <td {...restProps}>{childNode}</td>;
-};
-
-type ColumnTypes = (
-  | ColumnGroupType<KilosCalculator>
-  | ColumnType<KilosCalculator>
-)[];
-
 const KilosEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [dataSource, setDataSource] =
-    useState<KilosCalculator[]>(dataKilosCalculator);
+  const [dataSource, setDataSource] = useState<KilosCalculator[]>(dataKilosCalculator);
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
   const [checkedChange, setCheckedChange] = useState(false);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedEvo, setCheckedEvo] = useState(false);
 
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: KilosCalculator[]
-  ) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  };
-
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
-    dataIndex: string;
-  })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.CR,
-      dataIndex: "craft",
-      editable: true,
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-    {
-      title: TAB.EVO2,
-      dataIndex: "evoTier2",
-      editable: true,
-    },
-  ];
-
-  const encTable = [
-    ...KilosT1ArmorEnhanceMaterialTable,
-    ...KilosT2ArmorEnhanceMaterialTable,
-  ];
+  const encTable = [...KilosT1ArmorEnhanceMaterialTable, ...KilosT2ArmorEnhanceMaterialTable];
 
   const handleSave = (row: KilosCalculator) => {
     const newData = [...dataSource];
     const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
+    newData.splice(index, 1, { ...newData[index], ...row });
     setDataSource(newData);
   };
 
-  const columns = columnsCalculator.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: KilosCalculator) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
+  const toggleRow = (key: React.Key) => {
+    setSelectedRowKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const allSelected = selectedRowKeys.length === dataSource.length;
+
+  const invalidDtSrc = useMemo(
+    () => selectedRowKeys.some((k) => {
+      const f = dataSource.find((d) => d.key === k);
+      return f ? f.to <= f.from : false;
+    }),
+    [selectedRowKeys, dataSource]
+  );
 
   const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Helm Fragment": 0,
-      "Upper Fragment": 0,
-      "Lower Fragment": 0,
-      "Gloves Fragment": 0,
-      "Shoes Fragment": 0,
-      "Joys & Sorrow of Kilos": 0,
-      "High Grade Joys & Sorrow of Kilos": 0,
-      "Thread of Intellect": 0,
-      Gold: 0,
-      "Needle of Intellect": 0,
+    const temp: TableMaterialList = {
+      "Helm Fragment": 0, "Upper Fragment": 0, "Lower Fragment": 0,
+      "Gloves Fragment": 0, "Shoes Fragment": 0, "Joys & Sorrow of Kilos": 0,
+      "High Grade Joys & Sorrow of Kilos": 0, "Thread of Intellect": 0,
+      Gold: 0, "Needle of Intellect": 0,
     };
-    if (invalidDtSrc) {
-      return temp;
-    }
+    if (invalidDtSrc) return temp;
 
-    selectedRowKeys.map((item) => {
+    selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
-
-      if (found) {
-        const { equipment, from, to,  evoTier2, craft } = found;
-        let tempSlice: KilosArmorCraftMaterial[] = [];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = encTable.slice(from, to);
-            break;
-
-          default:
-            break;
-        }
-
-        let tempFragment = 0;
-        let tempJoySorrow = 0;
-        let tempHGJoySorrow = 0;
-        let tempThreadIntel = 0;
-        let tempGold = 0;
-
-        tempSlice.forEach((slicedItem) => {
-          tempFragment += slicedItem.eqTypeFragment;
-          tempJoySorrow += slicedItem.joySorrow;
-          tempHGJoySorrow += slicedItem.joySorrowHG;
-          tempThreadIntel += slicedItem.threadIntelect;
-          tempGold += slicedItem.gold;
-        });
-
-        if (craft) {
-          tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
-          tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
-          tempGold += KilosT1ArmorCraftMaterial.gold;
-        }
-
-        temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
-        temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
-        temp["Thread of Intellect"] += tempThreadIntel;
-        temp["Gold"] += tempGold;
-        temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            temp["Helm Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.UPPER:
-            temp["Upper Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.LOWER:
-            temp["Lower Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.GLOVE:
-            temp["Gloves Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.SHOES:
-            temp["Shoes Fragment"] += tempFragment;
-            break;
-
-          default:
-            break;
-        }
+      if (!found) return;
+      const { equipment, from, to, evoTier2, craft } = found;
+      let tempSlice: KilosArmorCraftMaterial[] = [];
+      switch (equipment) {
+        case EQUIPMENT.HELM: case EQUIPMENT.UPPER: case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE: case EQUIPMENT.SHOES:
+          tempSlice = encTable.slice(from, to);
+          break;
+        default: break;
+      }
+      let frag = 0, joy = 0, hgjoy = 0, thread = 0, gold = 0;
+      tempSlice.forEach((s) => { frag += s.eqTypeFragment; joy += s.joySorrow; hgjoy += s.joySorrowHG; thread += s.threadIntelect; gold += s.gold; });
+      if (craft) { frag += KilosT1ArmorCraftMaterial.eqTypeFragment; thread += KilosT1ArmorCraftMaterial.threadIntelect; gold += KilosT1ArmorCraftMaterial.gold; }
+      temp["Joys & Sorrow of Kilos"] += joy;
+      temp["High Grade Joys & Sorrow of Kilos"] += hgjoy;
+      temp["Thread of Intellect"] += thread;
+      temp.Gold += gold;
+      temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
+      switch (equipment) {
+        case EQUIPMENT.HELM: temp["Helm Fragment"] += frag; break;
+        case EQUIPMENT.UPPER: temp["Upper Fragment"] += frag; break;
+        case EQUIPMENT.LOWER: temp["Lower Fragment"] += frag; break;
+        case EQUIPMENT.GLOVE: temp["Gloves Fragment"] += frag; break;
+        case EQUIPMENT.SHOES: temp["Shoes Fragment"] += frag; break;
+        default: break;
       }
     });
+
     if (checkedChange) {
-      temp["Joys & Sorrow of Kilos"] +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
-      temp["Thread of Intellect"] +=
-        temp["Needle of Intellect"] *
-        NeedleOfIntelectCraftMaterial.threadIntelect;
-      temp.Gold +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
+      temp["Joys & Sorrow of Kilos"] += temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
+      temp["Thread of Intellect"] += temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.threadIntelect;
+      temp.Gold += temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
       temp["Needle of Intellect"] = 0;
     }
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
 
   useEffect(() => {
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from: selectFrom,
-      to: selectTo,
-      craft: checkedCraft,
-      evoTier2: checkedEvo,
-    }));
-    setDataSource(newData);
+    setDataSource((prev) => prev.map((item) => ({
+      ...item, from: selectFrom, to: selectTo, craft: checkedCraft, evoTier2: checkedEvo,
+    })));
   }, [selectFrom, selectTo, checkedCraft, checkedEvo]);
 
-  const getCalculator = () => {
+  const matEntries = Object.entries(tableResource).filter(([, v]) => v !== 0) as [string, number][];
+
+  // ── Reference table renderer ─────────────────────────────────────────────────
+
+  const renderRefTable = (data: KilosArmorCraftMaterial[], tier: 1 | 2) => {
+    const isT1 = tier === 1;
+    const headerBg = "bg-sky-600 dark:bg-sky-700";
+    const badgeCls = "bg-sky-500/10 text-sky-600 dark:text-sky-400 ring-sky-500/25";
+    const cardAccent = "bg-sky-500/5";
+
     return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              ...rowSelection,
-            }}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
-            dataSource={dataSource}
-            columns={columns as ColumnTypes}
-            pagination={false}
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={opt(0, encTable.length)}
-            />
+      <Card className="overflow-hidden">
+        <CardHeader className={cn("border-b py-3 px-4", cardAccent)}>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <span className={cn("inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset", badgeCls)}>
+              Tier {tier}
+            </span>
+            Enhancement Materials
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className={cn("text-white text-xs", headerBg)}>
+                  <th className="text-left px-4 py-2.5 font-semibold tracking-wide">Level</th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">Fragment</th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">
+                    {isT1 ? "Joys & Sorrow" : "HG Joys & Sorrow"}
+                  </th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">Thread of Intellect</th>
+                  <th className="text-right px-4 py-2.5 font-semibold tracking-wide">Gold</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row, idx) => (
+                  <tr
+                    key={row.encLevel}
+                    className={cn(
+                      "border-b border-border/40 transition-colors hover:bg-muted/50",
+                      idx % 2 === 0 ? "bg-background" : "bg-muted/20"
+                    )}
+                  >
+                    <td className="px-4 py-1.5">
+                      <span className={cn("inline-flex h-5 min-w-[3rem] items-center justify-center rounded px-1.5 font-mono text-[11px] font-bold ring-1 ring-inset", badgeCls)}>
+                        {getLabel(row.encLevel)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">{row.eqTypeFragment.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">
+                      {isT1 ? row.joySorrow.toLocaleString() : row.joySorrowHG.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">{row.threadIntelect.toLocaleString()}</td>
+                    <td className="px-4 py-1.5 text-right font-mono text-xs tabular-nums font-semibold text-amber-600 dark:text-amber-400">{row.gold.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={opt(0, encTable.length)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedCraft}
-              onChange={(e) => {
-                setCheckedCraft(e.target.checked);
-              }}
-            >
-              Include Craft mats
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedEvo}
-              onChange={(e) => {
-                setCheckedEvo(e.target.checked);
-              }}
-            >
-              Include Evo mats
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedChange}
-              onChange={(e) => {
-                setCheckedChange(e.target.checked);
-              }}
-            >
-              <Tooltip
-                title="300 Joy&Sorrow, 2600 thread, 5k gold"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Change Needle to Craft mats
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     );
   };
 
-  const columnsArmorT1: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrow, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrow}(Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "Joys & Sorrow",
-      dataIndex: "joySorrow",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
+  // ── Render ───────────────────────────────────────────────────────────────────
 
-  const columnsArmorT2: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>HG Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrowHG, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrowHG}(HG Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "HG Joys & Sorrow",
-      dataIndex: "joySorrowHG",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Armor Tier 1 Craft Reference",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={KilosT1ArmorEnhanceMaterialTable}
-              columns={columnsArmorT1}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "2",
-      label: "Armor Tier 2 Craft Reference",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={KilosT2ArmorEnhanceMaterialTable}
-              columns={columnsArmorT2}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Calculate",
-      children: getCalculator(),
-    },
-  ];
   return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
-    </div>
+    <Tabs defaultValue="calc" className="space-y-4 pb-8">
+      <TabsList>
+        <TabsTrigger value="calc">Calculator</TabsTrigger>
+        <TabsTrigger value="t1">Tier 1 Reference</TabsTrigger>
+        <TabsTrigger value="t2">Tier 2 Reference</TabsTrigger>
+      </TabsList>
+
+      {/* ── Calculator ── */}
+      <TabsContent value="calc" className="mt-0">
+
+        {/* Settings bar */}
+        <Card size="sm" className="mb-4 bg-muted/30">
+          <CardContent className="py-3">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-medium text-muted-foreground">Quick select</span>
+                <Button size="xs" variant="outline" onClick={() => setSelectedRowKeys(dataSource.map((r) => r.key))}>All</Button>
+                <Button size="xs" variant="ghost" onClick={() => setSelectedRowKeys([])}>Clear</Button>
+              </div>
+              <Separator orientation="vertical" className="h-5 hidden sm:block" />
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">Apply to all</span>
+                <Select value={selectFrom} size="small" style={{ width: 110 }} onChange={setSelectFrom} options={opt(0, encTable.length)} />
+                <ArrowRight size={12} className="text-muted-foreground/60" />
+                <Select value={selectTo} size="small" style={{ width: 110 }} onChange={setSelectTo} options={opt(0, encTable.length)} />
+              </div>
+              <Separator orientation="vertical" className="h-5 hidden sm:block" />
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <Checkbox id="craft-all" checked={checkedCraft} onCheckedChange={(v) => setCheckedCraft(Boolean(v))} />
+                  <label htmlFor="craft-all" className="text-xs cursor-pointer select-none">Craft all</label>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Checkbox id="evo-all" checked={checkedEvo} onCheckedChange={(v) => setCheckedEvo(Boolean(v))} />
+                  <label htmlFor="evo-all" className="text-xs cursor-pointer select-none">Evo T2 all</label>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          {/* Equipment Selection */}
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <Shield size={14} className="text-muted-foreground" />
+                  Equipment Selection
+                </div>
+                <button
+                  className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setSelectedRowKeys(allSelected ? [] : dataSource.map((r) => r.key))}
+                >
+                  {allSelected ? "Deselect all" : "Select all"}
+                </button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {/* Column headers */}
+              <div className="flex items-center gap-2 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground bg-muted/20 border-b">
+                <span className="w-4 shrink-0" />
+                <span className="flex-1">Equipment</span>
+                <span className="w-9 text-center shrink-0">Craft</span>
+                <span className="w-[214px] text-center shrink-0">Range</span>
+                <span className="w-10 text-center shrink-0">Evo T2</span>
+              </div>
+              <div className="space-y-0.5 p-2">
+                {dataSource.map((row) => {
+                  const isSelected = selectedRowKeys.includes(row.key);
+                  const hasError = row.to <= row.from;
+                  return (
+                    <div
+                      key={row.key}
+                      className={cn(
+                        "flex items-center gap-2 py-1.5 px-2 rounded-lg transition-all duration-100",
+                        isSelected ? "bg-primary/5 ring-1 ring-primary/15" : "hover:bg-muted/50"
+                      )}
+                    >
+                      <Checkbox
+                        id={`eq-${row.key}`}
+                        checked={isSelected}
+                        onCheckedChange={() => toggleRow(row.key)}
+                      />
+                      <label
+                        htmlFor={`eq-${row.key}`}
+                        className={cn("flex-1 text-sm cursor-pointer select-none transition-colors", isSelected ? "font-medium text-foreground" : "text-muted-foreground")}
+                      >
+                        {row.equipment}
+                      </label>
+                      <Switch size="small" checked={row.craft} onChange={(e) => handleSave({ ...row, craft: e })} />
+                      <Select
+                        size="small"
+                        value={row.from}
+                        options={opt(row.min, row.max)}
+                        onChange={(val) => handleSave({ ...row, from: val })}
+                        status={isSelected && hasError ? "error" : undefined}
+                        style={{ width: 100 }}
+                      />
+                      <ArrowRight size={12} className="shrink-0 text-muted-foreground/60" />
+                      <Select
+                        size="small"
+                        value={row.to}
+                        options={opt(row.min, row.max)}
+                        onChange={(val) => handleSave({ ...row, to: val })}
+                        status={isSelected && hasError ? "error" : undefined}
+                        style={{ width: 100 }}
+                      />
+                      <Switch size="small" checked={row.evoTier2} onChange={(e) => handleSave({ ...row, evoTier2: e })} />
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Required Materials */}
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Package size={14} className="text-muted-foreground" />
+                Required Materials
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="flex items-center gap-1.5 mb-3">
+                <Checkbox
+                  id="change-needle"
+                  checked={checkedChange}
+                  onCheckedChange={(v) => setCheckedChange(Boolean(v))}
+                />
+                <label htmlFor="change-needle" className="text-sm cursor-pointer select-none">
+                  <Tooltip title="300 Joy & Sorrow, 2600 Thread, 5k Gold" trigger="hover" color="blue" placement="right">
+                    Change Needle to Craft mats
+                  </Tooltip>
+                </label>
+              </div>
+
+              {invalidDtSrc && <Alert banner message="From cannot exceed the To option" type="error" className="mb-3" />}
+
+              {matEntries.length === 0
+                ? <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <Package size={36} className="mb-3 opacity-15" />
+                    <p className="text-sm text-center leading-relaxed">Select equipment and set an<br />enhancement range to begin.</p>
+                  </div>
+                : <div className="space-y-1">
+                  {matEntries.map(([name, amount]) => (
+                    <div key={name} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-muted/40 transition-colors">
+                      <span className="text-sm text-foreground/80">{name}</span>
+                      <span className="text-sm font-mono font-medium tabular-nums">{amount.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              }
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+
+      {/* ── Tier 1 Reference ── */}
+      <TabsContent value="t1">
+        {renderRefTable(KilosT1ArmorEnhanceMaterialTable, 1)}
+      </TabsContent>
+
+      {/* ── Tier 2 Reference ── */}
+      <TabsContent value="t2">
+        {renderRefTable(KilosT2ArmorEnhanceMaterialTable, 2)}
+      </TabsContent>
+    </Tabs>
   );
 };
 

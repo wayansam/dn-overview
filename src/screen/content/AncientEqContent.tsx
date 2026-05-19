@@ -1,16 +1,34 @@
+import { Select } from "antd";
 import {
-  Alert,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Form,
-  FormInstance,
-  Radio,
-  Select,
-  Table,
-} from "antd";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+  AlertCircle,
+  AlertTriangle,
+  ArrowRight,
+  BookOpen,
+  Coins,
+  Gem,
+  Medal,
+  Package,
+  Shield,
+  Swords,
+} from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -23,7 +41,6 @@ import {
 } from "../../data/AncientData";
 import { AncientCalculator } from "../../interface/Common.interface";
 import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
-import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -38,157 +55,96 @@ interface TableMaterialList {
   Gold: number;
 }
 
+const ARMOR_KEYS = ["1", "2", "3", "4", "5"];
+const WEAPON_KEYS = ["6", "7"];
+const ACC_KEYS = ["8", "9", "10", "11"];
+const ALL_KEYS = [...ARMOR_KEYS, ...WEAPON_KEYS, ...ACC_KEYS];
+
 const opt = (start: number, end: number) =>
-  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
-    label: item,
-    value: item,
+  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((n) => ({
+    label: `+${n}`,
+    value: n,
   }));
 
-enum TAB {
-  EQ = "Equipment",
-  FR = "From",
-  TO = "To",
-}
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface EditableRowProps {
-  index: number;
-}
-
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof AncientCalculator;
-  record: AncientCalculator;
-  handleSave: (record: AncientCalculator) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const [inputNumb, setInputNumb] = useState<number>(0);
-  const [selectItem, setSelectItem] = useState<number>(0);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (record?.from && title === TAB.FR) {
-      setSelectItem(record.from);
-    }
-    if (record?.to && title === TAB.TO) {
-      setSelectItem(record.to);
-    }
-  }, [record, title]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const handleChange = (value: number) => {
-    setSelectItem(value);
-  };
-
-  const saveSelect = () => {
-    toggleEdit();
-    if (title === TAB.FR) {
-      handleSave({ ...record, from: selectItem });
-    }
-    if (title === TAB.TO) {
-      handleSave({ ...record, to: selectItem });
-    }
-  };
-
-  let childNode = children;
-
-  const findFr = record?.from ?? 0;
-  const findTo = record?.to ?? 0;
-
-  if (editable) {
-    childNode = editing ? (
-      <>
-        {title === TAB.FR && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 80 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findTo <= findFr ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-        {title === TAB.TO && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 80 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findFr >= findTo ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-      </>
-    ) : (
-      <div
-        className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 24,
-          color:
-            (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-              ? "red"
-              : "unset",
-          minWidth: title === TAB.FR || title === TAB.TO ? 80 : undefined,
-          paddingTop: 1,
-          paddingBottom: 1,
-        }}
-        onClick={toggleEdit}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  return <td {...restProps}>{childNode}</td>;
-};
-
-type ColumnTypes = (
-  | ColumnGroupType<AncientCalculator>
-  | ColumnType<AncientCalculator>
-)[];
-
 const versionOpt = [
+  { label: "New", value: "new" },
+  { label: "Old", value: "old" },
+];
+
+const MATERIAL_META: {
+  key: Exclude<keyof TableMaterialList, "Gold">;
+  label: string;
+  icon: React.ElementType;
+  colorClass: string;
+  bgClass: string;
+}[] = [
   {
-    label: "New",
-    value: "new",
+    key: "Helm Fragment",
+    label: "Helm Fragment",
+    icon: Shield,
+    colorClass: "text-sky-500",
+    bgClass: "bg-sky-500/10",
   },
   {
-    label: "Old",
-    value: "old",
+    key: "Upper Fragment",
+    label: "Upper Fragment",
+    icon: Shield,
+    colorClass: "text-sky-500",
+    bgClass: "bg-sky-500/10",
+  },
+  {
+    key: "Lower Fragment",
+    label: "Lower Fragment",
+    icon: Shield,
+    colorClass: "text-sky-500",
+    bgClass: "bg-sky-500/10",
+  },
+  {
+    key: "Gloves Fragment",
+    label: "Gloves Fragment",
+    icon: Shield,
+    colorClass: "text-sky-500",
+    bgClass: "bg-sky-500/10",
+  },
+  {
+    key: "Shoes Fragment",
+    label: "Shoes Fragment",
+    icon: Shield,
+    colorClass: "text-sky-500",
+    bgClass: "bg-sky-500/10",
+  },
+  {
+    key: "Otherworldly Ancient Weapon Fragment",
+    label: "Weapon Fragment",
+    icon: Swords,
+    colorClass: "text-rose-500",
+    bgClass: "bg-rose-500/10",
+  },
+  {
+    key: "Unknown Ancient Accessory Fragment",
+    label: "Accessory Fragment",
+    icon: Gem,
+    colorClass: "text-violet-500",
+    bgClass: "bg-violet-500/10",
+  },
+  {
+    key: "Ancient Knowledge",
+    label: "Ancient Knowledge",
+    icon: BookOpen,
+    colorClass: "text-amber-500",
+    bgClass: "bg-amber-500/10",
+  },
+  {
+    key: "Ancient Insignia",
+    label: "Ancient Insignia",
+    icon: Medal,
+    colorClass: "text-amber-600",
+    bgClass: "bg-amber-600/10",
   },
 ];
+
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 const AncientEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -200,106 +156,58 @@ const AncientEqContent = () => {
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
 
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: AncientCalculator[]
-  ) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  };
-
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
-    dataIndex: string;
-  })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-  ];
-
   const handleSave = (row: AncientCalculator) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
+    setDataSource((prev) => {
+      const next = [...prev];
+      const idx = next.findIndex((item) => item.key === row.key);
+      if (idx !== -1) next.splice(idx, 1, { ...next[idx], ...row });
+      return next;
     });
-    setDataSource(newData);
   };
 
-  const columns = columnsCalculator.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: AncientCalculator) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
+  const toggleRow = (key: React.Key) => {
+    setSelectedRowKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
+
+  const toggleGroup = (keys: string[]) => {
+    const allSelected = keys.every((k) => selectedRowKeys.includes(k));
+    setSelectedRowKeys((prev) =>
+      allSelected
+        ? prev.filter((k) => !keys.includes(k as string))
+        : [...new Set([...prev, ...keys])]
+    );
+  };
+
+  const invalidDtSrc = useMemo(
+    () =>
+      selectedRowKeys.some((key) => {
+        const found = dataSource.find((dt) => dt.key === key);
+        return found ? found.to <= found.from : false;
       }),
-    };
-  });
+    [selectedRowKeys, dataSource]
+  );
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
+  const showWarningAcc = useMemo(
+    () =>
+      selectedRowKeys.some((key) => {
+        const found = dataSource.find((dt) => dt.key === key);
+        if (
+          found &&
+          (found.equipment === EQUIPMENT.NECKLACE ||
+            found.equipment === EQUIPMENT.EARRING ||
+            found.equipment === EQUIPMENT.RING1)
+        ) {
+          return found.from > 10 || found.to > 10;
         }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
-
-  const showWarningAcc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (
-        !flag &&
-        found &&
-        (found.equipment === EQUIPMENT.NECKLACE ||
-          found.equipment === EQUIPMENT.EARRING ||
-          found.equipment === EQUIPMENT.RING1)
-      ) {
-        if (found.from > 10 || found.to > 10) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+        return false;
+      }),
+    [selectedRowKeys, dataSource]
+  );
 
   const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
+    const temp: TableMaterialList = {
       "Helm Fragment": 0,
       "Upper Fragment": 0,
       "Lower Fragment": 0,
@@ -311,467 +219,488 @@ const AncientEqContent = () => {
       "Ancient Insignia": 0,
       Gold: 0,
     };
-    if (invalidDtSrc) {
-      return temp;
-    }
-    selectedRowKeys.map((item) => {
+    if (invalidDtSrc) return temp;
+
+    selectedRowKeys.forEach((item) => {
       const found = dataSource.find((dt) => dt.key === item);
+      if (!found) return;
 
-      if (found) {
-        const { equipment, from, to, max, min } = found;
-        let tempSlice: AncientArmorCraftMaterial[] = [];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientArmorCraftMaterialTableV2
-                : AncientArmorCraftMaterialTable
-            ).slice(from, to);
-            break;
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientWeaponT2CraftMaterialTableV2
-                : AncientWeaponT2CraftMaterialTable
-            ).slice(from, to);
-            break;
-          case EQUIPMENT.NECKLACE:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING1:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientAccessoryCraftMaterialTableV2
-                : AncientAccessoryCraftMaterialTable
-            ).slice(from, to);
-            break;
+      const { equipment, from, to } = found;
+      let tempSlice: AncientArmorCraftMaterial[] = [];
 
-          default:
-            break;
-        }
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientArmorCraftMaterialTableV2
+              : AncientArmorCraftMaterialTable
+          ).slice(from, to);
+          break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientWeaponT2CraftMaterialTableV2
+              : AncientWeaponT2CraftMaterialTable
+          ).slice(from, to);
+          break;
+        case EQUIPMENT.NECKLACE:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.RING1:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientAccessoryCraftMaterialTableV2
+              : AncientAccessoryCraftMaterialTable
+          ).slice(from, to);
+          break;
+        default:
+          break;
+      }
 
-        // const sumWithInitial = temp.reduce(
-        //   (accumulator, currentValue) => accumulator + currentValue,
-        //   initialValue
-        // );
+      let frag = 0,
+        knowledge = 0,
+        insignia = 0,
+        gold = 0;
+      tempSlice.forEach((s) => {
+        frag += s.eqTypeFragment;
+        knowledge += s.ancKnowledge;
+        insignia += s.ancInsignia;
+        gold += s.gold;
+      });
 
-        let tempFragment = 0;
-        let tempAncKnowledge = 0;
-        let tempAncInsignia = 0;
-        let tempGold = 0;
+      temp["Ancient Knowledge"] += knowledge;
+      temp["Ancient Insignia"] += insignia;
+      temp["Gold"] += gold;
 
-        tempSlice.forEach((slicedItem) => {
-          tempFragment += slicedItem.eqTypeFragment;
-          tempAncKnowledge += slicedItem.ancKnowledge;
-          tempAncInsignia += slicedItem.ancInsignia;
-          tempGold += slicedItem.gold;
-        });
-
-        temp["Ancient Knowledge"] += tempAncKnowledge;
-        temp["Ancient Insignia"] += tempAncInsignia;
-        temp["Gold"] += tempGold;
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            temp["Helm Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.UPPER:
-            temp["Upper Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.LOWER:
-            temp["Lower Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.GLOVE:
-            temp["Gloves Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.SHOES:
-            temp["Shoes Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            temp["Otherworldly Ancient Weapon Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.NECKLACE:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING1:
-            temp["Unknown Ancient Accessory Fragment"] += tempFragment;
-            break;
-
-          default:
-            break;
-        }
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+          temp["Helm Fragment"] += frag;
+          break;
+        case EQUIPMENT.UPPER:
+          temp["Upper Fragment"] += frag;
+          break;
+        case EQUIPMENT.LOWER:
+          temp["Lower Fragment"] += frag;
+          break;
+        case EQUIPMENT.GLOVE:
+          temp["Gloves Fragment"] += frag;
+          break;
+        case EQUIPMENT.SHOES:
+          temp["Shoes Fragment"] += frag;
+          break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          temp["Otherworldly Ancient Weapon Fragment"] += frag;
+          break;
+        case EQUIPMENT.NECKLACE:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.RING1:
+          temp["Unknown Ancient Accessory Fragment"] += frag;
+          break;
+        default:
+          break;
       }
     });
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc, selectVersion]);
 
   useEffect(() => {
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from: selectFrom,
-      to: selectTo,
-    }));
-    setDataSource(newData);
+    setDataSource((prev) =>
+      prev.map((item) => ({ ...item, from: selectFrom, to: selectTo }))
+    );
   }, [selectFrom, selectTo]);
 
-  const getCalculator = () => {
+  const hasMaterials = MATERIAL_META.some(({ key }) => tableResource[key] > 0);
+
+  // ── Sub-components ───────────────────────────────────────────────────────────
+
+  const renderGroup = (
+    label: string,
+    GroupIcon: React.ElementType,
+    accentClass: string,
+    keys: string[]
+  ) => {
+    const allSelected = keys.every((k) => selectedRowKeys.includes(k));
+    const rows = dataSource.filter((r) => keys.includes(r.key));
+
     return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              ...rowSelection,
-            }}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
-            dataSource={dataSource}
-            columns={columns as ColumnTypes}
-            pagination={false}
-          />
+      <div>
+        {/* Group header */}
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center gap-2">
+            <div className={cn("w-0.5 h-3.5 rounded-full", accentClass)} />
+            <GroupIcon size={11} className="text-muted-foreground" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+              {label}
+            </span>
+          </div>
+          <button
+            className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => toggleGroup(keys)}
+          >
+            {allSelected ? "Deselect all" : "Select all"}
+          </button>
         </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
-          {showWarningAcc && (
-            <div>
-              <Alert
-                banner
-                message="From +11 onward, your accessory might break"
-                type="warning"
-              />
-            </div>
-          )}
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            Version
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectVersion}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectVersion(val);
-              }}
-              options={versionOpt}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            Spesific Type
-            <Divider type="vertical" />
-            <Radio.Group
-              value={selectedRowKeys}
-              onChange={(e) => {
-                setSelectedRowKeys(e.target.value);
-              }}
-            >
-              <Radio.Button
-                value={["1", "2", "3", "4", "5"]}
-                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
+
+        {/* Equipment rows */}
+        <div className="space-y-0.5">
+          {rows.map((row) => {
+            const isSelected = selectedRowKeys.includes(row.key);
+            const hasError = row.to <= row.from;
+            return (
+              <div
+                key={row.key}
+                className={cn(
+                  "flex items-center gap-2 py-1.5 px-2 rounded-lg transition-all duration-100",
+                  isSelected
+                    ? "bg-primary/5 ring-1 ring-primary/15"
+                    : "hover:bg-muted/50"
+                )}
               >
-                Armor
-              </Radio.Button>
-              <Radio.Button
-                value={["6", "7"]}
-                onClick={() => setSelectedRowKeys(["6", "7"])}
-              >
-                Weapon
-              </Radio.Button>
-              <Radio.Button
-                value={["8", "9", "10", "11"]}
-                onClick={() => setSelectedRowKeys(["8", "9", "10", "11"])}
-              >
-                Accessories
-              </Radio.Button>
-            </Radio.Group>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={opt(0, 20)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={opt(0, 20)}
-            />
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            // dataSource={tableResource}
-            dataSource={Object.entries(tableResource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
+                <Checkbox
+                  id={`eq-${row.key}`}
+                  checked={isSelected}
+                  onCheckedChange={() => toggleRow(row.key)}
+                />
+                <label
+                  htmlFor={`eq-${row.key}`}
+                  className={cn(
+                    "flex-1 text-sm cursor-pointer select-none transition-colors",
+                    isSelected
+                      ? "font-medium text-foreground"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  {row.equipment}
+                </label>
+                <Select
+                  size="small"
+                  value={row.from}
+                  options={opt(row.min, row.max)}
+                  onChange={(val) => handleSave({ ...row, from: val })}
+                  status={isSelected && hasError ? "error" : undefined}
+                  style={{ width: 68 }}
+                />
+                <ArrowRight
+                  size={12}
+                  className="shrink-0 text-muted-foreground/60"
+                />
+                <Select
+                  size="small"
+                  value={row.to}
+                  options={opt(row.min, row.max)}
+                  onChange={(val) => handleSave({ ...row, to: val })}
+                  status={isSelected && hasError ? "error" : undefined}
+                  style={{ width: 68 }}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     );
   };
 
-  const columnsArmor: ColumnsType<AncientArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-  const columnsWeapon: ColumnsType<AncientArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Otherworldly A. Weapon Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Otherworldly A. Weapon Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-  const columnsAccessory: ColumnsType<AncientArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Unknown Ancient Accessory Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Unknown Ancient Accessory Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Armor Craft Reference",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "New table"}
-              size={"small"}
-              dataSource={AncientArmorCraftMaterialTableV2}
-              columns={columnsArmor}
-              pagination={false}
-              bordered
-            />
+  const renderRefTable = (
+    label: string,
+    data: AncientArmorCraftMaterial[],
+    isNew: boolean
+  ) => {
+    const headerBg = isNew ? "bg-emerald-600 dark:bg-emerald-700" : "bg-amber-600 dark:bg-amber-700";
+    const badgeCls = isNew
+      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-emerald-500/25"
+      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-amber-500/25";
+    const cardAccent = isNew ? "bg-emerald-500/5" : "bg-amber-500/5";
+
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader className={cn("border-b py-3 px-4", cardAccent)}>
+          <CardTitle className="flex items-center gap-2 text-sm">
+            <span className={cn("inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ring-1 ring-inset", badgeCls)}>
+              {label}
+            </span>
+            Enhancement Rates
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className={cn("text-white text-xs", headerBg)}>
+                  <th className="text-left px-4 py-2.5 font-semibold tracking-wide">Level</th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">Fragment</th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">Knowledge</th>
+                  <th className="text-right px-3 py-2.5 font-semibold tracking-wide">Insignia</th>
+                  <th className="text-right px-4 py-2.5 font-semibold tracking-wide">Gold</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.map((row, idx) => (
+                  <tr
+                    key={row.encLevel}
+                    className={cn(
+                      "border-b border-border/40 transition-colors hover:bg-muted/50",
+                      idx % 2 === 0 ? "bg-background" : "bg-muted/20"
+                    )}
+                  >
+                    <td className="px-4 py-1.5">
+                      <span className={cn("inline-flex h-5 min-w-[2.25rem] items-center justify-center rounded px-1.5 font-mono text-[11px] font-bold ring-1 ring-inset", badgeCls)}>
+                        +{row.encLevel}
+                      </span>
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">{row.eqTypeFragment.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">{row.ancKnowledge.toLocaleString()}</td>
+                    <td className="px-3 py-1.5 text-right font-mono text-xs tabular-nums text-foreground/75">{row.ancInsignia.toLocaleString()}</td>
+                    <td className="px-4 py-1.5 text-right font-mono text-xs tabular-nums font-semibold text-amber-600 dark:text-amber-400">{row.gold.toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "Old table"}
-              size={"small"}
-              dataSource={AncientArmorCraftMaterialTable}
-              columns={columnsArmor}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "2",
-      label: "Weapon Craft Reference",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "New table"}
-              size={"small"}
-              dataSource={AncientWeaponT2CraftMaterialTableV2}
-              columns={columnsWeapon}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "Old table"}
-              size={"small"}
-              dataSource={AncientWeaponT2CraftMaterialTable}
-              columns={columnsWeapon}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Accessories Craft Reference",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "New table"}
-              size={"small"}
-              dataSource={AncientAccessoryCraftMaterialTableV2}
-              columns={columnsAccessory}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ marginRight: 10, marginBottom: 10 }}>
-            <Table
-              title={() => "Old table"}
-              size={"small"}
-              dataSource={AncientAccessoryCraftMaterialTable}
-              columns={columnsAccessory}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "4",
-      label: "Calculate",
-      children: getCalculator(),
-    },
-  ];
-  return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["4"]} />
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const refTabContent = (
+    newData: AncientArmorCraftMaterial[],
+    oldData: AncientArmorCraftMaterial[]
+  ) => (
+    <div className="grid grid-cols-2 gap-4">
+      {renderRefTable("New", newData, true)}
+      {renderRefTable("Old", oldData, false)}
     </div>
+  );
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+
+  return (
+    <Tabs defaultValue="calculator">
+      <TabsList className="mb-4">
+        <TabsTrigger value="calculator">Calculator</TabsTrigger>
+        <TabsTrigger value="reference">Reference Tables</TabsTrigger>
+      </TabsList>
+
+      {/* ── Calculator ── */}
+      <TabsContent value="calculator" className="mt-0">
+
+        {/* Settings bar */}
+        <Card size="sm" className="mb-4 bg-muted/30">
+          <CardContent className="py-3">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Version
+                </span>
+                <Select
+                  value={selectVersion}
+                  size="small"
+                  style={{ width: 88 }}
+                  onChange={setSelectVersion}
+                  options={versionOpt}
+                />
+              </div>
+
+              <Separator orientation="vertical" className="h-5 hidden sm:block" />
+
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Quick select
+                </span>
+                {[
+                  { label: "Armor", keys: ARMOR_KEYS },
+                  { label: "Weapon", keys: WEAPON_KEYS },
+                  { label: "Accessories", keys: ACC_KEYS },
+                  { label: "All", keys: ALL_KEYS },
+                ].map(({ label, keys }) => (
+                  <Button
+                    key={label}
+                    size="xs"
+                    variant="outline"
+                    onClick={() => setSelectedRowKeys(keys)}
+                  >
+                    {label}
+                  </Button>
+                ))}
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => setSelectedRowKeys([])}
+                >
+                  Clear
+                </Button>
+              </div>
+
+              <Separator orientation="vertical" className="h-5 hidden sm:block" />
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">
+                  Apply to all
+                </span>
+                <Select
+                  value={selectFrom}
+                  size="small"
+                  style={{ width: 68 }}
+                  onChange={setSelectFrom}
+                  options={opt(0, 20)}
+                />
+                <ArrowRight size={12} className="text-muted-foreground/60" />
+                <Select
+                  value={selectTo}
+                  size="small"
+                  style={{ width: 68 }}
+                  onChange={setSelectTo}
+                  options={opt(0, 20)}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          {/* Equipment selection card */}
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Shield size={14} className="text-muted-foreground" />
+                Equipment Selection
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4 space-y-4">
+              {renderGroup("Armor", Shield, "bg-sky-400", ARMOR_KEYS)}
+              <Separator />
+              {renderGroup("Weapon", Swords, "bg-rose-400", WEAPON_KEYS)}
+              <Separator />
+              {renderGroup("Accessories", Gem, "bg-violet-400", ACC_KEYS)}
+            </CardContent>
+          </Card>
+
+          {/* Required materials card */}
+          <Card>
+            <CardHeader className="border-b">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Package size={14} className="text-muted-foreground" />
+                Required Materials
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              {/* Alerts */}
+              {invalidDtSrc && (
+                <Alert variant="destructive" className="mb-3 py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    "From" must be less than "To" for all selected equipment.
+                  </AlertDescription>
+                </Alert>
+              )}
+              {showWarningAcc && (
+                <Alert className="mb-3 py-2 border-amber-500/40 text-amber-700 dark:text-amber-400 [&>svg]:text-amber-500">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    Accessories past +10 may break during enhancement.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Empty state */}
+              {!hasMaterials && !invalidDtSrc && (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <Package size={36} className="mb-3 opacity-15" />
+                  <p className="text-sm text-center leading-relaxed">
+                    Select equipment and set an<br />enhancement range to begin.
+                  </p>
+                </div>
+              )}
+
+              {/* Material list */}
+              {hasMaterials && (
+                <div className="space-y-1">
+                  {MATERIAL_META.filter(({ key }) => tableResource[key] > 0).map(
+                    ({ key, label, icon: Icon, colorClass, bgClass }) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-muted/40 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className={cn("rounded-full p-1.5", bgClass)}>
+                            <Icon size={12} className={colorClass} />
+                          </div>
+                          <span className="text-sm">{label}</span>
+                        </div>
+                        <span className="text-sm font-mono font-medium tabular-nums">
+                          {tableResource[key].toLocaleString()}
+                        </span>
+                      </div>
+                    )
+                  )}
+
+                  {/* Gold summary */}
+                  {tableResource.Gold > 0 && (
+                    <div className="mt-2 flex items-center justify-between py-2.5 px-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/30">
+                      <div className="flex items-center gap-2.5">
+                        <div className="rounded-full p-1.5 bg-amber-400/15">
+                          <Coins size={12} className="text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">
+                          Gold
+                        </span>
+                      </div>
+                      <span className="text-sm font-mono font-bold tabular-nums text-amber-700 dark:text-amber-400">
+                        {tableResource.Gold.toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </TabsContent>
+
+      {/* ── Reference Tables ── */}
+      <TabsContent value="reference" className="mt-0">
+        <Tabs defaultValue="armor">
+          <TabsList className="mb-4">
+            <TabsTrigger value="armor">
+              <Shield size={12} className="mr-1.5" />
+              Armor
+            </TabsTrigger>
+            <TabsTrigger value="weapon">
+              <Swords size={12} className="mr-1.5" />
+              Weapon
+            </TabsTrigger>
+            <TabsTrigger value="accessories">
+              <Gem size={12} className="mr-1.5" />
+              Accessories
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="armor" className="mt-0">
+            {refTabContent(
+              AncientArmorCraftMaterialTableV2,
+              AncientArmorCraftMaterialTable
+            )}
+          </TabsContent>
+          <TabsContent value="weapon" className="mt-0">
+            {refTabContent(
+              AncientWeaponT2CraftMaterialTableV2,
+              AncientWeaponT2CraftMaterialTable
+            )}
+          </TabsContent>
+          <TabsContent value="accessories" className="mt-0">
+            {refTabContent(
+              AncientAccessoryCraftMaterialTableV2,
+              AncientAccessoryCraftMaterialTable
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

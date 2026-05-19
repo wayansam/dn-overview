@@ -1,13 +1,8 @@
-import {
-  Collapse,
-  CollapseProps,
-  Divider,
-  Slider,
-  Table,
-  Typography,
-} from "antd";
-import { ColumnsType } from "antd/es/table";
+import { Select } from "antd";
+import { Package } from "lucide-react";
 import { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import {
@@ -17,654 +12,332 @@ import {
   EternalWorldTalismanMatsTable,
   EternalWorldTalismanStatTable,
 } from "../../data/EternalTalismanData";
-import {
-  EternalPainTalismanMats,
-  EternalWorldTalismanMats,
-} from "../../interface/Item.interface";
-import {
-  EternalChaosTalismanStat,
-  EternalPainTalismanStat,
-  EternalWorldTalismanStat,
-} from "../../interface/ItemStat.interface";
-import {
-  columnsResource,
-  getComparedData,
-  getTextEmpty,
-} from "../../utils/common.util";
-const { Text } = Typography;
+import { getComparedData } from "../../utils/common.util";
 
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
+// ─── Reference table helper ───────────────────────────────────────────────────
 
-interface WorldTableMaterialList {
-  "Eternal Dimensional Apparition": number;
-  Gold: number;
-}
-interface PainTableMaterialList {
-  "Eternal Dimensional Apparition": number;
-  "Eternal Pain Vortex": number;
-  Gold: number;
-}
-
-const ExternalTalismanContent = () => {
-  const [worldData, setWorldData] = useState([0, 10]);
-  const [painData, setPainData] = useState([0, 5]);
-
-  const getRemarks = (N: number) => {
-    const temp = Array.from({ length: N }, (_, i) => (i + 1).toString());
-
-    return temp.reduce(
-      (obj, key) => {
-        return { ...obj, [key]: `lv.${key}` };
-      },
-      { 0: "Don't have" }
-    );
-  };
-
-  const getStatContent = () => {
-    const columnsWorldStats: ColumnsType<EternalWorldTalismanStat> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Attack</p>
-            <p>Attribute ATK(%)</p>
-            <p>MAX HP</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { attack, attributePercent, maxHP }) => (
-          <div>
-            <p>ATT {attack.toLocaleString()}</p>
-            <p>
-              Attribute {getTextEmpty({ txt: attributePercent, tailText: "%" })}
-            </p>
-            <p>HP {maxHP.toLocaleString()}</p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { attack }) => <Text>{attack.toLocaleString()}</Text>,
-      },
-      {
-        title: "Attribute ATK(%)",
-        responsive: ["sm"],
-        render: (_, { attributePercent }) => (
-          <Text>{getTextEmpty({ txt: attributePercent, tailText: "%" })}</Text>
-        ),
-      },
-      {
-        title: "MAX HP",
-        responsive: ["sm"],
-        render: (_, { maxHP }) => <Text>{maxHP.toLocaleString()}</Text>,
-      },
-    ];
-
-    const columnsPainStats: ColumnsType<EternalPainTalismanStat> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Attack</p>
-            <p>Final Damage</p>
-            <p>MAX HP</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { attack, fd, maxHP }) => (
-          <div>
-            <p>ATT {attack.toLocaleString()}</p>
-            <p>FD {fd.toLocaleString()}</p>
-            <p>HP {maxHP.toLocaleString()}</p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { attack }) => <Text>{attack.toLocaleString()}</Text>,
-      },
-      {
-        title: "Final Damage",
-        responsive: ["sm"],
-        render: (_, { fd }) => <Text>{fd.toLocaleString()}</Text>,
-      },
-      {
-        title: "MAX HP",
-        responsive: ["sm"],
-        render: (_, { maxHP }) => <Text>{maxHP.toLocaleString()}</Text>,
-      },
-    ];
-
-    const columnsChaosStats: ColumnsType<EternalChaosTalismanStat> = [
-      {
-        title: (
-          <>
-            <p>Critical</p>
-            <p>Critical Damage</p>
-            <p>Phy Def</p>
-            <p>Mag Def</p>
-            <p>Final Damage</p>
-          </>
-        ),
-        responsive: ["xs"],
-        width: 150,
-        render: (_, { critical, criticalDamage, phyDef, magDef, fd }) => (
-          <>
-            <p>CRT </p>
-            {critical.map((it) => it.toLocaleString()).join(" / ")}
-
-            <p>CDM</p>
-            {criticalDamage.map((it) => it.toLocaleString()).join(" / ")}
-
-            <p>Phy Def</p>
-            {phyDef.map((it) => it.toLocaleString()).join(" / ")}
-
-            <p>Mag Def</p>
-            {magDef.map((it) => it.toLocaleString()).join(" / ")}
-
-            <p>FD</p>
-            {fd.map((it) => it.toLocaleString()).join(" / ")}
-          </>
-        ),
-      },
-      {
-        title: "Critical",
-        responsive: ["sm"],
-        width: 70,
-        render: (_, { critical }) => (
-          <Text>
-            {critical.map((it) => (
-              <p>{it.toLocaleString()}</p>
+const renderRefTable = (headers: string[], rows: (string | number | undefined | null)[][]) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th key={h} className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap">
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? cell.toLocaleString()
+                  : cell}
+              </td>
             ))}
-          </Text>
-        ),
-      },
-      {
-        title: "Critical Damage",
-        responsive: ["sm"],
-        render: (_, { criticalDamage }) => (
-          <Text>
-            {criticalDamage.map((it) => (
-              <p>{it.toLocaleString()}</p>
-            ))}
-          </Text>
-        ),
-      },
-      {
-        title: "Phy Def",
-        responsive: ["sm"],
-        render: (_, { phyDef }) => (
-          <Text>
-            {phyDef.map((it) => (
-              <p>{it.toLocaleString()}</p>
-            ))}
-          </Text>
-        ),
-      },
-      {
-        title: "Mag Def",
-        responsive: ["sm"],
-        render: (_, { magDef }) => (
-          <Text>
-            {magDef.map((it) => (
-              <p>{it.toLocaleString()}</p>
-            ))}
-          </Text>
-        ),
-      },
-      {
-        title: "Final Damage",
-        responsive: ["sm"],
-        render: (_, { fd }) => (
-          <Text>
-            {fd.map((it) => (
-              <p>{it.toLocaleString()}</p>
-            ))}
-          </Text>
-        ),
-      },
-    ];
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Eternal World Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={EternalWorldTalismanStatTable}
-              columns={columnsWorldStats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "Eternal Pain Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={EternalPainTalismanStatTable}
-              columns={columnsPainStats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "3",
-        label: "Eternal Chaos Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={[EternalChaosTalismanStatTable]}
-              columns={columnsChaosStats}
-              pagination={false}
-              bordered
-            />
-            <i>notes: random add on stat</i>
-          </div>
-        ),
-      },
-    ];
+// ─── World Talisman Calculator ────────────────────────────────────────────────
 
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
-    );
-  };
+const WorldCalc = () => {
+  const worldOpts = Array.from({ length: 11 }, (_, i) => ({
+    value: i,
+    label: i === 0 ? "Don't Have" : `lv.${i}`,
+  }));
 
-  const getMatsContent = () => {
-    const columnsWorldMats: ColumnsType<EternalWorldTalismanMats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Eternal Dim. Apparition</p>
-            <p>Gold</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { apparition, gold }) => (
-          <div>
-            <p>{apparition.toLocaleString()} (app)</p>
-            <p>{gold.toLocaleString()} (g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Eternal Dimensional Apparition",
-        responsive: ["sm"],
-        render: (_, { apparition }) => (
-          <Text>{apparition.toLocaleString()}</Text>
-        ),
-      },
-      {
-        title: "Gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
-      },
-    ];
-    const columnsPainMats: ColumnsType<EternalPainTalismanMats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Eternal Dim. Apparition</p>
-            <p>Eternal Pain Vortex</p>
-            <p>Gold</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { apparition, vortex, gold }) => (
-          <div>
-            <p>{apparition.toLocaleString()} (app)</p>
-            <p>{vortex.toLocaleString()} (vort)</p>
-            <p>{gold.toLocaleString()} (g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Eternal Dimensional Apparition",
-        responsive: ["sm"],
-        render: (_, { apparition }) => (
-          <Text>{apparition.toLocaleString()}</Text>
-        ),
-      },
-      {
-        title: "Eternal Pain Vortex",
-        responsive: ["sm"],
-        render: (_, { vortex }) => <Text>{vortex.toLocaleString()}</Text>,
-      },
-      {
-        title: "Gold",
-        responsive: ["sm"],
-        width: 70,
-        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
-      },
-    ];
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(10);
+  const isError = from >= to;
 
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Eternal World Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={EternalWorldTalismanMatsTable}
-              columns={columnsWorldMats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "Eternal Pain Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={EternalPainTalismanMatsTable}
-              columns={columnsPainMats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "3",
-        label: "Eternal Chaos Talisman",
-        children: (
-          <div style={{ marginRight: 10 }}>
-            <i>notes: You cannot craft this type of talisman.</i>
-          </div>
-        ),
-      },
-    ];
+  const mats = useMemo(() => {
+    if (isError) return { apparition: 0, gold: 0 };
+    const slice = EternalWorldTalismanMatsTable.slice(from, to);
+    let apparition = 0, gold = 0;
+    slice.forEach((r) => { apparition += r.apparition; gold += r.gold; });
+    return { apparition, gold };
+  }, [from, to, isError]);
 
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
-    );
-  };
-
-  const worldDataSource: WorldTableMaterialList = useMemo(() => {
-    const tempSlice = EternalWorldTalismanMatsTable.slice(
-      worldData[0],
-      worldData[1]
-    );
-    let tempApp = 0;
-    let tempGold = 0;
-
-    tempSlice.forEach((slicedItem) => {
-      tempApp += slicedItem.apparition;
-      tempGold += slicedItem.gold;
-    });
-    const temp: WorldTableMaterialList = {
-      "Eternal Dimensional Apparition": tempApp,
-      Gold: tempGold,
-    };
-    return temp;
-  }, [worldData]);
-
-  const worldStatDiff: EternalWorldTalismanStat | undefined = useMemo(() => {
-    const { dt1, dt2 } = getComparedData(
-      EternalWorldTalismanStatTable,
-      worldData[0],
-      worldData[1]
-    );
-    if (!dt2) {
-      return;
-    }
-    if (!dt1) {
-      return dt2;
-    }
+  const statDiff = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(EternalWorldTalismanStatTable, from, to);
+    if (!dt2) return null;
+    if (!dt1) return dt2;
     return {
-      encLevel: 0,
       attack: (dt2.attack ?? 0) - (dt1.attack ?? 0),
-      attributePercent:
-        (dt2.attributePercent ?? 0) - (dt1.attributePercent ?? 0),
+      attributePercent: (dt2.attributePercent ?? 0) - (dt1.attributePercent ?? 0),
       maxHP: (dt2.maxHP ?? 0) - (dt1.maxHP ?? 0),
     };
-  }, [worldData]);
+  }, [from, to]);
 
-  const getWorldCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setWorldData(value);
-    };
+  const matRows = [
+    { name: "Eternal Dimensional Apparition", amount: mats.apparition },
+    { name: "Gold", amount: mats.gold },
+  ].filter((r) => r.amount > 0);
 
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={getRemarks(10)}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div>
-          <Divider orientation="left">Materials</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(worldDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">From</span>
+              <Select value={from} options={worldOpts} onChange={setFrom} style={{ width: 100 }} size="small" status={isError ? "error" : undefined} />
+              <span className="text-sm text-muted-foreground">To</span>
+              <Select value={to} options={worldOpts} onChange={setTo} style={{ width: 100 }} size="small" status={isError ? "error" : undefined} />
+            </div>
+            {isError && <span className="text-sm text-destructive">From must be less than To</span>}
+          </div>
+        </CardContent>
+      </Card>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Required Materials</CardTitle>
+          </CardHeader>
+          <CardContent className="px-0 pb-2">
+            {isError || matRows.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+                <Package className="h-10 w-10 opacity-30" />
+                <p className="text-sm">{isError ? "Fix the range above" : "No materials required"}</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {matRows.map((r) => (
+                  <div key={r.name} className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors">
+                    <span className="text-sm">{r.name}</span>
+                    <span className="text-sm font-medium tabular-nums">{r.amount.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-4">
           <ListingCard
             title="Status Increase"
             data={[
-              {
-                title: "ATK",
-                value: worldStatDiff?.attack,
-                format: true,
-              },
-              {
-                title: "Attribute",
-                value: worldStatDiff?.attributePercent,
-                suffix: "%",
-              },
-              {
-                title: "MAX HP",
-                value: worldStatDiff?.maxHP,
-                format: true,
-              },
+              { title: "ATK", value: statDiff?.attack, format: true },
+              { title: "Attribute ATK", value: statDiff?.attributePercent, suffix: "%" },
+              { title: "MAX HP", value: statDiff?.maxHP, format: true },
             ]}
           />
+          <TradingHouseCalc
+            data={[{ name: "Eternal Dimensional Apparition", amt: mats.apparition }]}
+            additionalTotal={mats.gold}
+          />
         </div>
-
-        <TradingHouseCalc
-          data={[
-            {
-              name: "Eternal Dimensional Apparition",
-              amt: worldDataSource["Eternal Dimensional Apparition"],
-            },
-          ]}
-          additionalTotal={worldDataSource.Gold}
-        />
       </div>
-    );
-  };
+    </div>
+  );
+};
 
-  const painDataSource: PainTableMaterialList = useMemo(() => {
-    const tempSlice = EternalPainTalismanMatsTable.slice(
-      painData[0],
-      painData[1]
-    );
-    let tempApp = 0;
-    let tempVortex = 0;
-    let tempGold = 0;
+// ─── Pain Talisman Calculator ─────────────────────────────────────────────────
 
-    tempSlice.forEach((slicedItem) => {
-      tempApp += slicedItem.apparition;
-      tempVortex += slicedItem.vortex;
-      tempGold += slicedItem.gold;
-    });
-    const temp: PainTableMaterialList = {
-      "Eternal Dimensional Apparition": tempApp,
-      "Eternal Pain Vortex": tempVortex,
-      Gold: tempGold,
-    };
-    return temp;
-  }, [painData]);
+const PainCalc = () => {
+  const painOpts = Array.from({ length: 6 }, (_, i) => ({
+    value: i,
+    label: i === 0 ? "Don't Have" : `lv.${i}`,
+  }));
 
-  const painStatDiff: EternalPainTalismanStat | undefined = useMemo(() => {
-    const { dt1, dt2 } = getComparedData(
-      EternalPainTalismanStatTable,
-      painData[0],
-      painData[1]
-    );
-    if (!dt2) {
-      return;
-    }
-    if (!dt1) {
-      return dt2;
-    }
+  const [from, setFrom] = useState(0);
+  const [to, setTo] = useState(5);
+  const isError = from >= to;
+
+  const mats = useMemo(() => {
+    if (isError) return { apparition: 0, vortex: 0, gold: 0 };
+    const slice = EternalPainTalismanMatsTable.slice(from, to);
+    let apparition = 0, vortex = 0, gold = 0;
+    slice.forEach((r) => { apparition += r.apparition; vortex += r.vortex; gold += r.gold; });
+    return { apparition, vortex, gold };
+  }, [from, to, isError]);
+
+  const statDiff = useMemo(() => {
+    const { dt1, dt2 } = getComparedData(EternalPainTalismanStatTable, from, to);
+    if (!dt2) return null;
+    if (!dt1) return dt2;
     return {
-      encLevel: 0,
       attack: (dt2.attack ?? 0) - (dt1.attack ?? 0),
       fd: (dt2.fd ?? 0) - (dt1.fd ?? 0),
       maxHP: (dt2.maxHP ?? 0) - (dt1.maxHP ?? 0),
     };
-  }, [painData]);
+  }, [from, to]);
 
-  const getPainCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setPainData(value);
-    };
+  const matRows = [
+    { name: "Eternal Dimensional Apparition", amount: mats.apparition },
+    { name: "Eternal Pain Vortex", amount: mats.vortex },
+    { name: "Gold", amount: mats.gold },
+  ].filter((r) => r.amount > 0);
 
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={getRemarks(5)}
-            defaultValue={[0, 5]}
-            max={5}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div>
-          <Divider orientation="left">Materials</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(painDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="pt-4">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">From</span>
+              <Select value={from} options={painOpts} onChange={setFrom} style={{ width: 100 }} size="small" status={isError ? "error" : undefined} />
+              <span className="text-sm text-muted-foreground">To</span>
+              <Select value={to} options={painOpts} onChange={setTo} style={{ width: 100 }} size="small" status={isError ? "error" : undefined} />
+            </div>
+            {isError && <span className="text-sm text-destructive">From must be less than To</span>}
+          </div>
+        </CardContent>
+      </Card>
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Required Materials</CardTitle>
+          </CardHeader>
+          <CardContent className="px-0 pb-2">
+            {isError || matRows.length === 0 ? (
+              <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+                <Package className="h-10 w-10 opacity-30" />
+                <p className="text-sm">{isError ? "Fix the range above" : "No materials required"}</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {matRows.map((r) => (
+                  <div key={r.name} className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors">
+                    <span className="text-sm">{r.name}</span>
+                    <span className="text-sm font-medium tabular-nums">{r.amount.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="flex flex-col gap-4">
           <ListingCard
             title="Status Increase"
             data={[
-              {
-                title: "ATK",
-                value: painStatDiff?.attack,
-                format: true,
-              },
-              {
-                title: "FD",
-                value: painStatDiff?.fd,
-                format: true,
-              },
-              {
-                title: "MAX HP",
-                value: painStatDiff?.maxHP,
-                format: true,
-              },
+              { title: "ATK", value: statDiff?.attack, format: true },
+              { title: "FD", value: statDiff?.fd, format: true },
+              { title: "MAX HP", value: statDiff?.maxHP, format: true },
             ]}
           />
+          <TradingHouseCalc
+            data={[
+              { name: "Eternal Dimensional Apparition", amt: mats.apparition },
+              { name: "Eternal Pain Vortex", amt: mats.vortex },
+            ]}
+            additionalTotal={mats.gold}
+          />
         </div>
-
-        <TradingHouseCalc
-          data={[
-            {
-              name: "Eternal Dimensional Apparition",
-              amt: painDataSource["Eternal Dimensional Apparition"],
-            },
-            {
-              name: "Eternal Pain Vortex",
-              amt: painDataSource["Eternal Pain Vortex"],
-            },
-          ]}
-          additionalTotal={painDataSource.Gold}
-        />
       </div>
-    );
-  };
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Stats",
-      children: getStatContent(),
-    },
-    {
-      key: "2",
-      label: "Mats",
-      children: getMatsContent(),
-    },
-    {
-      key: "3",
-      label: "Eternal World Talisman",
-      children: getWorldCalc(),
-    },
-    {
-      key: "4",
-      label: "Eternal Pain Talisman",
-      children: getPainCalc(),
-    },
-  ];
-  return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
     </div>
+  );
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+const ExternalTalismanContent = () => {
+  return (
+    <Tabs defaultValue="world" className="space-y-4">
+      <TabsList className="flex-wrap h-auto gap-1">
+        <TabsTrigger value="world">Eternal World</TabsTrigger>
+        <TabsTrigger value="pain">Eternal Pain</TabsTrigger>
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="world">
+        <WorldCalc />
+      </TabsContent>
+
+      <TabsContent value="pain">
+        <PainCalc />
+      </TabsContent>
+
+      {/* ── REFERENCE ── */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="world-stats" className="space-y-4">
+          <TabsList className="flex-wrap h-auto gap-1">
+            <TabsTrigger value="world-stats">World Stats</TabsTrigger>
+            <TabsTrigger value="pain-stats">Pain Stats</TabsTrigger>
+            <TabsTrigger value="chaos-stats">Chaos Stats</TabsTrigger>
+            <TabsTrigger value="world-mats">World Mats</TabsTrigger>
+            <TabsTrigger value="pain-mats">Pain Mats</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="world-stats">
+            {renderRefTable(
+              ["Enhancement", "Attack", "Attribute ATK(%)", "MAX HP"],
+              EternalWorldTalismanStatTable.map((r) => [
+                `lv.${r.encLevel}`,
+                r.attack,
+                `${r.attributePercent}%`,
+                r.maxHP,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="pain-stats">
+            {renderRefTable(
+              ["Enhancement", "Attack", "Final Damage", "MAX HP"],
+              EternalPainTalismanStatTable.map((r) => [
+                `lv.${r.encLevel}`,
+                r.attack,
+                r.fd,
+                r.maxHP,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="chaos-stats">
+            <p className="text-sm text-muted-foreground mb-3 italic">
+              Note: random add-on stat
+            </p>
+            {renderRefTable(
+              ["Critical", "Critical Damage", "Phy Def", "Mag Def", "Final Damage"],
+              [
+                [
+                  EternalChaosTalismanStatTable.critical.join(" / "),
+                  EternalChaosTalismanStatTable.criticalDamage.join(" / "),
+                  EternalChaosTalismanStatTable.phyDef.join(" / "),
+                  EternalChaosTalismanStatTable.magDef.join(" / "),
+                  EternalChaosTalismanStatTable.fd.join(" / "),
+                ],
+              ]
+            )}
+          </TabsContent>
+
+          <TabsContent value="world-mats">
+            {renderRefTable(
+              ["Enhancement", "Eternal Dimensional Apparition", "Gold"],
+              EternalWorldTalismanMatsTable.map((r) => [
+                `lv.${r.encLevel}`,
+                r.apparition,
+                r.gold,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="pain-mats">
+            {renderRefTable(
+              ["Enhancement", "Eternal Dimensional Apparition", "Eternal Pain Vortex", "Gold"],
+              EternalPainTalismanMatsTable.map((r) => [
+                `lv.${r.encLevel}`,
+                r.apparition,
+                r.vortex,
+                r.gold,
+              ])
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -1,7 +1,5 @@
-import { Collapse, CollapseProps, Table, Typography } from "antd";
-import { ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
-import { useRef } from "react";
+import React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SkillJadeCalcComp from "../../components/SkillJadeCalcComp";
 import {
   AncientDJSkillMaterialTable,
@@ -11,309 +9,229 @@ import {
   DMFDJSkillMaterialTable,
   DMFDJSkillStatTable,
 } from "../../data/SkillJadeData";
-import { useAppSelector } from "../../hooks";
 import { SkillJadeEnhanceMaterial } from "../../interface/Item.interface";
 import { SkillJadeStat } from "../../interface/ItemStat.interface";
-import { getTextEmpty } from "../../utils/common.util";
 
-const { Text } = Typography;
+// ─── Calculators config ──────────────────────────────────────────────────────
+
+const CALCS = [
+  {
+    value: "dreamy",
+    label: "Dreamy",
+    matsTable: DMFDJSkillMaterialTable,
+    statsTable: DMFDJSkillStatTable,
+    lFragName: "Dreamy Core",
+    hFragName: "High Purity Dreamy Core",
+  },
+  {
+    value: "blood-moon",
+    label: "Blood Moon",
+    matsTable: DMFDJSkillMaterialTable,
+    statsTable: DMFDJSkillStatTable,
+    lFragName: "Blood Moon Core",
+    hFragName: "High Purity Blood Moon Core",
+  },
+  {
+    value: "verdure",
+    label: "Verdure",
+    matsTable: DMFDJSkillMaterialTable,
+    statsTable: DMFDJSkillStatTable,
+    lFragName: "Verdure Core",
+    hFragName: "High Purity Verdure Core",
+  },
+  {
+    value: "ancient",
+    label: "Ancient",
+    matsTable: AncientDJSkillMaterialTable,
+    statsTable: AncientDJSkillStatTable,
+    lFragName: "Ancient Broken Dragon Jade Fragments",
+    hFragName: "Ancient Dragon Jade Fragments",
+    hideCD: true,
+    hideTH: true,
+  },
+  {
+    value: "dimensional",
+    label: "Dimensional",
+    matsTable: DimeOtherDJSkillMaterialTable,
+    statsTable: DimeOtherDJSkillStatTable,
+    lFragName: "Dimensional Core",
+    hFragName: "High Purity Dimensional Core",
+  },
+  {
+    value: "otherworldly",
+    label: "Otherworldly",
+    matsTable: DimeOtherDJSkillMaterialTable,
+    statsTable: DimeOtherDJSkillStatTable,
+    lFragName: "Otherworldly Core",
+    hFragName: "High Purity Otherworldly Core",
+  },
+] as const;
+
+// ─── Reference table helper ──────────────────────────────────────────────────
+
+const renderRefTable = (
+  headers: string[],
+  rows: React.ReactNode[][]
+) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th
+              key={h}
+              className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap"
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? (cell as number).toLocaleString()
+                  : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+// ─── Reference sections ──────────────────────────────────────────────────────
+
+const REF_SECTIONS = [
+  {
+    value: "dmf-stats",
+    label: "DMF Stats",
+    title: "Dreamy / Blood Moon / Verdure",
+    renderRows: (t: SkillJadeStat[]) =>
+      t.map((r) => [
+        `+${r.encLevel}`,
+        `${r.attackPercent}%`,
+        `${r.cooldownPercent}%`,
+        `${r.successRate}%`,
+      ]),
+    headers: ["Enhancement", "ATK%", "Cooldown -", "Success Rate"],
+    table: DMFDJSkillStatTable as SkillJadeStat[],
+  },
+  {
+    value: "dmf-mats",
+    label: "DMF Mats",
+    title: "Dreamy / Blood Moon / Verdure",
+    renderRows: (t: SkillJadeEnhanceMaterial[]) =>
+      t.map((r) => [`+${r.encLevel}`, r.lowerFragment || "-", r.higherFragment || "-", r.gold]),
+    headers: ["Enhancement", "Core", "HG Core", "Gold"],
+    table: DMFDJSkillMaterialTable as SkillJadeEnhanceMaterial[],
+  },
+  {
+    value: "anc-stats",
+    label: "Ancient Stats",
+    title: "Ancient Dragon Jade",
+    renderRows: (t: SkillJadeStat[]) =>
+      t.map((r) => [
+        `+${r.encLevel}`,
+        `${r.attackPercent}%`,
+        `${r.successRate}%`,
+      ]),
+    headers: ["Enhancement", "ATK%", "Success Rate"],
+    table: AncientDJSkillStatTable as SkillJadeStat[],
+  },
+  {
+    value: "anc-mats",
+    label: "Ancient Mats",
+    title: "Ancient Dragon Jade",
+    renderRows: (t: SkillJadeEnhanceMaterial[]) =>
+      t.map((r) => [`+${r.encLevel}`, r.lowerFragment || "-", r.higherFragment || "-", r.gold]),
+    headers: ["Enhancement", "Core", "HG Core", "Gold"],
+    table: AncientDJSkillMaterialTable as SkillJadeEnhanceMaterial[],
+  },
+  {
+    value: "dim-stats",
+    label: "Dim/Other Stats",
+    title: "Dimensional / Otherworldly",
+    renderRows: (t: SkillJadeStat[]) =>
+      t.map((r) => [
+        `+${r.encLevel}`,
+        `${r.attackPercent}%`,
+        `${r.cooldownPercent}%`,
+        `${r.successRate}%`,
+      ]),
+    headers: ["Enhancement", "ATK%", "Cooldown -", "Success Rate"],
+    table: DimeOtherDJSkillStatTable as SkillJadeStat[],
+  },
+  {
+    value: "dim-mats",
+    label: "Dim/Other Mats",
+    title: "Dimensional / Otherworldly",
+    renderRows: (t: SkillJadeEnhanceMaterial[]) =>
+      t.map((r) => [`+${r.encLevel}`, r.lowerFragment || "-", r.higherFragment || "-", r.gold]),
+    headers: ["Enhancement", "Core", "HG Core", "Gold"],
+    table: DimeOtherDJSkillMaterialTable as SkillJadeEnhanceMaterial[],
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const SkillJadeContent = () => {
-  const skillJadeScreen = useAppSelector(
-    (state) => state.UIState.selectedSideBar.payload?.skillJadeScreen
-  );
-  const activeKey = useRef(skillJadeScreen?.tabOpen || ["8"]);
-  const getColumnsStats = (showCd?: boolean): ColumnsType<SkillJadeStat> => {
-    const cdData: ColumnsType<SkillJadeStat> = showCd
-      ? [
-          {
-            title: "Cooldown Decrease",
-            responsive: ["sm"],
-            render: (_, { cooldownPercent }) => (
-              <div>
-                <Text>Cd -{cooldownPercent}%</Text>
-              </div>
-            ),
-          },
-        ]
-      : [];
-    const dt: ColumnsType<SkillJadeStat> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <Text>Attack Percentage</Text>
-            {showCd && <Text>Cooldown Decrease</Text>}
-            <Text>Success Rate</Text>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { attackPercent, cooldownPercent, successRate }) => (
-          <div>
-            <p>ATK {attackPercent}%</p>
-            {showCd && <p>Cd -{cooldownPercent}%</p>}
-            <p>Success: {successRate}%</p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack Percentage",
-        responsive: ["sm"],
-        render: (_, { attackPercent }) => (
-          <div>
-            <Text style={{ margin: 0 }}>ATK {attackPercent}%</Text>
-          </div>
-        ),
-      },
-    ];
-
-    const sRate: ColumnsType<SkillJadeStat> = [
-      {
-        title: "Success Rate",
-        responsive: ["sm"],
-        render: (_, { successRate }) => (
-          <div>
-            <Text style={{ margin: 0 }}>{successRate}%</Text>
-          </div>
-        ),
-      },
-    ];
-
-    return [...dt, ...cdData, ...sRate];
-  };
-
-  const getColumnsMats = (): ColumnsType<SkillJadeEnhanceMaterial> => {
-    const dt: ColumnsType<SkillJadeEnhanceMaterial> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <Text>Core</Text>
-            <Text>Success Rate</Text>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { lowerFragment, higherFragment, gold }) => (
-          <div>
-            <p>{getTextEmpty({ txt: lowerFragment })}(core)</p>
-            <p>{getTextEmpty({ txt: higherFragment })}(hg core)</p>
-            <p>{getTextEmpty({ txt: gold })}(g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Core",
-        responsive: ["sm"],
-        render: (_, { lowerFragment }) => (
-          <Text>
-            {getTextEmpty({
-              txt: lowerFragment,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "HG Core",
-        responsive: ["sm"],
-        render: (_, { higherFragment }) => (
-          <Text>
-            {getTextEmpty({
-              txt: higherFragment,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => (
-          <Text>
-            {getTextEmpty({
-              txt: gold,
-            })}
-          </Text>
-        ),
-      },
-    ];
-
-    return dt;
-  };
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Skill Jade Stat Table",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>
-              {"Dreamy / Blood Moon / Verdure Dragon Jade"}
-            </Title>
-            <Table
-              size={"small"}
-              dataSource={DMFDJSkillStatTable}
-              columns={getColumnsStats(true)}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Ancient Dragon Jade"}</Title>
-            <Table
-              size={"small"}
-              dataSource={AncientDJSkillStatTable}
-              columns={getColumnsStats()}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Dimensional / Otherworldly Dragon Jade"}</Title>
-            <Table
-              size={"small"}
-              dataSource={DimeOtherDJSkillStatTable}
-              columns={getColumnsStats(true)}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "2",
-      label: "Skill Jade Mat Table",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>
-              {"Dreamy / Blood Moon / Verdure Dragon Jade"}
-            </Title>
-            <Table
-              size={"small"}
-              dataSource={DMFDJSkillMaterialTable}
-              columns={getColumnsMats()}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Ancient Dragon Jade"}</Title>
-            <Table
-              size={"small"}
-              dataSource={AncientDJSkillMaterialTable}
-              columns={getColumnsMats()}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Dimensional / Otherworldly Dragon Jade"}</Title>
-            <Table
-              size={"small"}
-              dataSource={DimeOtherDJSkillMaterialTable}
-              columns={getColumnsMats()}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Dreamy Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={DMFDJSkillMaterialTable}
-          statsTable={DMFDJSkillStatTable}
-          lFragName={"Dreamy Core"}
-          hFragName={"High Purity Dreamy Core"}
-        />
-      ),
-    },
-    {
-      key: "4",
-      label: "Blood Moon Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={DMFDJSkillMaterialTable}
-          statsTable={DMFDJSkillStatTable}
-          lFragName={"Blood Moon Core"}
-          hFragName={"High Purity Blood Moon Core"}
-        />
-      ),
-    },
-    {
-      key: "5",
-      label: "Verdure Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={DMFDJSkillMaterialTable}
-          statsTable={DMFDJSkillStatTable}
-          lFragName={"Verdure Core"}
-          hFragName={"High Purity Verdure Core"}
-        />
-      ),
-    },
-    {
-      key: "6",
-      label: "Ancient Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={AncientDJSkillMaterialTable}
-          statsTable={AncientDJSkillStatTable}
-          lFragName={"Ancient Broken Dragon Jade Fragments"}
-          hFragName={"Ancient Dragon Jade Fragments"}
-          hideCD
-          hideTH
-        />
-      ),
-    },
-    {
-      key: "7",
-      label: "Dimensional Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={DimeOtherDJSkillMaterialTable}
-          statsTable={DimeOtherDJSkillStatTable}
-          lFragName={"Dimensional Core"}
-          hFragName={"High Purity Dimensional Core"}
-        />
-      ),
-    },
-    {
-      key: "8",
-      label: "Otherworldly Dragon Jade",
-      children: (
-        <SkillJadeCalcComp
-          matsTable={DimeOtherDJSkillMaterialTable}
-          statsTable={DimeOtherDJSkillStatTable}
-          lFragName={"Otherworldly Core"}
-          hFragName={"High Purity Otherworldly Core"}
-        />
-      ),
-    },
-  ];
-
   return (
-    <div>
-      <Collapse
-        items={items}
-        size="small"
-        defaultActiveKey={activeKey.current}
-      />
-    </div>
+    <Tabs defaultValue="dreamy" className="space-y-4">
+      <TabsList className="flex-wrap h-auto gap-1">
+        {CALCS.map((c) => (
+          <TabsTrigger key={c.value} value={c.value}>
+            {c.label}
+          </TabsTrigger>
+        ))}
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      {/* Calculator tabs */}
+      {CALCS.map((c) => (
+        <TabsContent key={c.value} value={c.value}>
+          <SkillJadeCalcComp
+            matsTable={c.matsTable}
+            statsTable={c.statsTable}
+            lFragName={c.lFragName}
+            hFragName={c.hFragName}
+            hideCD={"hideCD" in c ? c.hideCD : undefined}
+            hideTH={"hideTH" in c ? c.hideTH : undefined}
+          />
+        </TabsContent>
+      ))}
+
+      {/* Reference tab */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="dmf-stats" className="space-y-4">
+          <TabsList className="flex-wrap h-auto gap-1">
+            {REF_SECTIONS.map((s) => (
+              <TabsTrigger key={s.value} value={s.value}>
+                {s.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {REF_SECTIONS.map((s) => (
+            <TabsContent key={s.value} value={s.value} className="space-y-2">
+              <p className="text-sm font-semibold text-muted-foreground">
+                {s.title}
+              </p>
+              {renderRefTable(
+                s.headers,
+                (s.renderRows as (t: any[]) => React.ReactNode[][])(s.table)
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

@@ -1,20 +1,10 @@
-import {
-  Alert,
-  Button,
-  Card,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Form,
-  Grid,
-  InputNumber,
-  Radio,
-  Space,
-  Table,
-  Typography,
-} from "antd";
-import { CloseOutlined } from "@ant-design/icons";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Select } from "antd";
+import { Package, Plus, Trash2 } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ListingCard from "../../components/ListingCard";
+import { BESTIE_TYPE } from "../../constants/InGame.constants";
 import {
   BestieGrowthTableMats,
   BestieMountV1TableStats,
@@ -22,831 +12,357 @@ import {
   BestieSpiritV1TableStats,
   BestieSpiritV2TableStats,
 } from "../../data/BestieCalculatorData";
-import { ColumnsType } from "antd/es/table";
-import { BestieStats } from "../../interface/ItemStat.interface";
-import {
-  columnsResource,
-  getTextEmpty,
-  typedEntries,
-} from "../../utils/common.util";
-import CustomSlider from "../../components/CustomSlider";
-import { BESTIE_TYPE } from "../../constants/InGame.constants";
-import { TableResource } from "../../constants/Common.constants";
-import ListingCard from "../../components/ListingCard";
-const { Text } = Typography;
-const { useBreakpoint } = Grid;
 
-interface FormEnhance {
-  type: BESTIE_TYPE | null;
-  listEnhance: Array<{
-    range?: [number, number] | null;
-    version: string;
-  }> | null;
+// ─── Reference table helper ───────────────────────────────────────────────────
+
+const renderRefTable = (headers: string[], rows: (string | number | undefined | null)[][]) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th key={h} className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap">
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? cell.toLocaleString()
+                  : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface GrowEntry {
+  id: number;
+  type: BESTIE_TYPE;
+  version: "v1" | "v2" | "v3";
+  from: number;
+  to: number;
 }
 
-const BestieVersion = ["v1", "v2", "v3"];
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-interface GrowthMaterialList {
-  "Faded Bestie Star": number;
-  "Shining Bestie Star": number;
-  "Unbeatable Bestie Star": number;
-}
+const growOpts = Array.from({ length: 31 }, (_, i) => ({ value: i, label: `+${i}` }));
 
-interface GrowthTableRes {
-  growthData?: GrowthMaterialList;
-  statsData?: BestieStats;
-  errorDt?: string[];
-}
+const getStatTable = (type: BESTIE_TYPE, version: "v1" | "v2" | "v3") => {
+  const isMount = type === BESTIE_TYPE.MNT;
+  return version === "v1"
+    ? isMount ? BestieMountV1TableStats : BestieSpiritV1TableStats
+    : isMount ? BestieMountV2TableStats : BestieSpiritV2TableStats;
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const BestieContent = () => {
-  const screens = useBreakpoint();
-  const [formEnhance] = Form.useForm<{ items: Array<FormEnhance> }>();
-  const [enhanceDataSource, setEnhanceDataSource] = useState<GrowthTableRes>(
-    {}
-  );
+  const nextId = useRef(2);
+  const [entries, setEntries] = useState<GrowEntry[]>([
+    { id: 1, type: BESTIE_TYPE.MNT, version: "v1", from: 0, to: 30 },
+  ]);
 
-  const getStats = () => {
-    const colMount: ColumnsType<BestieStats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            {[
-              "ATK",
-              "ATK(%)",
-              "ATT(%)",
-              "CRT",
-              "CDM",
-              "FD",
-              "Movespeed(%)",
-            ].map((it) => (
-              <p key={`title-${it}`}>{it}</p>
-            ))}
-          </div>
-        ),
-        responsive: ["xs"],
-        width: 150,
-        render: (
-          _,
-          {
-            phyMagAtk,
-            phyMagAtkPercent,
-            attAtkPercent,
-            crt,
-            cdm,
-            fd,
-            moveSpeedPercent,
-          }
-        ) => (
-          <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-            <p>CRT {getTextEmpty({ txt: crt })}</p>
-            <p>CDM {getTextEmpty({ txt: cdm })}</p>
-            <p>FD {getTextEmpty({ txt: fd })}</p>
-            <p>
-              Movespeed {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-            </p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { phyMagAtk }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attack(%)",
-        responsive: ["sm"],
-        render: (_, { phyMagAtkPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attribute(%)",
-        responsive: ["sm"],
-        render: (_, { attAtkPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "CRT",
-        responsive: ["sm"],
-        render: (_, { crt }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: crt })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "CDM",
-        responsive: ["sm"],
-        render: (_, { cdm }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: cdm })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "FD",
-        responsive: ["sm"],
-        render: (_, { fd }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: fd })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Movespeed(%)",
-        responsive: ["sm"],
-        render: (_, { moveSpeedPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-    ];
-
-    const colSpirit: ColumnsType<BestieStats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            {["ATK", "ATK(%)", "ATT(%)", "FD", "HP", "HP(%)"].map((it) => (
-              <p key={`title-${it}`}>{it}</p>
-            ))}
-          </div>
-        ),
-        responsive: ["xs"],
-        width: 150,
-        render: (
-          _,
-          { phyMagAtk, phyMagAtkPercent, attAtkPercent, fd, hp, hpPercent }
-        ) => (
-          <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-            <p>FD {getTextEmpty({ txt: fd })}</p>
-            <p>HP {getTextEmpty({ txt: hp })}</p>
-            <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { phyMagAtk }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attack(%)",
-        responsive: ["sm"],
-        render: (_, { phyMagAtkPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attribute(%)",
-        responsive: ["sm"],
-        render: (_, { attAtkPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "FD",
-        responsive: ["sm"],
-        render: (_, { fd }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: fd })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "HP",
-        responsive: ["sm"],
-        render: (_, { hp }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: hp })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "HP(%)",
-        responsive: ["sm"],
-        render: (_, { hpPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-    ];
-
-    const itemStatMount: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "1st",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              dataSource={BestieMountV1TableStats}
-              columns={colMount}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "2nd & 3rd",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              dataSource={BestieMountV2TableStats}
-              columns={colMount}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-    ];
-
-    const itemStatSpirit: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "1st",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              dataSource={BestieSpiritV1TableStats}
-              columns={colSpirit}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "2nd & 3rd",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              dataSource={BestieSpiritV2TableStats}
-              columns={colSpirit}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-    ];
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Divider orientation="left">Mount</Divider>
-        <Collapse items={itemStatMount} size="small" />
-
-        <Divider orientation="left">Spirit</Divider>
-        <Collapse items={itemStatSpirit} size="small" />
-      </div>
-    );
-  };
-  const getMats = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Table
-          style={{ marginRight: 10, marginBottom: 10 }}
-          size={"small"}
-          dataSource={BestieGrowthTableMats}
-          columns={[
-            {
-              title: "Enhancement",
-              dataIndex: "encLevel",
-            },
-            {
-              title: "Faded",
-              dataIndex: "faded",
-            },
-            {
-              title: "Shining",
-              dataIndex: "shining",
-            },
-            {
-              title: "Unbeatable",
-              dataIndex: "unbeatable",
-            },
-          ]}
-          pagination={false}
-          bordered
-          footer={() =>
-            "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
-          }
-        />
-      </div>
-    );
+  const addEntry = () => {
+    setEntries((prev) => [
+      ...prev,
+      { id: nextId.current++, type: BESTIE_TYPE.MNT, version: "v1", from: 0, to: 30 },
+    ]);
   };
 
-  const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
-    if (!temp || !Array.isArray(temp) || temp.length < 1) {
-      return { errorDt: ["Empty List"] };
-    }
+  const removeEntry = (id: number) => setEntries((prev) => prev.filter((e) => e.id !== id));
 
-    // mats
-    let tempFaded = 0;
-    let tempShining = 0;
-    let tempUnbeat = 0;
+  const updateEntry = (id: number, patch: Partial<GrowEntry>) =>
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
 
-    // stats
-    let phyMagAtk = 0;
-    let phyMagAtkPercent = 0;
-    let attAtkPercent = 0;
-    let fd = 0;
-    // mount
-    let crt = 0;
-    let cdm = 0;
-    let moveSpeedPercent = 0;
-    // spirit
-    let hp = 0;
-    let hpPercent = 0;
+  const validEntries = useMemo(() => entries.filter((e) => e.from < e.to), [entries]);
 
-    let errorMsg: string[] = [];
-
-    temp.forEach((enhItem, idx) => {
-      if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
-        errorMsg.push(`Nothing to calculate in Grow ${idx + 1}`);
-      } else if (
-        enhItem?.type &&
-        enhItem?.listEnhance &&
-        enhItem?.listEnhance.length > 0
-      ) {
-        enhItem?.listEnhance.forEach((item, i) => {
-          if (!item || (!item?.version && !item?.range)) {
-            errorMsg.push(
-              `Nothing to calculate on Grow ${idx + 1} list ${i + 1}`
-            );
-          } else if (item?.version && item?.range) {
-            // mats
-            let tempFadedC = 0;
-            let tempShiningC = 0;
-            let tempUnbeatC = 0;
-
-            const isMount = enhItem?.type === BESTIE_TYPE.MNT;
-
-            const tempSliceMats = BestieGrowthTableMats.slice(
-              item?.range[0],
-              item?.range[1]
-            );
-            tempSliceMats.forEach((slicedItem) => {
-              tempFadedC += slicedItem.faded;
-              tempShiningC += slicedItem.shining;
-              tempUnbeatC += slicedItem.unbeatable;
-            });
-
-            tempFaded += tempFadedC;
-            tempShining += tempShiningC;
-            tempUnbeat += tempUnbeatC;
-
-            // stats
-            let tempArrStats: BestieStats[] = [];
-
-            switch (item?.version) {
-              case BestieVersion[0]:
-                tempArrStats = isMount
-                  ? BestieMountV1TableStats
-                  : BestieSpiritV1TableStats;
-                break;
-              case BestieVersion[1]:
-              case BestieVersion[2]:
-                tempArrStats = isMount
-                  ? BestieMountV2TableStats
-                  : BestieSpiritV2TableStats;
-                break;
-
-              default:
-                break;
-            }
-
-            const dt1 =
-              tempArrStats.length >= item?.range[0]
-                ? tempArrStats[item?.range[0] - 1]
-                : undefined;
-            const dt2 =
-              tempArrStats.length >= item?.range[1]
-                ? tempArrStats[item?.range[1] - 1]
-                : undefined;
-            const minusHandler = (n1?: number, n2?: number) => {
-              return (n1 ?? 0) - (n2 ?? 0);
-            };
-
-            if (dt2) {
-              phyMagAtk += minusHandler(dt2.phyMagAtk, dt1?.phyMagAtk);
-              phyMagAtkPercent += minusHandler(
-                dt2.phyMagAtkPercent,
-                dt1?.phyMagAtkPercent
-              );
-              attAtkPercent += minusHandler(
-                dt2.attAtkPercent,
-                dt1?.attAtkPercent
-              );
-              fd += minusHandler(dt2.fd, dt1?.fd);
-
-              crt += minusHandler(dt2.crt, dt1?.crt);
-              cdm += minusHandler(dt2.cdm, dt1?.cdm);
-              moveSpeedPercent += minusHandler(
-                dt2.moveSpeedPercent,
-                dt1?.moveSpeedPercent
-              );
-
-              hp += minusHandler(dt2.hp, dt1?.hp);
-              hpPercent += minusHandler(dt2.hpPercent, dt1?.hpPercent);
-            }
-          } else {
-            let emsg = "";
-            if (!item?.version) {
-              emsg = "Version";
-            } else if (!item?.range) {
-              emsg = "Range";
-            }
-            errorMsg.push(
-              `The ${emsg} in Grow ${idx + 1}, item ${
-                i + 1
-              } haven't inputted properly`
-            );
-          }
-        });
-      } else {
-        let msg = "";
-        if (!enhItem?.type) {
-          msg = "Type";
-        } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
-          msg = "List";
-        }
-        errorMsg.push(`Empty ${msg} in Grow ${idx + 1}`);
-      }
+  const mats = useMemo(() => {
+    let faded = 0, shining = 0, unbeatable = 0;
+    validEntries.forEach(({ from, to }) => {
+      BestieGrowthTableMats.slice(from, to).forEach((r) => {
+        faded += r.faded;
+        shining += r.shining;
+        unbeatable += r.unbeatable;
+      });
     });
+    return { faded, shining, unbeatable };
+  }, [validEntries]);
 
-    return {
-      growthData: {
-        "Faded Bestie Star": tempFaded,
-        "Shining Bestie Star": tempShining,
-        "Unbeatable Bestie Star": tempUnbeat,
-      },
-      statsData: {
-        encLevel: "",
-        phyMagAtk,
-        phyMagAtkPercent,
-        attAtkPercent,
-        fd,
+  const statDiff = useMemo(() => {
+    let phyMagAtk = 0, phyMagAtkPercent = 0, attAtkPercent = 0, fd = 0;
+    let crt = 0, cdm = 0, moveSpeedPercent = 0, hp = 0, hpPercent = 0;
+    validEntries.forEach(({ type, version, from, to }) => {
+      const table = getStatTable(type, version);
+      const dt1 = from > 0 && table.length >= from ? table[from - 1] : undefined;
+      const dt2 = table.length >= to ? table[to - 1] : undefined;
+      if (!dt2) return;
+      const d = (a?: number, b?: number) => (a ?? 0) - (b ?? 0);
+      phyMagAtk += d(dt2.phyMagAtk, dt1?.phyMagAtk);
+      phyMagAtkPercent += d(dt2.phyMagAtkPercent, dt1?.phyMagAtkPercent);
+      attAtkPercent += d(dt2.attAtkPercent, dt1?.attAtkPercent);
+      fd += d(dt2.fd, dt1?.fd);
+      crt += d(dt2.crt, dt1?.crt);
+      cdm += d(dt2.cdm, dt1?.cdm);
+      moveSpeedPercent += d(dt2.moveSpeedPercent, dt1?.moveSpeedPercent);
+      hp += d(dt2.hp, dt1?.hp);
+      hpPercent += d(dt2.hpPercent, dt1?.hpPercent);
+    });
+    return { phyMagAtk, phyMagAtkPercent, attAtkPercent, fd, crt, cdm, moveSpeedPercent, hp, hpPercent };
+  }, [validEntries]);
 
-        // mount
-        crt,
-        cdm,
-        moveSpeedPercent,
-
-        // spirit
-        hp,
-        hpPercent,
-      },
-      errorDt: errorMsg.length > 0 ? errorMsg : undefined,
-    } as GrowthTableRes;
-  };
-
-  useEffect(() => {
-    setEnhanceDataSource(
-      calcEnhanceDataSource([{ type: null, listEnhance: null }])
-    );
-  }, []);
-
-  const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
-    setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
-  };
-
-  const getWidthSetting = () => {
-    if (screens.xs) {
-      return 200;
-    }
-    return 400;
-  };
-
-  const getEnhanceCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Grow List</Divider>
-          <Form
-            labelCol={{ span: 5 }}
-            wrapperCol={{ span: 19 }}
-            form={formEnhance}
-            name="dynamic_form_complex"
-            style={{ maxWidth: 600 }}
-            autoComplete="off"
-            initialValues={{ items: [{}] }}
-            onValuesChange={onValuesChange}
-          >
-            <Form.List name="items">
-              {(fields, { add, remove }) => (
-                <div
-                  style={{
-                    display: "flex",
-                    rowGap: 16,
-                    flexDirection: "column",
-                  }}
-                >
-                  {fields.map((field, index) => (
-                    <Card
-                      size="small"
-                      title={`Grow ${field.name + 1}`}
-                      style={{ minWidth: getWidthSetting() }}
-                      key={field.key}
-                      id={`${field.name}-card-${index}`}
-                      extra={
-                        <CloseOutlined
-                          onClick={() => {
-                            remove(field.name);
-                          }}
-                        />
-                      }
-                    >
-                      <Form.Item
-                        label="Type"
-                        name={[field.name, "type"]}
-                        rules={[{ required: true }]}
-                        id={`${field.name}-type-${index}`}
-                      >
-                        <Radio.Group>
-                          <Radio.Button value={BESTIE_TYPE.MNT}>
-                            mount
-                          </Radio.Button>
-                          <Radio.Button value={BESTIE_TYPE.SPT}>
-                            spirit
-                          </Radio.Button>
-                        </Radio.Group>
-                      </Form.Item>
-
-                      <Form.Item label="List">
-                        <Form.List name={[field.name, "listEnhance"]}>
-                          {(subFields, subOpt) => (
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                rowGap: 18,
-                              }}
-                            >
-                              {subFields.map((subField, idx) => (
-                                <Card
-                                  key={subField.key}
-                                  size="small"
-                                  style={{ width: "100%" }}
-                                  id={`${subField.name}-card-${idx}`}
-                                >
-                                  <Space
-                                    direction="horizontal"
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      flexDirection: "row",
-                                      borderWidth: 1,
-                                    }}
-                                  >
-                                    <Form.Item
-                                      label="Version"
-                                      name={[subField.name, "version"]}
-                                      rules={[{ required: true }]}
-                                      id={`${subField.name}-version-${idx}`}
-                                    >
-                                      <Radio.Group>
-                                        {BestieVersion.map((it) => (
-                                          <Radio.Button value={it}>
-                                            {it.toUpperCase()}
-                                          </Radio.Button>
-                                        ))}
-                                      </Radio.Group>
-                                    </Form.Item>
-
-                                    <CloseOutlined
-                                      onClick={() => {
-                                        subOpt.remove(subField.name);
-                                      }}
-                                    />
-                                  </Space>
-
-                                  <Form.Item
-                                    noStyle
-                                    name={[subField.name, "range"]}
-                                  >
-                                    <CustomSlider
-                                      id={`${subField.name}-range-${idx}`}
-                                      max={30}
-                                      mark={{
-                                        0: "+0",
-                                        10: "+10",
-                                        20: "+20",
-                                        30: "+30",
-                                      }}
-                                    />
-                                  </Form.Item>
-                                </Card>
-                              ))}
-                              <Button
-                                type="dashed"
-                                onClick={() => subOpt.add()}
-                                block
-                                disabled={
-                                  subFields &&
-                                  subFields.length >= BestieVersion.length
-                                }
-                              >
-                                + Add Enhancement
-                              </Button>
-                            </div>
-                          )}
-                        </Form.List>
-                      </Form.Item>
-                    </Card>
-                  ))}
-
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    disabled={fields && fields.length >= 2}
-                  >
-                    + Add Type
-                  </Button>
-                </div>
-              )}
-            </Form.List>
-          </Form>
-          {enhanceDataSource.errorDt &&
-            enhanceDataSource.errorDt.length > 0 && (
-              <div style={{ marginTop: 4, maxWidth: getWidthSetting() }}>
-                <Space direction="vertical" size={"small"}>
-                  {enhanceDataSource.errorDt.map((it, x) => (
-                    <Text type="warning" key={`error-label-${x}`}>
-                      {it}
-                    </Text>
-                  ))}
-                </Space>
-              </div>
-            )}
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Growth Material List</Divider>
-          {enhanceDataSource.errorDt && (
-            <div>
-              <Alert
-                banner
-                message="Some of the item you input is not valid"
-                type="warning"
-              />
-            </div>
-          )}
-          <Table
-            size={"small"}
-            dataSource={
-              (enhanceDataSource.growthData
-                ? typedEntries(enhanceDataSource.growthData).map(
-                    ([key, value]) => ({
-                      mats: key,
-                      amount: value,
-                    })
-                  )
-                : []) as TableResource[]
-            }
-            columns={columnsResource}
-            pagination={false}
-            bordered
-            footer={() =>
-              "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
-            }
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard
-            title="Status Increase"
-            data={[
-              {
-                title: "ATK",
-                value: enhanceDataSource.statsData?.phyMagAtk,
-                format: true,
-              },
-              {
-                title: "ATK",
-                value: enhanceDataSource.statsData?.phyMagAtkPercent,
-                suffix: "%",
-              },
-              {
-                title: "ATT",
-                value: enhanceDataSource.statsData?.attAtkPercent,
-                suffix: "%",
-              },
-              {
-                title: "FD",
-                value: enhanceDataSource.statsData?.fd,
-                format: true,
-              },
-              {
-                title: "CRT",
-                value: enhanceDataSource.statsData?.crt,
-                format: true,
-              },
-              {
-                title: "CDM",
-                value: enhanceDataSource.statsData?.cdm,
-                format: true,
-              },
-              {
-                title: "MvSpeed",
-                value: enhanceDataSource.statsData?.moveSpeedPercent,
-                suffix: "%",
-              },
-              {
-                title: "HP",
-                value: enhanceDataSource.statsData?.hp,
-                format: true,
-              },
-              {
-                title: "HP",
-                value: enhanceDataSource.statsData?.hpPercent,
-                suffix: "%",
-              },
-            ]}
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Stats",
-      children: getStats(),
-    },
-    {
-      key: "2",
-      label: "Resource",
-      children: getMats(),
-    },
-    {
-      key: "3",
-      label: "Grow",
-      children: getEnhanceCalculator(),
-    },
-  ];
+  const matRows = [
+    { name: "Faded Bestie Star", amount: mats.faded },
+    { name: "Shining Bestie Star", amount: mats.shining },
+    { name: "Unbeatable Bestie Star", amount: mats.unbeatable },
+  ].filter((r) => r.amount > 0);
 
   return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
-    </div>
+    <Tabs defaultValue="calculator" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="calculator">Calculator</TabsTrigger>
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      {/* ── CALCULATOR ── */}
+      <TabsContent value="calculator">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Left: grow entries */}
+          <div className="flex flex-col gap-3">
+            {entries.map((entry, idx) => {
+              const isErr = entry.from >= entry.to;
+              return (
+                <Card key={entry.id}>
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
+                    <CardTitle className="text-sm font-medium">Grow {idx + 1}</CardTitle>
+                    <button
+                      onClick={() => removeEntry(entry.id)}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                      aria-label="Remove entry"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground w-16 shrink-0">Type</span>
+                      <div className="flex gap-1">
+                        {([BESTIE_TYPE.MNT, BESTIE_TYPE.SPT] as const).map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => updateEntry(entry.id, { type: t })}
+                            className={`px-3 py-1 rounded text-sm border transition-colors ${
+                              entry.type === t
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background border-border hover:bg-muted"
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground w-16 shrink-0">Version</span>
+                      <div className="flex gap-1">
+                        {(["v1", "v2", "v3"] as const).map((v) => (
+                          <button
+                            key={v}
+                            onClick={() => updateEntry(entry.id, { version: v })}
+                            className={`px-3 py-1 rounded text-sm border transition-colors ${
+                              entry.version === v
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background border-border hover:bg-muted"
+                            }`}
+                          >
+                            {v.toUpperCase()}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm text-muted-foreground w-16 shrink-0">Range</span>
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={entry.from}
+                          options={growOpts}
+                          onChange={(v) => updateEntry(entry.id, { from: v })}
+                          style={{ width: 90 }}
+                          size="small"
+                          status={isErr ? "error" : undefined}
+                        />
+                        <span className="text-sm text-muted-foreground">→</span>
+                        <Select
+                          value={entry.to}
+                          options={growOpts}
+                          onChange={(v) => updateEntry(entry.id, { to: v })}
+                          style={{ width: 90 }}
+                          size="small"
+                          status={isErr ? "error" : undefined}
+                        />
+                        {isErr && <span className="text-xs text-destructive">From must be less than To</span>}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+
+            <button
+              onClick={addEntry}
+              disabled={entries.length >= 3}
+              className="flex items-center justify-center gap-2 w-full py-2 rounded-md border border-dashed text-sm text-muted-foreground hover:bg-muted/50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Plus className="h-4 w-4" />
+              Add Grow Entry
+            </button>
+          </div>
+
+          {/* Right: materials + stats */}
+          <div className="flex flex-col gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Required Materials</CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 pb-2">
+                {matRows.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+                    <Package className="h-10 w-10 opacity-30" />
+                    <p className="text-sm">No materials required</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="divide-y">
+                      {matRows.map((r) => (
+                        <div key={r.name} className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors">
+                          <span className="text-sm">{r.name}</span>
+                          <span className="text-sm font-medium tabular-nums">{r.amount.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="px-4 pt-2 text-xs text-muted-foreground italic">
+                      * Growth uses one Bestie Star type; same for both Mount & Spirit
+                    </p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <ListingCard
+              title="Status Increase"
+              data={[
+                { title: "ATK", value: statDiff.phyMagAtk, format: true },
+                { title: "ATK", value: statDiff.phyMagAtkPercent, suffix: "%" },
+                { title: "ATT", value: statDiff.attAtkPercent, suffix: "%" },
+                { title: "FD", value: statDiff.fd, format: true },
+                { title: "CRT", value: statDiff.crt, format: true },
+                { title: "CDM", value: statDiff.cdm, format: true },
+                { title: "MvSpeed", value: statDiff.moveSpeedPercent, suffix: "%" },
+                { title: "HP", value: statDiff.hp, format: true },
+                { title: "HP", value: statDiff.hpPercent, suffix: "%" },
+              ]}
+            />
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* ── REFERENCE ── */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="growth-mats" className="space-y-4">
+          <TabsList className="flex-wrap h-auto gap-1">
+            <TabsTrigger value="growth-mats">Growth Mats</TabsTrigger>
+            <TabsTrigger value="mount-v1">Mount V1</TabsTrigger>
+            <TabsTrigger value="mount-v2">Mount V2/V3</TabsTrigger>
+            <TabsTrigger value="spirit-v1">Spirit V1</TabsTrigger>
+            <TabsTrigger value="spirit-v2">Spirit V2/V3</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="growth-mats">
+            <p className="text-sm text-muted-foreground italic mb-3">
+              * Growth only uses one Bestie Star type; same for both Mount & Spirit
+            </p>
+            {renderRefTable(
+              ["Enhancement", "Faded Bestie Star", "Shining Bestie Star", "Unbeatable Bestie Star"],
+              BestieGrowthTableMats.map((r) => [`+${r.encLevel}`, r.faded, r.shining, r.unbeatable])
+            )}
+          </TabsContent>
+
+          <TabsContent value="mount-v1">
+            {renderRefTable(
+              ["Enhancement", "ATK", "ATK(%)", "Attribute(%)", "CRT", "CDM", "FD", "Movespeed(%)"],
+              BestieMountV1TableStats.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.phyMagAtkPercent !== undefined ? `${r.phyMagAtkPercent}%` : null,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : null,
+                r.crt,
+                r.cdm,
+                r.fd,
+                r.moveSpeedPercent !== undefined ? `${r.moveSpeedPercent}%` : null,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="mount-v2">
+            {renderRefTable(
+              ["Enhancement", "ATK", "ATK(%)", "Attribute(%)", "CRT", "CDM", "FD", "Movespeed(%)"],
+              BestieMountV2TableStats.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.phyMagAtkPercent !== undefined ? `${r.phyMagAtkPercent}%` : null,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : null,
+                r.crt,
+                r.cdm,
+                r.fd,
+                r.moveSpeedPercent !== undefined ? `${r.moveSpeedPercent}%` : null,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="spirit-v1">
+            {renderRefTable(
+              ["Enhancement", "ATK", "ATK(%)", "Attribute(%)", "FD", "HP", "HP(%)"],
+              BestieSpiritV1TableStats.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.phyMagAtkPercent !== undefined ? `${r.phyMagAtkPercent}%` : null,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : null,
+                r.fd,
+                r.hp,
+                r.hpPercent !== undefined ? `${r.hpPercent}%` : null,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="spirit-v2">
+            {renderRefTable(
+              ["Enhancement", "ATK", "ATK(%)", "Attribute(%)", "FD", "HP", "HP(%)"],
+              BestieSpiritV2TableStats.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.phyMagAtkPercent !== undefined ? `${r.phyMagAtkPercent}%` : null,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : null,
+                r.fd,
+                r.hp,
+                r.hpPercent !== undefined ? `${r.hpPercent}%` : null,
+              ])
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

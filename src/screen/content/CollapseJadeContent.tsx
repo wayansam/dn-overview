@@ -1,42 +1,20 @@
-import { CloseOutlined } from "@ant-design/icons";
-import type { CollapseProps } from "antd";
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Collapse,
-  Divider,
-  Form,
-  Grid,
-  InputNumber,
-  Radio,
-  Space,
-  Table,
-  Typography,
-} from "antd";
-import { ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
-import { useEffect, useState } from "react";
-import CustomSlider from "../../components/CustomSlider";
+import { InputNumber, Select } from "antd";
+import { Package, Plus, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
-import {
-  EmptyCommonnStat,
-  TableResource,
-} from "../../constants/Common.constants";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { COLLAPSE_JADE_TYPE } from "../../constants/InGame.constants";
-import { CollapseJadeCraftEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
-  getColumnsStats,
   getComparedData,
   getStatDif,
-  getTextEmpty,
   multiplyEqStats,
-  typedEntries,
 } from "../../utils/common.util";
 import {
   CollapseJadeAttackStatsTable,
@@ -45,551 +23,352 @@ import {
   CollapseJadeEnhanceMatsTable,
 } from "../../data/CollapseJadeData";
 
-const { useBreakpoint } = Grid;
-const { Text } = Typography;
+const enhOpts = Array.from({ length: 6 }, (_, i) => ({
+  label: `+${i}`,
+  value: i,
+}));
 
-interface FormEnhance {
-  type: string | null;
-  listEnhance: Array<{
-    range?: [number, number] | null;
-    amt?: number | null;
-    craft?: boolean | null;
-  }> | null;
+interface EnhanceEntry {
+  id: string;
+  type: COLLAPSE_JADE_TYPE;
+  amt: number;
+  from: number;
+  to: number;
+  craft: boolean;
 }
 
-interface EnhanceTableMaterialList {
-  "Collapse Dragon Jade Fragment": number;
-  "Ancient's Foundation Stone": number;
-  "Dimensional Vestige": number;
-  Gold: number;
-}
+let nextId = 1;
+const makeEntry = (): EnhanceEntry => ({
+  id: String(nextId++),
+  type: COLLAPSE_JADE_TYPE.ATT,
+  amt: 1,
+  from: 0,
+  to: 5,
+  craft: false,
+});
 
-interface MatsTableRes {
-  matsData?: EnhanceTableMaterialList;
-  statsData?: CommonItemStats;
-  errorDt?: string[];
-}
+const renderRefTable = (headers: string[], rows: (string | number | undefined)[][]) => (
+  <div className="overflow-x-auto rounded-md border">
+    <table className="w-full text-sm">
+      <thead>
+        <tr className="bg-muted">
+          {headers.map((h) => (
+            <th key={h} className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap">
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, i) => (
+          <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+            {row.map((cell, j) => (
+              <td key={j} className="px-3 py-1.5 tabular-nums">
+                {cell === undefined || cell === null
+                  ? "-"
+                  : typeof cell === "number"
+                  ? cell.toLocaleString()
+                  : cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
 const CollapseJadeContent = () => {
-  const screens = useBreakpoint();
+  const [entries, setEntries] = useState<EnhanceEntry[]>([makeEntry()]);
 
-  const [formEnhance] = Form.useForm<{ items: Array<FormEnhance> }>();
+  const updateEntry = (id: string, patch: Partial<EnhanceEntry>) =>
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
 
-  const [enhanceDataSource, setEnhanceDataSource] = useState<MatsTableRes>({});
+  const removeEntry = (id: string) =>
+    setEntries((prev) => prev.filter((e) => e.id !== id));
 
-  const getMatsCol = (): ColumnsType<CollapseJadeCraftEnhanceMaterial> => {
-    return [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Collapse Fragment</p>
-            <p>Foundation Stone</p>
-            <p>Dim. Vestige</p>
-            <p>Gold</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (
-          _,
-          { collapseFragment, foundationStone, dimVestige, gold }
-        ) => (
-          <div>
-            <p>{getTextEmpty({ txt: collapseFragment })}(frag)</p>
-            <p>{getTextEmpty({ txt: foundationStone })}(stone)</p>
-            <p>{getTextEmpty({ txt: dimVestige })}(d.ves)</p>
-            <p>{getTextEmpty({ txt: gold })}(g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Collapse Fragment",
-        responsive: ["sm"],
-        render: (_, { collapseFragment }) => (
-          <Text>
-            {getTextEmpty({
-              txt: collapseFragment,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Foundation Stone",
-        responsive: ["sm"],
-        render: (_, { foundationStone }) => (
-          <Text>
-            {getTextEmpty({
-              txt: foundationStone,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Dim. Vestige",
-        responsive: ["sm"],
-        render: (_, { dimVestige }) => (
-          <Text>
-            {getTextEmpty({
-              txt: dimVestige,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Gold",
-        dataIndex: "gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
-      },
-    ];
-  };
+  const addEntry = () => setEntries((prev) => [...prev, makeEntry()]);
 
-  const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
-    if (!temp || !Array.isArray(temp) || temp.length < 1) {
-      return { errorDt: ["Empty List"] };
-    }
-    // mats
-    let tempCollapseFragment = 0;
-    let tempFoundationStone = 0;
-    let tempDimVestige = 0;
-    let tempGold = 0;
+  const { matsTotal, statsTotal } = useMemo(() => {
+    let collapseFragment = 0;
+    let foundationStone = 0;
+    let dimVestige = 0;
+    let gold = 0;
+    let statsAcc: CommonItemStats = { ...EmptyCommonnStat };
 
-    // stats
-    let tempStat: CommonItemStats = { ...EmptyCommonnStat };
+    entries.forEach((e) => {
+      const amt = Math.max(0, e.amt || 0);
+      if (amt === 0 || e.from >= e.to) return;
 
-    let errorMsg: string[] = [];
+      if (e.craft) {
+        collapseFragment += CollapseJadeCraftMats.collapseFragment * amt;
+        foundationStone += CollapseJadeCraftMats.foundationStone * amt;
+        dimVestige += CollapseJadeCraftMats.dimVestige * amt;
+        gold += CollapseJadeCraftMats.gold * amt;
+      }
 
-    temp.forEach((enhItem, idx) => {
-      if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
-        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
-      } else if (
-        enhItem?.type &&
-        enhItem?.listEnhance &&
-        enhItem?.listEnhance.length > 0
-      ) {
-        enhItem?.listEnhance.forEach((item, i) => {
-          if (!item || !item?.amt) {
-            errorMsg.push(
-              `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
-            );
-          } else if (item?.amt) {
-            // mats
-            const range = item?.range ?? [0, 0];
-            const { collapseFragment, foundationStone, dimVestige, gold } =
-              CollapseJadeCraftMats;
-            let tempCollapseFragmentC = item?.craft ? collapseFragment : 0;
-            let tempFoundationStoneC = item?.craft ? foundationStone : 0;
-            let tempDimVestigeC = item?.craft ? dimVestige : 0;
-            let tempGoldC = item?.craft ? gold : 0;
+      const sliced = CollapseJadeEnhanceMatsTable.slice(e.from, e.to);
+      let cf = 0, fs = 0, dv = 0, g = 0;
+      sliced.forEach((r) => {
+        cf += r.collapseFragment;
+        fs += r.foundationStone;
+        dv += r.dimVestige;
+        g += r.gold;
+      });
+      collapseFragment += cf * amt;
+      foundationStone += fs * amt;
+      dimVestige += dv * amt;
+      gold += g * amt;
 
-            const isAtt = enhItem?.type === COLLAPSE_JADE_TYPE.ATT;
-
-            const tempSliceMats = CollapseJadeEnhanceMatsTable.slice(
-              range[0],
-              range[1]
-            );
-
-            tempSliceMats.forEach((slicedItem) => {
-              tempCollapseFragmentC += slicedItem.collapseFragment;
-              tempFoundationStoneC += slicedItem.foundationStone;
-              tempDimVestigeC += slicedItem.dimVestige;
-              tempGoldC += slicedItem.gold;
-            });
-
-            tempCollapseFragment += tempCollapseFragmentC * item?.amt;
-            tempFoundationStone += tempFoundationStoneC * item?.amt;
-            tempDimVestige += tempDimVestigeC * item?.amt;
-            tempGold += tempGoldC * item?.amt;
-
-            // stats
-            const tempArrStats = isAtt
-              ? CollapseJadeAttackStatsTable
-              : CollapseJadeDefendStatsTable;
-
-            const { dt1, dt2 } = getComparedData(
-              tempArrStats,
-              range[0] + 1,
-              range[1] + 1
-            );
-            if (dt2) {
-              const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-              const dtn = multiplyEqStats(dt, item?.amt);
-              tempStat = combineEqStats(tempStat, dtn, "add");
-            }
-          } else {
-            let emsg = "";
-            if (!item?.amt) {
-              emsg = "Amount";
-            }
-            errorMsg.push(
-              `The ${emsg} in Enhance ${idx + 1}, item ${
-                i + 1
-              } haven't inputted properly`
-            );
-          }
-        });
-      } else {
-        let msg = "";
-        if (!enhItem?.type) {
-          msg = "Type";
-        } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
-          msg = "List";
-        }
-        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`);
+      const statsTable =
+        e.type === COLLAPSE_JADE_TYPE.ATT
+          ? CollapseJadeAttackStatsTable
+          : CollapseJadeDefendStatsTable;
+      const { dt1, dt2 } = getComparedData(statsTable, e.from + 1, e.to + 1);
+      if (dt2) {
+        const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+        const scaled = multiplyEqStats(dt, amt);
+        statsAcc = combineEqStats(statsAcc, scaled, "add");
       }
     });
 
     return {
-      matsData: {
-        "Collapse Dragon Jade Fragment": tempCollapseFragment,
-        "Ancient's Foundation Stone": tempFoundationStone,
-        "Dimensional Vestige": tempDimVestige,
-        Gold: tempGold,
-      },
-      statsData: tempStat,
-      errorDt: errorMsg.length > 0 ? errorMsg : undefined,
-    } as MatsTableRes;
-  };
+      matsTotal: { collapseFragment, foundationStone, dimVestige, gold },
+      statsTotal: statsAcc,
+    };
+  }, [entries]);
 
-  useEffect(() => {
-    setEnhanceDataSource(
-      calcEnhanceDataSource([{ type: null, listEnhance: null }])
-    );
-  }, []);
+  const matRows = [
+    { name: "Collapse Dragon Jade Fragment", amount: matsTotal.collapseFragment },
+    { name: "Ancient's Foundation Stone", amount: matsTotal.foundationStone },
+    { name: "Dimensional Vestige", amount: matsTotal.dimVestige },
+    { name: "Gold", amount: matsTotal.gold },
+  ].filter((r) => r.amount > 0);
 
-  const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
-    setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
-  };
-
-  const getWidthSetting = () => {
-    if (screens.xs) {
-      return 200;
-    }
-    return 320;
-  };
-
-  const getEnhanceCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Enhance List</Divider>
-          <Form
-            labelCol={{ span: 5 }}
-            wrapperCol={{ span: 19 }}
-            form={formEnhance}
-            name="dynamic_form_complex"
-            style={{ maxWidth: 600 }}
-            autoComplete="off"
-            initialValues={{ items: [{}] }}
-            onValuesChange={onValuesChange}
-          >
-            <Form.List name="items">
-              {(fields, { add, remove }) => (
-                <div
-                  style={{
-                    display: "flex",
-                    rowGap: 16,
-                    flexDirection: "column",
-                  }}
-                >
-                  {fields.map((field, index) => (
-                    <Card
-                      size="small"
-                      title={`Enhance ${field.name + 1}`}
-                      style={{ minWidth: getWidthSetting() }}
-                      key={field.key}
-                      id={`${field.name}-card-${index}`}
-                      extra={
-                        <CloseOutlined
-                          onClick={() => {
-                            remove(field.name);
-                          }}
-                        />
-                      }
-                    >
-                      <Form.Item
-                        label="Type"
-                        name={[field.name, "type"]}
-                        rules={[{ required: true }]}
-                        id={`${field.name}-type-${index}`}
-                      >
-                        <Radio.Group>
-                          <Radio.Button value={COLLAPSE_JADE_TYPE.ATT}>
-                            Attack
-                          </Radio.Button>
-                          <Radio.Button value={COLLAPSE_JADE_TYPE.DEF}>
-                            Defense
-                          </Radio.Button>
-                        </Radio.Group>
-                      </Form.Item>
-
-                      {/* Nest Form.List */}
-                      <Form.Item label="List">
-                        <Form.List name={[field.name, "listEnhance"]}>
-                          {(subFields, subOpt) => (
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                rowGap: 18,
-                              }}
-                            >
-                              {subFields.map((subField, idx) => (
-                                <Card
-                                  key={subField.key}
-                                  size="small"
-                                  style={{ width: "100%" }}
-                                  id={`${subField.name}-card-${idx}`}
-                                >
-                                  <Space
-                                    direction="horizontal"
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "flex-start",
-                                      marginBottom: 8,
-                                    }}
-                                  >
-                                    <Form.Item
-                                      noStyle
-                                      name={[subField.name, "amt"]}
-                                      id={`${subField.name}-amt-${idx}`}
-                                    >
-                                      <InputNumber
-                                        placeholder="amount"
-                                        max={20}
-                                        min={0}
-                                      />
-                                    </Form.Item>
-
-                                    <CloseOutlined
-                                      onClick={() => {
-                                        subOpt.remove(subField.name);
-                                      }}
-                                    />
-                                  </Space>
-
-                                  <Form.Item
-                                    noStyle
-                                    name={[subField.name, "craft"]}
-                                    valuePropName="checked"
-                                    label={null}
-                                  >
-                                    <Checkbox>Craft</Checkbox>
-                                  </Form.Item>
-
-                                  <Form.Item
-                                    noStyle
-                                    name={[subField.name, "range"]}
-                                  >
-                                    <CustomSlider
-                                      id={`${subField.name}-range-${idx}`}
-                                      min={0}
-                                      max={5}
-                                    />
-                                  </Form.Item>
-                                </Card>
-                              ))}
-                              <Button
-                                type="dashed"
-                                onClick={() => subOpt.add()}
-                                block
-                                disabled={subFields && subFields.length >= 20}
-                              >
-                                + Add Enhancement
-                              </Button>
-                            </div>
-                          )}
-                        </Form.List>
-                      </Form.Item>
-                    </Card>
-                  ))}
-
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    disabled={fields && fields.length >= 2}
-                  >
-                    + Add Type
-                  </Button>
-                </div>
-              )}
-            </Form.List>
-
-            {/* <Form.Item noStyle shouldUpdate>
-              {() => (
-                <Typography>
-                  <pre>
-                    {JSON.stringify(formEnhance.getFieldsValue(), null, 2)}
-                  </pre>
-                </Typography>
-              )}
-            </Form.Item> */}
-          </Form>
-          {enhanceDataSource.errorDt &&
-            enhanceDataSource.errorDt.length > 0 && (
-              <div style={{ marginTop: 4, maxWidth: getWidthSetting() }}>
-                <Space direction="vertical" size={"small"}>
-                  {enhanceDataSource.errorDt.map((it, x) => (
-                    <Text type="warning" key={`error-label-${x}`}>
-                      {it}
-                    </Text>
-                  ))}
-                </Space>
-              </div>
-            )}
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Material List</Divider>
-          {enhanceDataSource.errorDt && (
-            <div>
-              <Alert
-                banner
-                message="Some of the item you input is not valid"
-                type="warning"
-              />
-            </div>
-          )}
-          <Table
-            size={"small"}
-            dataSource={
-              (enhanceDataSource.matsData
-                ? typedEntries(enhanceDataSource.matsData)
-                    .filter(([_, value]) => value !== 0)
-                    .map(([key, value]) => ({
-                      mats: key,
-                      amount: value,
-                    }))
-                : []) as TableResource[]
-            }
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-          <ListingCard
-            title="Enhancement Status Increase "
-            data={getStatDif(enhanceDataSource.statsData)}
-          />
-        </div>
-        <TradingHouseCalc
-          data={[
-            {
-              name: "Dim. Vestige",
-              amt: enhanceDataSource.matsData?.["Dimensional Vestige"],
-            },
-          ]}
-          additionalTotal={enhanceDataSource.matsData?.Gold}
-        />
-      </div>
-    );
-  };
-
-  const craftMat: EnhanceTableMaterialList = {
-    "Collapse Dragon Jade Fragment": CollapseJadeCraftMats.collapseFragment,
-    "Ancient's Foundation Stone": CollapseJadeCraftMats.foundationStone,
-    "Dimensional Vestige": CollapseJadeCraftMats.dimVestige,
-    Gold: CollapseJadeCraftMats.gold,
-  };
-
-  const items: CollapseProps["items"] = [
-    {
-      key: "1",
-      label: "Stats",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ marginRight: 30, marginBottom: 10 }}>
-            <Title level={5}>{"Enhance Attack Jade Stats"}</Title>
-            <Table
-              size={"small"}
-              dataSource={CollapseJadeAttackStatsTable}
-              columns={getColumnsStats({
-                phyMagAtkFlag: true,
-                phyMagAtkPercentFlag: true,
-                attAtkPercentFlag: true,
-                crtFlag: true,
-                cdmFlag: true,
-                fdFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{}}>
-            <Title level={5}>{"Enhance Defense Jade Stats"}</Title>
-            <Table
-              size={"small"}
-              dataSource={CollapseJadeDefendStatsTable}
-              columns={getColumnsStats({
-                phyMagAtkFlag: true,
-                attAtkPercentFlag: true,
-                fdFlag: true,
-                defFlag: true,
-                magdefFlag: true,
-                hpFlag: true,
-                hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "2",
-      label: "Mats",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ marginRight: 30, marginBottom: 10 }}>
-            <Title level={5}>{"Craft Mats"}</Title>
-            <Table
-              size={"small"}
-              dataSource={
-                typedEntries(craftMat)
-                  .filter(([key]) => key !== "encLevel")
-                  .map(([key, value]) => ({
-                    mats: key,
-                    amount: value,
-                  })) as TableResource[]
-              }
-              columns={columnsResource}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ marginRight: 30, marginBottom: 10 }}>
-            <Title level={5}>{"Enhance Mats"}</Title>
-            <Table
-              size={"small"}
-              dataSource={CollapseJadeEnhanceMatsTable}
-              columns={getMatsCol()}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: "3",
-      label: "Enhance",
-      children: getEnhanceCalculator(),
-    },
-  ];
+  const hasEntries = entries.some((e) => e.amt > 0 && e.from < e.to);
 
   return (
-    <div>
-      <Collapse items={items} size="small" defaultActiveKey={["3"]} />
-    </div>
+    <Tabs defaultValue="calculator" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="calculator">Calculator</TabsTrigger>
+        <TabsTrigger value="reference">Reference</TabsTrigger>
+      </TabsList>
+
+      {/* ── CALCULATOR ── */}
+      <TabsContent value="calculator" className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* Left: entry list */}
+          <div className="flex flex-col gap-3">
+            {entries.map((e, idx) => {
+              const isError = e.from >= e.to;
+              return (
+                <Card key={e.id}>
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                    <CardTitle className="text-sm">Jade {idx + 1}</CardTitle>
+                    {entries.length > 1 && (
+                      <button
+                        onClick={() => removeEntry(e.id)}
+                        className="text-muted-foreground hover:text-destructive transition-colors"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {/* Type toggle */}
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant={e.type === COLLAPSE_JADE_TYPE.ATT ? "default" : "outline"}
+                        onClick={() => updateEntry(e.id, { type: COLLAPSE_JADE_TYPE.ATT })}
+                      >
+                        Attack
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={e.type === COLLAPSE_JADE_TYPE.DEF ? "default" : "outline"}
+                        onClick={() => updateEntry(e.id, { type: COLLAPSE_JADE_TYPE.DEF })}
+                      >
+                        Defense
+                      </Button>
+                    </div>
+
+                    {/* Amount + From/To */}
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Qty</span>
+                        <InputNumber
+                          value={e.amt}
+                          min={1}
+                          max={20}
+                          size="small"
+                          style={{ width: 64 }}
+                          onChange={(v) => updateEntry(e.id, { amt: v ?? 1 })}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">From</span>
+                        <Select
+                          value={e.from}
+                          options={enhOpts}
+                          onChange={(v) => updateEntry(e.id, { from: v })}
+                          style={{ width: 72 }}
+                          size="small"
+                          status={isError ? "error" : undefined}
+                        />
+                        <span className="text-sm text-muted-foreground">To</span>
+                        <Select
+                          value={e.to}
+                          options={enhOpts}
+                          onChange={(v) => updateEntry(e.id, { to: v })}
+                          style={{ width: 72 }}
+                          size="small"
+                          status={isError ? "error" : undefined}
+                        />
+                      </div>
+                    </div>
+                    {isError && (
+                      <p className="text-sm text-destructive">From must be less than To</p>
+                    )}
+
+                    {/* Craft checkbox */}
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <Checkbox
+                        checked={e.craft}
+                        onCheckedChange={(v: boolean | "indeterminate") => updateEntry(e.id, { craft: Boolean(v) })}
+                      />
+                      <span className="text-sm">Include craft mats</span>
+                    </label>
+                  </CardContent>
+                </Card>
+              );
+            })}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addEntry}
+              disabled={entries.length >= 10}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Jade
+            </Button>
+          </div>
+
+          {/* Right: materials + stats + trading house */}
+          <div className="flex flex-col gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Required Materials</CardTitle>
+              </CardHeader>
+              <CardContent className="px-0 pb-2">
+                {!hasEntries || matRows.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 py-10 text-muted-foreground">
+                    <Package className="h-10 w-10 opacity-30" />
+                    <p className="text-sm">No materials required</p>
+                  </div>
+                ) : (
+                  <div className="divide-y">
+                    {matRows.map((r) => (
+                      <div
+                        key={r.name}
+                        className="flex items-center justify-between px-4 py-2 hover:bg-muted/50 transition-colors"
+                      >
+                        <span className="text-sm">{r.name}</span>
+                        <span className="text-sm font-medium tabular-nums">
+                          {r.amount.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <ListingCard title="Status Increase" data={getStatDif(statsTotal)} />
+
+            <TradingHouseCalc
+              data={[
+                {
+                  name: "Dim. Vestige",
+                  amt: matsTotal.dimVestige,
+                },
+              ]}
+              additionalTotal={matsTotal.gold}
+            />
+          </div>
+        </div>
+      </TabsContent>
+
+      {/* ── REFERENCE ── */}
+      <TabsContent value="reference">
+        <Tabs defaultValue="enh-mats" className="space-y-4">
+          <TabsList className="flex-wrap h-auto gap-1">
+            <TabsTrigger value="enh-mats">Enhance Mats</TabsTrigger>
+            <TabsTrigger value="craft-mats">Craft Mats</TabsTrigger>
+            <TabsTrigger value="att-stats">Attack Stats</TabsTrigger>
+            <TabsTrigger value="def-stats">Defense Stats</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="enh-mats">
+            {renderRefTable(
+              ["Enhancement", "Collapse Fragment", "Foundation Stone", "Dim. Vestige", "Gold"],
+              CollapseJadeEnhanceMatsTable.map((r) => [
+                `+${r.encLevel}`,
+                r.collapseFragment,
+                r.foundationStone,
+                r.dimVestige,
+                r.gold,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="craft-mats">
+            {renderRefTable(
+              ["Material", "Amount"],
+              [
+                ["Collapse Dragon Jade Fragment", CollapseJadeCraftMats.collapseFragment],
+                ["Ancient's Foundation Stone", CollapseJadeCraftMats.foundationStone],
+                ["Dimensional Vestige", CollapseJadeCraftMats.dimVestige],
+                ["Gold", CollapseJadeCraftMats.gold],
+              ]
+            )}
+          </TabsContent>
+
+          <TabsContent value="att-stats">
+            {renderRefTable(
+              ["Enhancement", "ATK", "ATK%", "CRT", "CDM", "Att ATK%", "FD"],
+              CollapseJadeAttackStatsTable.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.phyMagAtkPercent !== undefined ? `${r.phyMagAtkPercent}%` : "-",
+                r.crt,
+                r.cdm,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : "-",
+                r.fd,
+              ])
+            )}
+          </TabsContent>
+
+          <TabsContent value="def-stats">
+            {renderRefTable(
+              ["Enhancement", "ATK", "HP%", "HP", "DEF", "MDEF", "Att ATK%", "FD"],
+              CollapseJadeDefendStatsTable.map((r) => [
+                `+${r.encLevel}`,
+                r.phyMagAtk,
+                r.hpPercent !== undefined ? `${r.hpPercent}%` : "-",
+                r.hp,
+                r.def,
+                r.magdef,
+                r.attAtkPercent !== undefined ? `${r.attAtkPercent}%` : "-",
+                r.fd,
+              ])
+            )}
+          </TabsContent>
+        </Tabs>
+      </TabsContent>
+    </Tabs>
   );
 };
 

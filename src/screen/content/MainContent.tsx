@@ -28,7 +28,8 @@ import GeneralContent from "./GeneralContent";
 import KilosEqContent from "./KilosEqContent";
 import LunarJadeCalculatorContent from "./LunarJadeCalculatorContent";
 import NamedEODEqContent from "./NamedEODEqContent";
-import SettingContent from "./SettingContent";
+import ReleaseHistoryContent from "./ReleaseHistoryContent";
+import FeedbackContent from "./FeedbackContent";
 import SkillJadeContent from "./SkillJadeContent";
 import ConversionContent from "./ConversionContent";
 import BoneDragonEqContent from "./BoneDragonEqContent";
@@ -139,8 +140,11 @@ const MainContent = () => {
       case TAB_KEY.miscBestie:
         return <BestieContent />;
 
-      case TAB_KEY.setting:
-        return <SettingContent />;
+      case TAB_KEY.releaseHistory:
+        return <ReleaseHistoryContent />;
+
+      case TAB_KEY.feedback:
+        return <FeedbackContent />;
 
       default:
         return (
