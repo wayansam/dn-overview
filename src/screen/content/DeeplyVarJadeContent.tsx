@@ -489,17 +489,13 @@ const DeeplyVarJadeContent = () => {
         selectEnd + 1
       );
       if (dt2) {
-        if (checkedCraft) {
-          temp = dt2;
-        } else {
-          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(temp, dt, "add");
-        }
+        const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+        temp = combineEqStats(temp, dt, "add");
       }
     }
 
     return temp;
-  }, [checkedCraft, isError, selectStart, selectEnd]);
+  }, [isError, selectStart, selectEnd]);
 
   const getLCalc = () => {
     return (

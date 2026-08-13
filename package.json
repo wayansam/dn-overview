@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@types/redux-logger": "^3.0.9",
+    "baseline-browser-mapping": "^2.9.19",
     "redux-logger": "^3.0.6"
   }
 }

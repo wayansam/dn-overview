@@ -12,24 +12,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
 import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
+import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import {
-  conversionDecalStats,
-  conversionEarringStats,
-  conversionGloveStats,
-  conversionHelmStats,
-  conversionLowerStats,
-  conversionMainStats,
-  conversionNecklaceStats,
-  conversionRingStats,
-  conversionSecondStats,
-  conversionShoesStats,
-  conversionTailStats,
-  conversionUpperStats,
-  conversionWingStats,
-  dataConversionCalculator,
-} from "../../data/ConversionCalculatorData";
+import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
@@ -39,6 +24,7 @@ import {
   getComparedData,
   getStatDif,
 } from "../../utils/common.util";
+import { getResource } from "../../utils/resource.util";
 
 const { Text } = Typography;
 
@@ -79,6 +65,10 @@ const ENC_AST_POW_ARMOR = 450;
 const ENC_AST_STONE_ARMOR = 1;
 const ENC_AST_POW_ACC = 500;
 const ENC_AST_STONE_ACC = 3;
+const ENC_AST_POW_WEAP = 600;
+const ENC_AST_STONE_WEAP = 3;
+const ENC_AST_POW_WTD = 550;
+const ENC_AST_STONE_WTD = 3;
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -87,9 +77,14 @@ const ConversionContent = () => {
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
-  const [selectStat, setSelectStat] = useState<
-    { label: string; value: string } | undefined
-  >();
+  const [selectStat, setSelectStat] = useState<{
+    label: string;
+    value: string;
+  }>();
+  const [selectPrev, setSelectPrev] = useState<{
+    label: string;
+    value: string;
+  }>();
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -127,7 +122,7 @@ const ConversionContent = () => {
         const isEvo = to >= 12 && from <= 11;
         let frag =
           (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
-            CONV_FRAG +
+          CONV_FRAG +
           (isBuy ? CONV_FRAG : 0);
 
         let lgFrag = 0;
@@ -156,6 +151,10 @@ const ConversionContent = () => {
               lgFrag += EV_AST_POW_WEAP;
               lgStone += EV_AST_STONE;
             }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_WEAP;
+              lgStone += enhLRange * ENC_AST_STONE_WEAP;
+            }
             break;
 
           case EQUIPMENT.NECKLACE:
@@ -181,6 +180,10 @@ const ConversionContent = () => {
               lgFrag += EV_AST_POW_WTD;
               lgStone += EV_AST_STONE;
             }
+            if (!isEnhUnique) {
+              lgFrag += enhLRange * ENC_AST_POW_WTD;
+              lgStone += enhLRange * ENC_AST_STONE_WTD;
+            }
             break;
 
           default:
@@ -195,44 +198,6 @@ const ConversionContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  const getRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {
-    switch (equipment) {
-      case EQUIPMENT.HELM:
-        return conversionHelmStats;
-      case EQUIPMENT.UPPER:
-        return conversionUpperStats;
-      case EQUIPMENT.LOWER:
-        return conversionLowerStats;
-      case EQUIPMENT.GLOVE:
-        return conversionGloveStats;
-      case EQUIPMENT.SHOES:
-        return conversionShoesStats;
-
-      case EQUIPMENT.MAIN_WEAPON:
-        return conversionMainStats;
-      case EQUIPMENT.SECOND_WEAPON:
-        return conversionSecondStats;
-
-      case EQUIPMENT.NECKLACE:
-        return conversionNecklaceStats;
-      case EQUIPMENT.EARRING:
-        return conversionEarringStats;
-      case EQUIPMENT.RING1:
-      case EQUIPMENT.RING2:
-        return conversionRingStats;
-
-      case EQUIPMENT.WING:
-        return conversionWingStats;
-      case EQUIPMENT.TAIL:
-        return conversionTailStats;
-      case EQUIPMENT.DECAL:
-        return conversionDecalStats;
-
-      default:
-        return [];
-    }
-  };
-
   const statDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
     if (invalidDtSrc) {
@@ -244,9 +209,7 @@ const ConversionContent = () => {
 
       if (found) {
         const { equipment, from, to } = found;
-
-        const tableHolder = getRscTable(equipment);
-
+        const tableHolder = getResource(TAB_KEY.miscConversion, equipment);
         const { dt1, dt2 } = getComparedData(tableHolder, from, to);
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
@@ -309,8 +272,8 @@ const ConversionContent = () => {
         selectFrom < item.min
           ? item.min
           : selectFrom >= item.max
-          ? item.max
-          : selectFrom,
+            ? item.max
+            : selectFrom,
       to: selectTo > item.max ? item.max : selectTo,
     }));
     setDataSource(newData);
@@ -326,18 +289,23 @@ const ConversionContent = () => {
       if (found) {
         const { equipment, from, to } = found;
         const tableHolder = [{ ...EmptyCommonnStat, encLevel: "Buy" }].concat(
-          getRscTable(equipment)
+          getResource(TAB_KEY.miscConversion, equipment)
         );
         const clippedTable = tableHolder.slice(from, to + 1);
-        clippedTable.forEach((it) => {
+        let prevStatVal: number = 0;
+        clippedTable.forEach((it, idx) => {
           const val =
             it[stat] !== undefined && typeof it?.[stat] === "number"
               ? (it[stat] as number)
               : 0;
 
+          const dif = idx !== 0 ? val - prevStatVal : 0;
+          prevStatVal = val;
+
           holder.push({
             enhance: it.encLevel,
-            value: val,
+            total: val,
+            step: dif,
             type: equipment,
           });
         });
@@ -458,6 +426,8 @@ const ConversionContent = () => {
             data={chartItems}
             statVal={selectStat}
             setStatVal={setSelectStat}
+            statPrev={selectPrev}
+            setStatPrev={setSelectPrev}
           />
         </div>
       </div>
@@ -477,7 +447,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Helm"}
               size={"small"}
-              dataSource={conversionHelmStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.HELM)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -500,7 +470,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Upper"}
               size={"small"}
-              dataSource={conversionUpperStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.UPPER)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -524,7 +494,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Lower"}
               size={"small"}
-              dataSource={conversionLowerStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.LOWER)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -544,7 +514,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Glove"}
               size={"small"}
-              dataSource={conversionGloveStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.GLOVE)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -564,7 +534,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Shoes"}
               size={"small"}
-              dataSource={conversionShoesStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.SHOES)}
               columns={getColumnsStats({
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -598,7 +568,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Main"}
               size={"small"}
-              dataSource={conversionMainStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.MAIN_WEAPON
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -619,13 +592,17 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Second"}
               size={"small"}
-              dataSource={conversionSecondStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.SECOND_WEAPON
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
+                crtFlag: true,
               })}
               pagination={false}
               bordered
@@ -644,7 +621,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Necklace"}
               size={"small"}
-              dataSource={conversionNecklaceStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.NECKLACE
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -665,7 +645,10 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Earring"}
               size={"small"}
-              dataSource={conversionEarringStats}
+              dataSource={getResource(
+                TAB_KEY.miscConversion,
+                EQUIPMENT.EARRING
+              )}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -684,7 +667,7 @@ const ConversionContent = () => {
               style={{ marginRight: 10, marginBottom: 10 }}
               title={() => "Ring"}
               size={"small"}
-              dataSource={conversionRingStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.RING1)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -711,7 +694,7 @@ const ConversionContent = () => {
               title={() => "Wing"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionWingStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.WING)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -730,7 +713,7 @@ const ConversionContent = () => {
               title={() => "Tail"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionTailStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.TAIL)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
@@ -751,7 +734,7 @@ const ConversionContent = () => {
               title={() => "Decal"}
               footer={() => "*Legend stats based on KDN patch note"}
               size={"small"}
-              dataSource={conversionDecalStats}
+              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.DECAL)}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
                 attAtkPercentFlag: true,
@@ -885,6 +868,22 @@ const ConversionContent = () => {
                 bordered
               />
             </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_WEAP,
+                  "Astral Stone": ENC_AST_STONE_WEAP,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
           </div>
         ),
       },
@@ -980,6 +979,22 @@ const ConversionContent = () => {
                 dataSource={Object.entries({
                   "Astral Powder": EV_AST_POW_WTD,
                   "Astral Stone": EV_AST_STONE,
+                }).map(([key, value]) => ({
+                  mats: key,
+                  amount: value,
+                }))}
+                columns={columnsResource}
+                pagination={false}
+                bordered
+              />
+            </div>
+            <div style={{ marginRight: 10, marginBottom: 10 }}>
+              <Table
+                title={() => "Enhancement Legend"}
+                size={"small"}
+                dataSource={Object.entries({
+                  "Astral Powder": ENC_AST_POW_WTD,
+                  "Astral Stone": ENC_AST_STONE_WTD,
                 }).map(([key, value]) => ({
                   mats: key,
                   amount: value,

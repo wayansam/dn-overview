@@ -7,10 +7,7 @@ import ListingCard, { ItemList } from "../../components/ListingCard";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   dataIonaCalculator,
-  IonaEarringEnhancementStatsTable,
   IonaEqEnhanceMaterialTable,
-  IonaNecklaceEnhancementStatsTable,
-  IonaRingEnhancementStatsTable,
 } from "../../data/VIPAccData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../interface/Item.interface";
@@ -24,7 +21,9 @@ import {
   getSuccessRateTag,
   getTextEmpty,
 } from "../../utils/common.util";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
+import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
+import ChartsCard, { ChartItem } from "../../components/ChartsCard";
+import { getResource } from "../../utils/resource.util";
 
 const { Text } = Typography;
 
@@ -53,6 +52,14 @@ const VIPAccContent = () => {
     useState<CommonEquipmentCalculator[]>(dataIonaCalculator);
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
+  const [selectStat, setSelectStat] = useState<{
+    label: string;
+    value: string;
+  }>();
+  const [selectPrev, setSelectPrev] = useState<{
+    label: string;
+    value: string;
+  }>();
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -145,26 +152,8 @@ const VIPAccContent = () => {
 
       if (found) {
         const { equipment, from, to } = found;
-
-        let tableHolder: CommonItemStats[];
-        switch (equipment) {
-          case EQUIPMENT.RING1:
-          case EQUIPMENT.RING2:
-            tableHolder = IonaRingEnhancementStatsTable;
-            break;
-          case EQUIPMENT.EARRING:
-            tableHolder = IonaEarringEnhancementStatsTable;
-            break;
-          case EQUIPMENT.NECKLACE:
-            tableHolder = IonaNecklaceEnhancementStatsTable;
-            break;
-
-          default:
-            tableHolder = [];
-            break;
-        }
+        let tableHolder = getResource(TAB_KEY.eqVIPAcc, equipment);
         const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-
         if (dt2) {
           const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
           temp = combineEqStats(temp, dt, "add");
@@ -223,6 +212,38 @@ const VIPAccContent = () => {
     }
     return list;
   }, [tableResource.res2]);
+
+  const chartItems = useMemo((): ChartItem[] => {
+    const stat = selectStat?.value.replace("Desc", "") as keyof CommonItemStats;
+    const holder: ChartItem[] = [];
+
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+
+      if (found) {
+        const { equipment, from, to } = found;
+        const tableHolder = getResource(TAB_KEY.eqVIPAcc, equipment);
+        const clippedTable = tableHolder.slice(from, to + 1);
+        let prevStatVal: number = 0;
+        clippedTable.forEach((it, idx) => {
+          const val =
+            it[stat] !== undefined && typeof it?.[stat] === "number"
+              ? (it[stat] as number)
+              : 0;
+
+          const dif = idx !== 0 ? val - prevStatVal : 0;
+          prevStatVal = val;
+          holder.push({
+            enhance: it.encLevel,
+            total: val,
+            step: dif,
+            type: equipment,
+          });
+        });
+      }
+    });
+    return holder;
+  }, [selectStat, selectedRowKeys, dataSource]);
 
   const getCalculator = () => {
     return (
@@ -295,6 +316,16 @@ const VIPAccContent = () => {
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
         </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ChartsCard
+            title="Status Charts"
+            data={chartItems}
+            statVal={selectStat}
+            setStatVal={setSelectStat}
+            statPrev={selectPrev}
+            setStatPrev={setSelectPrev}
+          />
+        </div>
       </div>
     );
   };
@@ -308,7 +339,7 @@ const VIPAccContent = () => {
           <Table
             style={{ marginRight: 10, marginBottom: 10 }}
             size={"small"}
-            dataSource={IonaRingEnhancementStatsTable}
+            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING1)}
             columns={getColumnsStats({
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,
@@ -326,7 +357,7 @@ const VIPAccContent = () => {
           <Table
             style={{ marginRight: 10, marginBottom: 10 }}
             size={"small"}
-            dataSource={IonaEarringEnhancementStatsTable}
+            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.EARRING)}
             columns={getColumnsStats({
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,
@@ -349,7 +380,7 @@ const VIPAccContent = () => {
           <Table
             style={{ marginRight: 10, marginBottom: 10 }}
             size={"small"}
-            dataSource={IonaNecklaceEnhancementStatsTable}
+            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.NECKLACE)}
             columns={getColumnsStats({
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,

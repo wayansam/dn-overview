@@ -75,39 +75,30 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
   const dataNew: Array<FeatureItem> = [
     {
       key: keyUpdate.N,
-      label: "Arc of Transcendence, Season 2 [Future]",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "4-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Conversion charts",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "09-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Arc of Transcendence, Season 3 [Past]",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "10-11-2025",
-    },
-    {
-      key: keyUpdate.N,
       label: "Deeply Rooted Variant Jade",
       link: {
         key: TAB_KEY.jadeDeepVariant,
         name: TAB_KEY.jadeDeepVariant,
       },
       date: "12-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "VIP Accessories charts",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "17-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Legend Conversion Weapon & WTD (+1 to +3)",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "06-02-2026",
     },
   ];
 
@@ -292,6 +283,33 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "30-10-2025",
     },
+    {
+      key: keyUpdate.D,
+      label: "Arc of Transcendence, Season 2 [Future]",
+      link: {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
+      },
+      date: "4-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Conversion charts",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "09-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Arc of Transcendence, Season 3 [Past]",
+      link: {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
+      },
+      date: "10-11-2025",
+    },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
     {
@@ -312,6 +330,11 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       key: keyUpdate.D,
       label: "Add preference 'Stay on last opened screen'",
       date: "10-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Update Chart Visualization to show data by total or step",
+      date: "18-11-2025",
     },
   ];
 

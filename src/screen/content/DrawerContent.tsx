@@ -1,14 +1,17 @@
 import { CaretRightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, theme } from "antd";
 import { CSSProperties } from "react";
-import { PatchNoteLink, PatchNoteSection } from "../../components/PatchNoteLink";
+import {
+  PatchNoteLink,
+  PatchNoteSection,
+} from "../../components/PatchNoteLink";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
 
 const getItems: (
   panelStyle: CSSProperties,
-  key: string
+  key: string,
 ) => CollapseProps["items"] = (panelStyle, key) => {
   const listHelp = [
     {
@@ -711,8 +714,17 @@ const getItems: (
                 href: "https://patchnote.dragonnest.com/sea/162/c/5",
                 label: "Enhancement Legend Conversion Accessories (+1 to +3)",
               },
+              {
+                href: "https://patchnote.dragonnest.com/sea/171/c/2",
+                label: "Enhancement Legend Conversion Weapon (+1 to +3)",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/174/c/15",
+                label: "Enhancement Legend Conversion WTD (+1 to +3)",
+              },
             ]}
           />
+
           <PatchNoteSection
             heading="KR Patch Note related :"
             entries={[
@@ -803,7 +815,7 @@ const DrawerContent = () => {
   const { token } = theme.useToken();
 
   const selectedSideBar = useAppSelector(
-    (state) => state.UIState.selectedSideBar
+    (state) => state.UIState.selectedSideBar,
   );
 
   const panelStyle: React.CSSProperties = {

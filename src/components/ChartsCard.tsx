@@ -7,9 +7,20 @@ import { getAllStatDesc } from "../utils/common.util";
 
 const { useBreakpoint } = Grid;
 
+export const CHARTS_OPT = {
+  TOTAL: "total",
+  STEP: "step",
+};
+
+const previewOpt = [
+  { label: "by Total Change", value: CHARTS_OPT.TOTAL },
+  { label: "by Step Difference", value: CHARTS_OPT.STEP },
+];
+
 export interface ChartItem {
   enhance: string;
-  value: number;
+  total: number;
+  step: number;
   type: EQUIPMENT;
 }
 interface ChartsCardProps {
@@ -18,6 +29,8 @@ interface ChartsCardProps {
   data: Array<ChartItem>;
   statVal?: { label: string; value: string };
   setStatVal?: (s?: { label: string; value: string }) => void;
+  statPrev?: { label: string; value: string };
+  setStatPrev?: (s?: { label: string; value: string }) => void;
 }
 
 const ChartsCard = ({
@@ -26,6 +39,8 @@ const ChartsCard = ({
   data,
   statVal,
   setStatVal,
+  statPrev,
+  setStatPrev,
 }: ChartsCardProps) => {
   const screens = useBreakpoint();
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
@@ -35,7 +50,10 @@ const ChartsCard = ({
       data,
       height: 500,
       xField: "enhance",
-      yField: "value",
+      yField:
+        statPrev?.value === CHARTS_OPT.STEP
+          ? CHARTS_OPT.STEP
+          : CHARTS_OPT.TOTAL,
       point: {
         shapeField: "square",
         sizeField: 4,
@@ -51,7 +69,7 @@ const ChartsCard = ({
       theme: { type: isDarkMode ? "dark" : "light" },
       colorField: "type",
     }),
-    [data, isDarkMode]
+    [data, isDarkMode, statPrev]
   );
 
   const allDesc = Object.entries(getAllStatDesc())
@@ -66,6 +84,7 @@ const ChartsCard = ({
       const stat = allDesc[0];
       setStatVal?.(stat);
     }
+    setStatPrev?.(previewOpt[0]);
   }, []);
   return (
     <div key={keyId} style={{ minWidth: screens?.xs ? 200 : 400 }}>
@@ -85,6 +104,19 @@ const ChartsCard = ({
             setStatVal?.(found);
           }}
           options={allDesc}
+        />
+      </div>
+      <div style={{ marginBottom: 4 }}>
+        Preview:
+        <Divider type="vertical" />
+        <Select
+          value={statPrev?.label}
+          style={{ width: 200 }}
+          onChange={(val) => {
+            const found = previewOpt.find((it) => it.value === val);
+            setStatPrev?.(found);
+          }}
+          options={previewOpt}
         />
       </div>
       <Card key={`card-${keyId}`} size="small" style={{ marginTop: 4 }}>
