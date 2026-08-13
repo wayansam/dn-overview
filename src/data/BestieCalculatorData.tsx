@@ -1,5 +1,5 @@
 import { BestieGrowthMaterial } from "../interface/Item.interface";
-import { BestieStats } from "../interface/ItemStat.interface";
+import { CommonItemStats } from "../interface/ItemStat.interface";
 
 export const BestieGrowthTableMats: BestieGrowthMaterial[] = [
   {
@@ -183,7 +183,7 @@ export const BestieGrowthTableMats: BestieGrowthMaterial[] = [
     unbeatable: 1,
   },
 ];
-export const BestieMountV1TableStats: BestieStats[] = [
+export const BestieMountV1TableStats: CommonItemStats[] = [
   {
     encLevel: "1",
     phyMagAtk: 1000,
@@ -485,7 +485,7 @@ export const BestieMountV1TableStats: BestieStats[] = [
     moveSpeedPercent: 3,
   },
 ];
-export const BestieMountV2TableStats: BestieStats[] = [
+export const BestieMountV2TableStats: CommonItemStats[] = [
   {
     encLevel: "1",
     phyMagAtk: 1000,
@@ -788,7 +788,7 @@ export const BestieMountV2TableStats: BestieStats[] = [
   },
 ];
 
-export const BestieSpiritV1TableStats: BestieStats[] = [
+export const BestieSpiritV1TableStats: CommonItemStats[] = [
   {
     encLevel: "1",
     phyMagAtk: 1000,
@@ -1060,7 +1060,7 @@ export const BestieSpiritV1TableStats: BestieStats[] = [
     fd: 1000,
   },
 ];
-export const BestieSpiritV2TableStats: BestieStats[] = [
+export const BestieSpiritV2TableStats: CommonItemStats[] = [
   {
     encLevel: "1",
     phyMagAtk: 1000,

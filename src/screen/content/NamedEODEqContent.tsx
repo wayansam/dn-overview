@@ -21,7 +21,7 @@ import {
   NamedEODSecondStatTable,
 } from "../../data/NamedEODData";
 import { NamedEODMaterial } from "../../interface/Item.interface";
-import { NamedEODStat } from "../../interface/ItemStat.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
 import { columnsResource } from "../../utils/common.util";
 
 const { Text } = Typography;
@@ -65,7 +65,7 @@ const NamedEODEqContent = () => {
     { dataIndex: "twilightEssence", label: "Twilight Essence", shortLabel: "(ess)" },
     { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
   ]);
-  const columnsStats: ColumnsType<NamedEODStat> = [
+  const columnsStats: ColumnsType<CommonItemStats> = [
     {
       title: "Enhancement",
       dataIndex: "encLevel",
@@ -82,25 +82,25 @@ const NamedEODEqContent = () => {
       responsive: ["xs"],
       render: (
         _,
-        { minAttack, maxAttack, attackPercent, critical, criticalDamage }
+        { phyMagAtkMin, phyMagAtkMax, phyMagAtkPercent, crt, cdm }
       ) => (
         <div>
           <p>
-            ATK {minAttack}-{maxAttack}
+            ATK {phyMagAtkMin}-{phyMagAtkMax}
           </p>
-          <p>ATK {attackPercent}%</p>
-          <p>CRT {critical}</p>
-          <p>CDM {criticalDamage}</p>
+          <p>ATK {phyMagAtkPercent}%</p>
+          <p>CRT {crt}</p>
+          <p>CDM {cdm}</p>
         </div>
       ),
     },
     {
       title: "Attack",
       responsive: ["sm"],
-      render: (_, { minAttack, maxAttack }) => (
+      render: (_, { phyMagAtkMin, phyMagAtkMax }) => (
         <div>
           <Text>
-            ATK {minAttack}-{maxAttack}
+            ATK {phyMagAtkMin}-{phyMagAtkMax}
           </Text>
         </div>
       ),
@@ -108,20 +108,20 @@ const NamedEODEqContent = () => {
     {
       title: "Attack Percentage",
       responsive: ["sm"],
-      render: (_, { attackPercent }) => (
+      render: (_, { phyMagAtkPercent }) => (
         <div>
-          <Text>ATK {attackPercent}%</Text>
+          <Text>ATK {phyMagAtkPercent}%</Text>
         </div>
       ),
     },
     {
       title: "Critical",
-      dataIndex: "critical",
+      dataIndex: "crt",
       responsive: ["sm"],
     },
     {
       title: "Critical Damage",
-      dataIndex: "criticalDamage",
+      dataIndex: "cdm",
       responsive: ["sm"],
     },
   ];
@@ -153,30 +153,35 @@ const NamedEODEqContent = () => {
     return temp;
   }, [namedEODData, checkedCraft]);
 
-  const getStatDiff = (arr: NamedEODStat[], min: number, max: number) => {
+  const getStatDiff = (
+    arr: CommonItemStats[],
+    min: number,
+    max: number
+  ): CommonItemStats => {
     const dt1 = arr.length > min ? arr[min] : undefined;
     const dt2 = arr.length > max ? arr[max] : undefined;
     if (!dt1 || !dt2) {
       return {
-        encLevel: 0,
-        minAttack: 0,
-        maxAttack: 0,
-        attackPercent: 0,
-        critical: 0,
-        criticalDamage: 0,
+        encLevel: "0",
+        phyMagAtkMin: 0,
+        phyMagAtkMax: 0,
+        phyMagAtkPercent: 0,
+        crt: 0,
+        cdm: 0,
       };
     }
     return {
-      encLevel: 0,
-      minAttack: dt2.minAttack - dt1.minAttack,
-      maxAttack: dt2.maxAttack - dt1.maxAttack,
-      attackPercent: dt2.attackPercent - dt1.attackPercent,
-      critical: dt2.critical - dt1.critical,
-      criticalDamage: dt2.criticalDamage - dt1.criticalDamage,
+      encLevel: "0",
+      phyMagAtkMin: (dt2.phyMagAtkMin ?? 0) - (dt1.phyMagAtkMin ?? 0),
+      phyMagAtkMax: (dt2.phyMagAtkMax ?? 0) - (dt1.phyMagAtkMax ?? 0),
+      phyMagAtkPercent:
+        (dt2.phyMagAtkPercent ?? 0) - (dt1.phyMagAtkPercent ?? 0),
+      crt: (dt2.crt ?? 0) - (dt1.crt ?? 0),
+      cdm: (dt2.cdm ?? 0) - (dt1.cdm ?? 0),
     };
   };
 
-  const statRange: NamedEODStat | undefined = useMemo(() => {
+  const statRange: CommonItemStats | undefined = useMemo(() => {
     if (selectedStat === 1) {
       return getStatDiff(
         NamedEODMainStatTable,
@@ -262,11 +267,11 @@ const NamedEODEqContent = () => {
                 <Card size="small" style={{ marginTop: 4 }}>
                   <Space direction="vertical">
                     <Text>
-                      +ATK {statRange.minAttack}-{statRange.maxAttack}
+                      +ATK {statRange.phyMagAtkMin}-{statRange.phyMagAtkMax}
                     </Text>
-                    <Text>+ATK {statRange.attackPercent}%</Text>
-                    <Text>+CRT {statRange.critical}</Text>
-                    <Text>+CDM {statRange.criticalDamage}</Text>
+                    <Text>+ATK {statRange.phyMagAtkPercent}%</Text>
+                    <Text>+CRT {statRange.crt}</Text>
+                    <Text>+CDM {statRange.cdm}</Text>
                   </Space>
                 </Card>
               </div>

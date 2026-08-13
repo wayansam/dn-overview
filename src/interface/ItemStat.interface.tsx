@@ -42,15 +42,6 @@ export type columnCommonItemDesc = {
     short: string;
   };
 };
-export interface NamedEODStat {
-  encLevel: number;
-  minAttack: number;
-  maxAttack: number;
-  attackPercent: number;
-  critical: number;
-  criticalDamage: number;
-}
-
 export interface SkillJadeStat {
   encLevel: number;
   attackPercent: number;
@@ -132,22 +123,4 @@ export interface LunarJadeEnhancementStats {
   hp?: number;
   phyDef?: number;
   magDef?: number;
-}
-
-export interface BestieStats {
-  encLevel: string;
-
-  phyMagAtk?: number;
-  phyMagAtkPercent?: number;
-  attAtkPercent?: number;
-  fd?: number;
-
-  // mount
-  crt?: number;
-  cdm?: number;
-  moveSpeedPercent?: number;
-
-  // spirit
-  hp?: number;
-  hpPercent?: number;
 }

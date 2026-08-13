@@ -23,7 +23,7 @@ import {
   BestieSpiritV2TableStats,
 } from "../../data/BestieCalculatorData";
 import { ColumnsType } from "antd/es/table";
-import { BestieStats } from "../../interface/ItemStat.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
   getTextEmpty,
@@ -54,7 +54,7 @@ interface GrowthMaterialList {
 
 interface GrowthTableRes {
   growthData?: GrowthMaterialList;
-  statsData?: BestieStats;
+  statsData?: CommonItemStats;
   errorDt?: string[];
 }
 
@@ -66,7 +66,7 @@ const BestieContent = () => {
   );
 
   const getStats = () => {
-    const colMount: ColumnsType<BestieStats> = [
+    const colMount: ColumnsType<CommonItemStats> = [
       {
         title: "Enhancement",
         dataIndex: "encLevel",
@@ -183,7 +183,7 @@ const BestieContent = () => {
       },
     ];
 
-    const colSpirit: ColumnsType<BestieStats> = [
+    const colSpirit: ColumnsType<CommonItemStats> = [
       {
         title: "Enhancement",
         dataIndex: "encLevel",
@@ -453,7 +453,7 @@ const BestieContent = () => {
             tempUnbeat += tempUnbeatC;
 
             // stats
-            let tempArrStats: BestieStats[] = [];
+            let tempArrStats: CommonItemStats[] = [];
 
             switch (item?.version) {
               case BestieVersion[0]:
