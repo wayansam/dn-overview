@@ -1,6 +1,7 @@
 import { CaretRightOutlined } from "@ant-design/icons";
 import { Collapse, CollapseProps, theme } from "antd";
 import { CSSProperties } from "react";
+import { PatchNoteLink, PatchNoteSection } from "../../components/PatchNoteLink";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
 import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
@@ -15,25 +16,18 @@ const getItems: (
       label: TAB_KEY.stageArcOfTranscen,
       children: (
         <div>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/153/c/3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Arc of Transcendence Season 2 [Future]
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/166/c/5"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Arc of Transcendence Season 3 [Past]
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/153/c/3",
+                label: "Arc of Transcendence Season 2 [Future]",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/166/c/5",
+                label: "Arc of Transcendence Season 3 [Past]",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -78,16 +72,14 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/156/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ancient's Equipment cost change
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/156/c/2",
+                label: "Ancient's Equipment cost change",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -172,16 +164,10 @@ const getItems: (
               (yellow text).
             </i>
           </p>
-          <p>
-            Patch Note related{" "}
-            <a
-              href="https://patchnote.dragonnest.com/sea/108/c/5"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Lunar Eclipse Dragon Jade Ancient Grade – Enhancement
-            </a>
-          </p>
+          <PatchNoteLink
+            href="https://patchnote.dragonnest.com/sea/108/c/5"
+            label="Lunar Eclipse Dragon Jade Ancient Grade – Enhancement"
+          />
         </div>
       ),
       style: panelStyle,
@@ -198,25 +184,18 @@ const getItems: (
             </b>
           </p>
           <p>To use the calculator, please drag the pointer.</p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/138/c/3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Dimensional Dragon Jade
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/160/c/4"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Otherworldly Dragon Jade
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/138/c/3",
+                label: "Dimensional Dragon Jade",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/160/c/4",
+                label: "Otherworldly Dragon Jade",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -269,16 +248,10 @@ const getItems: (
               (yellow text).
             </i>
           </p>
-          <p>
-            Patch Note related{" "}
-            <a
-              href="https://patchnote.dragonnest.com/sea/160/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Collapse Dragon Jade
-            </a>
-          </p>
+          <PatchNoteLink
+            href="https://patchnote.dragonnest.com/sea/160/c/2"
+            label="Collapse Dragon Jade"
+          />
         </div>
       ),
       style: panelStyle,
@@ -313,16 +286,14 @@ const getItems: (
             evolve the Legend to Ancient, the enhancement level will be
             maintained.
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/166/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Deeply Rooted Variant Dragon Jade
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/166/c/2",
+                label: "Deeply Rooted Variant Dragon Jade",
+              },
+            ]}
+          />
           <p>Special Thanks</p>
           <p>
             <i>~BananaCredits~</i>
@@ -388,16 +359,14 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/126/c/1"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Bone Dragon Nest Equipment
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/126/c/1",
+                label: "Bone Dragon Nest Equipment",
+              },
+            ]}
+          />
           <p>Special Thanks</p>
           <p>
             <i>~BananaCredits~</i>
@@ -447,43 +416,26 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/111/c/10"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Iona Accessory
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/126/c/5"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Iona Accessory New Level release (+4 to +9)
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/144/c/6"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Iona Accessory New Level release (+10 to +12)
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/162/c/4"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Iona Accessory New Level release (+13 to +15)
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/111/c/10",
+                label: "Iona Accessory",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/126/c/5",
+                label: "Iona Accessory New Level release (+4 to +9)",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/144/c/6",
+                label: "Iona Accessory New Level release (+10 to +12)",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/162/c/4",
+                label: "Iona Accessory New Level release (+13 to +15)",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -579,16 +531,14 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/160/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Spun Gold Equipment
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/160/c/2",
+                label: "Spun Gold Equipment",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -622,16 +572,10 @@ const getItems: (
           <p>
             <i>You can access this shop via Heraldry NPC in Milla Laurel.</i>
           </p>
-          <p>
-            Patch Note related{" "}
-            <a
-              href="https://patchnote.dragonnest.com/sea/123/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Ancients' Goddess Heraldry
-            </a>
-          </p>
+          <PatchNoteLink
+            href="https://patchnote.dragonnest.com/sea/123/c/2"
+            label="Ancients' Goddess Heraldry"
+          />
         </div>
       ),
       style: panelStyle,
@@ -655,16 +599,10 @@ const getItems: (
           <p>
             <i>Most of the item is only drop from Black Dragon Nest.</i>
           </p>
-          <p>
-            Patch Note related{" "}
-            <a
-              href="https://patchnote.dragonnest.com/sea/108/c/3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Black Dragon Talismans
-            </a>
-          </p>
+          <PatchNoteLink
+            href="https://patchnote.dragonnest.com/sea/108/c/3"
+            label="Black Dragon Talismans"
+          />
         </div>
       ),
       style: panelStyle,
@@ -696,16 +634,10 @@ const getItems: (
           <p>
             <i>Most of the item is only drop from Dimensional Rift.</i>
           </p>
-          <p>
-            Patch Note related{" "}
-            <a
-              href="https://patchnote.dragonnest.com/sea/129/c/3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Eternal Talisman
-            </a>
-          </p>
+          <PatchNoteLink
+            href="https://patchnote.dragonnest.com/sea/129/c/3"
+            label="Eternal Talisman"
+          />
         </div>
       ),
       style: panelStyle,
@@ -756,63 +688,40 @@ const getItems: (
               then adjust things you needed.
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/111/c/1"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Legend Conversion Armor
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/117/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Legend Conversion Accessories
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/126/c/12"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Legend Conversion Weapon
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/144/c/5"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Legend Conversion WTD & Enhancement Legend Conversion Armor (+1 to
-              +3)
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/162/c/5"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Enhancement Legend Conversion Accessories (+1 to +3)
-            </a>
-          </p>
-          <p>KR Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/kr/149/c/8"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Enhancement Legend Conversion Armor
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/111/c/1",
+                label: "Legend Conversion Armor",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/117/c/2",
+                label: "Legend Conversion Accessories",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/126/c/12",
+                label: "Legend Conversion Weapon",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/144/c/5",
+                label:
+                  "Legend Conversion WTD & Enhancement Legend Conversion Armor (+1 to +3)",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/162/c/5",
+                label: "Enhancement Legend Conversion Accessories (+1 to +3)",
+              },
+            ]}
+          />
+          <PatchNoteSection
+            heading="KR Patch Note related :"
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/kr/149/c/8",
+                label: "Enhancement Legend Conversion Armor",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,
@@ -846,34 +755,22 @@ const getItems: (
               (yellow text).
             </i>
           </p>
-          <p>Patch Note related :</p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/133/c/2"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Bestie Star v.1 (First Release)
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/144/c/8"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Bestie Star v.2
-            </a>
-          </p>
-          <p>
-            <a
-              href="https://patchnote.dragonnest.com/sea/162/c/3"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Bestie Star v.3
-            </a>
-          </p>
+          <PatchNoteSection
+            entries={[
+              {
+                href: "https://patchnote.dragonnest.com/sea/133/c/2",
+                label: "Bestie Star v.1 (First Release)",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/144/c/8",
+                label: "Bestie Star v.2",
+              },
+              {
+                href: "https://patchnote.dragonnest.com/sea/162/c/3",
+                label: "Bestie Star v.3",
+              },
+            ]}
+          />
         </div>
       ),
       style: panelStyle,

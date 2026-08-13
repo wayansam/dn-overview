@@ -14,6 +14,7 @@ import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useMemo, useState } from "react";
+import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import {
   NamedEODMainStatTable,
   NamedEODMaterialTable,
@@ -59,44 +60,11 @@ const NamedEODEqContent = () => {
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [selectedStat, setSelectedStat] = useState(0);
 
-  const columnsMats: ColumnsType<NamedEODMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Guide Star</p>
-          <p>Twilight Essence</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { guideStar, twilightEssence, gold }) => (
-        <div>
-          <p>{guideStar}(gs)</p>
-          <p>{twilightEssence}(ess)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Guide Star",
-      dataIndex: "guideStar",
-      responsive: ["sm"],
-    },
-    {
-      title: "Twilight Essence",
-      dataIndex: "twilightEssence",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
+  const columnsMats = makeCraftMaterialColumns<NamedEODMaterial>([
+    { dataIndex: "guideStar", label: "Guide Star", shortLabel: "(gs)" },
+    { dataIndex: "twilightEssence", label: "Twilight Essence", shortLabel: "(ess)" },
+    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
+  ]);
   const columnsStats: ColumnsType<NamedEODStat> = [
     {
       title: "Enhancement",

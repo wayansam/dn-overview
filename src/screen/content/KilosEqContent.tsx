@@ -11,8 +11,9 @@ import {
   Table,
   Tooltip,
 } from "antd";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
+import { ColumnGroupType, ColumnType } from "antd/es/table";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -551,97 +552,22 @@ const KilosEqContent = () => {
     );
   };
 
-  const columnsArmorT1: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrow, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrow}(Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "Joys & Sorrow",
-      dataIndex: "joySorrow",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
+  const threadIntelectGoldFields = [
+    { dataIndex: "threadIntelect" as const, label: "Thread of Intellect", shortLabel: "(Thr)" },
+    { dataIndex: "gold" as const, label: "Gold", shortLabel: "(g)" },
   ];
 
-  const columnsArmorT2: ColumnsType<KilosArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>HG Joys & Sorrow</p>
-          <p>Thread of Intellect</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, joySorrowHG, threadIntelect, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{joySorrowHG}(HG Joy)</p>
-          <p>{threadIntelect}(Thr)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "HG Joys & Sorrow",
-      dataIndex: "joySorrowHG",
-      responsive: ["sm"],
-    },
-    {
-      title: "Thread of Intellect",
-      dataIndex: "threadIntelect",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
+  const columnsArmorT1 = makeCraftMaterialColumns<KilosArmorCraftMaterial>([
+    { dataIndex: "eqTypeFragment", label: "Eq. Fragment", shortLabel: "(Fragment)" },
+    { dataIndex: "joySorrow", label: "Joys & Sorrow", shortLabel: "(Joy)" },
+    ...threadIntelectGoldFields,
+  ]);
+
+  const columnsArmorT2 = makeCraftMaterialColumns<KilosArmorCraftMaterial>([
+    { dataIndex: "eqTypeFragment", label: "Eq. Fragment", shortLabel: "(Fragment)" },
+    { dataIndex: "joySorrowHG", label: "HG Joys & Sorrow", shortLabel: "(HG Joy)" },
+    ...threadIntelectGoldFields,
+  ]);
 
   const items: CollapseProps["items"] = [
     {

@@ -3,14 +3,13 @@ import {
   Collapse,
   CollapseProps,
   Divider,
-  Form,
-  FormInstance,
   Radio,
   Select,
   Table,
 } from "antd";
-import { ColumnGroupType, ColumnType, ColumnsType } from "antd/es/table";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import EquipmentTable from "../../components/EquipmentTable";
+import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -44,141 +43,6 @@ const opt = (start: number, end: number) =>
     value: item,
   }));
 
-enum TAB {
-  EQ = "Equipment",
-  FR = "From",
-  TO = "To",
-}
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface EditableRowProps {
-  index: number;
-}
-
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof AncientCalculator;
-  record: AncientCalculator;
-  handleSave: (record: AncientCalculator) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const [inputNumb, setInputNumb] = useState<number>(0);
-  const [selectItem, setSelectItem] = useState<number>(0);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (record?.from && title === TAB.FR) {
-      setSelectItem(record.from);
-    }
-    if (record?.to && title === TAB.TO) {
-      setSelectItem(record.to);
-    }
-  }, [record, title]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const handleChange = (value: number) => {
-    setSelectItem(value);
-  };
-
-  const saveSelect = () => {
-    toggleEdit();
-    if (title === TAB.FR) {
-      handleSave({ ...record, from: selectItem });
-    }
-    if (title === TAB.TO) {
-      handleSave({ ...record, to: selectItem });
-    }
-  };
-
-  let childNode = children;
-
-  const findFr = record?.from ?? 0;
-  const findTo = record?.to ?? 0;
-
-  if (editable) {
-    childNode = editing ? (
-      <>
-        {title === TAB.FR && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 80 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findTo <= findFr ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-        {title === TAB.TO && (
-          <Select
-            defaultValue={selectItem}
-            style={{ width: 80 }}
-            onChange={handleChange}
-            options={opt(record.min, record.max)}
-            onBlur={saveSelect}
-            autoFocus
-            status={findFr >= findTo ? "error" : undefined}
-            size="small"
-          ></Select>
-        )}
-      </>
-    ) : (
-      <div
-        className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 24,
-          color:
-            (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-              ? "red"
-              : "unset",
-          minWidth: title === TAB.FR || title === TAB.TO ? 80 : undefined,
-          paddingTop: 1,
-          paddingBottom: 1,
-        }}
-        onClick={toggleEdit}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  return <td {...restProps}>{childNode}</td>;
-};
-
-type ColumnTypes = (
-  | ColumnGroupType<AncientCalculator>
-  | ColumnType<AncientCalculator>
-)[];
-
 const versionOpt = [
   {
     label: "New",
@@ -199,72 +63,6 @@ const AncientEqContent = () => {
   );
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
-
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: AncientCalculator[]
-  ) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  };
-
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
-    dataIndex: string;
-  })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-  ];
-
-  const handleSave = (row: AncientCalculator) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setDataSource(newData);
-  };
-
-  const columns = columnsCalculator.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: AncientCalculator) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -421,17 +219,12 @@ const AncientEqContent = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              ...rowSelection,
-            }}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
+          <EquipmentTable
+            selectedRowKeys={selectedRowKeys}
+            setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
-            columns={columns as ColumnTypes}
-            pagination={false}
+            setDataSource={setDataSource}
+            customLabeling={(item) => `${item}`}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
@@ -536,141 +329,32 @@ const AncientEqContent = () => {
     );
   };
 
-  const columnsArmor: ColumnsType<AncientArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Eq. Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Eq. Fragment",
-      dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
+  const ancKnowledgeInsigniaGoldFields = [
+    { dataIndex: "ancKnowledge" as const, label: "A. Knowledge", shortLabel: "(Know)" },
+    { dataIndex: "ancInsignia" as const, label: "A. Insignia", shortLabel: "(Ins)" },
+    { dataIndex: "gold" as const, label: "Gold", shortLabel: "(g)" },
   ];
-  const columnsWeapon: ColumnsType<AncientArmorCraftMaterial> = [
+
+  const columnsArmor = makeCraftMaterialColumns<AncientArmorCraftMaterial>([
+    { dataIndex: "eqTypeFragment", label: "Eq. Fragment", shortLabel: "(Fragment)" },
+    ...ancKnowledgeInsigniaGoldFields,
+  ]);
+  const columnsWeapon = makeCraftMaterialColumns<AncientArmorCraftMaterial>([
     {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Otherworldly A. Weapon Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Otherworldly A. Weapon Fragment",
       dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
+      label: "Otherworldly A. Weapon Fragment",
+      shortLabel: "(Fragment)",
     },
+    ...ancKnowledgeInsigniaGoldFields,
+  ]);
+  const columnsAccessory = makeCraftMaterialColumns<AncientArmorCraftMaterial>([
     {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
-  const columnsAccessory: ColumnsType<AncientArmorCraftMaterial> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Unknown Ancient Accessory Fragment</p>
-          <p>A. Knowledge</p>
-          <p>A. Insignia</p>
-          <p>Gold</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (_, { eqTypeFragment, ancKnowledge, ancInsignia, gold }) => (
-        <div>
-          <p>{eqTypeFragment}(Fragment)</p>
-          <p>{ancKnowledge}(Know)</p>
-          <p>{ancInsignia}(Ins)</p>
-          <p>{gold}(g)</p>
-        </div>
-      ),
-    },
-    {
-      title: "Unknown Ancient Accessory Fragment",
       dataIndex: "eqTypeFragment",
-      responsive: ["sm"],
+      label: "Unknown Ancient Accessory Fragment",
+      shortLabel: "(Fragment)",
     },
-    {
-      title: "A. Knowledge",
-      dataIndex: "ancKnowledge",
-      responsive: ["sm"],
-    },
-    {
-      title: "A. Insignia",
-      dataIndex: "ancInsignia",
-      responsive: ["sm"],
-    },
-    {
-      title: "Gold",
-      dataIndex: "gold",
-      responsive: ["sm"],
-    },
-  ];
+    ...ancKnowledgeInsigniaGoldFields,
+  ]);
   const items: CollapseProps["items"] = [
     {
       key: "1",
