@@ -2,9 +2,11 @@ import { Alert, Checkbox, Divider, Tooltip } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table from "antd/es/table";
 import { useMemo, useState } from "react";
+import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
+import MaterialListTable from "../../components/MaterialListTable";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
@@ -18,7 +20,6 @@ import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { NamedEODMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
   getComparedData,
   getStatDif,
@@ -156,15 +157,15 @@ const NamedEODEqContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        <CalcCard>
           <EquipmentTable
             selectedRowKeys={selectedRowKeys}
             setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
             setDataSource={setDataSource}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -191,21 +192,11 @@ const NamedEODEqContent = () => {
               </Tooltip>
             </Checkbox>
           </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <MaterialListTable data={tableResource} />
+        </CalcCard>
+        <CalcCard>
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </div>
+        </CalcCard>
       </div>
     );
   };

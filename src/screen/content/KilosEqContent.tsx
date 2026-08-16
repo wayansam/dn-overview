@@ -1,16 +1,10 @@
-import {
-  Alert,
-  Checkbox,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Select,
-  Table,
-  Tooltip,
-} from "antd";
+import { Alert, Checkbox, Collapse, CollapseProps, Divider, Table, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import MaterialListTable from "../../components/MaterialListTable";
+import RangeFromTo from "../../components/RangeFromTo";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -21,7 +15,6 @@ import {
 } from "../../data/KilosData";
 import { KilosCalculator } from "../../interface/Common.interface";
 import { KilosArmorCraftMaterial } from "../../interface/Item.interface";
-import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -39,12 +32,6 @@ interface TableMaterialList {
 const getLabel = (item: number) => {
   return item <= 20 ? `Tier 1 +${item}` : `Tier 2 +${item - 20}`;
 };
-
-const opt = (start: number, end: number) =>
-  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
-    label: getLabel(item),
-    value: item,
-  }));
 
 const KilosEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -184,7 +171,7 @@ const KilosEqContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        <CalcCard>
           <EquipmentTable
             selectedRowKeys={selectedRowKeys}
             setSelectedRowKeys={setSelectedRowKeys}
@@ -196,8 +183,8 @@ const KilosEqContent = () => {
               { type: "switch", dataIndex: "evoTier2", label: "Evo Tier 2" },
             ]}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -208,30 +195,14 @@ const KilosEqContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={opt(0, encTable.length)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={opt(0, encTable.length)}
-            />
-          </div>
+          <RangeFromTo
+            from={selectFrom}
+            to={selectTo}
+            onFromChange={setSelectFrom}
+            onToChange={setSelectTo}
+            max={encTable.length}
+            customLabeling={getLabel}
+          />
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
             <Checkbox
@@ -272,18 +243,8 @@ const KilosEqContent = () => {
               </Tooltip>
             </Checkbox>
           </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
+          <MaterialListTable data={tableResource} />
+        </CalcCard>
       </div>
     );
   };

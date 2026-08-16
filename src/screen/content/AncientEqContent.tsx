@@ -1,15 +1,10 @@
-import {
-  Alert,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Radio,
-  Select,
-  Table,
-} from "antd";
+import { Alert, Collapse, CollapseProps, Divider, Radio, Select, Table } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
-import EquipmentTable from "../../components/EquipmentTable";
+import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
+import EquipmentTable from "../../components/EquipmentTable";
+import MaterialListTable from "../../components/MaterialListTable";
+import RangeFromTo from "../../components/RangeFromTo";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -22,7 +17,6 @@ import {
 } from "../../data/AncientData";
 import { AncientCalculator } from "../../interface/Common.interface";
 import { AncientArmorCraftMaterial } from "../../interface/Item.interface";
-import { columnsResource } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Helm Fragment": number;
@@ -36,12 +30,6 @@ interface TableMaterialList {
   "Ancient Insignia": number;
   Gold: number;
 }
-
-const opt = (start: number, end: number) =>
-  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
-    label: item,
-    value: item,
-  }));
 
 const versionOpt = [
   {
@@ -218,7 +206,7 @@ const AncientEqContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        <CalcCard>
           <EquipmentTable
             selectedRowKeys={selectedRowKeys}
             setSelectedRowKeys={setSelectedRowKeys}
@@ -226,8 +214,8 @@ const AncientEqContent = () => {
             setDataSource={setDataSource}
             customLabeling={(item) => `${item}`}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -288,43 +276,16 @@ const AncientEqContent = () => {
               </Radio.Button>
             </Radio.Group>
           </div>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={opt(0, 20)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={opt(0, 20)}
-            />
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            // dataSource={tableResource}
-            dataSource={Object.entries(tableResource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
+          <RangeFromTo
+            from={selectFrom}
+            to={selectTo}
+            onFromChange={setSelectFrom}
+            onToChange={setSelectTo}
+            max={20}
+            customLabeling={(item) => `${item}`}
           />
-        </div>
+          <MaterialListTable data={tableResource} />
+        </CalcCard>
       </div>
     );
   };

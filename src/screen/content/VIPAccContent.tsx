@@ -1,11 +1,13 @@
-import { Alert, Divider, Select, Typography } from "antd";
+import { Alert, Divider, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import Table from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
+import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
-import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
+import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import MaterialListTable from "../../components/MaterialListTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
+import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
@@ -16,7 +18,6 @@ import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
   getComparedData,
   getStatDif,
@@ -249,15 +250,15 @@ const VIPAccContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        <CalcCard>
           <EquipmentTable
             selectedRowKeys={selectedRowKeys}
             setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
             setDataSource={setDataSource}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           {invalidDtSrc && (
             <div>
               <Alert
@@ -268,56 +269,22 @@ const VIPAccContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={getListOpt(0, 15)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={getListOpt(0, 15)}
-            />
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource.res1)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
+          <RangeFromTo
+            from={selectFrom}
+            to={selectTo}
+            onFromChange={setSelectFrom}
+            onToChange={setSelectTo}
+            max={15}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <MaterialListTable data={tableResource.res1} hideZero />
+        </CalcCard>
+        <CalcCard>
           <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           <ChartsCard
             title="Status Charts"
             data={chartItems}
@@ -326,7 +293,7 @@ const VIPAccContent = () => {
             statPrev={selectPrev}
             setStatPrev={setSelectPrev}
           />
-        </div>
+        </CalcCard>
       </div>
     );
   };

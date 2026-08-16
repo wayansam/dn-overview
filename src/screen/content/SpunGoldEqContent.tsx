@@ -1,15 +1,16 @@
 import { Alert, Divider, Radio, Select } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import Table from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
+import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable, {
   BasicOpt,
-  getListOpt,
   makeEquipmentSelectColumn,
 } from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
+import MaterialListTable from "../../components/MaterialListTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
+import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
@@ -33,7 +34,6 @@ import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
   getComparedData,
   getStatDif,
@@ -257,7 +257,7 @@ const SpunGoldEqContent = () => {
   const getCalculator = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        <CalcCard>
           <EquipmentTable
             selectedRowKeys={selectedRowKeys}
             setSelectedRowKeys={setSelectedRowKeys}
@@ -271,8 +271,8 @@ const SpunGoldEqContent = () => {
               ),
             ]}
           />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           {invalidEnhanceSteps && (
             <div>
               <Alert
@@ -306,35 +306,18 @@ const SpunGoldEqContent = () => {
               </Radio.Button>
             </Radio.Group>
           </div>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={getListOpt(0, 10)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={getListOpt(0, 10)}
-            />
-          </div>
+          <RangeFromTo
+            from={selectFrom}
+            to={selectTo}
+            onFromChange={setSelectFrom}
+            onToChange={setSelectTo}
+            max={10}
+          />
           <div style={{ marginBottom: 4 }}>
             Craft
             <Divider type="vertical" />
             <Select
-              defaultValue={selectTo}
+              defaultValue={selectCr}
               style={{ width: 120 }}
               onChange={(val) => {
                 setSelectCr(val);
@@ -342,29 +325,12 @@ const SpunGoldEqContent = () => {
               options={SpunOption[0].option}
             />
           </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource.res1)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <MaterialListTable data={tableResource.res1} hideZero />
+        </CalcCard>
+        <CalcCard>
           <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+        </CalcCard>
+        <CalcCard>
           <TradingHouseCalc
             data={[
               {
@@ -374,7 +340,7 @@ const SpunGoldEqContent = () => {
             ]}
             additionalTotal={tableResource.res1.Gold}
           />
-        </div>
+        </CalcCard>
       </div>
     );
   };
