@@ -23,6 +23,7 @@ import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import { getStatDif, getSuccessRateTag } from "../../utils/common.util";
+import { buildRateSummary } from "../../utils/rateSummary";
 import { TAB_KEY } from "../../constants/Common.constants";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
 import { getResource } from "../../utils/resource.util";
@@ -144,54 +145,18 @@ const VIPAccContent = () => {
     getIonaStatsTable
   );
 
-  const extraInfo: ItemList[] = useMemo(() => {
-    const list: ItemList[] = [];
-    const items: CollapseProps["items"] = [];
-
-    Object.entries(tableResource.res2).forEach(([key, value]) => {
-      items.push({
-        key: key,
-        styles: {
-          header: {
-            padding: "4px 4px 0px 4px",
-          },
-          body: {
-            padding: "0px 4px",
-            marginTop: 8,
-            marginBottom: 8,
-          },
+  const extraInfo: ItemList[] = useMemo(
+    () =>
+      buildRateSummary(tableResource.res2, [
+        {
+          key: "Success Rate",
+          title: "Success Rate",
+          suffix: "%",
+          tag: getSuccessRateTag,
         },
-        label: (
-          <div>
-            {`${key} `}
-            {getSuccessRateTag(key, value?.["Success Rate"])}
-          </div>
-        ),
-        children: (
-          <ListingCard
-            data={[
-              {
-                title: `${key} Success Rate : `,
-                value: value?.["Success Rate"]
-                  ?.map((it: any) => `${it}%`)
-                  .join(", "),
-              },
-            ]}
-          />
-        ),
-      });
-    });
-    if (items.length > 0) {
-      list.push({
-        title: "Summary",
-        isHeader: true,
-        children: (
-          <Collapse ghost key={"summary-item"} items={items} size="small" />
-        ),
-      });
-    }
-    return list;
-  }, [tableResource.res2]);
+      ]),
+    [tableResource.res2]
+  );
 
   const chartItems = useMemo((): ChartItem[] => {
     const stat = selectStat?.value.replace("Desc", "") as keyof CommonItemStats;

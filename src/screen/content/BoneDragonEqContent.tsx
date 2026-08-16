@@ -39,6 +39,7 @@ import {
   getStatDif,
   getSuccessRateTag,
 } from "../../utils/common.util";
+import { buildRateSummary } from "../../utils/rateSummary";
 import { getResource } from "../../utils/resource.util";
 
 const { Text } = Typography;
@@ -188,74 +189,15 @@ const BoneDragonEqContent = () => {
   );
 
   const extraInfo: ItemList[] = useMemo(() => {
-    const list: ItemList[] = [];
-    const items: CollapseProps["items"] = [];
-
-    Object.entries(tableResource.res2).forEach(([key, value]) => {
-      if (key === "Jelly") {
-        list.push({
-          title: "Min. Jelly used",
-          value: tableResource.res2.Jelly,
-          format: true,
-        });
-      } else {
-        items.push({
-          key: key,
-          styles: {
-            header: {
-              padding: "4px 4px 0px 4px",
-            },
-            body: {
-              padding: "0px 4px",
-              marginTop: 8,
-              marginBottom: 8,
-            },
-          },
-          label: (
-            <div>
-              {`${key} `}
-              {getSuccessRateTag(key, value?.["Success Rate"])}
-              {getBreakTag(key, value?.["Break Rate"])}
-              {getDeductTag(key, value?.["Fail Deduction"])}
-            </div>
-          ),
-          children: (
-            <ListingCard
-              data={[
-                {
-                  title: `${key} Success Rate : `,
-                  value: value?.["Success Rate"]
-                    ?.map((it: any) => `${it}%`)
-                    .join(", "),
-                },
-                {
-                  title: `${key} Break Rate : `,
-                  value: value?.["Break Rate"]
-                    ?.map((it: any) => `${it}%`)
-                    .join(", "),
-                },
-                {
-                  title: `${key} Fail Deduction : `,
-                  value: value?.["Fail Deduction"]
-                    ?.map((it: any) => `${it}`)
-                    .join(", "),
-                },
-              ]}
-            />
-          ),
-        });
-      }
-    });
-    if (items.length > 0) {
-      list.push({
-        title: "Summary",
-        isHeader: true,
-        children: (
-          <Collapse ghost key={"summary-item"} items={items} size="small" />
-        ),
-      });
-    }
-    return list;
+    const { Jelly, ...perEquipmentRates } = tableResource.res2;
+    return [
+      { title: "Min. Jelly used", value: Jelly, format: true },
+      ...buildRateSummary(perEquipmentRates, [
+        { key: "Success Rate", title: "Success Rate", suffix: "%", tag: getSuccessRateTag },
+        { key: "Break Rate", title: "Break Rate", suffix: "%", tag: getBreakTag },
+        { key: "Fail Deduction", title: "Fail Deduction", tag: getDeductTag },
+      ]),
+    ];
   }, [tableResource.res2]);
 
   const getCalculator = () => {
