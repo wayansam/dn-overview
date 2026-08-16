@@ -7,7 +7,10 @@ import FlagAlert from "../../components/FlagAlert";
 import MaterialListTable from "../../components/MaterialListTable";
 import RangeFromTo from "../../components/RangeFromTo";
 import { EQUIPMENT } from "../../constants/InGame.constants";
-import { useInvalidRange } from "../../hooks/useEquipmentCalculator";
+import {
+  useInvalidRange,
+  useSelectedRows,
+} from "../../hooks/useEquipmentCalculator";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
   KilosT1ArmorCraftMaterial,
@@ -52,6 +55,8 @@ const KilosEqContent = () => {
 
   const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
   const tableResource: TableMaterialList = useMemo(() => {
     let temp: TableMaterialList = {
       "Helm Fragment": 0,
@@ -69,70 +74,65 @@ const KilosEqContent = () => {
       return temp;
     }
 
-    selectedRowKeys.map((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
+    selectedRows.forEach(({ equipment, from, to, evoTier2, craft }) => {
+      let tempSlice: KilosArmorCraftMaterial[] = [];
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          tempSlice = encTable.slice(from, to);
+          break;
 
-      if (found) {
-        const { equipment, from, to,  evoTier2, craft } = found;
-        let tempSlice: KilosArmorCraftMaterial[] = [];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = encTable.slice(from, to);
-            break;
+        default:
+          break;
+      }
 
-          default:
-            break;
-        }
+      let tempFragment = 0;
+      let tempJoySorrow = 0;
+      let tempHGJoySorrow = 0;
+      let tempThreadIntel = 0;
+      let tempGold = 0;
 
-        let tempFragment = 0;
-        let tempJoySorrow = 0;
-        let tempHGJoySorrow = 0;
-        let tempThreadIntel = 0;
-        let tempGold = 0;
+      tempSlice.forEach((slicedItem) => {
+        tempFragment += slicedItem.eqTypeFragment;
+        tempJoySorrow += slicedItem.joySorrow;
+        tempHGJoySorrow += slicedItem.joySorrowHG;
+        tempThreadIntel += slicedItem.threadIntelect;
+        tempGold += slicedItem.gold;
+      });
 
-        tempSlice.forEach((slicedItem) => {
-          tempFragment += slicedItem.eqTypeFragment;
-          tempJoySorrow += slicedItem.joySorrow;
-          tempHGJoySorrow += slicedItem.joySorrowHG;
-          tempThreadIntel += slicedItem.threadIntelect;
-          tempGold += slicedItem.gold;
-        });
+      if (craft) {
+        tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
+        tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
+        tempGold += KilosT1ArmorCraftMaterial.gold;
+      }
 
-        if (craft) {
-          tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
-          tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
-          tempGold += KilosT1ArmorCraftMaterial.gold;
-        }
+      temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
+      temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
+      temp["Thread of Intellect"] += tempThreadIntel;
+      temp["Gold"] += tempGold;
+      temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+          temp["Helm Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.UPPER:
+          temp["Upper Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.LOWER:
+          temp["Lower Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.GLOVE:
+          temp["Gloves Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.SHOES:
+          temp["Shoes Fragment"] += tempFragment;
+          break;
 
-        temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
-        temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
-        temp["Thread of Intellect"] += tempThreadIntel;
-        temp["Gold"] += tempGold;
-        temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            temp["Helm Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.UPPER:
-            temp["Upper Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.LOWER:
-            temp["Lower Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.GLOVE:
-            temp["Gloves Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.SHOES:
-            temp["Shoes Fragment"] += tempFragment;
-            break;
-
-          default:
-            break;
-        }
+        default:
+          break;
       }
     });
     if (checkedChange) {
@@ -146,7 +146,7 @@ const KilosEqContent = () => {
       temp["Needle of Intellect"] = 0;
     }
     return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc, checkedChange]);
+  }, [selectedRows, invalidDtSrc, checkedChange]);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({

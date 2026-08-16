@@ -10,6 +10,7 @@ import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useInvalidRange,
+  useSelectedRows,
   useSelectionFlag,
 } from "../../hooks/useEquipmentCalculator";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
@@ -70,6 +71,8 @@ const AncientEqContent = () => {
       (row.from > 10 || row.to > 10)
   );
 
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
   const tableResource: TableMaterialList = useMemo(() => {
     let temp: TableMaterialList = {
       "Helm Fragment": 0,
@@ -86,99 +89,89 @@ const AncientEqContent = () => {
     if (invalidDtSrc) {
       return temp;
     }
-    selectedRowKeys.map((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
+    selectedRows.forEach(({ equipment, from, to }) => {
+      let tempSlice: AncientArmorCraftMaterial[] = [];
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientArmorCraftMaterialTableV2
+              : AncientArmorCraftMaterialTable
+          ).slice(from, to);
+          break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientWeaponT2CraftMaterialTableV2
+              : AncientWeaponT2CraftMaterialTable
+          ).slice(from, to);
+          break;
+        case EQUIPMENT.NECKLACE:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.RING1:
+          tempSlice = (
+            selectVersion === versionOpt[0].value
+              ? AncientAccessoryCraftMaterialTableV2
+              : AncientAccessoryCraftMaterialTable
+          ).slice(from, to);
+          break;
 
-      if (found) {
-        const { equipment, from, to, max, min } = found;
-        let tempSlice: AncientArmorCraftMaterial[] = [];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientArmorCraftMaterialTableV2
-                : AncientArmorCraftMaterialTable
-            ).slice(from, to);
-            break;
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientWeaponT2CraftMaterialTableV2
-                : AncientWeaponT2CraftMaterialTable
-            ).slice(from, to);
-            break;
-          case EQUIPMENT.NECKLACE:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING1:
-            tempSlice = (
-              selectVersion === versionOpt[0].value
-                ? AncientAccessoryCraftMaterialTableV2
-                : AncientAccessoryCraftMaterialTable
-            ).slice(from, to);
-            break;
+        default:
+          break;
+      }
 
-          default:
-            break;
-        }
+      let tempFragment = 0;
+      let tempAncKnowledge = 0;
+      let tempAncInsignia = 0;
+      let tempGold = 0;
 
-        // const sumWithInitial = temp.reduce(
-        //   (accumulator, currentValue) => accumulator + currentValue,
-        //   initialValue
-        // );
+      tempSlice.forEach((slicedItem) => {
+        tempFragment += slicedItem.eqTypeFragment;
+        tempAncKnowledge += slicedItem.ancKnowledge;
+        tempAncInsignia += slicedItem.ancInsignia;
+        tempGold += slicedItem.gold;
+      });
 
-        let tempFragment = 0;
-        let tempAncKnowledge = 0;
-        let tempAncInsignia = 0;
-        let tempGold = 0;
+      temp["Ancient Knowledge"] += tempAncKnowledge;
+      temp["Ancient Insignia"] += tempAncInsignia;
+      temp["Gold"] += tempGold;
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+          temp["Helm Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.UPPER:
+          temp["Upper Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.LOWER:
+          temp["Lower Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.GLOVE:
+          temp["Gloves Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.SHOES:
+          temp["Shoes Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          temp["Otherworldly Ancient Weapon Fragment"] += tempFragment;
+          break;
+        case EQUIPMENT.NECKLACE:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.RING1:
+          temp["Unknown Ancient Accessory Fragment"] += tempFragment;
+          break;
 
-        tempSlice.forEach((slicedItem) => {
-          tempFragment += slicedItem.eqTypeFragment;
-          tempAncKnowledge += slicedItem.ancKnowledge;
-          tempAncInsignia += slicedItem.ancInsignia;
-          tempGold += slicedItem.gold;
-        });
-
-        temp["Ancient Knowledge"] += tempAncKnowledge;
-        temp["Ancient Insignia"] += tempAncInsignia;
-        temp["Gold"] += tempGold;
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            temp["Helm Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.UPPER:
-            temp["Upper Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.LOWER:
-            temp["Lower Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.GLOVE:
-            temp["Gloves Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.SHOES:
-            temp["Shoes Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            temp["Otherworldly Ancient Weapon Fragment"] += tempFragment;
-            break;
-          case EQUIPMENT.NECKLACE:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING1:
-            temp["Unknown Ancient Accessory Fragment"] += tempFragment;
-            break;
-
-          default:
-            break;
-        }
+        default:
+          break;
       }
     });
     return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc, selectVersion]);
+  }, [selectedRows, invalidDtSrc, selectVersion]);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({

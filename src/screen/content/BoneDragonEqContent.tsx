@@ -17,6 +17,7 @@ import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
   useInvalidRange,
+  useSelectedRows,
   useSelectionFlag,
 } from "../../hooks/useEquipmentCalculator";
 import {
@@ -85,6 +86,8 @@ const BoneDragonEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
   const tableResource: { res1: TableMaterialList; res2: ExtraData } =
     useMemo(() => {
       let temp: TableMaterialList = {
@@ -100,81 +103,76 @@ const BoneDragonEqContent = () => {
         return { res1: temp, res2: temp2 };
       }
 
-      selectedRowKeys.forEach((item) => {
-        const found = dataSource.find((dt) => dt.key === item);
+      selectedRows.forEach(({ equipment, from, to }) => {
+        let tempSlice: BoneDragonEqEnhanceMaterial[] = [];
 
-        if (found) {
-          const { equipment, from, to } = found;
-          let tempSlice: BoneDragonEqEnhanceMaterial[] = [];
+        switch (equipment) {
+          case EQUIPMENT.HELM:
+          case EQUIPMENT.UPPER:
+          case EQUIPMENT.LOWER:
+          case EQUIPMENT.GLOVE:
+          case EQUIPMENT.SHOES:
+            tempSlice = BoneDragonEqEnhanceMaterialArmorTable.slice(from, to);
+            break;
 
-          switch (equipment) {
-            case EQUIPMENT.HELM:
-            case EQUIPMENT.UPPER:
-            case EQUIPMENT.LOWER:
-            case EQUIPMENT.GLOVE:
-            case EQUIPMENT.SHOES:
-              tempSlice = BoneDragonEqEnhanceMaterialArmorTable.slice(from, to);
-              break;
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
+            tempSlice = BoneDragonEqEnhanceMaterialWeapTable.slice(from, to);
+            break;
 
-            case EQUIPMENT.MAIN_WEAPON:
-            case EQUIPMENT.SECOND_WEAPON:
-              tempSlice = BoneDragonEqEnhanceMaterialWeapTable.slice(from, to);
-              break;
+          default:
+            break;
+        }
 
-            default:
-              break;
-          }
+        let boneFragmentTemp = 0;
+        let garnetTemp = 0;
+        let essenceTemp = 0;
+        let goldTemp = 0;
+        let jellyTemp = 0;
+        let srTemp: number[] = [];
+        let brTemp: number[] = [];
+        let deTemp: Array<number | undefined> = [];
 
-          let boneFragmentTemp = 0;
-          let garnetTemp = 0;
-          let essenceTemp = 0;
-          let goldTemp = 0;
-          let jellyTemp = 0;
-          let srTemp: number[] = [];
-          let brTemp: number[] = [];
-          let deTemp: Array<number | undefined> = [];
+        tempSlice.forEach((slicedItem) => {
+          boneFragmentTemp += slicedItem.boneFragment;
+          garnetTemp += slicedItem.garnet;
+          essenceTemp += slicedItem.essence;
+          goldTemp += slicedItem.gold;
+          jellyTemp += slicedItem.jelly ?? 0;
+          srTemp.push(slicedItem.successRatePercent);
+          brTemp.push(slicedItem.breakNoJellyPercent);
+          deTemp.push(slicedItem.enhanceFailDeduction);
+        });
 
-          tempSlice.forEach((slicedItem) => {
-            boneFragmentTemp += slicedItem.boneFragment;
-            garnetTemp += slicedItem.garnet;
-            essenceTemp += slicedItem.essence;
-            goldTemp += slicedItem.gold;
-            jellyTemp += slicedItem.jelly ?? 0;
-            srTemp.push(slicedItem.successRatePercent);
-            brTemp.push(slicedItem.breakNoJellyPercent);
-            deTemp.push(slicedItem.enhanceFailDeduction);
-          });
+        temp["Bone Fragment"] += boneFragmentTemp;
+        temp.Garnet += garnetTemp;
+        temp.Essence += essenceTemp;
+        temp.Gold += goldTemp;
+        temp2.Jelly += jellyTemp;
 
-          temp["Bone Fragment"] += boneFragmentTemp;
-          temp.Garnet += garnetTemp;
-          temp.Essence += essenceTemp;
-          temp.Gold += goldTemp;
-          temp2.Jelly += jellyTemp;
+        const exData = {
+          "Success Rate": srTemp,
+          "Break Rate": brTemp,
+          "Fail Deduction": deTemp,
+        };
+        switch (equipment) {
+          case EQUIPMENT.HELM:
+          case EQUIPMENT.UPPER:
+          case EQUIPMENT.LOWER:
+          case EQUIPMENT.GLOVE:
+          case EQUIPMENT.SHOES:
+          case EQUIPMENT.MAIN_WEAPON:
+          case EQUIPMENT.SECOND_WEAPON:
+            temp2[equipment] = exData;
+            break;
 
-          const exData = {
-            "Success Rate": srTemp,
-            "Break Rate": brTemp,
-            "Fail Deduction": deTemp,
-          };
-          switch (equipment) {
-            case EQUIPMENT.HELM:
-            case EQUIPMENT.UPPER:
-            case EQUIPMENT.LOWER:
-            case EQUIPMENT.GLOVE:
-            case EQUIPMENT.SHOES:
-            case EQUIPMENT.MAIN_WEAPON:
-            case EQUIPMENT.SECOND_WEAPON:
-              temp2[equipment] = exData;
-              break;
-
-            default:
-              break;
-          }
+          default:
+            break;
         }
       });
 
       return { res1: temp, res2: temp2 };
-    }, [selectedRowKeys, dataSource, invalidDtSrc]);
+    }, [selectedRows, invalidDtSrc]);
 
   const getBoneDragonStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqBoneDragon, equipment),

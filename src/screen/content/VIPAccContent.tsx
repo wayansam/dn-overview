@@ -14,6 +14,7 @@ import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
   useInvalidRange,
+  useSelectedRows,
 } from "../../hooks/useEquipmentCalculator";
 import {
   dataIonaCalculator,
@@ -75,6 +76,8 @@ const VIPAccContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
   const tableResource: { res1: TableMaterialList; res2: EquipmentExtraData } =
     useMemo(() => {
       let temp: TableMaterialList = {
@@ -85,53 +88,48 @@ const VIPAccContent = () => {
         return { res1: temp, res2: temp2 };
       }
 
-      selectedRowKeys.forEach((item) => {
-        const found = dataSource.find((dt) => dt.key === item);
+      selectedRows.forEach(({ equipment, from, to }) => {
+        let tempSlice: IonaEqEnhanceMaterial[] = [];
 
-        if (found) {
-          const { equipment, from, to } = found;
-          let tempSlice: IonaEqEnhanceMaterial[] = [];
+        switch (equipment) {
+          case EQUIPMENT.RING1:
+          case EQUIPMENT.RING2:
+          case EQUIPMENT.EARRING:
+          case EQUIPMENT.NECKLACE:
+            tempSlice = IonaEqEnhanceMaterialTable.slice(from, to);
+            break;
 
-          switch (equipment) {
-            case EQUIPMENT.RING1:
-            case EQUIPMENT.RING2:
-            case EQUIPMENT.EARRING:
-            case EQUIPMENT.NECKLACE:
-              tempSlice = IonaEqEnhanceMaterialTable.slice(from, to);
-              break;
+          default:
+            break;
+        }
 
-            default:
-              break;
-          }
+        let whiteCoreTemp = 0;
+        let srTemp: number[] = [];
+        tempSlice.forEach((slicedItem) => {
+          whiteCoreTemp += slicedItem.whiteCore;
+          srTemp.push(slicedItem.successRatePercent);
+        });
 
-          let whiteCoreTemp = 0;
-          let srTemp: number[] = [];
-          tempSlice.forEach((slicedItem) => {
-            whiteCoreTemp += slicedItem.whiteCore;
-            srTemp.push(slicedItem.successRatePercent);
-          });
+        temp["White Core"] += whiteCoreTemp;
 
-          temp["White Core"] += whiteCoreTemp;
+        const exData = {
+          "Success Rate": srTemp,
+        };
+        switch (equipment) {
+          case EQUIPMENT.RING1:
+          case EQUIPMENT.RING2:
+          case EQUIPMENT.EARRING:
+          case EQUIPMENT.NECKLACE:
+            temp2[equipment] = exData;
+            break;
 
-          const exData = {
-            "Success Rate": srTemp,
-          };
-          switch (equipment) {
-            case EQUIPMENT.RING1:
-            case EQUIPMENT.RING2:
-            case EQUIPMENT.EARRING:
-            case EQUIPMENT.NECKLACE:
-              temp2[equipment] = exData;
-              break;
-
-            default:
-              break;
-          }
+          default:
+            break;
         }
       });
 
       return { res1: temp, res2: temp2 };
-    }, [selectedRowKeys, dataSource, invalidDtSrc]);
+    }, [selectedRows, invalidDtSrc]);
 
   const getIonaStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqVIPAcc, equipment),

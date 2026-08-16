@@ -20,6 +20,7 @@ import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
   useInvalidRange,
+  useSelectedRows,
 } from "../../hooks/useEquipmentCalculator";
 import {
   SpunGoldEqEnhanceMaterialArmorTable,
@@ -106,6 +107,8 @@ const SpunGoldEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo, selectCr]);
 
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
   const tableResource: { res1: TableMaterialList } = useMemo(() => {
     let temp: TableMaterialList = {
       "Shattered Armor Crystal": 0,
@@ -115,83 +118,78 @@ const SpunGoldEqContent = () => {
       Gold: 0,
     };
 
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
+    selectedRows.forEach(({ equipment, from, to, craft }) => {
+      let tempSlice: SpunGoldEqEnhanceMaterial[] = [];
+      let tempCraft: SpunGoldEqEnhanceMaterial | undefined = undefined;
 
-      if (found) {
-        const { equipment, from, to, craft } = found;
-        let tempSlice: SpunGoldEqEnhanceMaterial[] = [];
-        let tempCraft: SpunGoldEqEnhanceMaterial | undefined = undefined;
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          if (!invalidEnhanceSteps) {
+            tempSlice = SpunGoldEqEnhanceMaterialArmorTable.slice(from, to);
+          }
+          if (craft === 1) {
+            tempCraft = SpunGoldEvolverCraftArmorT1;
+          }
+          if (craft === 2) {
+            tempCraft = SpunGoldEvolverCraftArmorT2;
+          }
+          break;
 
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            if (!invalidEnhanceSteps) {
-              tempSlice = SpunGoldEqEnhanceMaterialArmorTable.slice(from, to);
-            }
-            if (craft === 1) {
-              tempCraft = SpunGoldEvolverCraftArmorT1;
-            }
-            if (craft === 2) {
-              tempCraft = SpunGoldEvolverCraftArmorT2;
-            }
-            break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          if (!invalidEnhanceSteps) {
+            tempSlice = SpunGoldEqEnhanceMaterialWeapTable.slice(from, to);
+          }
+          if (craft === 2) {
+            tempCraft = SpunGoldEvolverCraftWeapon;
+          }
+          break;
 
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            if (!invalidEnhanceSteps) {
-              tempSlice = SpunGoldEqEnhanceMaterialWeapTable.slice(from, to);
-            }
-            if (craft === 2) {
-              tempCraft = SpunGoldEvolverCraftWeapon;
-            }
-            break;
-
-          default:
-            break;
-        }
-
-        let shatteredCrystalTemp = tempCraft?.shatteredCrystal ?? 0;
-        let foundationStoneTemp = tempCraft?.foundationStone ?? 0;
-        let dimVestigeTemp = tempCraft?.dimVestige ?? 0;
-        let goldTemp = tempCraft?.gold ?? 0;
-
-        tempSlice.forEach((slicedItem) => {
-          shatteredCrystalTemp += slicedItem.shatteredCrystal;
-          foundationStoneTemp += slicedItem.foundationStone;
-          dimVestigeTemp += slicedItem.dimVestige;
-          goldTemp += slicedItem.gold;
-        });
-
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            temp["Shattered Armor Crystal"] += shatteredCrystalTemp;
-            break;
-
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            temp["Shattered Weapon Crystal"] += shatteredCrystalTemp;
-            break;
-
-          default:
-            break;
-        }
-
-        temp["Foundation Stone"] += foundationStoneTemp;
-        temp["Dim. Vestige"] += dimVestigeTemp;
-        temp.Gold += goldTemp;
+        default:
+          break;
       }
+
+      let shatteredCrystalTemp = tempCraft?.shatteredCrystal ?? 0;
+      let foundationStoneTemp = tempCraft?.foundationStone ?? 0;
+      let dimVestigeTemp = tempCraft?.dimVestige ?? 0;
+      let goldTemp = tempCraft?.gold ?? 0;
+
+      tempSlice.forEach((slicedItem) => {
+        shatteredCrystalTemp += slicedItem.shatteredCrystal;
+        foundationStoneTemp += slicedItem.foundationStone;
+        dimVestigeTemp += slicedItem.dimVestige;
+        goldTemp += slicedItem.gold;
+      });
+
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          temp["Shattered Armor Crystal"] += shatteredCrystalTemp;
+          break;
+
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          temp["Shattered Weapon Crystal"] += shatteredCrystalTemp;
+          break;
+
+        default:
+          break;
+      }
+
+      temp["Foundation Stone"] += foundationStoneTemp;
+      temp["Dim. Vestige"] += dimVestigeTemp;
+      temp.Gold += goldTemp;
     });
 
     return { res1: temp };
-  }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
+  }, [selectedRows, invalidEnhanceSteps]);
 
   const getSpunGoldStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqSpunGold, equipment),
