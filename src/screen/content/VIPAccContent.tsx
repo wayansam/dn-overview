@@ -1,9 +1,11 @@
 import { Alert, Divider, Select, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import Table, { ColumnsType } from "antd/es/table";
+import Table from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
+import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import MatsReferenceTables from "../../components/MatsReferenceTables";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
@@ -19,7 +21,6 @@ import {
   getComparedData,
   getStatDif,
   getSuccessRateTag,
-  getTextEmpty,
 } from "../../utils/common.util";
 import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
@@ -378,106 +379,55 @@ const VIPAccContent = () => {
     );
   };
 
-  const getMatsContent = () => {
-    const columnsMats: ColumnsType<IonaEqEnhanceMaterial> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>White Core</p>
-            <p>Success Rate</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { whiteCore, successRatePercent }) => (
-          <div>
-            <p>{getTextEmpty({ txt: whiteCore })}(White Core)</p>
-            <p>
-              {getTextEmpty({ txt: successRatePercent, tailText: "%" })}
-              (Success%)
-            </p>
-          </div>
-        ),
-      },
-      {
-        title: "White Core",
-        responsive: ["sm"],
-        render: (_, { whiteCore }) => (
-          <Text>
-            {getTextEmpty({
-              txt: whiteCore,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Success Rate",
-        responsive: ["sm"],
-        render: (_, { successRatePercent }) => (
-          <Text>
-            {getTextEmpty({
-              txt: successRatePercent,
+  const getMatsContent = () => (
+    <MatsReferenceTables
+      defaultActiveKey={"1"}
+      entries={[
+        {
+          key: "1",
+          label: "Acquiring",
+          content: (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Text>
+                * Go to Merchant Pania or Merchant Farvana in certain towns.
+                Purchase with 3900 Iona Core for each item.
+              </Text>
+              <Text>-or-</Text>
+              <Text>
+                * Exchange Argenta or Geraint Accessories with Path of Iona
+                (purchased with 10 Iona Core).
+              </Text>
+              <Text>
+                ** Please refer to Patch Note - first release of Iona
+                Accessories (look the link in (?) button on the bottom right
+                corner of the screen).
+              </Text>
+            </div>
+          ),
+        },
+        {
+          key: "2",
+          label: "Enhancement",
+          dataSource: IonaEqEnhanceMaterialTable,
+          fields: [
+            { dataIndex: "whiteCore", label: "White Core", shortLabel: "(White Core)" },
+            {
+              dataIndex: "successRatePercent",
+              label: "Success Rate",
+              shortLabel: "(Success%)",
               tailText: "%",
-            })}
-          </Text>
-        ),
-      },
-    ];
-    const itemMats: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Acquiring",
-        children: (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Text>
-              * Go to Merchant Pania or Merchant Farvana in certain towns.
-              Purchase with 3900 Iona Core for each item.
-            </Text>
-            <Text>-or-</Text>
-            <Text>
-              * Exchange Argenta or Geraint Accessories with Path of Iona
-              (purchased with 10 Iona Core).
-            </Text>
-            <Text>
-              ** Please refer to Patch Note - first release of Iona Accessories
-              (look the link in (?) button on the bottom right corner of the
-              screen).
-            </Text>
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "Enhancement",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={IonaEqEnhanceMaterialTable}
-            columns={columnsMats}
-            pagination={false}
-            bordered
-            footer={() =>
-              "*Necklace, Earring & Ring have same enhancement requirement"
-            }
-          />
-        ),
-      },
-    ];
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemMats} size="small" defaultActiveKey={"1"} />
-      </div>
-    );
-  };
+            },
+          ] satisfies CraftMaterialField<IonaEqEnhanceMaterial>[],
+          footer: "*Necklace, Earring & Ring have same enhancement requirement",
+        },
+      ]}
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {

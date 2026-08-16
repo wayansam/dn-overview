@@ -1,12 +1,14 @@
 import { ColumnsType } from "antd/es/table";
+import { getTextEmpty } from "../utils/common.util";
 
 export interface CraftMaterialField<T> {
   dataIndex: keyof T;
   label: string;
   shortLabel: string;
+  tailText?: string;
 }
 
-export const makeCraftMaterialColumns = <T extends { encLevel: number }>(
+export const makeCraftMaterialColumns = <T extends { encLevel: number | string }>(
   fields: CraftMaterialField<T>[]
 ): ColumnsType<T> => [
   {
@@ -26,7 +28,10 @@ export const makeCraftMaterialColumns = <T extends { encLevel: number }>(
       <div>
         {fields.map((field) => (
           <p key={String(field.dataIndex)}>
-            {String(record[field.dataIndex])}
+            {getTextEmpty({
+              txt: record[field.dataIndex] as unknown as string | number,
+              tailText: field.tailText,
+            })}
             {field.shortLabel}
           </p>
         ))}
@@ -37,5 +42,10 @@ export const makeCraftMaterialColumns = <T extends { encLevel: number }>(
     title: field.label,
     dataIndex: field.dataIndex as string,
     responsive: ["sm"] as Array<"sm">,
+    render: (_: unknown, record: T) =>
+      getTextEmpty({
+        txt: record[field.dataIndex] as unknown as string | number,
+        tailText: field.tailText,
+      }),
   })),
 ];

@@ -1,9 +1,11 @@
 import { Alert, Divider, Radio, Select, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import Table, { ColumnsType } from "antd/es/table";
+import Table from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
+import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import MatsReferenceTables from "../../components/MatsReferenceTables";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EQUIPMENT } from "../../constants/InGame.constants";
@@ -30,7 +32,6 @@ import {
   getDeductTag,
   getStatDif,
   getSuccessRateTag,
-  getTextEmpty,
 } from "../../utils/common.util";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 
@@ -581,210 +582,73 @@ const BoneDragonEqContent = () => {
     );
   };
 
-  const getMatsContent = () => {
-    const columnsMats: ColumnsType<BoneDragonEqEnhanceMaterial> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Bone Fragment</p>
-            <p>Garnet</p>
-            <p>Essence</p>
-            <p>Gold</p>
-            <p>Jelly</p>
-            <p>Success Rate</p>
-            <p>Break Rate</p>
-            <p>Fail Deduction</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (
-          _,
-          {
-            boneFragment,
-            garnet,
-            essence,
-            gold,
-            jelly,
-            successRatePercent,
-            breakNoJellyPercent,
-            enhanceFailDeduction,
-          }
-        ) => (
-          <div>
-            <p>{getTextEmpty({ txt: boneFragment })}(Bone Fragment)</p>
-            <p>{getTextEmpty({ txt: garnet })}(Garnet)</p>
-            <p>{getTextEmpty({ txt: essence })}(Essence)</p>
-            <p>{getTextEmpty({ txt: gold })}(g)</p>
-            <p>{getTextEmpty({ txt: jelly })}(Jelly)</p>
-            <p>
-              {getTextEmpty({ txt: successRatePercent, tailText: "%" })}
-              (Success%)
-            </p>
-            <p>
-              {getTextEmpty({ txt: breakNoJellyPercent, tailText: "%" })}
-              (Break%)
-            </p>
-            <p>
-              {getTextEmpty({ txt: enhanceFailDeduction })}
-              (Deduct)
-            </p>
-          </div>
-        ),
-      },
-      {
-        title: "Bone Fragment",
-        responsive: ["sm"],
-        render: (_, { boneFragment }) => (
-          <Text>
-            {getTextEmpty({
-              txt: boneFragment,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Garnet",
-        responsive: ["sm"],
-        render: (_, { garnet }) => (
-          <Text>
-            {getTextEmpty({
-              txt: garnet,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Essence",
-        responsive: ["sm"],
-        render: (_, { essence }) => (
-          <Text>
-            {getTextEmpty({
-              txt: essence,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => (
-          <Text>
-            {getTextEmpty({
-              txt: gold,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Jelly",
-        responsive: ["sm"],
-        render: (_, { jelly }) => (
-          <Text>
-            {getTextEmpty({
-              txt: jelly,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Success Rate",
-        responsive: ["sm"],
-        render: (_, { successRatePercent }) => (
-          <Text>
-            {getTextEmpty({
-              txt: successRatePercent,
-              tailText: "%",
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Break Rate",
-        responsive: ["sm"],
-        render: (_, { breakNoJellyPercent }) => (
-          <Text>
-            {getTextEmpty({
-              txt: breakNoJellyPercent,
-              tailText: "%",
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Fail Deduction",
-        responsive: ["sm"],
-        render: (_, { enhanceFailDeduction }) => (
-          <Text>
-            {getTextEmpty({
-              txt: enhanceFailDeduction,
-            })}
-          </Text>
-        ),
-      },
-    ];
-    const itemMats: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Note",
-        children: (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <Text>
-              * Beyond +10, there are downgrade intervals every 2 levels.
-            </Text>
-            <Text>
-              ** E.g. Enhance +10 to +11, failure dont have level downgrade.
-            </Text>
-            <Text>
-              ** E.g. Enhance +11 to +12, failure have level downgrade with
-              certain probability (become +10).
-            </Text>
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "Armor",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonEqEnhanceMaterialArmorTable}
-            columns={columnsMats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "3",
-        label: "Weapon",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonEqEnhanceMaterialWeapTable}
-            columns={columnsMats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemMats} size="small" defaultActiveKey={"1"} />
-      </div>
-    );
-  };
+  const matsFields: CraftMaterialField<BoneDragonEqEnhanceMaterial>[] = [
+    { dataIndex: "boneFragment", label: "Bone Fragment", shortLabel: "(Bone Fragment)" },
+    { dataIndex: "garnet", label: "Garnet", shortLabel: "(Garnet)" },
+    { dataIndex: "essence", label: "Essence", shortLabel: "(Essence)" },
+    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
+    { dataIndex: "jelly", label: "Jelly", shortLabel: "(Jelly)" },
+    {
+      dataIndex: "successRatePercent",
+      label: "Success Rate",
+      shortLabel: "(Success%)",
+      tailText: "%",
+    },
+    {
+      dataIndex: "breakNoJellyPercent",
+      label: "Break Rate",
+      shortLabel: "(Break%)",
+      tailText: "%",
+    },
+    {
+      dataIndex: "enhanceFailDeduction",
+      label: "Fail Deduction",
+      shortLabel: "(Deduct)",
+    },
+  ];
+
+  const getMatsContent = () => (
+    <MatsReferenceTables
+      defaultActiveKey={"1"}
+      entries={[
+        {
+          key: "1",
+          label: "Note",
+          content: (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Text>
+                * Beyond +10, there are downgrade intervals every 2 levels.
+              </Text>
+              <Text>
+                ** E.g. Enhance +10 to +11, failure dont have level downgrade.
+              </Text>
+              <Text>
+                ** E.g. Enhance +11 to +12, failure have level downgrade with
+                certain probability (become +10).
+              </Text>
+            </div>
+          ),
+        },
+        {
+          key: "2",
+          label: "Armor",
+          dataSource: BoneDragonEqEnhanceMaterialArmorTable,
+          fields: matsFields,
+        },
+        {
+          key: "3",
+          label: "Weapon",
+          dataSource: BoneDragonEqEnhanceMaterialWeapTable,
+          fields: matsFields,
+        },
+      ]}
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {

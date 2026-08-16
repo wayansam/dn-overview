@@ -1,13 +1,15 @@
-import { Alert, Divider, Radio, Select, Typography } from "antd";
+import { Alert, Divider, Radio, Select } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import Table, { ColumnsType } from "antd/es/table";
+import Table from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
+import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable, {
   BasicOpt,
   getListOpt,
   makeEquipmentSelectColumn,
 } from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
+import MatsReferenceTables from "../../components/MatsReferenceTables";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
@@ -35,10 +37,7 @@ import {
   combineEqStats,
   getComparedData,
   getStatDif,
-  getTextEmpty,
 } from "../../utils/common.util";
-
-const { Text } = Typography;
 
 interface TableMaterialList {
   "Shattered Armor Crystal": number;
@@ -496,115 +495,31 @@ const SpunGoldEqContent = () => {
     />
   );
 
-  const getMatsContent = () => {
-    const columnsMats: ColumnsType<SpunGoldEqEnhanceMaterial> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            <p>Shattered Crystal</p>
-            <p>Foundation Stone</p>
-            <p>Dim. Vestige</p>
-            <p>Gold</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (
-          _,
-          { shatteredCrystal, foundationStone, dimVestige, gold }
-        ) => (
-          <div>
-            <p>{getTextEmpty({ txt: shatteredCrystal })}(crys)</p>
-            <p>{getTextEmpty({ txt: foundationStone })}(stone)</p>
-            <p>{getTextEmpty({ txt: dimVestige })}(d.ves)</p>
-            <p>{getTextEmpty({ txt: gold })}(g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Shattered Crystal",
-        responsive: ["sm"],
-        render: (_, { shatteredCrystal }) => (
-          <Text>
-            {getTextEmpty({
-              txt: shatteredCrystal,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Foundation Stone",
-        responsive: ["sm"],
-        render: (_, { foundationStone }) => (
-          <Text>
-            {getTextEmpty({
-              txt: foundationStone,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Dim. Vestige",
-        responsive: ["sm"],
-        render: (_, { dimVestige }) => (
-          <Text>
-            {getTextEmpty({
-              txt: dimVestige,
-            })}
-          </Text>
-        ),
-      },
-      {
-        title: "Gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => (
-          <Text>
-            {getTextEmpty({
-              txt: gold,
-            })}
-          </Text>
-        ),
-      },
-    ];
-    const itemMats: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Armor",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldEqEnhanceMaterialArmorTable}
-            columns={columnsMats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "2",
-        label: "Weapon",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldEqEnhanceMaterialWeapTable}
-            columns={columnsMats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemMats} size="small" />
-      </div>
-    );
-  };
+  const matsFields: CraftMaterialField<SpunGoldEqEnhanceMaterial>[] = [
+    { dataIndex: "shatteredCrystal", label: "Shattered Crystal", shortLabel: "(crys)" },
+    { dataIndex: "foundationStone", label: "Foundation Stone", shortLabel: "(stone)" },
+    { dataIndex: "dimVestige", label: "Dim. Vestige", shortLabel: "(d.ves)" },
+    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
+  ];
+
+  const getMatsContent = () => (
+    <MatsReferenceTables
+      entries={[
+        {
+          key: "1",
+          label: "Armor",
+          dataSource: SpunGoldEqEnhanceMaterialArmorTable,
+          fields: matsFields,
+        },
+        {
+          key: "2",
+          label: "Weapon",
+          dataSource: SpunGoldEqEnhanceMaterialWeapTable,
+          fields: matsFields,
+        },
+      ]}
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {
