@@ -4,6 +4,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import StatReferenceTables from "../../components/StatReferenceTables";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   dataIonaCalculator,
@@ -15,7 +16,6 @@ import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
   combineEqStats,
-  getColumnsStats,
   getComparedData,
   getStatDif,
   getSuccessRateTag,
@@ -331,34 +331,24 @@ const VIPAccContent = () => {
   };
 
   const getStatContent = () => {
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Ring",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING1)}
-            columns={getColumnsStats({
+    return (
+      <StatReferenceTables
+        entries={[
+          {
+            key: "1",
+            label: "Ring",
+            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING1),
+            flags: {
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,
               attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "2",
-        label: "Earring",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.EARRING)}
-            columns={getColumnsStats({
+            },
+          },
+          {
+            key: "2",
+            label: "Earring",
+            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.EARRING),
+            flags: {
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,
               crtFlag: true,
@@ -367,21 +357,13 @@ const VIPAccContent = () => {
               strFlag: true,
               agiFlag: true,
               intFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "3",
-        label: "Necklace",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.NECKLACE)}
-            columns={getColumnsStats({
+            },
+          },
+          {
+            key: "3",
+            label: "Necklace",
+            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.NECKLACE),
+            flags: {
               phyMagAtkFlag: true,
               phyMagAtkPercentFlag: true,
               attAtkPercentFlag: true,
@@ -389,18 +371,10 @@ const VIPAccContent = () => {
               strFlag: true,
               agiFlag: true,
               intFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
+            },
+          },
+        ]}
+      />
     );
   };
 

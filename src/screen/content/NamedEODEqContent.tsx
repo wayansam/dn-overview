@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
+import StatReferenceTables from "../../components/StatReferenceTables";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
@@ -19,7 +20,6 @@ import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
   combineEqStats,
-  getColumnsStats,
   getComparedData,
   getStatDif,
 } from "../../utils/common.util";
@@ -110,47 +110,30 @@ const NamedEODEqContent = () => {
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const getStatContent = () => {
-    const columnsStats = getColumnsStats({
+    const flags = {
       phyMagAtkMinFlag: true,
       phyMagAtkMaxFlag: true,
       phyMagAtkPercentFlag: true,
       crtFlag: true,
       cdmFlag: true,
-    });
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Main Weapon",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={NamedEODMainStatTable}
-            columns={columnsStats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "2",
-        label: "Second Weapon",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={NamedEODSecondStatTable}
-            columns={columnsStats}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
+    };
     return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
+      <StatReferenceTables
+        entries={[
+          {
+            key: "1",
+            label: "Main Weapon",
+            dataSource: NamedEODMainStatTable,
+            flags,
+          },
+          {
+            key: "2",
+            label: "Second Weapon",
+            dataSource: NamedEODSecondStatTable,
+            flags,
+          },
+        ]}
+      />
     );
   };
 

@@ -8,6 +8,7 @@ import EquipmentTable, {
   makeEquipmentSelectColumn,
 } from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
+import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
@@ -32,7 +33,6 @@ import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   columnsResource,
   combineEqStats,
-  getColumnsStats,
   getComparedData,
   getStatDif,
   getTextEmpty,
@@ -380,181 +380,121 @@ const SpunGoldEqContent = () => {
     );
   };
 
-  const getStatContent = () => {
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Helm",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsHelmTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              attAtkPercentFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "2",
-        label: "Upper",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsUpperTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              fdFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "3",
-        label: "Lower",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsLowerTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              cdmFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "4",
-        label: "Glove",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsGlovesTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "5",
-        label: "Shoes",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsShoesTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-              moveSpeedPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "6",
-        label: "Main",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsMainTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              cdmFlag: true,
-              fdFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "7",
-        label: "Second",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={SpunGoldStatsSecondTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              cdmFlag: true,
-              fdFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
-    );
-  };
+  const getStatContent = () => (
+    <StatReferenceTables
+      entries={[
+        {
+          key: "1",
+          label: "Helm",
+          dataSource: SpunGoldStatsHelmTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            attAtkPercentFlag: true,
+            defFlag: true,
+            magdefFlag: true,
+            hpFlag: true,
+            hpPercentFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+          },
+        },
+        {
+          key: "2",
+          label: "Upper",
+          dataSource: SpunGoldStatsUpperTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            fdFlag: true,
+            defFlag: true,
+            magdefFlag: true,
+            hpFlag: true,
+            hpPercentFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            attAtkPercentFlag: true,
+          },
+        },
+        {
+          key: "3",
+          label: "Lower",
+          dataSource: SpunGoldStatsLowerTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            cdmFlag: true,
+            defFlag: true,
+            magdefFlag: true,
+            hpFlag: true,
+            hpPercentFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            attAtkPercentFlag: true,
+          },
+        },
+        {
+          key: "4",
+          label: "Glove",
+          dataSource: SpunGoldStatsGlovesTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            defFlag: true,
+            magdefFlag: true,
+            hpFlag: true,
+            hpPercentFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            attAtkPercentFlag: true,
+          },
+        },
+        {
+          key: "5",
+          label: "Shoes",
+          dataSource: SpunGoldStatsShoesTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            defFlag: true,
+            magdefFlag: true,
+            hpFlag: true,
+            hpPercentFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            attAtkPercentFlag: true,
+            moveSpeedPercentFlag: true,
+          },
+        },
+        {
+          key: "6",
+          label: "Main",
+          dataSource: SpunGoldStatsMainTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            cdmFlag: true,
+            fdFlag: true,
+          },
+        },
+        {
+          key: "7",
+          label: "Second",
+          dataSource: SpunGoldStatsSecondTable,
+          flags: {
+            phyMagAtkMinFlag: true,
+            phyMagAtkMaxFlag: true,
+            phyMagAtkPercentFlag: true,
+            crtFlag: true,
+            cdmFlag: true,
+            fdFlag: true,
+          },
+        },
+      ]}
+    />
+  );
 
   const getMatsContent = () => {
     const columnsMats: ColumnsType<SpunGoldEqEnhanceMaterial> = [

@@ -4,6 +4,7 @@ import Table, { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, { getListOpt } from "../../components/EquipmentTable";
 import ListingCard, { ItemList } from "../../components/ListingCard";
+import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
@@ -25,7 +26,6 @@ import {
   columnsResource,
   combineEqStats,
   getBreakTag,
-  getColumnsStats,
   getComparedData,
   getDeductTag,
   getStatDif,
@@ -465,177 +465,119 @@ const BoneDragonEqContent = () => {
   };
 
   const getStatContent = () => {
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Helm",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsHelmTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              attAtkPercentFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "2",
-        label: "Upper",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsUpperTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              fdFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "3",
-        label: "Lower",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsLowerTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              cdmFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "4",
-        label: "Glove",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsGlovesTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "5",
-        label: "Shoes",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsShoesTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              defFlag: true,
-              magdefFlag: true,
-              hpFlag: true,
-              hpPercentFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              attAtkPercentFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "6",
-        label: "Main",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsMainTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              cdmFlag: true,
-              fdFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-      {
-        key: "7",
-        label: "Second",
-        children: (
-          <Table
-            style={{ marginRight: 10, marginBottom: 10 }}
-            size={"small"}
-            dataSource={BoneDragonStatsSecondTable}
-            columns={getColumnsStats({
-              phyMagAtkMinFlag: true,
-              phyMagAtkMaxFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              cdmFlag: true,
-              fdFlag: true,
-            })}
-            pagination={false}
-            bordered
-          />
-        ),
-      },
-    ];
-
     return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
-      </div>
+      <StatReferenceTables
+        entries={[
+          {
+            key: "1",
+            label: "Helm",
+            dataSource: BoneDragonStatsHelmTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              attAtkPercentFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+            },
+          },
+          {
+            key: "2",
+            label: "Upper",
+            dataSource: BoneDragonStatsUpperTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              fdFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            },
+          },
+          {
+            key: "3",
+            label: "Lower",
+            dataSource: BoneDragonStatsLowerTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              cdmFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            },
+          },
+          {
+            key: "4",
+            label: "Glove",
+            dataSource: BoneDragonStatsGlovesTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            },
+          },
+          {
+            key: "5",
+            label: "Shoes",
+            dataSource: BoneDragonStatsShoesTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              defFlag: true,
+              magdefFlag: true,
+              hpFlag: true,
+              hpPercentFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              attAtkPercentFlag: true,
+            },
+          },
+          {
+            key: "6",
+            label: "Main",
+            dataSource: BoneDragonStatsMainTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              cdmFlag: true,
+              fdFlag: true,
+            },
+          },
+          {
+            key: "7",
+            label: "Second",
+            dataSource: BoneDragonStatsSecondTable,
+            flags: {
+              phyMagAtkMinFlag: true,
+              phyMagAtkMaxFlag: true,
+              phyMagAtkPercentFlag: true,
+              crtFlag: true,
+              cdmFlag: true,
+              fdFlag: true,
+            },
+          },
+        ]}
+      />
     );
   };
 
