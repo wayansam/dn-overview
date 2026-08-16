@@ -1,12 +1,17 @@
-import { Alert, Collapse, CollapseProps, Divider, Select, Table } from "antd";
+import { Collapse, CollapseProps, Divider, Select, Table } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import MaterialListTable from "../../components/MaterialListTable";
 import RangeFromTo from "../../components/RangeFromTo";
 import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import {
+  useInvalidRange,
+  useSelectionFlag,
+} from "../../hooks/useEquipmentCalculator";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
   AncientAccessoryCraftMaterialTable,
@@ -53,37 +58,17 @@ const AncientEqContent = () => {
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(20);
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
-  const showWarningAcc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (
-        !flag &&
-        found &&
-        (found.equipment === EQUIPMENT.NECKLACE ||
-          found.equipment === EQUIPMENT.EARRING ||
-          found.equipment === EQUIPMENT.RING1)
-      ) {
-        if (found.from > 10 || found.to > 10) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const showWarningAcc = useSelectionFlag(
+    selectedRowKeys,
+    dataSource,
+    (row) =>
+      (row.equipment === EQUIPMENT.NECKLACE ||
+        row.equipment === EQUIPMENT.EARRING ||
+        row.equipment === EQUIPMENT.RING1) &&
+      (row.from > 10 || row.to > 10)
+  );
 
   const tableResource: TableMaterialList = useMemo(() => {
     let temp: TableMaterialList = {
@@ -217,24 +202,16 @@ const AncientEqContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
-          {showWarningAcc && (
-            <div>
-              <Alert
-                banner
-                message="From +11 onward, your accessory might break"
-                type="warning"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidDtSrc}
+            message="From cannot exceed the To option"
+            type="error"
+          />
+          <FlagAlert
+            show={showWarningAcc}
+            message="From +11 onward, your accessory might break"
+            type="warning"
+          />
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             Version

@@ -1,11 +1,13 @@
-import { Alert, Checkbox, Collapse, CollapseProps, Divider, Table, Tooltip } from "antd";
+import { Checkbox, Collapse, CollapseProps, Divider, Table, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import MaterialListTable from "../../components/MaterialListTable";
 import RangeFromTo from "../../components/RangeFromTo";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import { useInvalidRange } from "../../hooks/useEquipmentCalculator";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
   KilosT1ArmorCraftMaterial,
@@ -48,18 +50,7 @@ const KilosEqContent = () => {
     ...KilosT2ArmorEnhanceMaterialTable,
   ];
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
   const tableResource: TableMaterialList = useMemo(() => {
     let temp: TableMaterialList = {
@@ -185,15 +176,11 @@ const KilosEqContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidDtSrc}
+            message="From cannot exceed the To option"
+            type="error"
+          />
           <Divider orientation="left">Settings</Divider>
           <RangeFromTo
             from={selectFrom}

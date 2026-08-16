@@ -1,15 +1,19 @@
-import { Alert, Checkbox, Divider, Tooltip } from "antd";
+import { Checkbox, Divider, Tooltip } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table from "antd/es/table";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import ListingCard from "../../components/ListingCard";
 import MaterialListTable from "../../components/MaterialListTable";
 import StatReferenceTables from "../../components/StatReferenceTables";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import {
+  useEquipmentStatDiff,
+  useInvalidRange,
+} from "../../hooks/useEquipmentCalculator";
 import {
   dataNamedEODCalculator,
   NamedEODMainStatTable,
@@ -19,11 +23,7 @@ import {
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { NamedEODMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
-import {
-  combineEqStats,
-  getComparedData,
-  getStatDif,
-} from "../../utils/common.util";
+import { getStatDif } from "../../utils/common.util";
 
 interface NamedEODTableMaterialList {
   "Guide Star": number;
@@ -48,16 +48,7 @@ const NamedEODEqContent = () => {
     { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
   ]);
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found && found.to <= found.from) {
-        flag = true;
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
   const tableResource: NamedEODTableMaterialList = useMemo(() => {
     const temp: NamedEODTableMaterialList = {
@@ -87,28 +78,20 @@ const NamedEODEqContent = () => {
     return temp;
   }, [selectedRowKeys, dataSource, invalidDtSrc, checkedCraft]);
 
-  const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = { ...EmptyCommonnStat };
-    if (invalidDtSrc) {
-      return temp;
-    }
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (found) {
-        const { equipment, from, to } = found;
-        const tableHolder =
-          equipment === EQUIPMENT.MAIN_WEAPON
-            ? NamedEODMainStatTable
-            : NamedEODSecondStatTable;
-        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-        if (dt2) {
-          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(temp, dt, "add");
-        }
-      }
-    });
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  const getNamedEODStatsTable = useCallback(
+    (equipment: EQUIPMENT): CommonItemStats[] =>
+      equipment === EQUIPMENT.MAIN_WEAPON
+        ? NamedEODMainStatTable
+        : NamedEODSecondStatTable,
+    []
+  );
+
+  const statDif = useEquipmentStatDiff(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getNamedEODStatsTable
+  );
 
   const getStatContent = () => {
     const flags = {
@@ -166,15 +149,11 @@ const NamedEODEqContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidDtSrc}
+            message="From cannot exceed the To option"
+            type="error"
+          />
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />

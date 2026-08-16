@@ -1,9 +1,10 @@
-import { Alert, Divider, Typography } from "antd";
+import { Divider, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import MaterialListTable from "../../components/MaterialListTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
@@ -12,6 +13,11 @@ import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import {
+  useEquipmentStatDiff,
+  useInvalidRange,
+  useSelectionFlag,
+} from "../../hooks/useEquipmentCalculator";
 import {
   BoneDragonEqEnhanceMaterialArmorTable,
   BoneDragonEqEnhanceMaterialWeapTable,
@@ -28,14 +34,11 @@ import { BoneCalculator } from "../../interface/Common.interface";
 import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  combineEqStats,
   getBreakTag,
-  getComparedData,
   getDeductTag,
   getStatDif,
   getSuccessRateTag,
 } from "../../utils/common.util";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
 
 const { Text } = Typography;
 
@@ -67,44 +70,9 @@ const BoneDragonEqContent = () => {
   const [selectFrom, setSelectFrom] = useState<number>(0);
   const [selectTo, setSelectTo] = useState<number>(1);
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
-
-  const warnDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to > 3) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
-
-  const dangerDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to > 5) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
+  const warnDtSrc = useSelectionFlag(selectedRowKeys, dataSource, (row) => row.to > 3);
+  const dangerDtSrc = useSelectionFlag(selectedRowKeys, dataSource, (row) => row.to > 5);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
@@ -206,57 +174,36 @@ const BoneDragonEqContent = () => {
       return { res1: temp, res2: temp2 };
     }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = { ...EmptyCommonnStat };
-    if (invalidDtSrc) {
-      return temp;
-    }
-
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-
-      if (found) {
-        const { equipment, from, to } = found;
-
-        let tableHolder: CommonItemStats[];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            tableHolder = BoneDragonStatsHelmTable;
-            break;
-          case EQUIPMENT.UPPER:
-            tableHolder = BoneDragonStatsUpperTable;
-            break;
-          case EQUIPMENT.LOWER:
-            tableHolder = BoneDragonStatsLowerTable;
-            break;
-          case EQUIPMENT.GLOVE:
-            tableHolder = BoneDragonStatsGlovesTable;
-            break;
-          case EQUIPMENT.SHOES:
-            tableHolder = BoneDragonStatsShoesTable;
-            break;
-
-          case EQUIPMENT.MAIN_WEAPON:
-            tableHolder = BoneDragonStatsMainTable;
-            break;
-          case EQUIPMENT.SECOND_WEAPON:
-            tableHolder = BoneDragonStatsSecondTable;
-            break;
-
-          default:
-            tableHolder = [];
-            break;
-        }
-        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-        if (dt2) {
-          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(temp, dt, "add");
-        }
+  const getBoneDragonStatsTable = useCallback(
+    (equipment: EQUIPMENT): CommonItemStats[] => {
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+          return BoneDragonStatsHelmTable;
+        case EQUIPMENT.UPPER:
+          return BoneDragonStatsUpperTable;
+        case EQUIPMENT.LOWER:
+          return BoneDragonStatsLowerTable;
+        case EQUIPMENT.GLOVE:
+          return BoneDragonStatsGlovesTable;
+        case EQUIPMENT.SHOES:
+          return BoneDragonStatsShoesTable;
+        case EQUIPMENT.MAIN_WEAPON:
+          return BoneDragonStatsMainTable;
+        case EQUIPMENT.SECOND_WEAPON:
+          return BoneDragonStatsSecondTable;
+        default:
+          return [];
       }
-    });
+    },
+    []
+  );
 
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  const statDif = useEquipmentStatDiff(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getBoneDragonStatsTable
+  );
 
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
@@ -341,15 +288,11 @@ const BoneDragonEqContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidDtSrc}
+            message="From cannot exceed the To option"
+            type="error"
+          />
           <Divider orientation="left">Settings</Divider>
           <TypeFilterToggle
             selectedRowKeys={selectedRowKeys}
@@ -366,24 +309,16 @@ const BoneDragonEqContent = () => {
             onToChange={setSelectTo}
             max={20}
           />
-          {warnDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="Above +3, the enhancement might fail."
-                type="info"
-              />
-            </div>
-          )}
-          {dangerDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="Above +5 even can break your item."
-                type="warning"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={warnDtSrc}
+            message="Above +3, the enhancement might fail."
+            type="info"
+          />
+          <FlagAlert
+            show={dangerDtSrc}
+            message="Above +5 even can break your item."
+            type="warning"
+          />
           <MaterialListTable data={tableResource.res1} hideZero />
         </CalcCard>
         <CalcCard>

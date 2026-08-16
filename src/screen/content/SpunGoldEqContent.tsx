@@ -1,12 +1,13 @@
-import { Alert, Divider, Select } from "antd";
+import { Divider, Select } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable, {
   BasicOpt,
   makeEquipmentSelectColumn,
 } from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import ListingCard from "../../components/ListingCard";
 import MaterialListTable from "../../components/MaterialListTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
@@ -14,8 +15,11 @@ import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import TypeFilterToggle from "../../components/TypeFilterToggle";
-import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import {
+  useEquipmentStatDiff,
+  useInvalidRange,
+} from "../../hooks/useEquipmentCalculator";
 import {
   SpunGoldEqEnhanceMaterialArmorTable,
   SpunGoldEqEnhanceMaterialWeapTable,
@@ -34,11 +38,7 @@ import {
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
-import {
-  combineEqStats,
-  getComparedData,
-  getStatDif,
-} from "../../utils/common.util";
+import { getStatDif } from "../../utils/common.util";
 
 interface TableMaterialList {
   "Shattered Armor Crystal": number;
@@ -81,18 +81,7 @@ const SpunGoldEqContent = () => {
   const [selectTo, setSelectTo] = useState<number>(0);
   const [selectCr, setSelectCr] = useState<number>(0);
 
-  const invalidEnhanceSteps = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidEnhanceSteps = useInvalidRange(selectedRowKeys, dataSource);
 
   useEffect(() => {
     const getCraftValue = (
@@ -203,57 +192,36 @@ const SpunGoldEqContent = () => {
     return { res1: temp };
   }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
 
-  const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = { ...EmptyCommonnStat };
-    if (invalidEnhanceSteps) {
-      return temp;
-    }
-
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-
-      if (found) {
-        const { equipment, from, to } = found;
-
-        let tableHolder: CommonItemStats[];
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-            tableHolder = SpunGoldStatsHelmTable;
-            break;
-          case EQUIPMENT.UPPER:
-            tableHolder = SpunGoldStatsUpperTable;
-            break;
-          case EQUIPMENT.LOWER:
-            tableHolder = SpunGoldStatsLowerTable;
-            break;
-          case EQUIPMENT.GLOVE:
-            tableHolder = SpunGoldStatsGlovesTable;
-            break;
-          case EQUIPMENT.SHOES:
-            tableHolder = SpunGoldStatsShoesTable;
-            break;
-
-          case EQUIPMENT.MAIN_WEAPON:
-            tableHolder = SpunGoldStatsMainTable;
-            break;
-          case EQUIPMENT.SECOND_WEAPON:
-            tableHolder = SpunGoldStatsSecondTable;
-            break;
-
-          default:
-            tableHolder = [];
-            break;
-        }
-        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-        if (dt2) {
-          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(temp, dt, "add");
-        }
+  const getSpunGoldStatsTable = useCallback(
+    (equipment: EQUIPMENT): CommonItemStats[] => {
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+          return SpunGoldStatsHelmTable;
+        case EQUIPMENT.UPPER:
+          return SpunGoldStatsUpperTable;
+        case EQUIPMENT.LOWER:
+          return SpunGoldStatsLowerTable;
+        case EQUIPMENT.GLOVE:
+          return SpunGoldStatsGlovesTable;
+        case EQUIPMENT.SHOES:
+          return SpunGoldStatsShoesTable;
+        case EQUIPMENT.MAIN_WEAPON:
+          return SpunGoldStatsMainTable;
+        case EQUIPMENT.SECOND_WEAPON:
+          return SpunGoldStatsSecondTable;
+        default:
+          return [];
       }
-    });
+    },
+    []
+  );
 
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
+  const statDif = useEquipmentStatDiff(
+    selectedRowKeys,
+    dataSource,
+    invalidEnhanceSteps,
+    getSpunGoldStatsTable
+  );
 
   const getCalculator = () => {
     return (
@@ -274,15 +242,11 @@ const SpunGoldEqContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidEnhanceSteps && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidEnhanceSteps}
+            message="From cannot exceed the To option"
+            type="error"
+          />
           <Divider orientation="left">Settings</Divider>
           <TypeFilterToggle
             selectedRowKeys={selectedRowKeys}

@@ -1,9 +1,10 @@
-import { Alert, Divider, Typography } from "antd";
+import { Divider, Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
+import FlagAlert from "../../components/FlagAlert";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import MaterialListTable from "../../components/MaterialListTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
@@ -11,19 +12,18 @@ import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentStatDiff,
+  useInvalidRange,
+} from "../../hooks/useEquipmentCalculator";
+import {
   dataIonaCalculator,
   IonaEqEnhanceMaterialTable,
 } from "../../data/VIPAccData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
-import {
-  combineEqStats,
-  getComparedData,
-  getStatDif,
-  getSuccessRateTag,
-} from "../../utils/common.util";
-import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
+import { getStatDif, getSuccessRateTag } from "../../utils/common.util";
+import { TAB_KEY } from "../../constants/Common.constants";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
 import { getResource } from "../../utils/resource.util";
 
@@ -63,18 +63,7 @@ const VIPAccContent = () => {
     value: string;
   }>();
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
@@ -143,28 +132,17 @@ const VIPAccContent = () => {
       return { res1: temp, res2: temp2 };
     }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  const statDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = { ...EmptyCommonnStat };
-    if (invalidDtSrc) {
-      return temp;
-    }
+  const getIonaStatsTable = useCallback(
+    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqVIPAcc, equipment),
+    []
+  );
 
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-
-      if (found) {
-        const { equipment, from, to } = found;
-        let tableHolder = getResource(TAB_KEY.eqVIPAcc, equipment);
-        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
-        if (dt2) {
-          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-          temp = combineEqStats(temp, dt, "add");
-        }
-      }
-    });
-
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+  const statDif = useEquipmentStatDiff(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getIonaStatsTable
+  );
 
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
@@ -259,15 +237,11 @@ const VIPAccContent = () => {
           />
         </CalcCard>
         <CalcCard>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={invalidDtSrc}
+            message="From cannot exceed the To option"
+            type="error"
+          />
           <Divider orientation="left">Settings</Divider>
           <RangeFromTo
             from={selectFrom}
