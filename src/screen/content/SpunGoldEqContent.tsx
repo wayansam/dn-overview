@@ -15,6 +15,7 @@ import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import TypeFilterToggle from "../../components/TypeFilterToggle";
+import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
@@ -37,8 +38,8 @@ import {
 } from "../../data/SpunGoldEqData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
 import { getStatDif } from "../../utils/common.util";
+import { getResource } from "../../utils/resource.util";
 
 interface TableMaterialList {
   "Shattered Armor Crystal": number;
@@ -193,26 +194,7 @@ const SpunGoldEqContent = () => {
   }, [selectedRowKeys, dataSource, invalidEnhanceSteps]);
 
   const getSpunGoldStatsTable = useCallback(
-    (equipment: EQUIPMENT): CommonItemStats[] => {
-      switch (equipment) {
-        case EQUIPMENT.HELM:
-          return SpunGoldStatsHelmTable;
-        case EQUIPMENT.UPPER:
-          return SpunGoldStatsUpperTable;
-        case EQUIPMENT.LOWER:
-          return SpunGoldStatsLowerTable;
-        case EQUIPMENT.GLOVE:
-          return SpunGoldStatsGlovesTable;
-        case EQUIPMENT.SHOES:
-          return SpunGoldStatsShoesTable;
-        case EQUIPMENT.MAIN_WEAPON:
-          return SpunGoldStatsMainTable;
-        case EQUIPMENT.SECOND_WEAPON:
-          return SpunGoldStatsSecondTable;
-        default:
-          return [];
-      }
-    },
+    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqSpunGold, equipment),
     []
   );
 

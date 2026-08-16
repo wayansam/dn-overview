@@ -12,6 +12,7 @@ import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
 import TypeFilterToggle from "../../components/TypeFilterToggle";
+import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
@@ -32,13 +33,13 @@ import {
 } from "../../data/BoneDragonEqData";
 import { BoneCalculator } from "../../interface/Common.interface";
 import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
   getBreakTag,
   getDeductTag,
   getStatDif,
   getSuccessRateTag,
 } from "../../utils/common.util";
+import { getResource } from "../../utils/resource.util";
 
 const { Text } = Typography;
 
@@ -175,26 +176,7 @@ const BoneDragonEqContent = () => {
     }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   const getBoneDragonStatsTable = useCallback(
-    (equipment: EQUIPMENT): CommonItemStats[] => {
-      switch (equipment) {
-        case EQUIPMENT.HELM:
-          return BoneDragonStatsHelmTable;
-        case EQUIPMENT.UPPER:
-          return BoneDragonStatsUpperTable;
-        case EQUIPMENT.LOWER:
-          return BoneDragonStatsLowerTable;
-        case EQUIPMENT.GLOVE:
-          return BoneDragonStatsGlovesTable;
-        case EQUIPMENT.SHOES:
-          return BoneDragonStatsShoesTable;
-        case EQUIPMENT.MAIN_WEAPON:
-          return BoneDragonStatsMainTable;
-        case EQUIPMENT.SECOND_WEAPON:
-          return BoneDragonStatsSecondTable;
-        default:
-          return [];
-      }
-    },
+    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqBoneDragon, equipment),
     []
   );
 

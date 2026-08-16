@@ -9,6 +9,7 @@ import FlagAlert from "../../components/FlagAlert";
 import ListingCard from "../../components/ListingCard";
 import MaterialListTable from "../../components/MaterialListTable";
 import StatReferenceTables from "../../components/StatReferenceTables";
+import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
   useEquipmentStatDiff,
@@ -22,8 +23,8 @@ import {
 } from "../../data/NamedEODData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { NamedEODMaterial } from "../../interface/Item.interface";
-import { CommonItemStats } from "../../interface/ItemStat.interface";
 import { getStatDif } from "../../utils/common.util";
+import { getResource } from "../../utils/resource.util";
 
 interface NamedEODTableMaterialList {
   "Guide Star": number;
@@ -79,10 +80,7 @@ const NamedEODEqContent = () => {
   }, [selectedRowKeys, dataSource, invalidDtSrc, checkedCraft]);
 
   const getNamedEODStatsTable = useCallback(
-    (equipment: EQUIPMENT): CommonItemStats[] =>
-      equipment === EQUIPMENT.MAIN_WEAPON
-        ? NamedEODMainStatTable
-        : NamedEODSecondStatTable,
+    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqNamedEOD, equipment),
     []
   );
 
