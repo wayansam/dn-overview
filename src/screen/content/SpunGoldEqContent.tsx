@@ -1,4 +1,4 @@
-import { Alert, Divider, Radio, Select } from "antd";
+import { Alert, Divider, Select } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import { useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
@@ -13,6 +13,7 @@ import MatsReferenceTables from "../../components/MatsReferenceTables";
 import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
+import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
@@ -283,29 +284,14 @@ const SpunGoldEqContent = () => {
             </div>
           )}
           <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            Spesific Type
-            <Divider type="vertical" />
-            <Radio.Group
-              value={selectedRowKeys}
-              onChange={(e) => {
-                setSelectedRowKeys(e.target.value);
-              }}
-            >
-              <Radio.Button
-                value={["1", "2", "3", "4", "5"]}
-                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
-              >
-                Armor
-              </Radio.Button>
-              <Radio.Button
-                value={["6", "7"]}
-                onClick={() => setSelectedRowKeys(["6", "7"])}
-              >
-                Weapon
-              </Radio.Button>
-            </Radio.Group>
-          </div>
+          <TypeFilterToggle
+            selectedRowKeys={selectedRowKeys}
+            onChange={setSelectedRowKeys}
+            options={[
+              { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+              { label: "Weapon", keys: ["6", "7"] },
+            ]}
+          />
           <RangeFromTo
             from={selectFrom}
             to={selectTo}

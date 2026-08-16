@@ -1,10 +1,11 @@
-import { Alert, Collapse, CollapseProps, Divider, Radio, Select, Table } from "antd";
+import { Alert, Collapse, CollapseProps, Divider, Select, Table } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import CalcCard from "../../components/CalcCard";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
 import EquipmentTable from "../../components/EquipmentTable";
 import MaterialListTable from "../../components/MaterialListTable";
 import RangeFromTo from "../../components/RangeFromTo";
+import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
 import {
@@ -247,35 +248,15 @@ const AncientEqContent = () => {
               options={versionOpt}
             />
           </div>
-          <div style={{ marginBottom: 4 }}>
-            Spesific Type
-            <Divider type="vertical" />
-            <Radio.Group
-              value={selectedRowKeys}
-              onChange={(e) => {
-                setSelectedRowKeys(e.target.value);
-              }}
-            >
-              <Radio.Button
-                value={["1", "2", "3", "4", "5"]}
-                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
-              >
-                Armor
-              </Radio.Button>
-              <Radio.Button
-                value={["6", "7"]}
-                onClick={() => setSelectedRowKeys(["6", "7"])}
-              >
-                Weapon
-              </Radio.Button>
-              <Radio.Button
-                value={["8", "9", "10", "11"]}
-                onClick={() => setSelectedRowKeys(["8", "9", "10", "11"])}
-              >
-                Accessories
-              </Radio.Button>
-            </Radio.Group>
-          </div>
+          <TypeFilterToggle
+            selectedRowKeys={selectedRowKeys}
+            onChange={setSelectedRowKeys}
+            options={[
+              { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+              { label: "Weapon", keys: ["6", "7"] },
+              { label: "Accessories", keys: ["8", "9", "10", "11"] },
+            ]}
+          />
           <RangeFromTo
             from={selectFrom}
             to={selectTo}
