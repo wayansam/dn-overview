@@ -1,5 +1,26 @@
+import { EQUIPMENT } from "../constants/InGame.constants";
+import { CommonEquipmentCalculator } from "../interface/Common.interface";
 import { NamedEODMaterial } from "../interface/Item.interface";
 import { CommonItemStats } from "../interface/ItemStat.interface";
+
+export const dataNamedEODCalculator: CommonEquipmentCalculator[] = [
+  {
+    key: "1",
+    equipment: EQUIPMENT.MAIN_WEAPON,
+    min: 0,
+    max: 10,
+    from: 0,
+    to: 5,
+  },
+  {
+    key: "2",
+    equipment: EQUIPMENT.SECOND_WEAPON,
+    min: 0,
+    max: 10,
+    from: 0,
+    to: 5,
+  },
+];
 
 export const NamedEODMaterialTable: NamedEODMaterial[] =
   [

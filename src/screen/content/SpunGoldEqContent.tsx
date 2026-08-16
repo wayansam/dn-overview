@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import EquipmentTable, {
   BasicOpt,
   getListOpt,
+  makeEquipmentSelectColumn,
 } from "../../components/EquipmentTable";
 import ListingCard from "../../components/ListingCard";
 import TradingHouseCalc from "../../components/TradingHouseCalc";
@@ -263,9 +264,13 @@ const SpunGoldEqContent = () => {
             setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
             setDataSource={setDataSource}
-            craftData={{
-              list: SpunOption,
-            }}
+            extraColumns={[
+              makeEquipmentSelectColumn<CommonEquipmentCalculator<{ craft: number }>>(
+                "craft",
+                "Craft",
+                SpunOption
+              ),
+            ]}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>

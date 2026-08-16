@@ -4,16 +4,13 @@ import {
   Collapse,
   CollapseProps,
   Divider,
-  Form,
-  FormInstance,
   Select,
-  Switch,
   Table,
   Tooltip,
 } from "antd";
-import { ColumnGroupType, ColumnType } from "antd/es/table";
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
+import EquipmentTable from "../../components/EquipmentTable";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -49,190 +46,6 @@ const opt = (start: number, end: number) =>
     value: item,
   }));
 
-enum TAB {
-  EQ = "Equipment",
-  CR = "Craft",
-  FR = "From",
-  TO = "To",
-  EVO2 = "Evo Tier 2",
-}
-
-const EditableContext = React.createContext<FormInstance<any> | null>(null);
-
-interface EditableRowProps {
-  index: number;
-}
-
-const EditableRow: React.FC<EditableRowProps> = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-
-interface EditableCellProps {
-  title: React.ReactNode;
-  editable: boolean;
-  children: React.ReactNode;
-  dataIndex: keyof KilosCalculator;
-  record: KilosCalculator;
-  handleSave: (record: KilosCalculator) => void;
-}
-
-const EditableCell: React.FC<EditableCellProps> = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const [selectItem, setSelectItem] = useState<number>(0);
-  const [evoItem, setEvoItem] = useState<boolean>(false);
-  const [craftItem, setCraftItem] = useState<boolean>(false);
-  const form = useContext(EditableContext)!;
-
-  useEffect(() => {
-    if (record?.from && title === TAB.FR) {
-      setSelectItem(record.from);
-    }
-    if (record?.to && title === TAB.TO) {
-      setSelectItem(record.to);
-    }
-    if (title === TAB.EVO2) {
-      setEvoItem(record?.evoTier2);
-    }
-    if (title === TAB.CR) {
-      setCraftItem(record?.craft);
-    }
-  }, [record, title]);
-
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({ [dataIndex]: record[dataIndex] });
-  };
-
-  const handleChange = (value: number) => {
-    setSelectItem(value);
-  };
-
-  const saveSelect = () => {
-    toggleEdit();
-    if (title === TAB.FR) {
-      handleSave({ ...record, from: selectItem });
-    }
-    if (title === TAB.TO) {
-      handleSave({ ...record, to: selectItem });
-    }
-  };
-
-  let childNode = children;
-
-  const findFr = record?.from ?? 0;
-  const findTo = record?.to ?? 0;
-
-  const renderCustom = (cust: any) => {
-    if (Array.isArray(cust) && cust.length > 0) {
-      if (typeof cust[1] === "number") {
-        return getLabel(cust[1]);
-      }
-    }
-    return cust;
-  };
-
-  if (editable) {
-    switch (title) {
-      case TAB.EVO2:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setEvoItem(e);
-                handleSave({ ...record, evoTier2: e });
-              }}
-              checked={evoItem}
-            />
-          </div>
-        );
-        break;
-      case TAB.CR:
-        childNode = (
-          <div>
-            <Switch
-              onChange={(e) => {
-                setCraftItem(e);
-                handleSave({ ...record, craft: e });
-              }}
-              checked={craftItem}
-            />
-          </div>
-        );
-        break;
-
-      default:
-        childNode = editing ? (
-          <>
-            {title === TAB.FR && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findTo <= findFr ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-            {title === TAB.TO && (
-              <Select
-                defaultValue={selectItem}
-                style={{ width: 120 }}
-                onChange={handleChange}
-                options={opt(record.min, record.max)}
-                onBlur={saveSelect}
-                autoFocus
-                status={findFr >= findTo ? "error" : undefined}
-                size="small"
-              ></Select>
-            )}
-          </>
-        ) : (
-          <div
-            className="editable-cell-value-wrap"
-            style={{
-              paddingRight: 24,
-              color:
-                (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-                  ? "red"
-                  : "unset",
-              minWidth: title === TAB.FR || title === TAB.TO ? 120 : undefined,
-              paddingTop: 1,
-              paddingBottom: 1,
-            }}
-            onClick={toggleEdit}
-          >
-            {renderCustom(children)}
-          </div>
-        );
-        break;
-    }
-  }
-
-  return <td {...restProps}>{childNode}</td>;
-};
-
-type ColumnTypes = (
-  | ColumnGroupType<KilosCalculator>
-  | ColumnType<KilosCalculator>
-)[];
-
 const KilosEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
@@ -243,86 +56,10 @@ const KilosEqContent = () => {
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedEvo, setCheckedEvo] = useState(false);
 
-  const onSelectChange = (
-    newSelectedRowKeys: React.Key[],
-    selectedRows: KilosCalculator[]
-  ) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell,
-    },
-  };
-
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
-    dataIndex: string;
-  })[] = [
-    {
-      title: TAB.EQ,
-      dataIndex: "equipment",
-    },
-    {
-      title: TAB.CR,
-      dataIndex: "craft",
-      editable: true,
-    },
-    {
-      title: TAB.FR,
-      dataIndex: "from",
-      editable: true,
-    },
-    {
-      title: TAB.TO,
-      dataIndex: "to",
-      editable: true,
-    },
-    {
-      title: TAB.EVO2,
-      dataIndex: "evoTier2",
-      editable: true,
-    },
-  ];
-
   const encTable = [
     ...KilosT1ArmorEnhanceMaterialTable,
     ...KilosT2ArmorEnhanceMaterialTable,
   ];
-
-  const handleSave = (row: KilosCalculator) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row,
-    });
-    setDataSource(newData);
-  };
-
-  const columns = columnsCalculator.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record: KilosCalculator) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave,
-      }),
-    };
-  });
 
   const invalidDtSrc = useMemo(() => {
     let flag = false;
@@ -448,17 +185,16 @@ const KilosEqContent = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Table
-            rowSelection={{
-              type: "checkbox",
-              ...rowSelection,
-            }}
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
+          <EquipmentTable
+            selectedRowKeys={selectedRowKeys}
+            setSelectedRowKeys={setSelectedRowKeys}
             dataSource={dataSource}
-            columns={columns as ColumnTypes}
-            pagination={false}
+            setDataSource={setDataSource}
+            customLabeling={getLabel}
+            extraColumns={[
+              { type: "switch", dataIndex: "craft", label: "Craft" },
+              { type: "switch", dataIndex: "evoTier2", label: "Evo Tier 2" },
+            ]}
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>

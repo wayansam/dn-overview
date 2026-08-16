@@ -1,53 +1,28 @@
-import {
-  Card,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Select,
-  Slider,
-  Space,
-  Tooltip,
-  Typography,
-} from "antd";
-import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
-import { SliderMarks } from "antd/es/slider";
-import Table, { ColumnsType } from "antd/es/table";
-import Title from "antd/es/typography/Title";
+import { Alert, Checkbox, Divider, Tooltip } from "antd";
+import Collapse, { CollapseProps } from "antd/es/collapse";
+import Table from "antd/es/table";
 import { useMemo, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
+import EquipmentTable from "../../components/EquipmentTable";
+import ListingCard from "../../components/ListingCard";
+import { EmptyCommonnStat } from "../../constants/Common.constants";
+import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  dataNamedEODCalculator,
   NamedEODMainStatTable,
   NamedEODMaterialTable,
   NamedEODSecondStatTable,
 } from "../../data/NamedEODData";
+import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { NamedEODMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
-import { columnsResource } from "../../utils/common.util";
-
-const { Text } = Typography;
-
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
-
-const marks: SliderMarks = {
-  0: "+0",
-  1: "+1",
-  2: "+2",
-  3: "+3",
-  4: "+4",
-  5: "+5",
-  6: "+6",
-  7: "+7",
-  8: "+8",
-  9: "+9",
-  10: "+10",
-};
+import {
+  columnsResource,
+  combineEqStats,
+  getColumnsStats,
+  getComparedData,
+  getStatDif,
+} from "../../utils/common.util";
 
 interface NamedEODTableMaterialList {
   "Guide Star": number;
@@ -56,177 +31,175 @@ interface NamedEODTableMaterialList {
 }
 
 const NamedEODEqContent = () => {
-  const [namedEODData, setNamedEODData] = useState([0, 5]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [dataSource, setDataSource] = useState<CommonEquipmentCalculator[]>(
+    dataNamedEODCalculator
+  );
   const [checkedCraft, setCheckedCraft] = useState(false);
-  const [selectedStat, setSelectedStat] = useState(0);
 
   const columnsMats = makeCraftMaterialColumns<NamedEODMaterial>([
     { dataIndex: "guideStar", label: "Guide Star", shortLabel: "(gs)" },
-    { dataIndex: "twilightEssence", label: "Twilight Essence", shortLabel: "(ess)" },
+    {
+      dataIndex: "twilightEssence",
+      label: "Twilight Essence",
+      shortLabel: "(ess)",
+    },
     { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
   ]);
-  const columnsStats: ColumnsType<CommonItemStats> = [
-    {
-      title: "Enhancement",
-      dataIndex: "encLevel",
-    },
-    {
-      title: (
-        <div>
-          <p>Attack</p>
-          <p>Attack Percentage</p>
-          <p>Critical</p>
-          <p>Critical Damage</p>
-        </div>
-      ),
-      responsive: ["xs"],
-      render: (
-        _,
-        { phyMagAtkMin, phyMagAtkMax, phyMagAtkPercent, crt, cdm }
-      ) => (
-        <div>
-          <p>
-            ATK {phyMagAtkMin}-{phyMagAtkMax}
-          </p>
-          <p>ATK {phyMagAtkPercent}%</p>
-          <p>CRT {crt}</p>
-          <p>CDM {cdm}</p>
-        </div>
-      ),
-    },
-    {
-      title: "Attack",
-      responsive: ["sm"],
-      render: (_, { phyMagAtkMin, phyMagAtkMax }) => (
-        <div>
-          <Text>
-            ATK {phyMagAtkMin}-{phyMagAtkMax}
-          </Text>
-        </div>
-      ),
-    },
-    {
-      title: "Attack Percentage",
-      responsive: ["sm"],
-      render: (_, { phyMagAtkPercent }) => (
-        <div>
-          <Text>ATK {phyMagAtkPercent}%</Text>
-        </div>
-      ),
-    },
-    {
-      title: "Critical",
-      dataIndex: "crt",
-      responsive: ["sm"],
-    },
-    {
-      title: "Critical Damage",
-      dataIndex: "cdm",
-      responsive: ["sm"],
-    },
-  ];
 
-  const ancDataSource: NamedEODTableMaterialList = useMemo(() => {
-    const tempSlice = NamedEODMaterialTable.slice(
-      namedEODData[0],
-      namedEODData[1]
-    );
-    let tempGS = 0;
-    let tempEss = 0;
-    let tempGold = 0;
-
-    tempSlice.forEach((slicedItem) => {
-      tempGS += slicedItem.guideStar;
-      tempEss += slicedItem.twilightEssence;
-      tempGold += slicedItem.gold;
+  const invalidDtSrc = useMemo(() => {
+    let flag = false;
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (!flag && found && found.to <= found.from) {
+        flag = true;
+      }
     });
-    if (checkedCraft) {
-      tempGS += 10;
-      tempEss += 80;
-      tempGold += 25;
-    }
+    return flag;
+  }, [selectedRowKeys, dataSource]);
+
+  const tableResource: NamedEODTableMaterialList = useMemo(() => {
     const temp: NamedEODTableMaterialList = {
-      "Guide Star": tempGS,
-      "Twilight Essence": tempEss,
-      Gold: tempGold,
+      "Guide Star": 0,
+      "Twilight Essence": 0,
+      Gold: 0,
     };
+    if (invalidDtSrc) {
+      return temp;
+    }
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (found) {
+        const tempSlice = NamedEODMaterialTable.slice(found.from, found.to);
+        tempSlice.forEach((slicedItem) => {
+          temp["Guide Star"] += slicedItem.guideStar;
+          temp["Twilight Essence"] += slicedItem.twilightEssence;
+          temp["Gold"] += slicedItem.gold;
+        });
+        if (checkedCraft) {
+          temp["Guide Star"] += 10;
+          temp["Twilight Essence"] += 80;
+          temp["Gold"] += 25;
+        }
+      }
+    });
     return temp;
-  }, [namedEODData, checkedCraft]);
+  }, [selectedRowKeys, dataSource, invalidDtSrc, checkedCraft]);
 
-  const getStatDiff = (
-    arr: CommonItemStats[],
-    min: number,
-    max: number
-  ): CommonItemStats => {
-    const dt1 = arr.length > min ? arr[min] : undefined;
-    const dt2 = arr.length > max ? arr[max] : undefined;
-    if (!dt1 || !dt2) {
-      return {
-        encLevel: "0",
-        phyMagAtkMin: 0,
-        phyMagAtkMax: 0,
-        phyMagAtkPercent: 0,
-        crt: 0,
-        cdm: 0,
-      };
+  const statDif: CommonItemStats = useMemo(() => {
+    let temp: CommonItemStats = { ...EmptyCommonnStat };
+    if (invalidDtSrc) {
+      return temp;
     }
-    return {
-      encLevel: "0",
-      phyMagAtkMin: (dt2.phyMagAtkMin ?? 0) - (dt1.phyMagAtkMin ?? 0),
-      phyMagAtkMax: (dt2.phyMagAtkMax ?? 0) - (dt1.phyMagAtkMax ?? 0),
-      phyMagAtkPercent:
-        (dt2.phyMagAtkPercent ?? 0) - (dt1.phyMagAtkPercent ?? 0),
-      crt: (dt2.crt ?? 0) - (dt1.crt ?? 0),
-      cdm: (dt2.cdm ?? 0) - (dt1.cdm ?? 0),
-    };
-  };
+    selectedRowKeys.forEach((item) => {
+      const found = dataSource.find((dt) => dt.key === item);
+      if (found) {
+        const { equipment, from, to } = found;
+        const tableHolder =
+          equipment === EQUIPMENT.MAIN_WEAPON
+            ? NamedEODMainStatTable
+            : NamedEODSecondStatTable;
+        const { dt1, dt2 } = getComparedData(tableHolder, from + 1, to + 1);
+        if (dt2) {
+          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+          temp = combineEqStats(temp, dt, "add");
+        }
+      }
+    });
+    return temp;
+  }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
-  const statRange: CommonItemStats | undefined = useMemo(() => {
-    if (selectedStat === 1) {
-      return getStatDiff(
-        NamedEODMainStatTable,
-        namedEODData[0],
-        namedEODData[1]
-      );
-    } else if (selectedStat === 2) {
-      return getStatDiff(
-        NamedEODSecondStatTable,
-        namedEODData[0],
-        namedEODData[1]
-      );
-    }
-    return;
-  }, [selectedStat, namedEODData]);
-
-  const onChangeCraft = (e: CheckboxChangeEvent) => {
-    setCheckedCraft(e.target.checked);
-  };
-
-  const getCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setNamedEODData(value);
-    };
-
+  const getStatContent = () => {
+    const columnsStats = getColumnsStats({
+      phyMagAtkMinFlag: true,
+      phyMagAtkMaxFlag: true,
+      phyMagAtkPercentFlag: true,
+      crtFlag: true,
+      cdmFlag: true,
+    });
+    const itemStat: CollapseProps["items"] = [
+      {
+        key: "1",
+        label: "Main Weapon",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={NamedEODMainStatTable}
+            columns={columnsStats}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+      {
+        key: "2",
+        label: "Second Weapon",
+        children: (
+          <Table
+            style={{ marginRight: 10, marginBottom: 10 }}
+            size={"small"}
+            dataSource={NamedEODSecondStatTable}
+            columns={columnsStats}
+            pagination={false}
+            bordered
+          />
+        ),
+      },
+    ];
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={marks}
-            defaultValue={[0, 5]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
+        <Collapse items={itemStat} size="small" />
+      </div>
+    );
+  };
+
+  const getMatsContent = () => {
+    return (
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <div style={{ width: 250, marginRight: 10 }}>
+          <Table
+            size={"small"}
+            dataSource={NamedEODMaterialTable}
+            columns={columnsMats}
+            pagination={false}
+            bordered
           />
         </div>
-        <div>
+      </div>
+    );
+  };
+
+  const getCalculator = () => {
+    return (
+      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <EquipmentTable
+            selectedRowKeys={selectedRowKeys}
+            setSelectedRowKeys={setSelectedRowKeys}
+            dataSource={dataSource}
+            setDataSource={setDataSource}
+          />
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          {invalidDtSrc && (
+            <div>
+              <Alert
+                banner
+                message="From cannot exceed the To option"
+                type="error"
+              />
+            </div>
+          )}
           <Divider orientation="left">Settings</Divider>
           <div style={{ marginBottom: 4 }}>
             <Divider type="vertical" />
-            <Checkbox checked={checkedCraft} onChange={onChangeCraft}>
+            <Checkbox
+              checked={checkedCraft}
+              onChange={(e) => setCheckedCraft(e.target.checked)}
+            >
               <Tooltip
-                title="10 guide star, 80 Twilight Essence, 25 gold"
+                title="10 guide star, 80 Twilight Essence, 25 gold per weapon"
                 trigger="hover"
                 color="blue"
                 placement="right"
@@ -235,11 +208,10 @@ const NamedEODEqContent = () => {
               </Tooltip>
             </Checkbox>
           </div>
-
           <Divider orientation="left">Material List</Divider>
           <Table
             size={"small"}
-            dataSource={Object.entries(ancDataSource).map(([key, value]) => ({
+            dataSource={Object.entries(tableResource).map(([key, value]) => ({
               mats: key,
               amount: value,
             }))}
@@ -247,36 +219,9 @@ const NamedEODEqContent = () => {
             pagination={false}
             bordered
           />
-
-          <Divider orientation="left">Stat Increase</Divider>
-          <Select
-            defaultValue={selectedStat}
-            style={{ width: 120 }}
-            onChange={(val) => {
-              setSelectedStat(val);
-            }}
-            options={[
-              { value: 0, label: "Select" },
-              { value: 1, label: "Main" },
-              { value: 2, label: "Second" },
-            ]}
-          />
-          <div style={{ marginBottom: 4 }}>
-            {statRange && (
-              <div>
-                <Card size="small" style={{ marginTop: 4 }}>
-                  <Space direction="vertical">
-                    <Text>
-                      +ATK {statRange.phyMagAtkMin}-{statRange.phyMagAtkMax}
-                    </Text>
-                    <Text>+ATK {statRange.phyMagAtkPercent}%</Text>
-                    <Text>+CRT {statRange.crt}</Text>
-                    <Text>+CDM {statRange.cdm}</Text>
-                  </Space>
-                </Card>
-              </div>
-            )}
-          </div>
+        </div>
+        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
         </div>
       </div>
     );
@@ -285,55 +230,18 @@ const NamedEODEqContent = () => {
   const items: CollapseProps["items"] = [
     {
       key: "1",
-      label: "Named End of Dream Craft Table",
-      children: (
-        <div style={{ display: "flex", flexDirection: "row" }}>
-          <div style={{ width: 250, marginRight: 10 }}>
-            <Table
-              size={"small"}
-              dataSource={NamedEODMaterialTable}
-              columns={columnsMats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
+      label: "Stats - Named EOD",
+      children: getStatContent(),
     },
     {
       key: "2",
-      label: "Named End of Dream Stat Table",
-      children: (
-        <div
-          style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-        >
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Main Weapon"}</Title>
-            <Table
-              size={"small"}
-              dataSource={NamedEODMainStatTable}
-              columns={columnsStats}
-              pagination={false}
-              bordered
-            />
-          </div>
-          <div style={{ width: 500, marginRight: 30 }}>
-            <Title level={5}>{"Second Weapon"}</Title>
-            <Table
-              size={"small"}
-              dataSource={NamedEODSecondStatTable}
-              columns={columnsStats}
-              pagination={false}
-              bordered
-            />
-          </div>
-        </div>
-      ),
+      label: "Mats - Named EOD",
+      children: getMatsContent(),
     },
     {
       key: "3",
-      label: "Named End of Dream Calculator",
-      children: getCalc(),
+      label: "Calculate - Named EOD",
+      children: getCalculator(),
     },
   ];
   return (

@@ -1,15 +1,8 @@
-import { Form, FormInstance, Select } from "antd";
+import { Form, FormInstance, Select, Switch } from "antd";
 import Table, { ColumnGroupType, ColumnType } from "antd/es/table";
 import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import { EQUIPMENT } from "../constants/InGame.constants";
-
-enum TAB {
-  EQ = "Equipment",
-  CR = "Craft",
-  FR = "From",
-  TO = "To",
-}
 
 const EditableContext = React.createContext<FormInstance<any> | null>(null);
 
@@ -34,7 +27,6 @@ export interface EquipmentTableCalculator {
   max: number;
   from: number;
   to: number;
-  craft?: number;
   equipment: EQUIPMENT;
 }
 
@@ -43,15 +35,44 @@ export interface BasicOpt {
   key: EQUIPMENT[];
 }
 
+export interface SelectColumnConfig<T> {
+  type: "select";
+  dataIndex: keyof T;
+  label: string;
+  getOptions: (record: T) => Array<{ label: string; value: number }>;
+}
+
+export interface SwitchColumnConfig<T> {
+  type: "switch";
+  dataIndex: keyof T;
+  label: string;
+}
+
+export type ExtraColumnConfig<T> = SelectColumnConfig<T> | SwitchColumnConfig<T>;
+
+// Builds a select-column config from a per-equipment option list, e.g. craft tiers.
+export const makeEquipmentSelectColumn = <T extends EquipmentTableCalculator>(
+  dataIndex: keyof T,
+  label: string,
+  list: BasicOpt[]
+): SelectColumnConfig<T> => ({
+  type: "select",
+  dataIndex,
+  label,
+  getOptions: (record) =>
+    list.find((it) => it.key.includes(record.equipment))?.option ?? [],
+});
+
 interface EquipmentTableProps<T extends EquipmentTableCalculator> {
   selectedRowKeys: React.Key[];
   setSelectedRowKeys: React.Dispatch<React.SetStateAction<React.Key[]>>;
   dataSource: T[];
   setDataSource: React.Dispatch<React.SetStateAction<T[]>>;
   customLabeling?: (item: number) => string;
-  craftData?: {
-    list: BasicOpt[];
-  };
+  // Opt-in columns beyond Equipment/From/To — e.g. a craft tier select or a boolean toggle.
+  // Items only appear on tables whose data actually provides the field, so older
+  // equipment calculators are unaffected unless they opt in.
+  extraColumns?: ExtraColumnConfig<T>[];
 }
 
 const getLabel = (item: number) => {
@@ -68,50 +89,55 @@ export const getListOpt = (
     value: item,
   }));
 
+type RangeKind = "from" | "to";
+
 const EquipmentTable = <T extends EquipmentTableCalculator>({
   selectedRowKeys,
   setSelectedRowKeys,
   dataSource,
   setDataSource,
   customLabeling,
-  craftData,
+  extraColumns = [],
 }: EquipmentTableProps<T>) => {
-  interface EditableCellProps<T> {
+  interface EditableCellProps {
     title: React.ReactNode;
     editable: boolean;
     children: React.ReactNode;
     dataIndex: keyof T;
     record: T;
     handleSave: (record: T) => void;
+    rangeKind?: RangeKind;
+    selectConfig?: SelectColumnConfig<T>;
+    isSwitch?: boolean;
   }
 
-  const EditableCell: React.FC<EditableCellProps<T>> = ({
+  const EditableCell: React.FC<EditableCellProps> = ({
     title,
     editable,
     children,
     dataIndex,
     record,
     handleSave,
+    rangeKind,
+    selectConfig,
+    isSwitch,
     ...restProps
   }) => {
     const [editing, setEditing] = useState(false);
     const [selectItem, setSelectItem] = useState<number>(0);
     const form = useContext(EditableContext)!;
-    const craftOpt = (craftData?.list ?? []).find((it) =>
-      it.key.includes(record?.equipment)
-    );
 
     useEffect(() => {
-      if (record?.from && title === TAB.FR) {
+      if (rangeKind === "from") {
         setSelectItem(record.from);
       }
-      if (record?.to && title === TAB.TO) {
+      if (rangeKind === "to") {
         setSelectItem(record.to);
       }
-      if (record?.craft && title === TAB.CR) {
-        setSelectItem(record.craft ?? 0);
+      if (selectConfig) {
+        setSelectItem(Number(record[selectConfig.dataIndex]) || 0);
       }
-    }, [record, title]);
+    }, [record, rangeKind, selectConfig]);
 
     const toggleEdit = () => {
       setEditing(!editing);
@@ -124,15 +150,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
 
     const saveSelect = () => {
       toggleEdit();
-      if (title === TAB.FR) {
-        handleSave({ ...record, from: selectItem });
-      }
-      if (title === TAB.TO) {
-        handleSave({ ...record, to: selectItem });
-      }
-      if (title === TAB.CR) {
-        handleSave({ ...record, craft: selectItem });
-      }
+      handleSave({ ...record, [dataIndex]: selectItem });
     };
 
     let childNode = children;
@@ -141,73 +159,62 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
     const findTo = record?.to ?? 0;
 
     const renderCustom = (cust: any) => {
-      if (Array.isArray(cust) && cust.length > 0) {
-        if (typeof cust[1] === "number") {
-          const found = (craftOpt?.option ?? []).find(
-            (it) => it.value === cust[1]
-          );
-          if (title === TAB.CR) {
-            return found ? found.label : "No Option";
-          } else {
-            return customLabeling ? customLabeling(cust[1]) : getLabel(cust[1]);
-          }
+      if (Array.isArray(cust) && cust.length > 0 && typeof cust[1] === "number") {
+        if (selectConfig) {
+          const found = selectConfig
+            .getOptions(record)
+            .find((it) => it.value === cust[1]);
+          return found ? found.label : "No Option";
+        }
+        if (rangeKind) {
+          return customLabeling ? customLabeling(cust[1]) : getLabel(cust[1]);
         }
       }
       return cust;
     };
 
-    if (editable) {
+    if (isSwitch) {
+      childNode = (
+        <Switch
+          checked={!!record[dataIndex]}
+          onChange={(checked) =>
+            handleSave({ ...record, [dataIndex]: checked } as T)
+          }
+        />
+      );
+    } else if (editable) {
       childNode = editing ? (
-        <>
-          {title === TAB.FR && (
-            <Select
-              defaultValue={selectItem}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={getListOpt(record.min, record.max, customLabeling)}
-              onBlur={saveSelect}
-              autoFocus
-              status={findTo <= findFr ? "error" : undefined}
-              size="small"
-            ></Select>
-          )}
-          {title === TAB.TO && (
-            <Select
-              defaultValue={selectItem}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={getListOpt(record.min, record.max, customLabeling)}
-              onBlur={saveSelect}
-              autoFocus
-              status={findFr >= findTo ? "error" : undefined}
-              size="small"
-            ></Select>
-          )}
-          {title === TAB.CR && (
-            <Select
-              defaultValue={selectItem}
-              style={{ width: 120 }}
-              onChange={handleChange}
-              options={craftOpt?.option}
-              onBlur={saveSelect}
-              autoFocus
-              size="small"
-            ></Select>
-          )}
-        </>
+        <Select
+          defaultValue={selectItem}
+          style={{ width: 120 }}
+          onChange={handleChange}
+          options={
+            rangeKind
+              ? getListOpt(record.min, record.max, customLabeling)
+              : selectConfig?.getOptions(record)
+          }
+          onBlur={saveSelect}
+          autoFocus
+          status={
+            rangeKind === "from"
+              ? findTo <= findFr
+                ? "error"
+                : undefined
+              : rangeKind === "to"
+                ? findFr >= findTo
+                  ? "error"
+                  : undefined
+                : undefined
+          }
+          size="small"
+        ></Select>
       ) : (
         <div
           className="editable-cell-value-wrap"
           style={{
             paddingRight: 24,
-            color:
-              (title === TAB.FR || title === TAB.TO) && findTo <= findFr
-                ? "red"
-                : "unset",
-            minWidth:
-              title === TAB.FR || title === TAB.TO || title === TAB.CR
-                ? 120
-                : undefined,
+            color: rangeKind && findTo <= findFr ? "red" : "unset",
+            minWidth: 120,
             paddingTop: 1,
             paddingBottom: 1,
           }}
@@ -242,32 +249,47 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
     },
   };
 
-  const columnsCalculator: (ColumnTypes[number] & {
-    editable?: boolean;
+  interface ColDef {
+    title: React.ReactNode;
     dataIndex: string;
-  })[] = [
+    editable?: boolean;
+    rangeKind?: RangeKind;
+    selectConfig?: SelectColumnConfig<T>;
+    isSwitch?: boolean;
+  }
+
+  const columnsCalculator: ColDef[] = [
     {
-      title: TAB.EQ,
+      title: "Equipment",
       dataIndex: "equipment",
     },
-    ...(craftData
-      ? [
-          {
-            title: TAB.CR,
-            dataIndex: "craft",
-            editable: true,
-          },
-        ]
-      : []),
+    ...extraColumns.map(
+      (col): ColDef =>
+        col.type === "select"
+          ? {
+              title: col.label,
+              dataIndex: col.dataIndex as string,
+              editable: true,
+              selectConfig: col,
+            }
+          : {
+              title: col.label,
+              dataIndex: col.dataIndex as string,
+              editable: true,
+              isSwitch: true,
+            }
+    ),
     {
-      title: TAB.FR,
+      title: "From",
       dataIndex: "from",
       editable: true,
+      rangeKind: "from",
     },
     {
-      title: TAB.TO,
+      title: "To",
       dataIndex: "to",
       editable: true,
+      rangeKind: "to",
     },
   ];
 
@@ -294,6 +316,9 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
         dataIndex: col.dataIndex,
         title: col.title,
         handleSave,
+        rangeKind: col.rangeKind,
+        selectConfig: col.selectConfig,
+        isSwitch: col.isSwitch,
       }),
     };
   });
