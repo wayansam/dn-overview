@@ -1,15 +1,11 @@
-import { Checkbox, Collapse, CollapseProps, Divider, Table, Tooltip } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
+import { Collapse, CollapseProps, Table } from "antd";
+import { useCallback, useEffect, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
-import EquipmentTable from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import MaterialListTable from "../../components/MaterialListTable";
-import RangeFromTo from "../../components/RangeFromTo";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useInvalidRange,
-  useSelectedRows,
 } from "../../hooks/useEquipmentCalculator";
 import { dataKilosCalculator } from "../../data/KilosCalculatorData";
 import {
@@ -55,39 +51,44 @@ const KilosEqContent = () => {
 
   const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
-  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+  const emptyKilosMats: TableMaterialList = {
+    "Helm Fragment": 0,
+    "Upper Fragment": 0,
+    "Lower Fragment": 0,
+    "Gloves Fragment": 0,
+    "Shoes Fragment": 0,
+    "Joys & Sorrow of Kilos": 0,
+    "High Grade Joys & Sorrow of Kilos": 0,
+    "Thread of Intellect": 0,
+    Gold: 0,
+    "Needle of Intellect": 0,
+  };
 
-  const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Helm Fragment": 0,
-      "Upper Fragment": 0,
-      "Lower Fragment": 0,
-      "Gloves Fragment": 0,
-      "Shoes Fragment": 0,
-      "Joys & Sorrow of Kilos": 0,
-      "High Grade Joys & Sorrow of Kilos": 0,
-      "Thread of Intellect": 0,
-      Gold: 0,
-      "Needle of Intellect": 0,
-    };
-    if (invalidDtSrc) {
-      return temp;
-    }
-
-    selectedRows.forEach(({ equipment, from, to, evoTier2, craft }) => {
-      let tempSlice: KilosArmorCraftMaterial[] = [];
+  const getKilosMatsTable = useCallback(
+    (equipment: EQUIPMENT): KilosArmorCraftMaterial[] => {
       switch (equipment) {
         case EQUIPMENT.HELM:
         case EQUIPMENT.UPPER:
         case EQUIPMENT.LOWER:
         case EQUIPMENT.GLOVE:
         case EQUIPMENT.SHOES:
-          tempSlice = encTable.slice(from, to);
-          break;
+          return encTable;
 
         default:
-          break;
+          return [];
       }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const reduceKilosRow = useCallback(
+    (
+      acc: TableMaterialList,
+      slice: KilosArmorCraftMaterial[],
+      row: KilosCalculator
+    ): TableMaterialList => {
+      const next = { ...acc };
 
       let tempFragment = 0;
       let tempJoySorrow = 0;
@@ -95,7 +96,7 @@ const KilosEqContent = () => {
       let tempThreadIntel = 0;
       let tempGold = 0;
 
-      tempSlice.forEach((slicedItem) => {
+      slice.forEach((slicedItem) => {
         tempFragment += slicedItem.eqTypeFragment;
         tempJoySorrow += slicedItem.joySorrow;
         tempHGJoySorrow += slicedItem.joySorrowHG;
@@ -103,50 +104,76 @@ const KilosEqContent = () => {
         tempGold += slicedItem.gold;
       });
 
-      if (craft) {
+      if (row.craft) {
         tempFragment += KilosT1ArmorCraftMaterial.eqTypeFragment;
         tempThreadIntel += KilosT1ArmorCraftMaterial.threadIntelect;
         tempGold += KilosT1ArmorCraftMaterial.gold;
       }
 
-      temp["Joys & Sorrow of Kilos"] += tempJoySorrow;
-      temp["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
-      temp["Thread of Intellect"] += tempThreadIntel;
-      temp["Gold"] += tempGold;
-      temp["Needle of Intellect"] += evoTier2 ? 1 : 0;
-      switch (equipment) {
+      next["Joys & Sorrow of Kilos"] += tempJoySorrow;
+      next["High Grade Joys & Sorrow of Kilos"] += tempHGJoySorrow;
+      next["Thread of Intellect"] += tempThreadIntel;
+      next.Gold += tempGold;
+      next["Needle of Intellect"] += row.evoTier2 ? 1 : 0;
+
+      switch (row.equipment) {
         case EQUIPMENT.HELM:
-          temp["Helm Fragment"] += tempFragment;
+          next["Helm Fragment"] += tempFragment;
           break;
         case EQUIPMENT.UPPER:
-          temp["Upper Fragment"] += tempFragment;
+          next["Upper Fragment"] += tempFragment;
           break;
         case EQUIPMENT.LOWER:
-          temp["Lower Fragment"] += tempFragment;
+          next["Lower Fragment"] += tempFragment;
           break;
         case EQUIPMENT.GLOVE:
-          temp["Gloves Fragment"] += tempFragment;
+          next["Gloves Fragment"] += tempFragment;
           break;
         case EQUIPMENT.SHOES:
-          temp["Shoes Fragment"] += tempFragment;
+          next["Shoes Fragment"] += tempFragment;
           break;
 
         default:
           break;
       }
-    });
-    if (checkedChange) {
-      temp["Joys & Sorrow of Kilos"] +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
-      temp["Thread of Intellect"] +=
-        temp["Needle of Intellect"] *
+
+      return next;
+    },
+    []
+  );
+
+  const finalizeKilosMats = useCallback(
+    (
+      acc: TableMaterialList,
+      ctx: { checkedChange: boolean }
+    ): TableMaterialList => {
+      if (!ctx.checkedChange) {
+        return acc;
+      }
+      const next = { ...acc };
+      next["Joys & Sorrow of Kilos"] +=
+        next["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.joySorrow;
+      next["Thread of Intellect"] +=
+        next["Needle of Intellect"] *
         NeedleOfIntelectCraftMaterial.threadIntelect;
-      temp.Gold +=
-        temp["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
-      temp["Needle of Intellect"] = 0;
-    }
-    return temp;
-  }, [selectedRows, invalidDtSrc, checkedChange]);
+      next.Gold +=
+        next["Needle of Intellect"] * NeedleOfIntelectCraftMaterial.gold;
+      next["Needle of Intellect"] = 0;
+      return next;
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getKilosMatsTable,
+    emptyKilosMats,
+    reduceKilosRow,
+    { checkedChange },
+    finalizeKilosMats
+  );
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
@@ -159,82 +186,50 @@ const KilosEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo, checkedCraft, checkedEvo]);
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-            customLabeling={getLabel}
-            extraColumns={[
-              { type: "switch", dataIndex: "craft", label: "Craft" },
-              { type: "switch", dataIndex: "evoTier2", label: "Evo Tier 2" },
-            ]}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidDtSrc}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <RangeFromTo
-            from={selectFrom}
-            to={selectTo}
-            onFromChange={setSelectFrom}
-            onToChange={setSelectTo}
-            max={encTable.length}
-            customLabeling={getLabel}
-          />
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedCraft}
-              onChange={(e) => {
-                setCheckedCraft(e.target.checked);
-              }}
-            >
-              Include Craft mats
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedEvo}
-              onChange={(e) => {
-                setCheckedEvo(e.target.checked);
-              }}
-            >
-              Include Evo mats
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedChange}
-              onChange={(e) => {
-                setCheckedChange(e.target.checked);
-              }}
-            >
-              <Tooltip
-                title="300 Joy&Sorrow, 2600 thread, 5k gold"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Change Needle to Craft mats
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <MaterialListTable data={tableResource} />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      customLabeling={getLabel}
+      extraColumns={[
+        { type: "switch", dataIndex: "craft", label: "Craft" },
+        { type: "switch", dataIndex: "evoTier2", label: "Evo Tier 2" },
+      ]}
+      invalid={invalidDtSrc}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: encTable.length,
+        customLabeling: getLabel,
+      }}
+      toggles={[
+        {
+          key: "craft",
+          label: "Include Craft mats",
+          checked: checkedCraft,
+          onChange: setCheckedCraft,
+        },
+        {
+          key: "evo",
+          label: "Include Evo mats",
+          checked: checkedEvo,
+          onChange: setCheckedEvo,
+        },
+        {
+          key: "change",
+          label: "Change Needle to Craft mats",
+          tooltip: "300 Joy&Sorrow, 2600 thread, 5k gold",
+          checked: checkedChange,
+          onChange: setCheckedChange,
+        },
+      ]}
+      mats={{ data: tableResource }}
+    />
+  );
 
   const threadIntelectGoldFields = [
     { dataIndex: "threadIntelect" as const, label: "Thread of Intellect", shortLabel: "(Thr)" },

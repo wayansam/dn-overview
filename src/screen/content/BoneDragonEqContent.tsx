@@ -1,23 +1,17 @@
-import { Divider, Typography } from "antd";
+import { Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
-import EquipmentTable from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import ListingCard, { ItemList } from "../../components/ListingCard";
-import MaterialListTable from "../../components/MaterialListTable";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
+import { ItemList } from "../../components/ListingCard";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
-import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
-import TradingHouseCalc from "../../components/TradingHouseCalc";
-import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useEquipmentStatDiff,
   useInvalidRange,
-  useSelectedRows,
   useSelectionFlag,
 } from "../../hooks/useEquipmentCalculator";
 import {
@@ -37,7 +31,6 @@ import { BoneDragonEqEnhanceMaterial } from "../../interface/Item.interface";
 import {
   getBreakTag,
   getDeductTag,
-  getStatDif,
   getSuccessRateTag,
 } from "../../utils/common.util";
 import { buildRateSummary } from "../../utils/rateSummary";
@@ -86,93 +79,100 @@ const BoneDragonEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
-  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+  const emptyBoneDragonMats: { res1: TableMaterialList; res2: ExtraData } = {
+    res1: { "Bone Fragment": 0, Garnet: 0, Essence: 0, Gold: 0 },
+    res2: { Jelly: 0 },
+  };
 
-  const tableResource: { res1: TableMaterialList; res2: ExtraData } =
-    useMemo(() => {
-      let temp: TableMaterialList = {
-        "Bone Fragment": 0,
-        Garnet: 0,
-        Essence: 0,
-        Gold: 0,
-      };
-      let temp2: ExtraData = {
-        Jelly: 0,
-      };
-      if (invalidDtSrc) {
-        return { res1: temp, res2: temp2 };
+  const getBoneDragonMatsTable = useCallback(
+    (equipment: EQUIPMENT): BoneDragonEqEnhanceMaterial[] => {
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          return BoneDragonEqEnhanceMaterialArmorTable;
+
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          return BoneDragonEqEnhanceMaterialWeapTable;
+
+        default:
+          return [];
       }
+    },
+    []
+  );
 
-      selectedRows.forEach(({ equipment, from, to }) => {
-        let tempSlice: BoneDragonEqEnhanceMaterial[] = [];
+  const reduceBoneDragonRow = useCallback(
+    (
+      acc: { res1: TableMaterialList; res2: ExtraData },
+      slice: BoneDragonEqEnhanceMaterial[],
+      row: BoneCalculator
+    ): { res1: TableMaterialList; res2: ExtraData } => {
+      const res1 = { ...acc.res1 };
+      const res2 = { ...acc.res2 };
 
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            tempSlice = BoneDragonEqEnhanceMaterialArmorTable.slice(from, to);
-            break;
+      let boneFragmentTemp = 0;
+      let garnetTemp = 0;
+      let essenceTemp = 0;
+      let goldTemp = 0;
+      let jellyTemp = 0;
+      let srTemp: number[] = [];
+      let brTemp: number[] = [];
+      let deTemp: Array<number | undefined> = [];
 
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            tempSlice = BoneDragonEqEnhanceMaterialWeapTable.slice(from, to);
-            break;
-
-          default:
-            break;
-        }
-
-        let boneFragmentTemp = 0;
-        let garnetTemp = 0;
-        let essenceTemp = 0;
-        let goldTemp = 0;
-        let jellyTemp = 0;
-        let srTemp: number[] = [];
-        let brTemp: number[] = [];
-        let deTemp: Array<number | undefined> = [];
-
-        tempSlice.forEach((slicedItem) => {
-          boneFragmentTemp += slicedItem.boneFragment;
-          garnetTemp += slicedItem.garnet;
-          essenceTemp += slicedItem.essence;
-          goldTemp += slicedItem.gold;
-          jellyTemp += slicedItem.jelly ?? 0;
-          srTemp.push(slicedItem.successRatePercent);
-          brTemp.push(slicedItem.breakNoJellyPercent);
-          deTemp.push(slicedItem.enhanceFailDeduction);
-        });
-
-        temp["Bone Fragment"] += boneFragmentTemp;
-        temp.Garnet += garnetTemp;
-        temp.Essence += essenceTemp;
-        temp.Gold += goldTemp;
-        temp2.Jelly += jellyTemp;
-
-        const exData = {
-          "Success Rate": srTemp,
-          "Break Rate": brTemp,
-          "Fail Deduction": deTemp,
-        };
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            temp2[equipment] = exData;
-            break;
-
-          default:
-            break;
-        }
+      slice.forEach((slicedItem) => {
+        boneFragmentTemp += slicedItem.boneFragment;
+        garnetTemp += slicedItem.garnet;
+        essenceTemp += slicedItem.essence;
+        goldTemp += slicedItem.gold;
+        jellyTemp += slicedItem.jelly ?? 0;
+        srTemp.push(slicedItem.successRatePercent);
+        brTemp.push(slicedItem.breakNoJellyPercent);
+        deTemp.push(slicedItem.enhanceFailDeduction);
       });
 
-      return { res1: temp, res2: temp2 };
-    }, [selectedRows, invalidDtSrc]);
+      res1["Bone Fragment"] += boneFragmentTemp;
+      res1.Garnet += garnetTemp;
+      res1.Essence += essenceTemp;
+      res1.Gold += goldTemp;
+      res2.Jelly += jellyTemp;
+
+      const exData = {
+        "Success Rate": srTemp,
+        "Break Rate": brTemp,
+        "Fail Deduction": deTemp,
+      };
+      switch (row.equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          res2[row.equipment] = exData;
+          break;
+
+        default:
+          break;
+      }
+
+      return { res1, res2 };
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getBoneDragonMatsTable,
+    emptyBoneDragonMats,
+    reduceBoneDragonRow
+  );
 
   const getBoneDragonStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqBoneDragon, equipment),
@@ -198,79 +198,49 @@ const BoneDragonEqContent = () => {
     ];
   }, [tableResource.res2]);
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidDtSrc}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <TypeFilterToggle
-            selectedRowKeys={selectedRowKeys}
-            onChange={setSelectedRowKeys}
-            options={[
-              { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
-              { label: "Weapon", keys: ["6", "7"] },
-            ]}
-          />
-          <RangeFromTo
-            from={selectFrom}
-            to={selectTo}
-            onFromChange={setSelectFrom}
-            onToChange={setSelectTo}
-            max={20}
-          />
-          <FlagAlert
-            show={warnDtSrc}
-            message="Above +3, the enhancement might fail."
-            type="info"
-          />
-          <FlagAlert
-            show={dangerDtSrc}
-            message="Above +5 even can break your item."
-            type="warning"
-          />
-          <MaterialListTable data={tableResource.res1} hideZero />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </CalcCard>
-        <CalcCard>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Bone Fragment",
-                amt: tableResource.res1["Bone Fragment"],
-              },
-              {
-                name: "Garnet",
-                amt: tableResource.res1.Garnet,
-              },
-              {
-                name: "Essence",
-                amt: tableResource.res1.Essence,
-              },
-            ]}
-            additionalTotal={tableResource.res1.Gold}
-          />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      invalid={invalidDtSrc}
+      typeFilter={[
+        { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+        { label: "Weapon", keys: ["6", "7"] },
+      ]}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: 20,
+      }}
+      flags={[
+        {
+          show: warnDtSrc,
+          message: "Above +3, the enhancement might fail.",
+          type: "info",
+        },
+        {
+          show: dangerDtSrc,
+          message: "Above +5 even can break your item.",
+          type: "warning",
+        },
+      ]}
+      mats={{ data: tableResource.res1, hideZero: true }}
+      rateSummary={{ items: extraInfo }}
+      stats={{ statDif }}
+      tradingHouse={{
+        data: [
+          { name: "Bone Fragment", amt: tableResource.res1["Bone Fragment"] },
+          { name: "Garnet", amt: tableResource.res1.Garnet },
+          { name: "Essence", amt: tableResource.res1.Essence },
+        ],
+        additionalTotal: tableResource.res1.Gold,
+      }}
+    />
+  );
 
   const getStatContent = () => {
     return (

@@ -19,7 +19,7 @@ const conicColors: ProgressProps["strokeColor"] = {
   "100%": "#87d068",
 };
 
-interface CalcData {
+export interface CalcData {
   name: string;
   amt?: number;
   useCustomAmt?: boolean;
