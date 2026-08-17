@@ -88,3 +88,47 @@ export function useEquipmentStatDiff<T extends EquipmentRow>(
     return temp;
   }, [selectedRows, invalid, getStatsTable]);
 }
+
+// Materials vary per equipment line (different fields, different per-row
+// extras like a craft toggle), so unlike useEquipmentStatDiff this doesn't
+// assume a result shape. It only shares what's actually identical across
+// every material calculator: resolve selected rows, look up each row's
+// per-level table, slice it by From/To, and fold the slice into an
+// accumulator. `reduceRow` gets the row itself (not just its slice) so
+// per-row extras — e.g. Kilos's craft/evoTier2 switches — can be applied
+// once per row instead of once per sliced level. `ctx` carries state that
+// isn't on the row or the table (e.g. a screen-level checkbox) through to
+// `reduceRow`/`finalize`; `finalize` runs once after the loop for
+// aggregate-level adjustments (e.g. converting a running total into
+// different materials).
+export function useEquipmentAccumulator<
+  T extends EquipmentRow,
+  TSlice,
+  TAcc,
+  Ctx = undefined
+>(
+  selectedRowKeys: React.Key[],
+  dataSource: T[],
+  invalid: boolean,
+  getTable: (equipment: EQUIPMENT) => TSlice[],
+  initial: TAcc,
+  reduceRow: (acc: TAcc, slice: TSlice[], row: T) => TAcc,
+  ctx?: Ctx,
+  finalize?: (acc: TAcc, ctx: Ctx) => TAcc
+): TAcc {
+  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+
+  return useMemo(() => {
+    if (invalid) {
+      return initial;
+    }
+
+    let acc = initial;
+    selectedRows.forEach((row) => {
+      const slice = getTable(row.equipment).slice(row.from, row.to);
+      acc = reduceRow(acc, slice, row);
+    });
+
+    return finalize ? finalize(acc, ctx as Ctx) : acc;
+  }, [selectedRows, invalid, getTable, initial, reduceRow, ctx, finalize]);
+}
