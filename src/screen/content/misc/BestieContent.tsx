@@ -65,7 +65,10 @@ const BestieContent = () => {
     {}
   );
 
-  const getStats = () => {
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every keystroke
+  // in the stateful "Grow" form below.
+  const statsContent = useMemo(() => {
     const colMount: ColumnsType<CommonItemStats> = [
       {
         title: "Enhancement",
@@ -281,6 +284,7 @@ const BestieContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               size={"small"}
+              rowKey="encLevel"
               dataSource={BestieMountV1TableStats}
               columns={colMount}
               pagination={false}
@@ -299,6 +303,7 @@ const BestieContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               size={"small"}
+              rowKey="encLevel"
               dataSource={BestieMountV2TableStats}
               columns={colMount}
               pagination={false}
@@ -320,6 +325,7 @@ const BestieContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               size={"small"}
+              rowKey="encLevel"
               dataSource={BestieSpiritV1TableStats}
               columns={colSpirit}
               pagination={false}
@@ -338,6 +344,7 @@ const BestieContent = () => {
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               size={"small"}
+              rowKey="encLevel"
               dataSource={BestieSpiritV2TableStats}
               columns={colSpirit}
               pagination={false}
@@ -356,13 +363,15 @@ const BestieContent = () => {
         <Collapse items={itemStatSpirit} size="small" />
       </div>
     );
-  };
-  const getMats = () => {
+  }, []);
+
+  const matsContent = useMemo(() => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <Table
           style={{ marginRight: 10, marginBottom: 10 }}
           size={"small"}
+          rowKey="encLevel"
           dataSource={BestieGrowthTableMats}
           columns={[
             {
@@ -390,7 +399,7 @@ const BestieContent = () => {
         />
       </div>
     );
-  };
+  }, []);
 
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
     if (!temp || !Array.isArray(temp) || temp.length < 1) {
@@ -751,6 +760,7 @@ const BestieContent = () => {
           )}
           <Table
             size={"small"}
+            rowKey="mats"
             dataSource={
               (enhanceDataSource.growthData
                 ? typedEntries(enhanceDataSource.growthData).map(
@@ -829,12 +839,12 @@ const BestieContent = () => {
     {
       key: "1",
       label: "Stats",
-      children: getStats(),
+      children: statsContent,
     },
     {
       key: "2",
       label: "Resource",
-      children: getMats(),
+      children: matsContent,
     },
     {
       key: "3",

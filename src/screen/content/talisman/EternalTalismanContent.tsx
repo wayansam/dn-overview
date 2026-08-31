@@ -47,7 +47,10 @@ const ExternalTalismanContent = () => {
     );
   };
 
-  const getStatContent = () => {
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every click in
+  // the two stateful calculator panels below.
+  const statContent = useMemo(() => {
     const columnsWorldStats: ColumnsType<EternalWorldTalismanStat> = [
       {
         title: "Enhancement",
@@ -228,6 +231,7 @@ const ExternalTalismanContent = () => {
           <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={EternalWorldTalismanStatTable}
               columns={columnsWorldStats}
               pagination={false}
@@ -243,6 +247,7 @@ const ExternalTalismanContent = () => {
           <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={EternalPainTalismanStatTable}
               columns={columnsPainStats}
               pagination={false}
@@ -258,6 +263,7 @@ const ExternalTalismanContent = () => {
           <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey={() => "chaos"}
               dataSource={[EternalChaosTalismanStatTable]}
               columns={columnsChaosStats}
               pagination={false}
@@ -274,9 +280,9 @@ const ExternalTalismanContent = () => {
         <Collapse items={itemStat} size="small" />
       </div>
     );
-  };
+  }, []);
 
-  const getMatsContent = () => {
+  const matsContent = useMemo(() => {
     const columnsWorldMats: ColumnsType<EternalWorldTalismanMats> = [
       {
         title: "Enhancement",
@@ -360,6 +366,7 @@ const ExternalTalismanContent = () => {
           <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={EternalWorldTalismanMatsTable}
               columns={columnsWorldMats}
               pagination={false}
@@ -375,6 +382,7 @@ const ExternalTalismanContent = () => {
           <div style={{ marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={EternalPainTalismanMatsTable}
               columns={columnsPainMats}
               pagination={false}
@@ -399,7 +407,7 @@ const ExternalTalismanContent = () => {
         <Collapse items={itemStat} size="small" />
       </div>
     );
-  };
+  }, []);
 
   const worldDataSource: WorldTableMaterialList = useMemo(() => {
     const tempSlice = EternalWorldTalismanMatsTable.slice(
@@ -557,12 +565,12 @@ const ExternalTalismanContent = () => {
     {
       key: "1",
       label: "Stats",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",

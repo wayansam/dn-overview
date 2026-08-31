@@ -1,5 +1,5 @@
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { CraftMaterialField } from "../../../components/CraftMaterialColumns";
 import EquipmentCalculatorPanel from "../../../components/EquipmentCalculatorPanel";
 import { BasicOpt, makeEquipmentSelectColumn } from "../../../components/EquipmentTable";
@@ -61,6 +61,13 @@ const SpunOption: BasicOpt[] = [
       { label: "Tier 2", value: 2 },
     ],
   },
+];
+
+const matsFields: CraftMaterialField<SpunGoldEqEnhanceMaterial>[] = [
+  { dataIndex: "shatteredCrystal", label: "Shattered Crystal", shortLabel: "(crys)" },
+  { dataIndex: "foundationStone", label: "Foundation Stone", shortLabel: "(stone)" },
+  { dataIndex: "dimVestige", label: "Dim. Vestige", shortLabel: "(d.ves)" },
+  { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
 ];
 
 const SpunGoldEqContent = () => {
@@ -262,7 +269,11 @@ const SpunGoldEqContent = () => {
     />
   );
 
-  const getStatContent = () => (
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every click in
+  // the stateful "Calculate" panel.
+  const statContent = useMemo(
+    () => (
     <StatReferenceTables
       entries={[
         {
@@ -376,16 +387,12 @@ const SpunGoldEqContent = () => {
         },
       ]}
     />
+    ),
+    []
   );
 
-  const matsFields: CraftMaterialField<SpunGoldEqEnhanceMaterial>[] = [
-    { dataIndex: "shatteredCrystal", label: "Shattered Crystal", shortLabel: "(crys)" },
-    { dataIndex: "foundationStone", label: "Foundation Stone", shortLabel: "(stone)" },
-    { dataIndex: "dimVestige", label: "Dim. Vestige", shortLabel: "(d.ves)" },
-    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
-  ];
-
-  const getMatsContent = () => (
+  const matsContent = useMemo(
+    () => (
     <MatsReferenceTables
       entries={[
         {
@@ -402,18 +409,20 @@ const SpunGoldEqContent = () => {
         },
       ]}
     />
+    ),
+    []
   );
 
   const items: CollapseProps["items"] = [
     {
       key: "1",
       label: "Stats",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",

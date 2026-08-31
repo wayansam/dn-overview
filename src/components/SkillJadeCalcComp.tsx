@@ -185,6 +185,7 @@ const SkillJadeCalcComp = ({
         )}
         <Table
           size={"small"}
+          rowKey="mats"
           dataSource={Object.entries(dataSource).map(([key, value]) => ({
             mats: getKeyName(key),
             amount: value,

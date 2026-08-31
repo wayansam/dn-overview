@@ -1,6 +1,6 @@
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table from "antd/es/table";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { makeCraftMaterialColumns } from "../../../components/CraftMaterialColumns";
 import EquipmentCalculatorPanel from "../../../components/EquipmentCalculatorPanel";
 import StatReferenceTables from "../../../components/StatReferenceTables";
@@ -33,16 +33,6 @@ const NamedEODEqContent = () => {
     dataNamedEODCalculator
   );
   const [checkedCraft, setCheckedCraft] = useState(false);
-
-  const columnsMats = makeCraftMaterialColumns<NamedEODMaterial>([
-    { dataIndex: "guideStar", label: "Guide Star", shortLabel: "(gs)" },
-    {
-      dataIndex: "twilightEssence",
-      label: "Twilight Essence",
-      shortLabel: "(ess)",
-    },
-    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
-  ]);
 
   const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
@@ -99,7 +89,10 @@ const NamedEODEqContent = () => {
     getNamedEODStatsTable
   );
 
-  const getStatContent = () => {
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every click in
+  // the stateful "Calculate" panel.
+  const statContent = useMemo(() => {
     const flags = {
       phyMagAtkMinFlag: true,
       phyMagAtkMaxFlag: true,
@@ -125,14 +118,24 @@ const NamedEODEqContent = () => {
         ]}
       />
     );
-  };
+  }, []);
 
-  const getMatsContent = () => {
+  const matsContent = useMemo(() => {
+    const columnsMats = makeCraftMaterialColumns<NamedEODMaterial>([
+      { dataIndex: "guideStar", label: "Guide Star", shortLabel: "(gs)" },
+      {
+        dataIndex: "twilightEssence",
+        label: "Twilight Essence",
+        shortLabel: "(ess)",
+      },
+      { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
+    ]);
     return (
       <div style={{ display: "flex", flexDirection: "row" }}>
         <div style={{ width: 250, marginRight: 10 }}>
           <Table
             size={"small"}
+            rowKey="encLevel"
             dataSource={NamedEODMaterialTable}
             columns={columnsMats}
             pagination={false}
@@ -141,7 +144,7 @@ const NamedEODEqContent = () => {
         </div>
       </div>
     );
-  };
+  }, []);
 
   const getCalculator = () => (
     <EquipmentCalculatorPanel
@@ -168,12 +171,12 @@ const NamedEODEqContent = () => {
     {
       key: "1",
       label: "Stats - Named EOD",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats - Named EOD",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",

@@ -76,234 +76,239 @@ const BlackDragonTalismanContent = () => {
       }, {});
   };
 
-  const get1stColumn = (): ColumnsType<BDTalismanStat> => {
-    return [
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every click in
+  // any of the four stateful calculator panels below. Column builders live
+  // inside the memo so colorText (used to color the rarity column) is the
+  // only outer dependency to track.
+  const statContent = useMemo(() => {
+    const get1stColumn = (): ColumnsType<BDTalismanStat> => {
+      return [
+        {
+          title: "Name",
+          dataIndex: "name",
+          responsive: ["sm"],
+        },
+        {
+          title: "Stage Rarity",
+          dataIndex: "rarity",
+          width: 150,
+          render: (_, { rarity }) => (
+            <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
+          ),
+        },
+      ];
+    };
+    const get2ndColumn = (): ColumnsType<BDTalismanStat> => {
+      return [
+        {
+          title: "MAX HP(%)",
+          responsive: ["sm"],
+          render: (_, { hpPercent }) => (
+            <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
+          ),
+        },
+        {
+          title: "ATK(%)",
+          responsive: ["sm"],
+          render: (_, { phyMagAtkPercent }) => (
+            <Text>{getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</Text>
+          ),
+        },
+        {
+          title: "Final Damage",
+          dataIndex: "fdOptions",
+          responsive: ["sm"],
+          render: (_, { fdOptions }) => (
+            <Text>{getTextEmpty({ txt: fdOptions?.join("/ ") })}</Text>
+          ),
+        },
+        {
+          title: "Craftable",
+          dataIndex: "craftable",
+          responsive: ["sm"],
+          render: (_, { craftable }) => (
+            <Text>{craftable ? "Craftable" : "Not craftable"}</Text>
+          ),
+        },
+      ];
+    };
+    const getCommonTitle = (item: React.ReactNode) => {
+      return (
+        <div>
+          {item}
+          <p>MAX HP(%)</p>
+          <p>ATK(%)</p>
+          <p>Final Damage</p>
+          <p>Craftable</p>
+        </div>
+      );
+    };
+    const getCommonContent = (item: React.ReactNode, data: BDTalismanStat) => {
+      const { hpPercent, phyMagAtkPercent, fdOptions, craftable } = data;
+      return (
+        <div>
+          {item}
+          <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
+          <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
+          <p>FD {getTextEmpty({ txt: fdOptions?.join("/ ") })}</p>
+          <p>{craftable ? "Craftable" : "Not craftable"}</p>
+        </div>
+      );
+    };
+
+    const columnsBaofaMats: ColumnsType<BDBaofaTalismanStat> = [
+      ...get1stColumn(),
       {
-        title: "Name",
-        dataIndex: "name",
-        responsive: ["sm"],
-      },
-      {
-        title: "Stage Rarity",
-        dataIndex: "rarity",
+        title: getCommonTitle(<p>MAX HP</p>),
+        responsive: ["xs"],
         width: 150,
-        render: (_, { rarity }) => (
-          <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
-        ),
+        render: (_, { hp, ...item }) =>
+          getCommonContent(<p>HP {hp?.toLocaleString()}</p>, item),
       },
+      {
+        title: "MAX HP",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { hp }) => <Text>{hp?.toLocaleString()}</Text>,
+      },
+      ...get2ndColumn(),
     ];
-  };
-  const get2ndColumn = (): ColumnsType<BDTalismanStat> => {
-    return [
+
+    const columnsUmbalaMats: ColumnsType<BDUmbalaTalismanStat> = [
+      ...get1stColumn(),
       {
-        title: "MAX HP(%)",
-        responsive: ["sm"],
-        render: (_, { hpPercent }) => (
-          <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-        ),
+        title: getCommonTitle(<p>Phy Def</p>),
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { def, ...item }) =>
+          getCommonContent(<p>Phy Def {def?.toLocaleString()}</p>, item),
       },
       {
-        title: "ATK(%)",
+        title: "Phy Def",
         responsive: ["sm"],
-        render: (_, { phyMagAtkPercent }) => (
-          <Text>{getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</Text>
-        ),
+        width: 175,
+        render: (_, { def }) => <Text>{def?.toLocaleString()}</Text>,
       },
-      {
-        title: "Final Damage",
-        dataIndex: "fdOptions",
-        responsive: ["sm"],
-        render: (_, { fdOptions }) => (
-          <Text>{getTextEmpty({ txt: fdOptions?.join("/ ") })}</Text>
-        ),
-      },
-      {
-        title: "Craftable",
-        dataIndex: "craftable",
-        responsive: ["sm"],
-        render: (_, { craftable }) => (
-          <Text>{craftable ? "Craftable" : "Not craftable"}</Text>
-        ),
-      },
+      ...get2ndColumn(),
     ];
-  };
-  const getCommonTitle = (item: React.ReactNode) => {
-    return (
-      <div>
-        {item}
-        <p>MAX HP(%)</p>
-        <p>ATK(%)</p>
-        <p>Final Damage</p>
-        <p>Craftable</p>
-      </div>
-    );
-  };
-  const getCommonContent = (item: React.ReactNode, data: BDTalismanStat) => {
-    const { hpPercent, phyMagAtkPercent, fdOptions, craftable } = data;
-    return (
-      <div>
-        {item}
-        <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-        <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
-        <p>FD {getTextEmpty({ txt: fdOptions?.join("/ ") })}</p>
-        <p>{craftable ? "Craftable" : "Not craftable"}</p>
-      </div>
-    );
-  };
 
-  const columnsBaofaMats: ColumnsType<BDBaofaTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(<p>MAX HP</p>),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { hp, ...item }) =>
-        getCommonContent(<p>HP {hp?.toLocaleString()}</p>, item),
-    },
-    {
-      title: "MAX HP",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { hp }) => <Text>{hp?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
+    const columnsMelukaMats: ColumnsType<BDMelukaTalismanStat> = [
+      ...get1stColumn(),
+      {
+        title: getCommonTitle(<p>Mag Def</p>),
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { magdef, ...item }) =>
+          getCommonContent(<p>Mag Def {magdef?.toLocaleString()}</p>, item),
+      },
+      {
+        title: "Mag Def",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { magdef }) => <Text>{magdef?.toLocaleString()}</Text>,
+      },
+      ...get2ndColumn(),
+    ];
 
-  const columnsUmbalaMats: ColumnsType<BDUmbalaTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(<p>Phy Def</p>),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { def, ...item }) =>
-        getCommonContent(<p>Phy Def {def?.toLocaleString()}</p>, item),
-    },
-    {
-      title: "Phy Def",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { def }) => <Text>{def?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
+    const columnsTitanionMats: ColumnsType<BDTitanionTalismanStat> = [
+      ...get1stColumn(),
+      {
+        title: getCommonTitle(<p>Attack</p>),
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { phyMagAtk, ...item }) =>
+          getCommonContent(<p>Attack {phyMagAtk?.toLocaleString()}</p>, item),
+      },
+      {
+        title: "Attack",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
+      },
+      ...get2ndColumn(),
+    ];
 
-  const columnsMelukaMats: ColumnsType<BDMelukaTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(<p>Mag Def</p>),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { magdef, ...item }) =>
-        getCommonContent(<p>Mag Def {magdef?.toLocaleString()}</p>, item),
-    },
-    {
-      title: "Mag Def",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { magdef }) => <Text>{magdef?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
-
-  const columnsTitanionMats: ColumnsType<BDTitanionTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(<p>Attack</p>),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { phyMagAtk, ...item }) =>
-        getCommonContent(<p>Attack {phyMagAtk?.toLocaleString()}</p>, item),
-    },
-    {
-      title: "Attack",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
-
-  const columnsKeenMats: ColumnsType<BDKeenTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(
-        <>
-          <p>Attack</p>
-          <p>CRT</p>
-          <p>CDM</p>
-        </>
-      ),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { phyMagAtk, crt, cdm, ...item }) =>
-        getCommonContent(
+    const columnsKeenMats: ColumnsType<BDKeenTalismanStat> = [
+      ...get1stColumn(),
+      {
+        title: getCommonTitle(
           <>
-            <p>Attack {phyMagAtk?.toLocaleString()}</p>
-            <p>CRT {crt?.toLocaleString()}</p>
-            <p>CDM {cdm?.toLocaleString()}</p>
-          </>,
-          item
+            <p>Attack</p>
+            <p>CRT</p>
+            <p>CDM</p>
+          </>
         ),
-    },
-    {
-      title: "Attack",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
-    },
-    {
-      title: "CRT",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { crt }) => <Text>{crt?.toLocaleString()}</Text>,
-    },
-    {
-      title: "CDM",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { cdm }) => <Text>{cdm?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { phyMagAtk, crt, cdm, ...item }) =>
+          getCommonContent(
+            <>
+              <p>Attack {phyMagAtk?.toLocaleString()}</p>
+              <p>CRT {crt?.toLocaleString()}</p>
+              <p>CDM {cdm?.toLocaleString()}</p>
+            </>,
+            item
+          ),
+      },
+      {
+        title: "Attack",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
+      },
+      {
+        title: "CRT",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { crt }) => <Text>{crt?.toLocaleString()}</Text>,
+      },
+      {
+        title: "CDM",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { cdm }) => <Text>{cdm?.toLocaleString()}</Text>,
+      },
+      ...get2ndColumn(),
+    ];
 
-  const columnsAncientElementMats: ColumnsType<BDAncientElementTalismanStat> = [
-    ...get1stColumn(),
-    {
-      title: getCommonTitle(
-        <>
-          <p>Element Att</p>
-          <p>Attack</p>
-        </>
-      ),
-      responsive: ["xs"],
-      width: 150,
-      render: (_, { attAtkPercent, phyMagAtk, ...item }) =>
-        getCommonContent(
+    const columnsAncientElementMats: ColumnsType<BDAncientElementTalismanStat> = [
+      ...get1stColumn(),
+      {
+        title: getCommonTitle(
           <>
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-            <p>Attack {phyMagAtk?.toLocaleString()}</p>
-          </>,
-          item
+            <p>Element Att</p>
+            <p>Attack</p>
+          </>
         ),
-    },
-    {
-      title: "Element Att",
-      responsive: ["sm"],
-      width: 150,
-      render: (_, { attAtkPercent }) => (
-        <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-      ),
-    },
-    {
-      title: "Attack",
-      responsive: ["sm"],
-      width: 175,
-      render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
-    },
-    ...get2ndColumn(),
-  ];
+        responsive: ["xs"],
+        width: 150,
+        render: (_, { attAtkPercent, phyMagAtk, ...item }) =>
+          getCommonContent(
+            <>
+              <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
+              <p>Attack {phyMagAtk?.toLocaleString()}</p>
+            </>,
+            item
+          ),
+      },
+      {
+        title: "Element Att",
+        responsive: ["sm"],
+        width: 150,
+        render: (_, { attAtkPercent }) => (
+          <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
+        ),
+      },
+      {
+        title: "Attack",
+        responsive: ["sm"],
+        width: 175,
+        render: (_, { phyMagAtk }) => <Text>{phyMagAtk?.toLocaleString()}</Text>,
+      },
+      ...get2ndColumn(),
+    ];
 
-  const getStatContent = () => {
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",
@@ -408,78 +413,81 @@ const BlackDragonTalismanContent = () => {
         <Collapse items={itemStat} size="small" />
       </div>
     );
-  };
+    // colorText: get1stColumn's rarity column re-colors when dark/light mode toggles.
+  }, [colorText]);
 
-  const getColumnsMats = (
-    type: string
-  ): ColumnsType<BlackDragonTalismanCraftMaterial> => {
-    return [
-      {
-        title: "Stage Rarity",
-        dataIndex: "rarity",
-        width: 80,
-        render: (_, { rarity }) => (
-          <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
-        ),
-      },
-      {
-        title: (
-          <div>
-            <p>Black Dragon Memories</p>
-            <p>{type} Fragment</p>
-            <p>Garnet</p>
-            <p>Essence</p>
-            <p>Gold</p>
-          </div>
-        ),
-        responsive: ["xs"],
-        render: (_, { bdMemories, fragment, garnet, essence, gold }) => (
-          <div>
-            <p>{bdMemories.toLocaleString()} (BD memo)</p>
-            <p>{fragment.toLocaleString()} (frag)</p>
-            <p>{garnet.toLocaleString()} (garnet)</p>
-            <p>{essence.toLocaleString()} (ess)</p>
-            <p>{gold.toLocaleString()} (g)</p>
-          </div>
-        ),
-      },
-      {
-        title: "Black Dragon Memories",
-        dataIndex: "bdMemories",
-        responsive: ["sm"],
-        render: (_, { bdMemories }) => (
-          <Text>{bdMemories.toLocaleString()}</Text>
-        ),
-      },
-      {
-        title: `${type} Fragment`,
-        dataIndex: "fragment",
-        responsive: ["sm"],
-        render: (_, { fragment }) => <Text>{fragment.toLocaleString()}</Text>,
-      },
-      {
-        title: "Garnet",
-        dataIndex: "garnet",
-        responsive: ["sm"],
-        render: (_, { garnet }) => <Text>{garnet.toLocaleString()}</Text>,
-      },
-      {
-        title: "Essence",
-        dataIndex: "essence",
-        responsive: ["sm"],
-        render: (_, { essence }) => <Text>{essence.toLocaleString()}</Text>,
-      },
-      {
-        title: "Gold",
-        dataIndex: "gold",
-        responsive: ["sm"],
-        render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
-        width: 90,
-      },
-    ];
-  };
+  // Pure reference data, same reasoning as statContent above. getColumnsMats
+  // lives inside so colorText (it colors the rarity column) is the only dep.
+  const matsContent = useMemo(() => {
+    const getColumnsMats = (
+      type: string
+    ): ColumnsType<BlackDragonTalismanCraftMaterial> => {
+      return [
+        {
+          title: "Stage Rarity",
+          dataIndex: "rarity",
+          width: 80,
+          render: (_, { rarity }) => (
+            <Text style={{ color: getColor(rarity, colorText) }}>{rarity}</Text>
+          ),
+        },
+        {
+          title: (
+            <div>
+              <p>Black Dragon Memories</p>
+              <p>{type} Fragment</p>
+              <p>Garnet</p>
+              <p>Essence</p>
+              <p>Gold</p>
+            </div>
+          ),
+          responsive: ["xs"],
+          render: (_, { bdMemories, fragment, garnet, essence, gold }) => (
+            <div>
+              <p>{bdMemories.toLocaleString()} (BD memo)</p>
+              <p>{fragment.toLocaleString()} (frag)</p>
+              <p>{garnet.toLocaleString()} (garnet)</p>
+              <p>{essence.toLocaleString()} (ess)</p>
+              <p>{gold.toLocaleString()} (g)</p>
+            </div>
+          ),
+        },
+        {
+          title: "Black Dragon Memories",
+          dataIndex: "bdMemories",
+          responsive: ["sm"],
+          render: (_, { bdMemories }) => (
+            <Text>{bdMemories.toLocaleString()}</Text>
+          ),
+        },
+        {
+          title: `${type} Fragment`,
+          dataIndex: "fragment",
+          responsive: ["sm"],
+          render: (_, { fragment }) => <Text>{fragment.toLocaleString()}</Text>,
+        },
+        {
+          title: "Garnet",
+          dataIndex: "garnet",
+          responsive: ["sm"],
+          render: (_, { garnet }) => <Text>{garnet.toLocaleString()}</Text>,
+        },
+        {
+          title: "Essence",
+          dataIndex: "essence",
+          responsive: ["sm"],
+          render: (_, { essence }) => <Text>{essence.toLocaleString()}</Text>,
+        },
+        {
+          title: "Gold",
+          dataIndex: "gold",
+          responsive: ["sm"],
+          render: (_, { gold }) => <Text>{gold.toLocaleString()}</Text>,
+          width: 90,
+        },
+      ];
+    };
 
-  const getMatsContent = () => {
     const itemStat: CollapseProps["items"] = [
       {
         key: "1",
@@ -560,7 +568,7 @@ const BlackDragonTalismanContent = () => {
         <Collapse items={itemStat} size="small" />
       </div>
     );
-  };
+  }, [colorText]);
 
   // Every talisman's mats calculator sums the same 5 fields off a
   // craftable-gated slice, differing only by which fragment name the sum
@@ -813,12 +821,12 @@ const BlackDragonTalismanContent = () => {
     {
       key: "1",
       label: "Stats",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",

@@ -44,6 +44,7 @@ const MatsReferenceTables = <T extends { encLevel: number | string }>({
             <Table
               style={{ marginRight: 10, marginBottom: 10 }}
               size={"small"}
+              rowKey="encLevel"
               dataSource={entry.dataSource}
               columns={makeCraftMaterialColumns(entry.fields)}
               pagination={false}

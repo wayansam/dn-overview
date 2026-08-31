@@ -59,6 +59,31 @@ interface TableMaterialList {
   Gold: number;
 }
 
+const matsFields: CraftMaterialField<BoneDragonEqEnhanceMaterial>[] = [
+  { dataIndex: "boneFragment", label: "Bone Fragment", shortLabel: "(Bone Fragment)" },
+  { dataIndex: "garnet", label: "Garnet", shortLabel: "(Garnet)" },
+  { dataIndex: "essence", label: "Essence", shortLabel: "(Essence)" },
+  { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
+  { dataIndex: "jelly", label: "Jelly", shortLabel: "(Jelly)" },
+  {
+    dataIndex: "successRatePercent",
+    label: "Success Rate",
+    shortLabel: "(Success%)",
+    tailText: "%",
+  },
+  {
+    dataIndex: "breakNoJellyPercent",
+    label: "Break Rate",
+    shortLabel: "(Break%)",
+    tailText: "%",
+  },
+  {
+    dataIndex: "enhanceFailDeduction",
+    label: "Fail Deduction",
+    shortLabel: "(Deduct)",
+  },
+];
+
 const BoneDragonEqContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
@@ -242,7 +267,10 @@ const BoneDragonEqContent = () => {
     />
   );
 
-  const getStatContent = () => {
+  // Pure reference data — memoized so it isn't rebuilt (and reconciled,
+  // since antd's Collapse keeps inactive panels mounted) on every click in
+  // the stateful "Calculate" panel.
+  const statContent = useMemo(() => {
     return (
       <StatReferenceTables
         entries={[
@@ -357,34 +385,9 @@ const BoneDragonEqContent = () => {
         ]}
       />
     );
-  };
+  }, []);
 
-  const matsFields: CraftMaterialField<BoneDragonEqEnhanceMaterial>[] = [
-    { dataIndex: "boneFragment", label: "Bone Fragment", shortLabel: "(Bone Fragment)" },
-    { dataIndex: "garnet", label: "Garnet", shortLabel: "(Garnet)" },
-    { dataIndex: "essence", label: "Essence", shortLabel: "(Essence)" },
-    { dataIndex: "gold", label: "Gold", shortLabel: "(g)" },
-    { dataIndex: "jelly", label: "Jelly", shortLabel: "(Jelly)" },
-    {
-      dataIndex: "successRatePercent",
-      label: "Success Rate",
-      shortLabel: "(Success%)",
-      tailText: "%",
-    },
-    {
-      dataIndex: "breakNoJellyPercent",
-      label: "Break Rate",
-      shortLabel: "(Break%)",
-      tailText: "%",
-    },
-    {
-      dataIndex: "enhanceFailDeduction",
-      label: "Fail Deduction",
-      shortLabel: "(Deduct)",
-    },
-  ];
-
-  const getMatsContent = () => (
+  const matsContent = useMemo(() => (
     <MatsReferenceTables
       defaultActiveKey={"1"}
       entries={[
@@ -425,18 +428,18 @@ const BoneDragonEqContent = () => {
         },
       ]}
     />
-  );
+  ), []);
 
   const items: CollapseProps["items"] = [
     {
       key: "1",
       label: "Stats",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",
