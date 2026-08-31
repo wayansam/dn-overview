@@ -1,17 +1,13 @@
-import { Checkbox, Divider, Tooltip } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import Table from "antd/es/table";
-import { useCallback, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
+import { useCallback, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
-import EquipmentTable from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import ListingCard from "../../components/ListingCard";
-import MaterialListTable from "../../components/MaterialListTable";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useEquipmentStatDiff,
   useInvalidRange,
 } from "../../hooks/useEquipmentCalculator";
@@ -23,7 +19,6 @@ import {
 } from "../../data/NamedEODData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { NamedEODMaterial } from "../../interface/Item.interface";
-import { getStatDif } from "../../utils/common.util";
 import { getResource } from "../../utils/resource.util";
 
 interface NamedEODTableMaterialList {
@@ -51,33 +46,46 @@ const NamedEODEqContent = () => {
 
   const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
-  const tableResource: NamedEODTableMaterialList = useMemo(() => {
-    const temp: NamedEODTableMaterialList = {
-      "Guide Star": 0,
-      "Twilight Essence": 0,
-      Gold: 0,
-    };
-    if (invalidDtSrc) {
-      return temp;
-    }
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (found) {
-        const tempSlice = NamedEODMaterialTable.slice(found.from, found.to);
-        tempSlice.forEach((slicedItem) => {
-          temp["Guide Star"] += slicedItem.guideStar;
-          temp["Twilight Essence"] += slicedItem.twilightEssence;
-          temp["Gold"] += slicedItem.gold;
-        });
-        if (checkedCraft) {
-          temp["Guide Star"] += 10;
-          temp["Twilight Essence"] += 80;
-          temp["Gold"] += 25;
-        }
+  const getNamedEODMatsTable = useCallback(
+    (): NamedEODMaterial[] => NamedEODMaterialTable,
+    []
+  );
+
+  const emptyNamedEODMats: NamedEODTableMaterialList = {
+    "Guide Star": 0,
+    "Twilight Essence": 0,
+    Gold: 0,
+  };
+
+  const reduceNamedEODRow = useCallback(
+    (
+      acc: NamedEODTableMaterialList,
+      slice: NamedEODMaterial[]
+    ): NamedEODTableMaterialList => {
+      const next = { ...acc };
+      slice.forEach((slicedItem) => {
+        next["Guide Star"] += slicedItem.guideStar;
+        next["Twilight Essence"] += slicedItem.twilightEssence;
+        next.Gold += slicedItem.gold;
+      });
+      if (checkedCraft) {
+        next["Guide Star"] += 10;
+        next["Twilight Essence"] += 80;
+        next.Gold += 25;
       }
-    });
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc, checkedCraft]);
+      return next;
+    },
+    [checkedCraft]
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getNamedEODMatsTable,
+    emptyNamedEODMats,
+    reduceNamedEODRow
+  );
 
   const getNamedEODStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqNamedEOD, equipment),
@@ -135,48 +143,26 @@ const NamedEODEqContent = () => {
     );
   };
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidDtSrc}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={checkedCraft}
-              onChange={(e) => setCheckedCraft(e.target.checked)}
-            >
-              <Tooltip
-                title="10 guide star, 80 Twilight Essence, 25 gold per weapon"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include Craft Mats
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <MaterialListTable data={tableResource} />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      invalid={invalidDtSrc}
+      toggles={[
+        {
+          key: "craft",
+          label: "Include Craft Mats",
+          tooltip: "10 guide star, 80 Twilight Essence, 25 gold per weapon",
+          checked: checkedCraft,
+          onChange: setCheckedCraft,
+        },
+      ]}
+      mats={{ data: tableResource }}
+      stats={{ statDif }}
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {

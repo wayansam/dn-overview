@@ -1,16 +1,11 @@
-import { Collapse, CollapseProps, Divider, Select, Table } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
+import { Collapse, CollapseProps, Table } from "antd";
+import React, { useCallback, useEffect, useState } from "react";
 import { makeCraftMaterialColumns } from "../../components/CraftMaterialColumns";
-import EquipmentTable from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import MaterialListTable from "../../components/MaterialListTable";
-import RangeFromTo from "../../components/RangeFromTo";
-import TypeFilterToggle from "../../components/TypeFilterToggle";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useInvalidRange,
-  useSelectedRows,
   useSelectionFlag,
 } from "../../hooks/useEquipmentCalculator";
 import { dataAncCalculator } from "../../data/AncientCalculatorData";
@@ -71,107 +66,114 @@ const AncientEqContent = () => {
       (row.from > 10 || row.to > 10)
   );
 
-  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
-
-  const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Helm Fragment": 0,
-      "Upper Fragment": 0,
-      "Lower Fragment": 0,
-      "Gloves Fragment": 0,
-      "Shoes Fragment": 0,
-      "Otherworldly Ancient Weapon Fragment": 0,
-      "Unknown Ancient Accessory Fragment": 0,
-      "Ancient Knowledge": 0,
-      "Ancient Insignia": 0,
-      Gold: 0,
-    };
-    if (invalidDtSrc) {
-      return temp;
-    }
-    selectedRows.forEach(({ equipment, from, to }) => {
-      let tempSlice: AncientArmorCraftMaterial[] = [];
+  const getAncientMatsTable = useCallback(
+    (equipment: EQUIPMENT): AncientArmorCraftMaterial[] => {
       switch (equipment) {
         case EQUIPMENT.HELM:
         case EQUIPMENT.UPPER:
         case EQUIPMENT.LOWER:
         case EQUIPMENT.GLOVE:
         case EQUIPMENT.SHOES:
-          tempSlice = (
-            selectVersion === versionOpt[0].value
-              ? AncientArmorCraftMaterialTableV2
-              : AncientArmorCraftMaterialTable
-          ).slice(from, to);
-          break;
+          return selectVersion === versionOpt[0].value
+            ? AncientArmorCraftMaterialTableV2
+            : AncientArmorCraftMaterialTable;
         case EQUIPMENT.MAIN_WEAPON:
         case EQUIPMENT.SECOND_WEAPON:
-          tempSlice = (
-            selectVersion === versionOpt[0].value
-              ? AncientWeaponT2CraftMaterialTableV2
-              : AncientWeaponT2CraftMaterialTable
-          ).slice(from, to);
-          break;
+          return selectVersion === versionOpt[0].value
+            ? AncientWeaponT2CraftMaterialTableV2
+            : AncientWeaponT2CraftMaterialTable;
         case EQUIPMENT.NECKLACE:
         case EQUIPMENT.EARRING:
         case EQUIPMENT.RING1:
-          tempSlice = (
-            selectVersion === versionOpt[0].value
-              ? AncientAccessoryCraftMaterialTableV2
-              : AncientAccessoryCraftMaterialTable
-          ).slice(from, to);
-          break;
-
+          return selectVersion === versionOpt[0].value
+            ? AncientAccessoryCraftMaterialTableV2
+            : AncientAccessoryCraftMaterialTable;
         default:
-          break;
+          return [];
       }
+    },
+    [selectVersion]
+  );
+
+  const emptyAncientMats: TableMaterialList = {
+    "Helm Fragment": 0,
+    "Upper Fragment": 0,
+    "Lower Fragment": 0,
+    "Gloves Fragment": 0,
+    "Shoes Fragment": 0,
+    "Otherworldly Ancient Weapon Fragment": 0,
+    "Unknown Ancient Accessory Fragment": 0,
+    "Ancient Knowledge": 0,
+    "Ancient Insignia": 0,
+    Gold: 0,
+  };
+
+  const reduceAncientRow = useCallback(
+    (
+      acc: TableMaterialList,
+      slice: AncientArmorCraftMaterial[],
+      row: AncientCalculator
+    ): TableMaterialList => {
+      const next = { ...acc };
 
       let tempFragment = 0;
       let tempAncKnowledge = 0;
       let tempAncInsignia = 0;
       let tempGold = 0;
 
-      tempSlice.forEach((slicedItem) => {
+      slice.forEach((slicedItem) => {
         tempFragment += slicedItem.eqTypeFragment;
         tempAncKnowledge += slicedItem.ancKnowledge;
         tempAncInsignia += slicedItem.ancInsignia;
         tempGold += slicedItem.gold;
       });
 
-      temp["Ancient Knowledge"] += tempAncKnowledge;
-      temp["Ancient Insignia"] += tempAncInsignia;
-      temp["Gold"] += tempGold;
-      switch (equipment) {
+      next["Ancient Knowledge"] += tempAncKnowledge;
+      next["Ancient Insignia"] += tempAncInsignia;
+      next.Gold += tempGold;
+      switch (row.equipment) {
         case EQUIPMENT.HELM:
-          temp["Helm Fragment"] += tempFragment;
+          next["Helm Fragment"] += tempFragment;
           break;
         case EQUIPMENT.UPPER:
-          temp["Upper Fragment"] += tempFragment;
+          next["Upper Fragment"] += tempFragment;
           break;
         case EQUIPMENT.LOWER:
-          temp["Lower Fragment"] += tempFragment;
+          next["Lower Fragment"] += tempFragment;
           break;
         case EQUIPMENT.GLOVE:
-          temp["Gloves Fragment"] += tempFragment;
+          next["Gloves Fragment"] += tempFragment;
           break;
         case EQUIPMENT.SHOES:
-          temp["Shoes Fragment"] += tempFragment;
+          next["Shoes Fragment"] += tempFragment;
           break;
         case EQUIPMENT.MAIN_WEAPON:
         case EQUIPMENT.SECOND_WEAPON:
-          temp["Otherworldly Ancient Weapon Fragment"] += tempFragment;
+          next["Otherworldly Ancient Weapon Fragment"] += tempFragment;
           break;
         case EQUIPMENT.NECKLACE:
         case EQUIPMENT.EARRING:
         case EQUIPMENT.RING1:
-          temp["Unknown Ancient Accessory Fragment"] += tempFragment;
+          next["Unknown Ancient Accessory Fragment"] += tempFragment;
           break;
 
         default:
           break;
       }
-    });
-    return temp;
-  }, [selectedRows, invalidDtSrc, selectVersion]);
+
+      return next;
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getAncientMatsTable,
+    emptyAncientMats,
+    reduceAncientRow
+  );
 
   useEffect(() => {
     const newData = dataSource.map((item) => ({
@@ -182,64 +184,46 @@ const AncientEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-            customLabeling={(item) => `${item}`}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidDtSrc}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <FlagAlert
-            show={showWarningAcc}
-            message="From +11 onward, your accessory might break"
-            type="warning"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            Version
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectVersion}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectVersion(val);
-              }}
-              options={versionOpt}
-            />
-          </div>
-          <TypeFilterToggle
-            selectedRowKeys={selectedRowKeys}
-            onChange={setSelectedRowKeys}
-            options={[
-              { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
-              { label: "Weapon", keys: ["6", "7"] },
-              { label: "Accessories", keys: ["8", "9", "10", "11"] },
-            ]}
-          />
-          <RangeFromTo
-            from={selectFrom}
-            to={selectTo}
-            onFromChange={setSelectFrom}
-            onToChange={setSelectTo}
-            max={20}
-            customLabeling={(item) => `${item}`}
-          />
-          <MaterialListTable data={tableResource} />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      customLabeling={(item) => `${item}`}
+      invalid={invalidDtSrc}
+      flags={[
+        {
+          show: showWarningAcc,
+          message: "From +11 onward, your accessory might break",
+          type: "warning",
+        },
+      ]}
+      typeFilter={[
+        { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+        { label: "Weapon", keys: ["6", "7"] },
+        { label: "Accessories", keys: ["8", "9", "10", "11"] },
+      ]}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: 20,
+        customLabeling: (item) => `${item}`,
+      }}
+      selects={[
+        {
+          key: "version",
+          label: "Version",
+          value: selectVersion,
+          onChange: (val) => setSelectVersion(val as string),
+          options: versionOpt,
+        },
+      ]}
+      mats={{ data: tableResource }}
+    />
+  );
 
   const ancKnowledgeInsigniaGoldFields = [
     { dataIndex: "ancKnowledge" as const, label: "A. Knowledge", shortLabel: "(Know)" },

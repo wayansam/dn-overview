@@ -1,19 +1,10 @@
-import {
-  Alert,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Radio,
-  Select,
-  Table,
-  Typography,
-} from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import { Collapse, CollapseProps, Table, Typography } from "antd";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
-import EquipmentTable from "../../components/EquipmentTable";
-import ListingCard from "../../components/ListingCard";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
 import { EmptyCommonnStat, TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
+import { useEquipmentAccumulator, useInvalidRange } from "../../hooks/useEquipmentCalculator";
 import { dataConversionCalculator } from "../../data/ConversionCalculatorData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
@@ -22,7 +13,6 @@ import {
   combineEqStats,
   getColumnsStats,
   getComparedData,
-  getStatDif,
 } from "../../utils/common.util";
 import { getResource } from "../../utils/resource.util";
 
@@ -46,12 +36,6 @@ const getLabel = (item: number) => {
   }
   return `+${item - 1}`;
 };
-
-const opt = (start: number, end: number) =>
-  Array.from({ length: end + 1 - start }, (_, k) => k + start).map((item) => ({
-    label: getLabel(item),
-    value: item,
-  }));
 
 const CONV_FRAG = 3500;
 const WEAP_FRAG = 1;
@@ -86,117 +70,116 @@ const ConversionContent = () => {
     value: string;
   }>();
 
-  const invalidDtSrc = useMemo(() => {
-    let flag = false;
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
-      if (!flag && found) {
-        if (found.to <= found.from) {
-          flag = true;
-        }
-      }
-    });
-    return flag;
-  }, [selectedRowKeys, dataSource]);
+  const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
-  const tableResource: TableMaterialList = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Armor Fragment": 0,
-      "Acc Fragment": 0,
-      "Wtd Fragment": 0,
-      "Weapon Fragment": 0,
-      "Astral Powder": 0,
-      "Astral Stone": 0,
-    };
-    if (invalidDtSrc) {
-      return temp;
-    }
+  const getConversionMatsTable = useCallback(() => [], []);
 
-    selectedRowKeys.forEach((item) => {
-      const found = dataSource.find((dt) => dt.key === item);
+  const emptyConversionMats: TableMaterialList = {
+    "Armor Fragment": 0,
+    "Acc Fragment": 0,
+    "Wtd Fragment": 0,
+    "Weapon Fragment": 0,
+    "Astral Powder": 0,
+    "Astral Stone": 0,
+  };
 
-      if (found) {
-        const { equipment, from, to } = found;
-        const isBuy = from === 0;
-        const isEnhUnique = to <= 11 && from <= 11;
-        const isEvo = to >= 12 && from <= 11;
-        let frag =
-          (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
+  const reduceConversionRow = useCallback(
+    (
+      acc: TableMaterialList,
+      _slice: never[],
+      row: CommonEquipmentCalculator
+    ): TableMaterialList => {
+      const next = { ...acc };
+      const { equipment, from, to } = row;
+      const isBuy = from === 0;
+      const isEnhUnique = to <= 11 && from <= 11;
+      const isEvo = to >= 12 && from <= 11;
+      let frag =
+        (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
           CONV_FRAG +
-          (isBuy ? CONV_FRAG : 0);
+        (isBuy ? CONV_FRAG : 0);
 
-        let lgFrag = 0;
-        let lgStone = 0;
-        let enhLRange = Math.min(to, 15) - Math.max(from, 1) - (isEvo ? 1 : 0);
-        switch (equipment) {
-          case EQUIPMENT.HELM:
-          case EQUIPMENT.UPPER:
-          case EQUIPMENT.LOWER:
-          case EQUIPMENT.GLOVE:
-          case EQUIPMENT.SHOES:
-            temp["Armor Fragment"] += frag;
-            if (isEvo) {
-              lgFrag += EV_AST_POW_ARMOR;
-              lgStone += EV_AST_STONE;
-            }
-            if (!isEnhUnique) {
-              lgFrag += enhLRange * ENC_AST_POW_ARMOR;
-              lgStone += enhLRange * ENC_AST_STONE_ARMOR;
-            }
-            break;
+      let lgFrag = 0;
+      let lgStone = 0;
+      let enhLRange = Math.min(to, 15) - Math.max(from, 1) - (isEvo ? 1 : 0);
+      switch (equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          next["Armor Fragment"] += frag;
+          if (isEvo) {
+            lgFrag += EV_AST_POW_ARMOR;
+            lgStone += EV_AST_STONE;
+          }
+          if (!isEnhUnique) {
+            lgFrag += enhLRange * ENC_AST_POW_ARMOR;
+            lgStone += enhLRange * ENC_AST_STONE_ARMOR;
+          }
+          break;
 
-          case EQUIPMENT.MAIN_WEAPON:
-          case EQUIPMENT.SECOND_WEAPON:
-            if (isEvo) {
-              lgFrag += EV_AST_POW_WEAP;
-              lgStone += EV_AST_STONE;
-            }
-            if (!isEnhUnique) {
-              lgFrag += enhLRange * ENC_AST_POW_WEAP;
-              lgStone += enhLRange * ENC_AST_STONE_WEAP;
-            }
-            break;
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          if (isEvo) {
+            lgFrag += EV_AST_POW_WEAP;
+            lgStone += EV_AST_STONE;
+          }
+          if (!isEnhUnique) {
+            lgFrag += enhLRange * ENC_AST_POW_WEAP;
+            lgStone += enhLRange * ENC_AST_STONE_WEAP;
+          }
+          break;
 
-          case EQUIPMENT.NECKLACE:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.RING1:
-          case EQUIPMENT.RING2:
-            temp["Acc Fragment"] += frag;
-            if (isEvo) {
-              lgFrag += EV_AST_POW_ACC;
-              lgStone += EV_AST_STONE;
-            }
-            if (!isEnhUnique) {
-              lgFrag += enhLRange * ENC_AST_POW_ACC;
-              lgStone += enhLRange * ENC_AST_STONE_ACC;
-            }
-            break;
+        case EQUIPMENT.NECKLACE:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.RING1:
+        case EQUIPMENT.RING2:
+          next["Acc Fragment"] += frag;
+          if (isEvo) {
+            lgFrag += EV_AST_POW_ACC;
+            lgStone += EV_AST_STONE;
+          }
+          if (!isEnhUnique) {
+            lgFrag += enhLRange * ENC_AST_POW_ACC;
+            lgStone += enhLRange * ENC_AST_STONE_ACC;
+          }
+          break;
 
-          case EQUIPMENT.WING:
-          case EQUIPMENT.TAIL:
-          case EQUIPMENT.DECAL:
-            temp["Wtd Fragment"] += frag;
-            if (isEvo) {
-              lgFrag += EV_AST_POW_WTD;
-              lgStone += EV_AST_STONE;
-            }
-            if (!isEnhUnique) {
-              lgFrag += enhLRange * ENC_AST_POW_WTD;
-              lgStone += enhLRange * ENC_AST_STONE_WTD;
-            }
-            break;
+        case EQUIPMENT.WING:
+        case EQUIPMENT.TAIL:
+        case EQUIPMENT.DECAL:
+          next["Wtd Fragment"] += frag;
+          if (isEvo) {
+            lgFrag += EV_AST_POW_WTD;
+            lgStone += EV_AST_STONE;
+          }
+          if (!isEnhUnique) {
+            lgFrag += enhLRange * ENC_AST_POW_WTD;
+            lgStone += enhLRange * ENC_AST_STONE_WTD;
+          }
+          break;
 
-          default:
-            break;
-        }
-
-        temp["Astral Powder"] += lgFrag;
-        temp["Astral Stone"] += lgStone;
+        default:
+          break;
       }
-    });
 
-    return temp;
-  }, [selectedRowKeys, dataSource, invalidDtSrc]);
+      next["Astral Powder"] += lgFrag;
+      next["Astral Stone"] += lgStone;
+
+      return next;
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getConversionMatsTable,
+    emptyConversionMats,
+    reduceConversionRow
+  );
 
   const statDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
@@ -314,113 +297,34 @@ const ConversionContent = () => {
     return holder;
   }, [selectStat, selectedRowKeys, dataSource]);
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-            customLabeling={(item) => getLabel(item)}
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          {invalidDtSrc && (
-            <div>
-              <Alert
-                banner
-                message="From cannot exceed the To option"
-                type="error"
-              />
-            </div>
-          )}
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            Spesific Type
-            <Divider type="vertical" />
-            <Radio.Group
-              value={selectedRowKeys}
-              onChange={(e) => {
-                setSelectedRowKeys(e.target.value);
-              }}
-            >
-              <Radio.Button
-                value={["1", "2", "3", "4", "5"]}
-                onClick={() => setSelectedRowKeys(["1", "2", "3", "4", "5"])}
-              >
-                Armor
-              </Radio.Button>
-              <Radio.Button
-                value={["6", "7"]}
-                onClick={() => setSelectedRowKeys(["6", "7"])}
-              >
-                Weapon
-              </Radio.Button>
-              <Radio.Button
-                value={["8", "9", "10", "11"]}
-                onClick={() => setSelectedRowKeys(["8", "9", "10", "11"])}
-              >
-                Accessories
-              </Radio.Button>
-              <Radio.Button
-                value={["12", "13", "14"]}
-                onClick={() => setSelectedRowKeys(["12", "13", "14"])}
-              >
-                WTD
-              </Radio.Button>
-            </Radio.Group>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            From
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectFrom}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectFrom(val);
-              }}
-              options={opt(0, 15)}
-            />
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            To
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectTo}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectTo(val);
-              }}
-              options={opt(0, 15)}
-            />
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(tableResource)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      customLabeling={(item) => getLabel(item)}
+      invalid={invalidDtSrc}
+      typeFilter={[
+        { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+        { label: "Weapon", keys: ["6", "7"] },
+        { label: "Accessories", keys: ["8", "9", "10", "11"] },
+        { label: "WTD", keys: ["12", "13", "14"] },
+      ]}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: 15,
+        customLabeling: getLabel,
+      }}
+      mats={{ data: tableResource, hideZero: true }}
+      stats={{ statDif }}
+      extra={
+        <>
           {weaponNotes?.main}
           {weaponNotes?.second}
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ChartsCard
             title="Status Charts"
             data={chartItems}
@@ -429,10 +333,10 @@ const ConversionContent = () => {
             statPrev={selectPrev}
             setStatPrev={setSelectPrev}
           />
-        </div>
-      </div>
-    );
-  };
+        </>
+      }
+    />
+  );
 
   const getStatContent = () => {
     const itemStat: CollapseProps["items"] = [

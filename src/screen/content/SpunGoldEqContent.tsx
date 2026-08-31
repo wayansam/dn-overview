@@ -1,26 +1,16 @@
-import { Divider, Select } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
+import { useCallback, useEffect, useState } from "react";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
-import EquipmentTable, {
-  BasicOpt,
-  makeEquipmentSelectColumn,
-} from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import ListingCard from "../../components/ListingCard";
-import MaterialListTable from "../../components/MaterialListTable";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
+import { BasicOpt, makeEquipmentSelectColumn } from "../../components/EquipmentTable";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
-import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
-import TradingHouseCalc from "../../components/TradingHouseCalc";
-import TypeFilterToggle from "../../components/TypeFilterToggle";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useEquipmentStatDiff,
   useInvalidRange,
-  useSelectedRows,
 } from "../../hooks/useEquipmentCalculator";
 import {
   SpunGoldEqEnhanceMaterialArmorTable,
@@ -39,7 +29,6 @@ import {
 } from "../../data/SpunGoldEqData";
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { SpunGoldEqEnhanceMaterial } from "../../interface/Item.interface";
-import { getStatDif } from "../../utils/common.util";
 import { getResource } from "../../utils/resource.util";
 
 interface TableMaterialList {
@@ -107,44 +96,61 @@ const SpunGoldEqContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo, selectCr]);
 
-  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
-
-  const tableResource: { res1: TableMaterialList } = useMemo(() => {
-    let temp: TableMaterialList = {
-      "Shattered Armor Crystal": 0,
-      "Shattered Weapon Crystal": 0,
-      "Foundation Stone": 0,
-      "Dim. Vestige": 0,
-      Gold: 0,
-    };
-
-    selectedRows.forEach(({ equipment, from, to, craft }) => {
-      let tempSlice: SpunGoldEqEnhanceMaterial[] = [];
-      let tempCraft: SpunGoldEqEnhanceMaterial | undefined = undefined;
-
+  const getSpunGoldMatsTable = useCallback(
+    (equipment: EQUIPMENT): SpunGoldEqEnhanceMaterial[] => {
       switch (equipment) {
         case EQUIPMENT.HELM:
         case EQUIPMENT.UPPER:
         case EQUIPMENT.LOWER:
         case EQUIPMENT.GLOVE:
         case EQUIPMENT.SHOES:
-          if (!invalidEnhanceSteps) {
-            tempSlice = SpunGoldEqEnhanceMaterialArmorTable.slice(from, to);
-          }
-          if (craft === 1) {
+          return SpunGoldEqEnhanceMaterialArmorTable;
+
+        case EQUIPMENT.MAIN_WEAPON:
+        case EQUIPMENT.SECOND_WEAPON:
+          return SpunGoldEqEnhanceMaterialWeapTable;
+
+        default:
+          return [];
+      }
+    },
+    []
+  );
+
+  const emptySpunGoldMats: TableMaterialList = {
+    "Shattered Armor Crystal": 0,
+    "Shattered Weapon Crystal": 0,
+    "Foundation Stone": 0,
+    "Dim. Vestige": 0,
+    Gold: 0,
+  };
+
+  const reduceSpunGoldRow = useCallback(
+    (
+      acc: TableMaterialList,
+      slice: SpunGoldEqEnhanceMaterial[],
+      row: CommonEquipmentCalculator<{ craft: number }>
+    ): TableMaterialList => {
+      const next = { ...acc };
+
+      let tempCraft: SpunGoldEqEnhanceMaterial | undefined = undefined;
+      switch (row.equipment) {
+        case EQUIPMENT.HELM:
+        case EQUIPMENT.UPPER:
+        case EQUIPMENT.LOWER:
+        case EQUIPMENT.GLOVE:
+        case EQUIPMENT.SHOES:
+          if (row.craft === 1) {
             tempCraft = SpunGoldEvolverCraftArmorT1;
           }
-          if (craft === 2) {
+          if (row.craft === 2) {
             tempCraft = SpunGoldEvolverCraftArmorT2;
           }
           break;
 
         case EQUIPMENT.MAIN_WEAPON:
         case EQUIPMENT.SECOND_WEAPON:
-          if (!invalidEnhanceSteps) {
-            tempSlice = SpunGoldEqEnhanceMaterialWeapTable.slice(from, to);
-          }
-          if (craft === 2) {
+          if (row.craft === 2) {
             tempCraft = SpunGoldEvolverCraftWeapon;
           }
           break;
@@ -158,38 +164,48 @@ const SpunGoldEqContent = () => {
       let dimVestigeTemp = tempCraft?.dimVestige ?? 0;
       let goldTemp = tempCraft?.gold ?? 0;
 
-      tempSlice.forEach((slicedItem) => {
+      slice.forEach((slicedItem) => {
         shatteredCrystalTemp += slicedItem.shatteredCrystal;
         foundationStoneTemp += slicedItem.foundationStone;
         dimVestigeTemp += slicedItem.dimVestige;
         goldTemp += slicedItem.gold;
       });
 
-      switch (equipment) {
+      switch (row.equipment) {
         case EQUIPMENT.HELM:
         case EQUIPMENT.UPPER:
         case EQUIPMENT.LOWER:
         case EQUIPMENT.GLOVE:
         case EQUIPMENT.SHOES:
-          temp["Shattered Armor Crystal"] += shatteredCrystalTemp;
+          next["Shattered Armor Crystal"] += shatteredCrystalTemp;
           break;
 
         case EQUIPMENT.MAIN_WEAPON:
         case EQUIPMENT.SECOND_WEAPON:
-          temp["Shattered Weapon Crystal"] += shatteredCrystalTemp;
+          next["Shattered Weapon Crystal"] += shatteredCrystalTemp;
           break;
 
         default:
           break;
       }
 
-      temp["Foundation Stone"] += foundationStoneTemp;
-      temp["Dim. Vestige"] += dimVestigeTemp;
-      temp.Gold += goldTemp;
-    });
+      next["Foundation Stone"] += foundationStoneTemp;
+      next["Dim. Vestige"] += dimVestigeTemp;
+      next.Gold += goldTemp;
 
-    return { res1: temp };
-  }, [selectedRows, invalidEnhanceSteps]);
+      return next;
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidEnhanceSteps,
+    getSpunGoldMatsTable,
+    emptySpunGoldMats,
+    reduceSpunGoldRow
+  );
 
   const getSpunGoldStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqSpunGold, equipment),
@@ -203,77 +219,48 @@ const SpunGoldEqContent = () => {
     getSpunGoldStatsTable
   );
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-            extraColumns={[
-              makeEquipmentSelectColumn<CommonEquipmentCalculator<{ craft: number }>>(
-                "craft",
-                "Craft",
-                SpunOption
-              ),
-            ]}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidEnhanceSteps}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <TypeFilterToggle
-            selectedRowKeys={selectedRowKeys}
-            onChange={setSelectedRowKeys}
-            options={[
-              { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
-              { label: "Weapon", keys: ["6", "7"] },
-            ]}
-          />
-          <RangeFromTo
-            from={selectFrom}
-            to={selectTo}
-            onFromChange={setSelectFrom}
-            onToChange={setSelectTo}
-            max={10}
-          />
-          <div style={{ marginBottom: 4 }}>
-            Craft
-            <Divider type="vertical" />
-            <Select
-              defaultValue={selectCr}
-              style={{ width: 120 }}
-              onChange={(val) => {
-                setSelectCr(val);
-              }}
-              options={SpunOption[0].option}
-            />
-          </div>
-          <MaterialListTable data={tableResource.res1} hideZero />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </CalcCard>
-        <CalcCard>
-          <TradingHouseCalc
-            data={[
-              {
-                name: "Dim. Vestige",
-                amt: tableResource.res1["Dim. Vestige"],
-              },
-            ]}
-            additionalTotal={tableResource.res1.Gold}
-          />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      extraColumns={[
+        makeEquipmentSelectColumn<CommonEquipmentCalculator<{ craft: number }>>(
+          "craft",
+          "Craft",
+          SpunOption
+        ),
+      ]}
+      invalid={invalidEnhanceSteps}
+      typeFilter={[
+        { label: "Armor", keys: ["1", "2", "3", "4", "5"] },
+        { label: "Weapon", keys: ["6", "7"] },
+      ]}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: 10,
+      }}
+      selects={[
+        {
+          key: "craft",
+          label: "Craft",
+          value: selectCr,
+          onChange: (val) => setSelectCr(val as number),
+          options: SpunOption[0].option,
+        },
+      ]}
+      mats={{ data: tableResource, hideZero: true }}
+      stats={{ statDif }}
+      tradingHouse={{
+        data: [{ name: "Dim. Vestige", amt: tableResource["Dim. Vestige"] }],
+        additionalTotal: tableResource.Gold,
+      }}
+    />
+  );
 
   const getStatContent = () => (
     <StatReferenceTables

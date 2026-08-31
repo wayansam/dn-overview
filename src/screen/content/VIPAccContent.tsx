@@ -1,20 +1,16 @@
-import { Divider, Typography } from "antd";
+import { Typography } from "antd";
 import Collapse, { CollapseProps } from "antd/es/collapse";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import CalcCard from "../../components/CalcCard";
 import { CraftMaterialField } from "../../components/CraftMaterialColumns";
-import EquipmentTable from "../../components/EquipmentTable";
-import FlagAlert from "../../components/FlagAlert";
-import ListingCard, { ItemList } from "../../components/ListingCard";
-import MaterialListTable from "../../components/MaterialListTable";
+import EquipmentCalculatorPanel from "../../components/EquipmentCalculatorPanel";
+import { ItemList } from "../../components/ListingCard";
 import MatsReferenceTables from "../../components/MatsReferenceTables";
-import RangeFromTo from "../../components/RangeFromTo";
 import StatReferenceTables from "../../components/StatReferenceTables";
 import { EQUIPMENT } from "../../constants/InGame.constants";
 import {
+  useEquipmentAccumulator,
   useEquipmentStatDiff,
   useInvalidRange,
-  useSelectedRows,
 } from "../../hooks/useEquipmentCalculator";
 import {
   dataIonaCalculator,
@@ -23,7 +19,7 @@ import {
 import { CommonEquipmentCalculator } from "../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
-import { getStatDif, getSuccessRateTag } from "../../utils/common.util";
+import { getSuccessRateTag } from "../../utils/common.util";
 import { buildRateSummary } from "../../utils/rateSummary";
 import { TAB_KEY } from "../../constants/Common.constants";
 import ChartsCard, { ChartItem } from "../../components/ChartsCard";
@@ -76,60 +72,73 @@ const VIPAccContent = () => {
     setDataSource(newData);
   }, [selectFrom, selectTo]);
 
-  const selectedRows = useSelectedRows(selectedRowKeys, dataSource);
+  const getIonaMatsTable = useCallback(
+    (equipment: EQUIPMENT): IonaEqEnhanceMaterial[] => {
+      switch (equipment) {
+        case EQUIPMENT.RING1:
+        case EQUIPMENT.RING2:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.NECKLACE:
+          return IonaEqEnhanceMaterialTable;
 
-  const tableResource: { res1: TableMaterialList; res2: EquipmentExtraData } =
-    useMemo(() => {
-      let temp: TableMaterialList = {
-        "White Core": 0,
-      };
-      let temp2: EquipmentExtraData = {};
-      if (invalidDtSrc) {
-        return { res1: temp, res2: temp2 };
+        default:
+          return [];
       }
+    },
+    []
+  );
 
-      selectedRows.forEach(({ equipment, from, to }) => {
-        let tempSlice: IonaEqEnhanceMaterial[] = [];
+  const emptyIonaResource: { res1: TableMaterialList; res2: EquipmentExtraData } = {
+    res1: { "White Core": 0 },
+    res2: {},
+  };
 
-        switch (equipment) {
-          case EQUIPMENT.RING1:
-          case EQUIPMENT.RING2:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.NECKLACE:
-            tempSlice = IonaEqEnhanceMaterialTable.slice(from, to);
-            break;
+  const reduceIonaRow = useCallback(
+    (
+      acc: { res1: TableMaterialList; res2: EquipmentExtraData },
+      slice: IonaEqEnhanceMaterial[],
+      row: CommonEquipmentCalculator
+    ): { res1: TableMaterialList; res2: EquipmentExtraData } => {
+      const next = {
+        res1: { ...acc.res1 },
+        res2: { ...acc.res2 },
+      };
 
-          default:
-            break;
-        }
-
-        let whiteCoreTemp = 0;
-        let srTemp: number[] = [];
-        tempSlice.forEach((slicedItem) => {
-          whiteCoreTemp += slicedItem.whiteCore;
-          srTemp.push(slicedItem.successRatePercent);
-        });
-
-        temp["White Core"] += whiteCoreTemp;
-
-        const exData = {
-          "Success Rate": srTemp,
-        };
-        switch (equipment) {
-          case EQUIPMENT.RING1:
-          case EQUIPMENT.RING2:
-          case EQUIPMENT.EARRING:
-          case EQUIPMENT.NECKLACE:
-            temp2[equipment] = exData;
-            break;
-
-          default:
-            break;
-        }
+      let whiteCoreTemp = 0;
+      const srTemp: number[] = [];
+      slice.forEach((slicedItem) => {
+        whiteCoreTemp += slicedItem.whiteCore;
+        srTemp.push(slicedItem.successRatePercent);
       });
 
-      return { res1: temp, res2: temp2 };
-    }, [selectedRows, invalidDtSrc]);
+      next.res1["White Core"] += whiteCoreTemp;
+
+      const exData = { "Success Rate": srTemp };
+      switch (row.equipment) {
+        case EQUIPMENT.RING1:
+        case EQUIPMENT.RING2:
+        case EQUIPMENT.EARRING:
+        case EQUIPMENT.NECKLACE:
+          next.res2[row.equipment as SelectedStats] = exData;
+          break;
+
+        default:
+          break;
+      }
+
+      return next;
+    },
+    []
+  );
+
+  const tableResource = useEquipmentAccumulator(
+    selectedRowKeys,
+    dataSource,
+    invalidDtSrc,
+    getIonaMatsTable,
+    emptyIonaResource,
+    reduceIonaRow
+  );
 
   const getIonaStatsTable = useCallback(
     (equipment: EQUIPMENT) => getResource(TAB_KEY.eqVIPAcc, equipment),
@@ -188,52 +197,35 @@ const VIPAccContent = () => {
     return holder;
   }, [selectStat, selectedRowKeys, dataSource]);
 
-  const getCalculator = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <CalcCard>
-          <EquipmentTable
-            selectedRowKeys={selectedRowKeys}
-            setSelectedRowKeys={setSelectedRowKeys}
-            dataSource={dataSource}
-            setDataSource={setDataSource}
-          />
-        </CalcCard>
-        <CalcCard>
-          <FlagAlert
-            show={invalidDtSrc}
-            message="From cannot exceed the To option"
-            type="error"
-          />
-          <Divider orientation="left">Settings</Divider>
-          <RangeFromTo
-            from={selectFrom}
-            to={selectTo}
-            onFromChange={setSelectFrom}
-            onToChange={setSelectTo}
-            max={15}
-          />
-          <MaterialListTable data={tableResource.res1} hideZero />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
-        </CalcCard>
-        <CalcCard>
-          <ListingCard title="Status Increase" data={getStatDif(statDif)} />
-        </CalcCard>
-        <CalcCard>
-          <ChartsCard
-            title="Status Charts"
-            data={chartItems}
-            statVal={selectStat}
-            setStatVal={setSelectStat}
-            statPrev={selectPrev}
-            setStatPrev={setSelectPrev}
-          />
-        </CalcCard>
-      </div>
-    );
-  };
+  const getCalculator = () => (
+    <EquipmentCalculatorPanel
+      selectedRowKeys={selectedRowKeys}
+      setSelectedRowKeys={setSelectedRowKeys}
+      dataSource={dataSource}
+      setDataSource={setDataSource}
+      invalid={invalidDtSrc}
+      range={{
+        from: selectFrom,
+        to: selectTo,
+        onFromChange: setSelectFrom,
+        onToChange: setSelectTo,
+        max: 15,
+      }}
+      mats={{ data: tableResource.res1, hideZero: true }}
+      rateSummary={{ items: extraInfo }}
+      stats={{ statDif }}
+      extra={
+        <ChartsCard
+          title="Status Charts"
+          data={chartItems}
+          statVal={selectStat}
+          setStatVal={setSelectStat}
+          statPrev={selectPrev}
+          setStatPrev={setSelectPrev}
+        />
+      }
+    />
+  );
 
   const getStatContent = () => {
     return (
