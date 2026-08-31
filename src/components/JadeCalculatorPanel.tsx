@@ -105,7 +105,9 @@ const JadeCalculatorPanel = ({
         {flags.map((flag, idx) => (
           <FlagAlert key={`extra-flag-${idx}`} {...flag} />
         ))}
-        <Divider orientation="left">Settings</Divider>
+        {(rangeSelect || selects.length > 0 || toggles.length > 0) && (
+          <Divider orientation="left">Settings</Divider>
+        )}
         {rangeSelect && (
           <RangeFromTo
             from={rangeSelect.from}

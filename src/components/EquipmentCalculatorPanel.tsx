@@ -128,7 +128,9 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
         {flags.map((flag, idx) => (
           <FlagAlert key={`extra-flag-${idx}`} {...flag} />
         ))}
-        <Divider orientation="left">Settings</Divider>
+        {(typeFilter || range || selects.length > 0 || toggles.length > 0) && (
+          <Divider orientation="left">Settings</Divider>
+        )}
         {typeFilter && (
           <TypeFilterToggle
             selectedRowKeys={selectedRowKeys}
