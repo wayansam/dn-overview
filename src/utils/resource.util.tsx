@@ -14,8 +14,8 @@ import {
   conversionTailStats,
   conversionUpperStats,
   conversionWingStats,
-} from "../data/ConversionCalculatorData";
-import { IonaEarringEnhancementStatsTable, IonaNecklaceEnhancementStatsTable, IonaRingEnhancementStatsTable } from "../data/VIPAccData";
+} from "../data/misc/ConversionCalculatorData";
+import { IonaEarringEnhancementStatsTable, IonaNecklaceEnhancementStatsTable, IonaRingEnhancementStatsTable } from "../data/equipment/VIPAccData";
 import {
   BoneDragonStatsGlovesTable,
   BoneDragonStatsHelmTable,
@@ -24,7 +24,7 @@ import {
   BoneDragonStatsSecondTable,
   BoneDragonStatsShoesTable,
   BoneDragonStatsUpperTable,
-} from "../data/BoneDragonEqData";
+} from "../data/equipment/BoneDragonEqData";
 import {
   SpunGoldStatsGlovesTable,
   SpunGoldStatsHelmTable,
@@ -33,11 +33,11 @@ import {
   SpunGoldStatsSecondTable,
   SpunGoldStatsShoesTable,
   SpunGoldStatsUpperTable,
-} from "../data/SpunGoldEqData";
+} from "../data/equipment/SpunGoldEqData";
 import {
   NamedEODMainStatTable,
   NamedEODSecondStatTable,
-} from "../data/NamedEODData";
+} from "../data/equipment/NamedEODData";
 import { CommonItemStats } from "../interface/ItemStat.interface";
 
 export const getConveRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {

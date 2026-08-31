@@ -7,7 +7,7 @@ import {
 } from "../../components/PatchNoteLink";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
-import { equipmentCraftOpt } from "./LunarJadeCalculatorContent";
+import { equipmentCraftOpt } from "./jade/LunarJadeCalculatorContent";
 
 const getItems: (
   panelStyle: CSSProperties,
