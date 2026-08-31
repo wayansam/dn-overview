@@ -1,12 +1,12 @@
 import { Button, Card, Divider, Grid, Layout, Space, theme } from "antd";
 import { useMemo, useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
+import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import {
   setIsCollapsedSideBar,
   setSelectedSideBar,
 } from "../slice/UIState.reducer";
-import { LS_KEYS } from "../constants/localStorage.constants";
 
 const { Sider } = Layout;
 const { useBreakpoint } = Grid;
@@ -18,10 +18,10 @@ const SideBar = () => {
   const screens = useBreakpoint();
 
   const selectedSideBar = useAppSelector(
-    (state) => state.UIState.selectedSideBar
+    (state) => state.UIState.selectedSideBar,
   );
   const isCollapsedSideBar = useAppSelector(
-    (state) => state.UIState.isCollapsedSideBar
+    (state) => state.UIState.isCollapsedSideBar,
   );
   const isKeepScreen = useAppSelector((state) => state.UIState.isKeepScreen);
 
@@ -103,6 +103,7 @@ const SideBar = () => {
               </Divider>
               {group.children.map((item) => (
                 <Button
+                  key={`${group.name}-children-${item.key}`}
                   block
                   style={{
                     border: "none",
@@ -123,7 +124,7 @@ const SideBar = () => {
                     if (isKeepScreen) {
                       localStorage.setItem(
                         LS_KEYS.last_screen,
-                        JSON.stringify(item)
+                        JSON.stringify(item),
                       );
                     }
                   }}

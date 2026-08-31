@@ -41,6 +41,8 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     }
     return;
   };
+  const getRowKey = (item: FeatureItem) => `${item.key}-${item.label}`;
+
   const renderItem = (item: FeatureItem, idx: number) => (
     <List.Item key={`item-${item.key}-${item.label}`}>
       <Typography.Text
@@ -346,6 +348,7 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
           bordered
           dataSource={dataNew}
           renderItem={renderItem}
+          rowKey={getRowKey}
           key={"list-new"}
         />
       </Space>
@@ -354,7 +357,12 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         <>
           <Divider orientation="left">What's Next?</Divider>
           <Space direction="horizontal">
-            <List bordered dataSource={dataSoon} renderItem={renderItem} />
+            <List
+              bordered
+              dataSource={dataSoon}
+              renderItem={renderItem}
+              rowKey={getRowKey}
+            />
           </Space>
 
           <Divider orientation="left">Release History</Divider>
@@ -369,6 +377,7 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
                       bordered
                       dataSource={dataPastFunc}
                       renderItem={renderItem}
+                      rowKey={getRowKey}
                     />
                   </Space>
                 ),
@@ -382,6 +391,7 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
                       bordered
                       dataSource={dataPastUpdate}
                       renderItem={renderItem}
+                      rowKey={getRowKey}
                     />
                   </Space>
                 ),
