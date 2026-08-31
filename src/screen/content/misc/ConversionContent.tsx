@@ -1,6 +1,10 @@
 import { Collapse, CollapseProps, Typography } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ChartsCard, { ChartItem } from "../../../components/ChartsCard";
+import ConversionSuggestionPanel, {
+  ConversionSuggestionMaterialInput,
+  ConversionSuggestionOption,
+} from "../../../components/ConversionSuggestionPanel";
 import EquipmentCalculatorPanel from "../../../components/EquipmentCalculatorPanel";
 import MaterialListTable from "../../../components/MaterialListTable";
 import StatReferenceTables from "../../../components/StatReferenceTables";
@@ -10,7 +14,7 @@ import { useEquipmentAccumulator, useInvalidRange } from "../../../hooks/useEqui
 import { dataConversionCalculator } from "../../../data/misc/ConversionCalculatorData";
 import { CommonEquipmentCalculator } from "../../../interface/Common.interface";
 import { CommonItemStats } from "../../../interface/ItemStat.interface";
-import { combineEqStats, getComparedData } from "../../../utils/common.util";
+import { combineEqStats, getAllStatDesc, getComparedData } from "../../../utils/common.util";
 import { getResource } from "../../../utils/resource.util";
 
 const { Text } = Typography;
@@ -23,6 +27,16 @@ interface TableMaterialList {
   "Astral Powder": number;
   "Astral Stone": number;
   "Astral Jewel": number;
+}
+
+// A tap the suggestion engine actually took (fits within owned resources).
+interface SuggestionRow {
+  key: string;
+  equipment: EQUIPMENT;
+  from: number;
+  to: number;
+  gain: number;
+  cost: TableMaterialList;
 }
 
 const getLabel = (item: number) => {
@@ -116,6 +130,596 @@ const getLegendMatsCost = (
   };
 };
 
+const EMPTY_CONVERSION_MATS: TableMaterialList = {
+  "Armor Fragment": 0,
+  "Acc Fragment": 0,
+  "Wtd Fragment": 0,
+  "Weapon Fragment": 0,
+  "Astral Powder": 0,
+  "Astral Stone": 0,
+  "Astral Jewel": 0,
+};
+
+const MATERIAL_KEYS = Object.keys(
+  EMPTY_CONVERSION_MATS
+) as (keyof TableMaterialList)[];
+
+// Material cost to take a single equipment piece from `from` to `to` (the
+// 0=Buy .. 19=Legend+7 index scheme used throughout this screen). Pure and
+// equipment/level-only, so both the resource accumulator (selected rows in
+// the Calculate tab) and the suggestion engine (hypothetical single-piece
+// projections) share one source of truth for the cost formula instead of
+// duplicating the per-category switch.
+const computeConversionMats = (
+  equipment: EQUIPMENT,
+  from: number,
+  to: number
+): TableMaterialList => {
+  const next: TableMaterialList = { ...EMPTY_CONVERSION_MATS };
+  const isBuy = from === 0;
+  const isEnhUnique = to <= 11 && from <= 11;
+  const isEvo = to >= 12 && from <= 11;
+  const frag =
+    (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) * CONV_FRAG +
+    (isBuy ? CONV_FRAG : 0);
+  // Weapon has no "buy from store" step (it's obtained via Cherry
+  // store/Trading House instead) and its fragment box costs WEAP_FRAG, not
+  // CONV_FRAG, so it needs its own tap count rather than reusing `frag`.
+  const weaponFrag =
+    (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) * WEAP_FRAG;
+
+  let lgFrag = 0;
+  let lgStone = 0;
+  let lgJewel = 0;
+
+  switch (equipment) {
+    case EQUIPMENT.HELM:
+    case EQUIPMENT.UPPER:
+    case EQUIPMENT.LOWER:
+    case EQUIPMENT.GLOVE:
+    case EQUIPMENT.SHOES:
+      next["Armor Fragment"] += frag;
+      if (isEvo) {
+        lgFrag += EV_AST_POW_ARMOR;
+        lgStone += EV_AST_STONE;
+      }
+      if (!isEnhUnique) {
+        const cost = getLegendMatsCost(
+          from,
+          to,
+          LEGEND_ARMOR_MAX,
+          isEvo,
+          { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR },
+          { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR_MID },
+          { powder: ENC_AST_POW_ARMOR_TOP, jewel: ENC_AST_JEWEL_ARMOR_TOP }
+        );
+        lgFrag += cost.powder;
+        lgStone += cost.stone;
+        lgJewel += cost.jewel;
+      }
+      break;
+
+    case EQUIPMENT.MAIN_WEAPON:
+    case EQUIPMENT.SECOND_WEAPON:
+      next["Weapon Fragment"] += weaponFrag;
+      if (isEvo) {
+        lgFrag += EV_AST_POW_WEAP;
+        lgStone += EV_AST_STONE;
+      }
+      if (!isEnhUnique) {
+        const cost = getLegendMatsCost(
+          from,
+          to,
+          LEGEND_MID_CAP,
+          isEvo,
+          { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP },
+          { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP_MID }
+        );
+        lgFrag += cost.powder;
+        lgStone += cost.stone;
+      }
+      break;
+
+    case EQUIPMENT.NECKLACE:
+    case EQUIPMENT.EARRING:
+    case EQUIPMENT.RING1:
+    case EQUIPMENT.RING2:
+      next["Acc Fragment"] += frag;
+      if (isEvo) {
+        lgFrag += EV_AST_POW_ACC;
+        lgStone += EV_AST_STONE;
+      }
+      if (!isEnhUnique) {
+        const cost = getLegendMatsCost(
+          from,
+          to,
+          LEGEND_MID_CAP,
+          isEvo,
+          { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC },
+          { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID }
+        );
+        lgFrag += cost.powder;
+        lgStone += cost.stone;
+      }
+      break;
+
+    case EQUIPMENT.WING:
+    case EQUIPMENT.TAIL:
+    case EQUIPMENT.DECAL:
+      next["Wtd Fragment"] += frag;
+      if (isEvo) {
+        lgFrag += EV_AST_POW_WTD;
+        lgStone += EV_AST_STONE;
+      }
+      if (!isEnhUnique) {
+        const cost = getLegendMatsCost(
+          from,
+          to,
+          LEGEND_MID_CAP,
+          isEvo,
+          { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD },
+          { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD_MID }
+        );
+        lgFrag += cost.powder;
+        lgStone += cost.stone;
+      }
+      break;
+
+    default:
+      break;
+  }
+
+  next["Astral Powder"] += lgFrag;
+  next["Astral Stone"] += lgStone;
+  next["Astral Jewel"] += lgJewel;
+
+  return next;
+};
+
+const sumMats = (
+  a: TableMaterialList,
+  b: TableMaterialList
+): TableMaterialList => {
+  const result = { ...a };
+  (Object.keys(a) as (keyof TableMaterialList)[]).forEach((key) => {
+    result[key] = a[key] + b[key];
+  });
+  return result;
+};
+
+const canAffordMats = (
+  owned: TableMaterialList,
+  cost: TableMaterialList
+): boolean =>
+  (Object.keys(cost) as (keyof TableMaterialList)[]).every(
+    (key) => owned[key] >= cost[key]
+  );
+
+const subtractMats = (
+  a: TableMaterialList,
+  b: TableMaterialList
+): TableMaterialList => {
+  const result = { ...a };
+  (Object.keys(a) as (keyof TableMaterialList)[]).forEach((key) => {
+    result[key] = a[key] - b[key];
+  });
+  return result;
+};
+
+// Value of a single stat at one level (not a diff) — level 0 (Buy) reads as
+// 0 for every stat, matching the "not owned yet" baseline used elsewhere in
+// this screen's own statDif computation.
+const getEquipmentStatValue = (
+  equipment: EQUIPMENT,
+  level: number,
+  statKey: keyof CommonItemStats
+): number => {
+  const table = getResource(TAB_KEY.miscConversion, equipment);
+  const { dt2 } = getComparedData(table, level, level);
+  const val = dt2?.[statKey];
+  return typeof val === "number" ? val : 0;
+};
+
+const getStatGain = (
+  equipment: EQUIPMENT,
+  from: number,
+  to: number,
+  statKey: keyof CommonItemStats
+): number =>
+  getEquipmentStatValue(equipment, to, statKey) -
+  getEquipmentStatValue(equipment, from, statKey);
+
+const formatMats = (mats: TableMaterialList): string => {
+  const parts = (Object.entries(mats) as [string, number][])
+    .filter(([, value]) => value > 0)
+    .map(([key, value]) => `${value.toLocaleString()} ${key}`);
+  return parts.length > 0 ? parts.join(", ") : "-";
+};
+
+// Hard cap on greedy iterations — with 14 equipment pieces each capped at
+// Legend +7 at most, the real bound is far lower; this only guards against a
+// logic bug turning into an infinite loop.
+const MAX_SUGGESTION_STEPS = 500;
+
+// One round of the greedy allocation: among every equipment piece's very
+// next tap, find whichever single tap grows the priority stat the most
+// while still fitting in `remaining` (skipping taps that don't grow it at
+// all, so resources aren't burned on a stat-irrelevant step while another
+// piece could still use them). Takes `remaining`/`levels` as plain
+// parameters (rather than closing over loop-reassigned locals) so each call
+// is a pure, independent snapshot.
+const pickBestTap = (
+  dataSource: CommonEquipmentCalculator[],
+  levels: Map<string, number>,
+  remaining: TableMaterialList,
+  statKey: keyof CommonItemStats
+): { key: string; cost: TableMaterialList } | undefined => {
+  let best: { key: string; gain: number; cost: TableMaterialList } | undefined;
+
+  dataSource.forEach((row) => {
+    const cur = levels.get(row.key) ?? row.from;
+    if (cur >= row.max) {
+      return;
+    }
+    const stepCost = computeConversionMats(row.equipment, cur, cur + 1);
+    if (!canAffordMats(remaining, stepCost)) {
+      return;
+    }
+    const stepGain = getStatGain(row.equipment, cur, cur + 1, statKey);
+    if (stepGain > (best?.gain ?? 0)) {
+      best = { key: row.key, gain: stepGain, cost: stepCost };
+    }
+  });
+
+  return best && { key: best.key, cost: best.cost };
+};
+
+const MAX_OPTIONS = 5;
+const MAX_PLAN_B_OPTIONS = 3;
+
+// Crude scalar stand-in for "how much resource this costs" across 7
+// different material types with no defined exchange rate between them —
+// just the sum of raw units. Only used to rank Plan B options by how little
+// extra is needed beyond what's owned.
+const materialMagnitude = (mats: TableMaterialList): number =>
+  (Object.values(mats) as number[]).reduce((sum, v) => sum + v, 0);
+
+// Componentwise max(0, cost - owned) — the extra resources a cost needs
+// beyond what's actually owned, per material.
+const excessMats = (
+  cost: TableMaterialList,
+  owned: TableMaterialList
+): TableMaterialList => {
+  const result = { ...cost };
+  (Object.keys(cost) as (keyof TableMaterialList)[]).forEach((key) => {
+    result[key] = Math.max(0, cost[key] - owned[key]);
+  });
+  return result;
+};
+
+// Componentwise max(0, owned - cost) — what's left of owned after paying a
+// cost, floored per material instead of allowed to go negative (used to
+// keep a Plan B seed's overspend in one material from corrupting how much
+// of OTHER materials are actually still available to greedy-fill with).
+const clampSubtractMats = (
+  owned: TableMaterialList,
+  cost: TableMaterialList
+): TableMaterialList => {
+  const result = { ...owned };
+  (Object.keys(owned) as (keyof TableMaterialList)[]).forEach((key) => {
+    result[key] = Math.max(0, owned[key] - cost[key]);
+  });
+  return result;
+};
+
+// One full "option" — a set of equipment moves that together spend (some
+// of) the pool, e.g. Wing Legend+0→+3 AND Helm Legend+0→+1 in one option.
+interface SuggestionOption {
+  key: string;
+  rows: SuggestionRow[];
+  totalGain: number;
+  totalCost: TableMaterialList;
+}
+
+// Runs the greedy allocation (see pickBestTap) starting from a given
+// levels/remaining snapshot, without mutating either — used both for the
+// unseeded baseline option and to fill whatever's left after a seed.
+const runGreedyFill = (
+  dataSource: CommonEquipmentCalculator[],
+  levels: Map<string, number>,
+  remaining: TableMaterialList,
+  statKey: keyof CommonItemStats
+): Map<string, number> => {
+  const nextLevels = new Map(levels);
+  let pool = remaining;
+  for (let i = 0; i < MAX_SUGGESTION_STEPS; i++) {
+    const best = pickBestTap(dataSource, nextLevels, pool, statKey);
+    if (!best) {
+      break;
+    }
+    pool = subtractMats(pool, best.cost);
+    nextLevels.set(best.key, (nextLevels.get(best.key) ?? 0) + 1);
+  }
+  return nextLevels;
+};
+
+// Builds one candidate option. With a `seedKey`, that piece is pushed as
+// far as the WHOLE pool allows first (guaranteeing it's the option's
+// headline pick), then whatever's left over runs through the same greedy
+// fill as everywhere else — which is how a seeded option ends up multi
+// equipment, e.g. Wing (seed) now + Helm from the leftover Astral Stone.
+// Without a seed it's just the unweighted greedy baseline.
+const buildSuggestionOption = (
+  dataSource: CommonEquipmentCalculator[],
+  ownedResources: TableMaterialList,
+  statKey: keyof CommonItemStats,
+  seedKey?: string
+): SuggestionOption | undefined => {
+  let levels = new Map<string, number>();
+  dataSource.forEach((row) => levels.set(row.key, row.from));
+  let remaining = ownedResources;
+
+  if (seedKey) {
+    const seedRow = dataSource.find((row) => row.key === seedKey);
+    if (!seedRow) {
+      return undefined;
+    }
+    let to = seedRow.from;
+    let cost = EMPTY_CONVERSION_MATS;
+    while (to < seedRow.max) {
+      const nextCost = sumMats(
+        cost,
+        computeConversionMats(seedRow.equipment, to, to + 1)
+      );
+      if (!canAffordMats(remaining, nextCost)) {
+        break;
+      }
+      cost = nextCost;
+      to += 1;
+    }
+    if (to === seedRow.from) {
+      return undefined; // can't even afford the seed's first tap
+    }
+    levels.set(seedKey, to);
+    remaining = subtractMats(remaining, cost);
+  }
+
+  levels = runGreedyFill(dataSource, levels, remaining, statKey);
+
+  const rows: SuggestionRow[] = dataSource
+    .filter((row) => (levels.get(row.key) ?? row.from) > row.from)
+    .map((row) => {
+      const to = levels.get(row.key) ?? row.from;
+      return {
+        key: row.key,
+        equipment: row.equipment,
+        from: row.from,
+        to,
+        gain: getStatGain(row.equipment, row.from, to, statKey),
+        cost: computeConversionMats(row.equipment, row.from, to),
+      };
+    })
+    .sort((a, b) => b.gain - a.gain);
+
+  if (rows.length === 0) {
+    return undefined;
+  }
+
+  return {
+    key: rows
+      .map((row) => `${row.key}:${row.to}`)
+      .sort()
+      .join("|"),
+    rows,
+    totalGain: rows.reduce((sum, row) => sum + row.gain, 0),
+    totalCost: rows.reduce(
+      (sum, row) => sumMats(sum, row.cost),
+      EMPTY_CONVERSION_MATS
+    ),
+  };
+};
+
+// Generates up to MAX_OPTIONS distinct ways to spend the pool: the
+// unweighted greedy baseline, plus one option per equipment piece seeded to
+// go as far as the whole pool allows before the leftover is greedy-filled
+// across everything else. Different seeds often converge on the same final
+// allocation (deduped by composition signature, keeping the better-gain
+// copy) — this is a heuristic search over plausible strategies, not an
+// exhaustive optimum, but it's what surfaces alternatives like "commit to
+// Wing first" vs. "commit to Helm first" as distinct, comparable options.
+const computeSuggestionOptions = (
+  dataSource: CommonEquipmentCalculator[],
+  ownedResources: TableMaterialList,
+  statKey: keyof CommonItemStats
+): SuggestionOption[] => {
+  const seeds: (string | undefined)[] = [
+    undefined,
+    ...dataSource.map((row) => row.key),
+  ];
+
+  const bySignature = new Map<string, SuggestionOption>();
+  seeds.forEach((seedKey) => {
+    const option = buildSuggestionOption(
+      dataSource,
+      ownedResources,
+      statKey,
+      seedKey
+    );
+    if (!option) {
+      return;
+    }
+    const existing = bySignature.get(option.key);
+    if (!existing || option.totalGain > existing.totalGain) {
+      bySignature.set(option.key, option);
+    }
+  });
+
+  return Array.from(bySignature.values())
+    .sort((a, b) => b.totalGain - a.totalGain)
+    .slice(0, MAX_OPTIONS);
+};
+
+// Greedily taps `equipment` from `from` upward, one level at a time, for as
+// long as the running total stays within `owned` — used only by Plan B, to
+// find each piece's own next milestone independent of any chosen option.
+const getMaxAffordableLevel = (
+  equipment: EQUIPMENT,
+  from: number,
+  max: number,
+  owned: TableMaterialList
+): { to: number; cost: TableMaterialList } => {
+  let to = from;
+  let cost = EMPTY_CONVERSION_MATS;
+  while (to < max) {
+    const nextCost = sumMats(
+      cost,
+      computeConversionMats(equipment, to, to + 1)
+    );
+    if (!canAffordMats(owned, nextCost)) {
+      break;
+    }
+    cost = nextCost;
+    to += 1;
+  }
+  return { to, cost };
+};
+
+// Plan B is a full option too — same shape as the affordable table — for
+// *pending* Option 1 in favor of saving up for a set that costs more than
+// currently owned but pays off more than Option 1's total. Built by taking
+// one equipment piece, pushing it exactly ONE tap past what it could reach
+// on its own with the whole pool (the cheapest "reach" beyond what's
+// already affordable), then greedy-filling the rest with whatever of the
+// pool that seed didn't need — e.g. Wing pushed to Legend+3 (one past its
+// own +2 ceiling) leaves enough Astral Powder untouched for Helm to still
+// tag along. Only kept if it (a) genuinely needs more than owned somewhere
+// — otherwise it already belongs in the affordable table — and (b) beats
+// Option 1's total, since there's no point saving for something worse.
+const buildPlanBOption = (
+  dataSource: CommonEquipmentCalculator[],
+  ownedResources: TableMaterialList,
+  statKey: keyof CommonItemStats,
+  seedKey: string
+): { option: SuggestionOption; shortfall: number } | undefined => {
+  const seedRow = dataSource.find((row) => row.key === seedKey);
+  if (!seedRow) {
+    return undefined;
+  }
+
+  const { to: affordableTo } = getMaxAffordableLevel(
+    seedRow.equipment,
+    seedRow.from,
+    seedRow.max,
+    ownedResources
+  );
+  if (affordableTo >= seedRow.max) {
+    return undefined; // already maxed on its own, nothing further to reach for
+  }
+
+  const extendedTo = affordableTo + 1;
+  const extendedCost = computeConversionMats(
+    seedRow.equipment,
+    seedRow.from,
+    extendedTo
+  );
+  if (canAffordMats(ownedResources, extendedCost)) {
+    return undefined; // already affordable — belongs in the main table, not here
+  }
+
+  const levels = new Map<string, number>();
+  dataSource.forEach((row) => levels.set(row.key, row.from));
+  levels.set(seedKey, extendedTo);
+
+  const leftover = clampSubtractMats(ownedResources, extendedCost);
+  const filledLevels = runGreedyFill(
+    dataSource.filter((row) => row.key !== seedKey),
+    levels,
+    leftover,
+    statKey
+  );
+
+  const rows: SuggestionRow[] = dataSource
+    .filter((row) => (filledLevels.get(row.key) ?? row.from) > row.from)
+    .map((row) => {
+      const to = filledLevels.get(row.key) ?? row.from;
+      return {
+        key: row.key,
+        equipment: row.equipment,
+        from: row.from,
+        to,
+        gain: getStatGain(row.equipment, row.from, to, statKey),
+        cost: computeConversionMats(row.equipment, row.from, to),
+      };
+    })
+    .sort((a, b) => b.gain - a.gain);
+
+  const option: SuggestionOption = {
+    key: rows
+      .map((row) => `${row.key}:${row.to}`)
+      .sort()
+      .join("|"),
+    rows,
+    totalGain: rows.reduce((sum, row) => sum + row.gain, 0),
+    totalCost: rows.reduce(
+      (sum, row) => sumMats(sum, row.cost),
+      EMPTY_CONVERSION_MATS
+    ),
+  };
+
+  return {
+    option,
+    shortfall: materialMagnitude(excessMats(extendedCost, ownedResources)),
+  };
+};
+
+const computeSuggestionPlanB = (
+  dataSource: CommonEquipmentCalculator[],
+  ownedResources: TableMaterialList,
+  statKey: keyof CommonItemStats,
+  bestOptionTotalGain: number
+): SuggestionOption[] => {
+  const bySignature = new Map<
+    string,
+    { option: SuggestionOption; shortfall: number }
+  >();
+
+  dataSource.forEach((row) => {
+    const built = buildPlanBOption(dataSource, ownedResources, statKey, row.key);
+    if (!built || built.option.totalGain <= bestOptionTotalGain) {
+      return;
+    }
+    const existing = bySignature.get(built.option.key);
+    if (!existing || built.shortfall < existing.shortfall) {
+      bySignature.set(built.option.key, built);
+    }
+  });
+
+  return Array.from(bySignature.values())
+    .sort((a, b) => a.shortfall - b.shortfall)
+    .slice(0, MAX_PLAN_B_OPTIONS)
+    .map((entry) => entry.option);
+};
+
+const computeSuggestionPlan = (
+  dataSource: CommonEquipmentCalculator[],
+  ownedResources: TableMaterialList,
+  statKey: keyof CommonItemStats
+): { options: SuggestionOption[]; planB: SuggestionOption[] } => {
+  const options = computeSuggestionOptions(
+    dataSource,
+    ownedResources,
+    statKey
+  );
+  const bestOptionTotalGain = options[0]?.totalGain ?? 0;
+  const planB = computeSuggestionPlanB(
+    dataSource,
+    ownedResources,
+    statKey,
+    bestOptionTotalGain
+  );
+  return { options, planB };
+};
+
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] = useState<CommonEquipmentCalculator[]>(
@@ -132,141 +736,28 @@ const ConversionContent = () => {
     value: string;
   }>();
 
+  // Suggestion tool: what the player currently owns/holds. Current levels
+  // are NOT tracked separately — they're read straight off `dataSource`'s
+  // own "From" column, the same one the Calculate table already edits.
+  const [ownedResources, setOwnedResources] = useState<TableMaterialList>({
+    ...EMPTY_CONVERSION_MATS,
+  });
+  const [priorityStat, setPriorityStat] = useState<{
+    label: string;
+    value: string;
+  }>();
+
   const invalidDtSrc = useInvalidRange(selectedRowKeys, dataSource);
 
   const getConversionMatsTable = useCallback(() => [], []);
-
-  const emptyConversionMats: TableMaterialList = {
-    "Armor Fragment": 0,
-    "Acc Fragment": 0,
-    "Wtd Fragment": 0,
-    "Weapon Fragment": 0,
-    "Astral Powder": 0,
-    "Astral Stone": 0,
-    "Astral Jewel": 0,
-  };
 
   const reduceConversionRow = useCallback(
     (
       acc: TableMaterialList,
       _slice: never[],
       row: CommonEquipmentCalculator
-    ): TableMaterialList => {
-      const next = { ...acc };
-      const { equipment, from, to } = row;
-      const isBuy = from === 0;
-      const isEnhUnique = to <= 11 && from <= 11;
-      const isEvo = to >= 12 && from <= 11;
-      let frag =
-        (Math.min(to, 11) - Math.max(isEnhUnique ? from : 11, 1)) *
-          CONV_FRAG +
-        (isBuy ? CONV_FRAG : 0);
-
-      let lgFrag = 0;
-      let lgStone = 0;
-      let lgJewel = 0;
-      switch (equipment) {
-        case EQUIPMENT.HELM:
-        case EQUIPMENT.UPPER:
-        case EQUIPMENT.LOWER:
-        case EQUIPMENT.GLOVE:
-        case EQUIPMENT.SHOES:
-          next["Armor Fragment"] += frag;
-          if (isEvo) {
-            lgFrag += EV_AST_POW_ARMOR;
-            lgStone += EV_AST_STONE;
-          }
-          if (!isEnhUnique) {
-            const cost = getLegendMatsCost(
-              from,
-              to,
-              LEGEND_ARMOR_MAX,
-              isEvo,
-              { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR },
-              { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR_MID },
-              { powder: ENC_AST_POW_ARMOR_TOP, jewel: ENC_AST_JEWEL_ARMOR_TOP }
-            );
-            lgFrag += cost.powder;
-            lgStone += cost.stone;
-            lgJewel += cost.jewel;
-          }
-          break;
-
-        case EQUIPMENT.MAIN_WEAPON:
-        case EQUIPMENT.SECOND_WEAPON:
-          if (isEvo) {
-            lgFrag += EV_AST_POW_WEAP;
-            lgStone += EV_AST_STONE;
-          }
-          if (!isEnhUnique) {
-            const cost = getLegendMatsCost(
-              from,
-              to,
-              LEGEND_MID_CAP,
-              isEvo,
-              { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP },
-              { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP_MID }
-            );
-            lgFrag += cost.powder;
-            lgStone += cost.stone;
-          }
-          break;
-
-        case EQUIPMENT.NECKLACE:
-        case EQUIPMENT.EARRING:
-        case EQUIPMENT.RING1:
-        case EQUIPMENT.RING2:
-          next["Acc Fragment"] += frag;
-          if (isEvo) {
-            lgFrag += EV_AST_POW_ACC;
-            lgStone += EV_AST_STONE;
-          }
-          if (!isEnhUnique) {
-            const cost = getLegendMatsCost(
-              from,
-              to,
-              LEGEND_MID_CAP,
-              isEvo,
-              { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC },
-              { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID }
-            );
-            lgFrag += cost.powder;
-            lgStone += cost.stone;
-          }
-          break;
-
-        case EQUIPMENT.WING:
-        case EQUIPMENT.TAIL:
-        case EQUIPMENT.DECAL:
-          next["Wtd Fragment"] += frag;
-          if (isEvo) {
-            lgFrag += EV_AST_POW_WTD;
-            lgStone += EV_AST_STONE;
-          }
-          if (!isEnhUnique) {
-            const cost = getLegendMatsCost(
-              from,
-              to,
-              LEGEND_MID_CAP,
-              isEvo,
-              { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD },
-              { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD_MID }
-            );
-            lgFrag += cost.powder;
-            lgStone += cost.stone;
-          }
-          break;
-
-        default:
-          break;
-      }
-
-      next["Astral Powder"] += lgFrag;
-      next["Astral Stone"] += lgStone;
-      next["Astral Jewel"] += lgJewel;
-
-      return next;
-    },
+    ): TableMaterialList =>
+      sumMats(acc, computeConversionMats(row.equipment, row.from, row.to)),
     []
   );
 
@@ -275,7 +766,7 @@ const ConversionContent = () => {
     dataSource,
     invalidDtSrc,
     getConversionMatsTable,
-    emptyConversionMats,
+    EMPTY_CONVERSION_MATS,
     reduceConversionRow
   );
 
@@ -395,6 +886,69 @@ const ConversionContent = () => {
     return holder;
   }, [selectStat, selectedRowKeys, dataSource]);
 
+  const statOptions = useMemo(
+    () =>
+      Object.entries(getAllStatDesc())
+        .map(([key, value]) => ({ label: value.long, value: key }))
+        .filter((it) => it.label !== "-"),
+    []
+  );
+
+  // Reads current levels straight off dataSource's own "From" column (the
+  // same column the Calculate table lets the player edit) and generates up
+  // to MAX_OPTIONS ways to spend the owned resource pool — see
+  // computeSuggestionPlan for the allocation itself.
+  const suggestionPlan = useMemo((): {
+    options: SuggestionOption[];
+    planB: SuggestionOption[];
+  } => {
+    const statKey = priorityStat?.value.replace("Desc", "") as
+      | keyof CommonItemStats
+      | undefined;
+    if (!statKey) {
+      return { options: [], planB: [] };
+    }
+    return computeSuggestionPlan(dataSource, ownedResources, statKey);
+  }, [priorityStat, dataSource, ownedResources]);
+
+  // Pre-formats the suggestion engine's raw numeric rows into the display
+  // strings ConversionSuggestionPanel expects — it's a purely presentational
+  // component with no knowledge of this screen's level/material shapes.
+  const statSuffix = priorityStat?.value.toLowerCase().includes("percent")
+    ? "%"
+    : "";
+
+  const suggestionMaterials: ConversionSuggestionMaterialInput[] =
+    MATERIAL_KEYS.map((key) => ({
+      key,
+      label: key,
+      value: ownedResources[key],
+      onChange: (value) =>
+        setOwnedResources((prev) => ({ ...prev, [key]: value })),
+    }));
+
+  const formatOptions = (
+    options: SuggestionOption[]
+  ): ConversionSuggestionOption[] =>
+    options.map((option, idx) => ({
+      key: option.key,
+      label: `Option ${idx + 1}`,
+      totalLabel: `Total: +${option.totalGain.toLocaleString()}${statSuffix} using ${formatMats(
+        option.totalCost
+      )}`,
+      rows: option.rows.map((row) => ({
+        key: row.key,
+        equipment: row.equipment,
+        from: getLabel(row.from),
+        to: getLabel(row.to),
+        gainLabel: `+${row.gain.toLocaleString()}${statSuffix}`,
+        materialsLabel: formatMats(row.cost),
+      })),
+    }));
+
+  const suggestionOptions = formatOptions(suggestionPlan.options);
+  const suggestionPlanB = formatOptions(suggestionPlan.planB);
+
   const getCalculator = () => (
     <EquipmentCalculatorPanel
       selectedRowKeys={selectedRowKeys}
@@ -432,6 +986,16 @@ const ConversionContent = () => {
             setStatPrev={setSelectPrev}
           />
         </>
+      }
+      suggestion={
+        <ConversionSuggestionPanel
+          materials={suggestionMaterials}
+          statOptions={statOptions}
+          priorityStat={priorityStat}
+          onPriorityStatChange={setPriorityStat}
+          options={suggestionOptions}
+          planB={suggestionPlanB}
+        />
       }
     />
   );

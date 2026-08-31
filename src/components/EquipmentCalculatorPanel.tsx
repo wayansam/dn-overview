@@ -89,6 +89,10 @@ interface EquipmentCalculatorPanelProps<T extends EquipmentTableCalculator> {
   // same CalcCard every other section gets, so the caller only supplies the
   // inner content.
   extra?: React.ReactNode;
+  // A "what should I upgrade next" tool (currently Conversion's suggestion
+  // engine) — kept separate from `extra` so it always gets its own card
+  // instead of being stacked under whatever else `extra` renders.
+  suggestion?: React.ReactNode;
 }
 
 const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
@@ -110,6 +114,7 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
   rateSummary,
   tradingHouse,
   extra,
+  suggestion,
 }: EquipmentCalculatorPanelProps<T>) => {
   return (
     <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -210,6 +215,7 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
         </CalcCard>
       )}
       {extra && <CalcCard>{extra}</CalcCard>}
+      {suggestion && <CalcCard>{suggestion}</CalcCard>}
     </div>
   );
 };
