@@ -122,6 +122,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "31-08-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "Conversion Suggestion",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "01-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
