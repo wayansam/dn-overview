@@ -7,6 +7,11 @@ interface MaterialListTableProps {
   data: object;
   hideZero?: boolean;
   footer?: string;
+  // When set, renders as the Table's own title bar instead of the default
+  // "Material List" divider — for screens that group several of these
+  // side-by-side under their own labels (e.g. Conversion's Enhancement/Evo
+  // Legend/Enhancement Legend tables).
+  title?: string;
 }
 
 // The repeated "Material List" divider + resource Table used by every
@@ -15,11 +20,13 @@ const MaterialListTable: React.FC<MaterialListTableProps> = ({
   data,
   hideZero,
   footer,
+  title,
 }) => (
   <>
-    <Divider orientation="left">Material List</Divider>
+    {!title && <Divider orientation="left">Material List</Divider>}
     <Table
       size={"small"}
+      title={title ? () => title : undefined}
       dataSource={(Object.entries(data) as [string, number][])
         .filter(([, value]) => !hideZero || value !== 0)
         .map(([key, value]) => ({

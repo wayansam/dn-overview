@@ -1,19 +1,16 @@
-import { Collapse, CollapseProps, Table, Typography } from "antd";
+import { Collapse, CollapseProps, Typography } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ChartsCard, { ChartItem } from "../../../components/ChartsCard";
 import EquipmentCalculatorPanel from "../../../components/EquipmentCalculatorPanel";
+import MaterialListTable from "../../../components/MaterialListTable";
+import StatReferenceTables from "../../../components/StatReferenceTables";
 import { EmptyCommonnStat, TAB_KEY } from "../../../constants/Common.constants";
 import { EQUIPMENT } from "../../../constants/InGame.constants";
 import { useEquipmentAccumulator, useInvalidRange } from "../../../hooks/useEquipmentCalculator";
 import { dataConversionCalculator } from "../../../data/misc/ConversionCalculatorData";
 import { CommonEquipmentCalculator } from "../../../interface/Common.interface";
 import { CommonItemStats } from "../../../interface/ItemStat.interface";
-import {
-  columnsResource,
-  combineEqStats,
-  getColumnsStats,
-  getComparedData,
-} from "../../../utils/common.util";
+import { combineEqStats, getComparedData } from "../../../utils/common.util";
 import { getResource } from "../../../utils/resource.util";
 
 const { Text } = Typography;
@@ -338,21 +335,22 @@ const ConversionContent = () => {
     />
   );
 
-  const getStatContent = () => {
-    const itemStat: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "Armor",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Helm"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.HELM)}
-              columns={getColumnsStats({
+  // Pure reference data — doesn't depend on any state, so this must not be
+  // rebuilt on every click in the Calculate tab (antd's Collapse keeps
+  // inactive panels mounted, so an unmemoized rebuild here still gets
+  // reconciled on every state change elsewhere in the screen).
+  const statContent = useMemo(
+    () => (
+    <StatReferenceTables
+      entries={[
+        {
+          key: "1",
+          label: "Armor",
+          tables: [
+            {
+              label: "Helm",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.HELM),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 fdFlag: true,
@@ -366,16 +364,12 @@ const ConversionContent = () => {
                 vitPercentFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Upper"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.UPPER)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Upper",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.UPPER),
+              flags: {
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 crtPercentFlag: true,
@@ -390,16 +384,12 @@ const ConversionContent = () => {
                 vitPercentFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Lower"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.LOWER)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Lower",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.LOWER),
+              flags: {
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 crtPercentFlag: true,
@@ -410,16 +400,12 @@ const ConversionContent = () => {
                 vitFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Glove"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.GLOVE)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Glove",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.GLOVE),
+              flags: {
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 crtPercentFlag: true,
@@ -430,16 +416,12 @@ const ConversionContent = () => {
                 vitFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Shoes"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.SHOES)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Shoes",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.SHOES),
+              flags: {
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 fdFlag: true,
@@ -454,29 +436,21 @@ const ConversionContent = () => {
                 hpFlag: true,
                 hpPercentFlag: true,
                 moveSpeedPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "Weapon",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Main"}
-              size={"small"}
-              dataSource={getResource(
+              },
+            },
+          ],
+        },
+        {
+          key: "2",
+          label: "Weapon",
+          tables: [
+            {
+              label: "Main",
+              dataSource: getResource(
                 TAB_KEY.miscConversion,
                 EQUIPMENT.MAIN_WEAPON
-              )}
-              columns={getColumnsStats({
+              ),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -488,48 +462,36 @@ const ConversionContent = () => {
                 intFlag: true,
                 vitFlag: true,
                 cdmFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Second"}
-              size={"small"}
-              dataSource={getResource(
+              },
+            },
+            {
+              label: "Second",
+              dataSource: getResource(
                 TAB_KEY.miscConversion,
                 EQUIPMENT.SECOND_WEAPON
-              )}
-              columns={getColumnsStats({
+              ),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
                 crtFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "3",
-        label: "Accesories",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Necklace"}
-              size={"small"}
-              dataSource={getResource(
+              },
+            },
+          ],
+        },
+        {
+          key: "3",
+          label: "Accesories",
+          tables: [
+            {
+              label: "Necklace",
+              dataSource: getResource(
                 TAB_KEY.miscConversion,
                 EQUIPMENT.NECKLACE
-              )}
-              columns={getColumnsStats({
+              ),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -541,19 +503,15 @@ const ConversionContent = () => {
                 vitFlag: true,
                 defFlag: true,
                 magdefFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Earring"}
-              size={"small"}
-              dataSource={getResource(
+              },
+            },
+            {
+              label: "Earring",
+              dataSource: getResource(
                 TAB_KEY.miscConversion,
                 EQUIPMENT.EARRING
-              )}
-              columns={getColumnsStats({
+              ),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -563,43 +521,31 @@ const ConversionContent = () => {
                 fdFlag: true,
                 hpFlag: true,
                 hpPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Ring"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.RING1)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Ring",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.RING1),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
                 crtFlag: true,
                 cdmFlag: true,
                 fdFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "4",
-        label: "WTD",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Wing"}
-              footer={() => "*Legend stats based on KDN patch note"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.WING)}
-              columns={getColumnsStats({
+              },
+            },
+          ],
+        },
+        {
+          key: "4",
+          label: "WTD",
+          tables: [
+            {
+              label: "Wing",
+              footer: "*Legend stats based on KDN patch note",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.WING),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 crtFlag: true,
@@ -608,17 +554,13 @@ const ConversionContent = () => {
                 vitFlag: true,
                 moveSpeedPercentFlag: true,
                 moveSpeedPercentTownFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Tail"}
-              footer={() => "*Legend stats based on KDN patch note"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.TAIL)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Tail",
+              footer: "*Legend stats based on KDN patch note",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.TAIL),
+              flags: {
                 phyMagAtkFlag: true,
                 phyMagAtkPercentFlag: true,
                 attAtkPercentFlag: true,
@@ -629,17 +571,13 @@ const ConversionContent = () => {
                 vitFlag: true,
                 defPercentFlag: true,
                 magdefPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              title={() => "Decal"}
-              footer={() => "*Legend stats based on KDN patch note"}
-              size={"small"}
-              dataSource={getResource(TAB_KEY.miscConversion, EQUIPMENT.DECAL)}
-              columns={getColumnsStats({
+              },
+            },
+            {
+              label: "Decal",
+              footer: "*Legend stats based on KDN patch note",
+              dataSource: getResource(TAB_KEY.miscConversion, EQUIPMENT.DECAL),
+              flags: {
                 phyMagAtkFlag: true,
                 attAtkPercentFlag: true,
                 crtFlag: true,
@@ -650,266 +588,125 @@ const ConversionContent = () => {
                 magdefFlag: true,
                 defPercentFlag: true,
                 magdefPercentFlag: true,
-              })}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-    ];
+              },
+            },
+          ],
+        },
+      ]}
+    />
+    ),
+    []
+  );
 
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Collapse items={itemStat} size="small" />
+  // Every equipment category's Mats panel is the same 3-table shape: an
+  // Enhancement resource table (with its own note/success-rate blurb), an
+  // Evo Legend table, and an Enhancement Legend table.
+  const getEnhanceMatsGroup = ({
+    enhanceFooter,
+    enhanceData,
+    enhanceNote,
+    evoData,
+    encLegendData,
+  }: {
+    enhanceFooter: string;
+    enhanceData: Record<string, number>;
+    enhanceNote: React.ReactNode;
+    evoData: Record<string, number>;
+    encLegendData: Record<string, number>;
+  }) => (
+    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
+      <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <MaterialListTable
+          title="Enhancement"
+          footer={enhanceFooter}
+          data={enhanceData}
+        />
+        {enhanceNote}
       </div>
-    );
-  };
+      <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <MaterialListTable title="Evo Legend" data={evoData} />
+      </div>
+      <div style={{ marginRight: 10, marginBottom: 10 }}>
+        <MaterialListTable title="Enhancement Legend" data={encLegendData} />
+      </div>
+    </div>
+  );
 
-  const getMatsContent = () => {
+  // Also pure reference data — same reasoning as statContent above.
+  const matsContent = useMemo(() => {
     const itemMats: CollapseProps["items"] = [
       {
         key: "1",
         label: "Armor",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement"}
-                footer={() => "Using Armor Fragment"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Buy from Store": CONV_FRAG,
-                  "Every tap from +0 to +10": CONV_FRAG,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-              <Text>* +1 to +10 have 100% success rate</Text>
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Evo Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": EV_AST_POW_ARMOR,
-                  "Astral Stone": EV_AST_STONE,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": ENC_AST_POW_ARMOR,
-                  "Astral Stone": ENC_AST_STONE_ARMOR,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-          </div>
-        ),
+        children: getEnhanceMatsGroup({
+          enhanceFooter: "Using Armor Fragment",
+          enhanceData: {
+            "Buy from Store": CONV_FRAG,
+            "Every tap from +0 to +10": CONV_FRAG,
+          },
+          enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
+          evoData: { "Astral Powder": EV_AST_POW_ARMOR, "Astral Stone": EV_AST_STONE },
+          encLegendData: {
+            "Astral Powder": ENC_AST_POW_ARMOR,
+            "Astral Stone": ENC_AST_STONE_ARMOR,
+          },
+        }),
       },
       {
         key: "2",
         label: "Weapon",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement"}
-                footer={() => "Using Weapon Fragment"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Every tap from +0 to +10": WEAP_FRAG,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
+        children: getEnhanceMatsGroup({
+          enhanceFooter: "Using Weapon Fragment",
+          enhanceData: { "Every tap from +0 to +10": WEAP_FRAG },
+          enhanceNote: (
+            <>
               <Text>
                 * You can buy Conversion Weapon box via Trading House, or Cherry
                 store
               </Text>
               {tempComp("Conversion Weapon", WEAP_ENH_SUC_RATE)}
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Evo Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": EV_AST_POW_WEAP,
-                  "Astral Stone": EV_AST_STONE,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": ENC_AST_POW_WEAP,
-                  "Astral Stone": ENC_AST_STONE_WEAP,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-          </div>
-        ),
+            </>
+          ),
+          evoData: { "Astral Powder": EV_AST_POW_WEAP, "Astral Stone": EV_AST_STONE },
+          encLegendData: {
+            "Astral Powder": ENC_AST_POW_WEAP,
+            "Astral Stone": ENC_AST_STONE_WEAP,
+          },
+        }),
       },
       {
         key: "3",
         label: "Accesories",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement"}
-                footer={() => "Using Acc Fragment"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Buy from Store": CONV_FRAG,
-                  "Every tap from +0 to +10": CONV_FRAG,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-              <Text>* +1 to +10 have 100% success rate</Text>
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Evo Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": EV_AST_POW_ACC,
-                  "Astral Stone": EV_AST_STONE,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": ENC_AST_POW_ACC,
-                  "Astral Stone": ENC_AST_STONE_ACC,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-          </div>
-        ),
+        children: getEnhanceMatsGroup({
+          enhanceFooter: "Using Acc Fragment",
+          enhanceData: {
+            "Buy from Store": CONV_FRAG,
+            "Every tap from +0 to +10": CONV_FRAG,
+          },
+          enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
+          evoData: { "Astral Powder": EV_AST_POW_ACC, "Astral Stone": EV_AST_STONE },
+          encLegendData: {
+            "Astral Powder": ENC_AST_POW_ACC,
+            "Astral Stone": ENC_AST_STONE_ACC,
+          },
+        }),
       },
       {
         key: "4",
         label: "WTD",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement"}
-                footer={() => "Using Wtd Fragment"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Buy from Store": CONV_FRAG,
-                  "Every tap from +0 to +10": CONV_FRAG,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-              <Text>* +1 to +10 have 100% success rate</Text>
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Evo Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": EV_AST_POW_WTD,
-                  "Astral Stone": EV_AST_STONE,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-            <div style={{ marginRight: 10, marginBottom: 10 }}>
-              <Table
-                title={() => "Enhancement Legend"}
-                size={"small"}
-                dataSource={Object.entries({
-                  "Astral Powder": ENC_AST_POW_WTD,
-                  "Astral Stone": ENC_AST_STONE_WTD,
-                }).map(([key, value]) => ({
-                  mats: key,
-                  amount: value,
-                }))}
-                columns={columnsResource}
-                pagination={false}
-                bordered
-              />
-            </div>
-          </div>
-        ),
+        children: getEnhanceMatsGroup({
+          enhanceFooter: "Using Wtd Fragment",
+          enhanceData: {
+            "Buy from Store": CONV_FRAG,
+            "Every tap from +0 to +10": CONV_FRAG,
+          },
+          enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
+          evoData: { "Astral Powder": EV_AST_POW_WTD, "Astral Stone": EV_AST_STONE },
+          encLegendData: {
+            "Astral Powder": ENC_AST_POW_WTD,
+            "Astral Stone": ENC_AST_STONE_WTD,
+          },
+        }),
       },
     ];
 
@@ -918,18 +715,18 @@ const ConversionContent = () => {
         <Collapse items={itemMats} size="small" />
       </div>
     );
-  };
+  }, []);
 
   const items: CollapseProps["items"] = [
     {
       key: "1",
       label: "Stats",
-      children: getStatContent(),
+      children: statContent,
     },
     {
       key: "2",
       label: "Mats",
-      children: getMatsContent(),
+      children: matsContent,
     },
     {
       key: "3",
