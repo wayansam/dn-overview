@@ -1,20 +1,14 @@
-import {
-  Card,
-  Collapse,
-  CollapseProps,
-  Divider,
-  Grid,
-  Select,
-  Slider,
-  Tooltip,
-  Typography,
-} from "antd";
-import Checkbox, { CheckboxChangeEvent } from "antd/es/checkbox";
+import { Card, Collapse, CollapseProps, Grid, Typography } from "antd";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import JadeCalculatorPanel from "../../components/JadeCalculatorPanel";
 import ListingCard, { ItemList } from "../../components/ListingCard";
 import { EmptyCommonnStat } from "../../constants/Common.constants";
+import {
+  useRangeAccumulator,
+  useRangeStatDiff,
+} from "../../hooks/useJadeCalculator";
 import {
   DeeplyVariantLJadeEnhanceMaterialTable,
   DeeplyVariantLJadeStatsTable,
@@ -24,7 +18,6 @@ import {
 import { DeeplyVariantJadeEnhanceMaterial } from "../../interface/Item.interface";
 import { CommonItemStats } from "../../interface/ItemStat.interface";
 import {
-  columnsResource,
   combineEqStats,
   getColumnsStats,
   getComparedData,
@@ -34,15 +27,6 @@ import {
 } from "../../utils/common.util";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
-
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
 
 const marks: SliderMarks = {
   0: "+0",
@@ -59,26 +43,38 @@ interface DeeplyVariantTableMaterialList {
   "Corrupted Origin": number;
 }
 
+const emptyDeepVariantMats: DeeplyVariantTableMaterialList = {
+  "Collapse Dimension Energy": 0,
+  "Deeply Rooted Fragment of Longing": 0,
+  "Twisted Root": 0,
+  Gold: 0,
+  "Contaminated Will": 0,
+  "Corrupted Origin": 0,
+};
+
 interface ExtraData {
   enhance: string;
   sRate: string;
 }
 
+// The base row prepended to the Legend/Ancient stat table: level 0 there is
+// "Unique Grade +10, plus the evolver's +5% attribute" — a fixed derived
+// value, not something that changes with state, so it's computed once here.
+const lJadeStatsTableWithBase: CommonItemStats[] = [
+  {
+    ...DeeplyVariantUJadeStatsTable[10],
+    attAtkPercent: 5,
+  } as CommonItemStats,
+].concat(DeeplyVariantLJadeStatsTable);
+
 const DeeplyVarJadeContent = () => {
   const screens = useBreakpoint();
-  const [deepData, setDeepData] = useState([0, 10]);
+  const [deepData, setDeepData] = useState<[number, number]>([0, 10]);
   const [checkedCraft, setCheckedCraft] = useState(false);
   const [checkedEvoL, setCheckedEvoL] = useState(false);
   const [checkedEvoA, setCheckedEvoA] = useState(false);
   const [selectStart, setSelectStart] = useState<number>(0);
   const [selectEnd, setSelectEnd] = useState<number>(1);
-
-  const enhanceList = useMemo(() => {
-    return Array.from({ length: 51 }, (_, k) => k).map((item) => ({
-      label: `+${item}`,
-      value: item,
-    }));
-  }, []);
 
   const getWidthSetting = () => {
     if (screens.xs) {
@@ -166,59 +162,59 @@ const DeeplyVarJadeContent = () => {
     ];
   };
 
-  const encUDataSource: DeeplyVariantTableMaterialList = useMemo(() => {
-    const tempSlice = DeeplyVariantUJadeEnhanceMaterialTable.slice(
-      deepData[0],
-      deepData[1]
-    );
-    let tempEnergy = 0;
-    let tempDeepFrag = 0;
-    let tempGold = 0;
-    let tempWill = 0;
-    let tempOri = 0;
+  const reduceDeepUSlice = useCallback(
+    (
+      acc: DeeplyVariantTableMaterialList,
+      slice: DeeplyVariantJadeEnhanceMaterial[]
+    ): DeeplyVariantTableMaterialList => {
+      const next = { ...acc };
+      slice.forEach((slicedItem) => {
+        next["Deeply Rooted Fragment of Longing"] +=
+          slicedItem.deepRootedLonging;
+        next.Gold += slicedItem.gold;
+      });
+      return next;
+    },
+    []
+  );
 
-    tempSlice.forEach((slicedItem) => {
-      tempDeepFrag += slicedItem.deepRootedLonging;
-      tempGold += slicedItem.gold;
-    });
-    if (checkedCraft) {
-      tempDeepFrag += 200;
-      tempEnergy += 2;
-      tempGold += 200000;
-    }
-    if (checkedEvoL) {
-      tempWill += 1;
-    }
-    if (checkedEvoA) {
-      tempOri += 1;
-    }
-    const temp: DeeplyVariantTableMaterialList = {
-      "Collapse Dimension Energy": tempEnergy,
-      "Deeply Rooted Fragment of Longing": tempDeepFrag,
-      "Twisted Root": 0,
-      Gold: tempGold,
-      "Contaminated Will": tempWill,
-      "Corrupted Origin": tempOri,
-    };
-    return temp;
-  }, [deepData, checkedCraft, checkedEvoL, checkedEvoA]);
+  const finalizeDeepUMats = useCallback(
+    (
+      acc: DeeplyVariantTableMaterialList,
+      ctx: { checkedCraft: boolean; checkedEvoL: boolean; checkedEvoA: boolean }
+    ): DeeplyVariantTableMaterialList => {
+      const next = { ...acc };
+      if (ctx.checkedCraft) {
+        next["Deeply Rooted Fragment of Longing"] += 200;
+        next["Collapse Dimension Energy"] += 2;
+        next.Gold += 200000;
+      }
+      if (ctx.checkedEvoL) {
+        next["Contaminated Will"] += 1;
+      }
+      if (ctx.checkedEvoA) {
+        next["Corrupted Origin"] += 1;
+      }
+      return next;
+    },
+    []
+  );
 
-  const onChangeCraft = (e: CheckboxChangeEvent) => {
-    setCheckedCraft(e.target.checked);
-  };
-  const onChangeEvoL = (e: CheckboxChangeEvent) => {
-    setCheckedEvoL(e.target.checked);
-  };
-  const onChangeEvoA = (e: CheckboxChangeEvent) => {
-    setCheckedEvoA(e.target.checked);
-  };
+  const encUDataSource = useRangeAccumulator(
+    deepData,
+    false,
+    DeeplyVariantUJadeEnhanceMaterialTable,
+    emptyDeepVariantMats,
+    reduceDeepUSlice,
+    { checkedCraft, checkedEvoL, checkedEvoA },
+    finalizeDeepUMats
+  );
 
   const uStatDif: CommonItemStats = useMemo(() => {
     let temp: CommonItemStats = { ...EmptyCommonnStat };
-    let tableHolder = DeeplyVariantUJadeStatsTable;
 
     const { dt1, dt2 } = getComparedData(
-      tableHolder,
+      DeeplyVariantUJadeStatsTable,
       deepData[0] + 1,
       deepData[1] + 1
     );
@@ -236,85 +232,40 @@ const DeeplyVarJadeContent = () => {
     return temp;
   }, [checkedCraft, checkedEvoL, checkedEvoA, deepData]);
 
-  const getCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setDeepData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={marks}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Settings</Divider>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedCraft} onChange={onChangeCraft}>
-              <Tooltip
-                title="200 deep fragment longing, 2 collapse Dim.Energy"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include craft mats
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedEvoL} onChange={onChangeEvoL}>
-              <Tooltip
-                title="1 Contaminated Will"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include Legend evolver
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox checked={checkedEvoA} onChange={onChangeEvoA}>
-              <Tooltip
-                title="1 Corrupted Origin"
-                trigger="hover"
-                color="blue"
-                placement="right"
-              >
-                Include Ancient evolver
-              </Tooltip>
-            </Checkbox>
-          </div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(encUDataSource)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
+  const getCalc = () => (
+    <JadeCalculatorPanel
+      rangeSlider={{
+        value: deepData,
+        onChange: (value) => setDeepData(value as [number, number]),
+        max: 10,
+        marks,
+      }}
+      toggles={[
+        {
+          key: "craft",
+          label: "Include craft mats",
+          tooltip: "200 deep fragment longing, 2 collapse Dim.Energy",
+          checked: checkedCraft,
+          onChange: setCheckedCraft,
+        },
+        {
+          key: "evoL",
+          label: "Include Legend evolver",
+          tooltip: "1 Contaminated Will",
+          checked: checkedEvoL,
+          onChange: setCheckedEvoL,
+        },
+        {
+          key: "evoA",
+          label: "Include Ancient evolver",
+          tooltip: "1 Corrupted Origin",
+          checked: checkedEvoA,
+          onChange: setCheckedEvoA,
+        },
+      ]}
+      mats={{ data: encUDataSource, hideZero: true }}
+      extra={
+        <>
           <ListingCard title="Status Increase" data={getStatDif(uStatDif)} />
           {checkedEvoL && (
             <Card
@@ -338,10 +289,10 @@ const DeeplyVarJadeContent = () => {
               </Text>
             </Card>
           )}
-        </div>
-      </div>
-    );
-  };
+        </>
+      }
+    />
+  );
 
   const getLStats = () => {
     const col = getColumnsStats({
@@ -406,51 +357,44 @@ const DeeplyVarJadeContent = () => {
     );
   };
 
-  const isError = useMemo(() => {
-    if (selectStart === undefined || selectEnd === undefined) {
-      return true;
-    }
-    return selectStart >= selectEnd;
-  }, [selectStart, selectEnd]);
+  const isError = selectStart >= selectEnd;
 
-  const encLDataSource: {
-    res1: DeeplyVariantTableMaterialList;
-    res2: Array<ExtraData>;
-  } = useMemo(() => {
-    let temp: DeeplyVariantTableMaterialList = {
-      "Collapse Dimension Energy": 0,
-      "Deeply Rooted Fragment of Longing": 0,
-      "Twisted Root": 0,
-      Gold: 0,
-      "Contaminated Will": 0,
-      "Corrupted Origin": 0,
-    };
-    let exData: ExtraData[] = [];
-    if (!isError) {
-      let tempDeepFrag = 0;
-      let tempTwist = 0;
-      let tempGold = 0;
-      const tempSlice = DeeplyVariantLJadeEnhanceMaterialTable.slice(
-        selectStart,
-        selectEnd
-      );
-      tempSlice.forEach((slicedItem) => {
-        tempDeepFrag += slicedItem.deepRootedLonging;
-        tempTwist += slicedItem.twistedRoot ?? 0;
-        tempGold += slicedItem.gold;
+  const reduceDeepLSlice = useCallback(
+    (
+      acc: { res1: DeeplyVariantTableMaterialList; res2: ExtraData[] },
+      slice: DeeplyVariantJadeEnhanceMaterial[]
+    ): { res1: DeeplyVariantTableMaterialList; res2: ExtraData[] } => {
+      const res1 = { ...acc.res1 };
+      const res2 = [...acc.res2];
+      slice.forEach((slicedItem) => {
+        res1["Deeply Rooted Fragment of Longing"] +=
+          slicedItem.deepRootedLonging;
+        res1["Twisted Root"] += slicedItem.twistedRoot ?? 0;
+        res1.Gold += slicedItem.gold;
         if (slicedItem.successRatePercent !== 100) {
-          exData.push({
+          res2.push({
             enhance: `${slicedItem.encLevel}`,
             sRate: `${slicedItem.successRatePercent}%`,
           });
         }
       });
-      temp["Deeply Rooted Fragment of Longing"] = tempDeepFrag;
-      temp["Twisted Root"] = tempTwist;
-      temp.Gold = tempGold;
-    }
-    return { res1: temp, res2: exData };
-  }, [isError, selectStart, selectEnd]);
+      return { res1, res2 };
+    },
+    []
+  );
+
+  const emptyDeepLMats = useMemo(
+    () => ({ res1: emptyDeepVariantMats, res2: [] as ExtraData[] }),
+    []
+  );
+
+  const encLDataSource = useRangeAccumulator(
+    [selectStart, selectEnd],
+    isError,
+    DeeplyVariantLJadeEnhanceMaterialTable,
+    emptyDeepLMats,
+    reduceDeepLSlice
+  );
 
   const extraInfo: ItemList[] = useMemo(() => {
     const list: ItemList[] = [];
@@ -473,88 +417,27 @@ const DeeplyVarJadeContent = () => {
     return list;
   }, [encLDataSource.res2]);
 
-  const lStatDif: CommonItemStats = useMemo(() => {
-    let temp: CommonItemStats = { ...EmptyCommonnStat };
-    let tableHolder = [
-      {
-        ...DeeplyVariantUJadeStatsTable[10],
-        attAtkPercent: 5,
-      } as CommonItemStats,
-    ].concat(DeeplyVariantLJadeStatsTable);
+  const lStatDif = useRangeStatDiff(
+    [selectStart, selectEnd],
+    isError,
+    lJadeStatsTableWithBase
+  );
 
-    if (!isError && selectStart !== undefined && selectEnd !== undefined) {
-      const { dt1, dt2 } = getComparedData(
-        tableHolder,
-        selectStart + 1,
-        selectEnd + 1
-      );
-      if (dt2) {
-        const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-        temp = combineEqStats(temp, dt, "add");
-      }
-    }
-
-    return temp;
-  }, [isError, selectStart, selectEnd]);
-
-  const getLCalc = () => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Enhance</Divider>
-          <div style={{ marginBottom: 4, color: isError ? "red" : "unset" }}>
-            Enhance
-            <Divider type="vertical" />
-            <Select
-              value={selectStart}
-              style={{ width: 100, marginBottom: 4 }}
-              onChange={(val) => {
-                setSelectStart(val);
-              }}
-              options={enhanceList}
-            />
-            {` - `}
-            <Select
-              value={selectEnd}
-              style={{ width: 100, marginBottom: 4 }}
-              onChange={(val) => {
-                setSelectEnd(val);
-              }}
-              options={enhanceList}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(encLDataSource.res1)
-              .filter(([_, value]) => {
-                if (typeof value === "number") {
-                  return value !== 0;
-                }
-                return value.amt !== 0;
-              })
-              .map(([key, value]) => ({
-                mats: key,
-                amount: value,
-              }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-        </div>
-
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard keyId="extra-info" title="Extra Info" data={extraInfo} />
-        </div>
-        <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <ListingCard title="Status Increase" data={getStatDif(lStatDif)} />
-        </div>
-      </div>
-    );
-  };
+  const getLCalc = () => (
+    <JadeCalculatorPanel
+      rangeSelect={{
+        from: selectStart,
+        to: selectEnd,
+        onFromChange: setSelectStart,
+        onToChange: setSelectEnd,
+        max: 50,
+      }}
+      invalid={isError}
+      mats={{ data: encLDataSource.res1, hideZero: true }}
+      rateSummary={{ items: extraInfo }}
+      stats={{ statDif: lStatDif }}
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {
