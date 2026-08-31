@@ -1,15 +1,8 @@
-import {
-  Collapse,
-  CollapseProps,
-  Divider,
-  Slider,
-  Table,
-  Typography,
-} from "antd";
+import { Collapse, CollapseProps, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
 import ListingCard from "../../../components/ListingCard";
-import TradingHouseCalc from "../../../components/TradingHouseCalc";
 import {
   EternalChaosTalismanStatTable,
   EternalPainTalismanMatsTable,
@@ -26,21 +19,8 @@ import {
   EternalPainTalismanStat,
   EternalWorldTalismanStat,
 } from "../../../interface/ItemStat.interface";
-import {
-  columnsResource,
-  getComparedData,
-  getTextEmpty,
-} from "../../../utils/common.util";
+import { getComparedData, getTextEmpty } from "../../../utils/common.util";
 const { Text } = Typography;
-
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
 
 interface WorldTableMaterialList {
   "Eternal Dimensional Apparition": number;
@@ -461,71 +441,40 @@ const ExternalTalismanContent = () => {
     };
   }, [worldData]);
 
-  const getWorldCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setWorldData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={getRemarks(10)}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div>
-          <Divider orientation="left">Materials</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(worldDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-
-          <ListingCard
-            title="Status Increase"
-            data={[
-              {
-                title: "ATK",
-                value: worldStatDiff?.attack,
-                format: true,
-              },
-              {
-                title: "Attribute",
-                value: worldStatDiff?.attributePercent,
-                suffix: "%",
-              },
-              {
-                title: "MAX HP",
-                value: worldStatDiff?.maxHP,
-                format: true,
-              },
-            ]}
-          />
-        </div>
-
-        <TradingHouseCalc
+  const getWorldCalc = () => (
+    <JadeCalculatorPanel
+      rangeSlider={{
+        value: worldData as [number, number],
+        onChange: setWorldData,
+        max: 10,
+        marks: getRemarks(10),
+      }}
+      mats={{ data: worldDataSource }}
+      tradingHouse={{
+        data: [
+          {
+            name: "Eternal Dimensional Apparition",
+            amt: worldDataSource["Eternal Dimensional Apparition"],
+          },
+        ],
+        additionalTotal: worldDataSource.Gold,
+      }}
+      extra={
+        <ListingCard
+          title="Status Increase"
           data={[
+            { title: "ATK", value: worldStatDiff?.attack, format: true },
             {
-              name: "Eternal Dimensional Apparition",
-              amt: worldDataSource["Eternal Dimensional Apparition"],
+              title: "Attribute",
+              value: worldStatDiff?.attributePercent,
+              suffix: "%",
             },
+            { title: "MAX HP", value: worldStatDiff?.maxHP, format: true },
           ]}
-          additionalTotal={worldDataSource.Gold}
         />
-      </div>
-    );
-  };
+      }
+    />
+  );
 
   const painDataSource: PainTableMaterialList = useMemo(() => {
     const tempSlice = EternalPainTalismanMatsTable.slice(
@@ -569,75 +518,40 @@ const ExternalTalismanContent = () => {
     };
   }, [painData]);
 
-  const getPainCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setPainData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={getRemarks(5)}
-            defaultValue={[0, 5]}
-            max={5}
-            min={0}
-            onChangeComplete={onAfterChange}
-          />
-        </div>
-        <div>
-          <Divider orientation="left">Materials</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(painDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-
-          <ListingCard
-            title="Status Increase"
-            data={[
-              {
-                title: "ATK",
-                value: painStatDiff?.attack,
-                format: true,
-              },
-              {
-                title: "FD",
-                value: painStatDiff?.fd,
-                format: true,
-              },
-              {
-                title: "MAX HP",
-                value: painStatDiff?.maxHP,
-                format: true,
-              },
-            ]}
-          />
-        </div>
-
-        <TradingHouseCalc
+  const getPainCalc = () => (
+    <JadeCalculatorPanel
+      rangeSlider={{
+        value: painData as [number, number],
+        onChange: setPainData,
+        max: 5,
+        marks: getRemarks(5),
+      }}
+      mats={{ data: painDataSource }}
+      tradingHouse={{
+        data: [
+          {
+            name: "Eternal Dimensional Apparition",
+            amt: painDataSource["Eternal Dimensional Apparition"],
+          },
+          {
+            name: "Eternal Pain Vortex",
+            amt: painDataSource["Eternal Pain Vortex"],
+          },
+        ],
+        additionalTotal: painDataSource.Gold,
+      }}
+      extra={
+        <ListingCard
+          title="Status Increase"
           data={[
-            {
-              name: "Eternal Dimensional Apparition",
-              amt: painDataSource["Eternal Dimensional Apparition"],
-            },
-            {
-              name: "Eternal Pain Vortex",
-              amt: painDataSource["Eternal Pain Vortex"],
-            },
+            { title: "ATK", value: painStatDiff?.attack, format: true },
+            { title: "FD", value: painStatDiff?.fd, format: true },
+            { title: "MAX HP", value: painStatDiff?.maxHP, format: true },
           ]}
-          additionalTotal={painDataSource.Gold}
         />
-      </div>
-    );
-  };
+      }
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {

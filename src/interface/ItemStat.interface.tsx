@@ -54,37 +54,26 @@ export interface AncientGoddesHeraStat {
   attackPercent: number;
 }
 
-export interface BDTalismanStat {
+// Black Dragon's Talisman stats reuse CommonItemStats for every field that
+// actually behaves like a per-item stat (hp/hpPercent/phyMagAtk/def/magdef/
+// crt/cdm/attAtkPercent/phyMagAtkPercent) so this shape stays comparable with
+// every other item's stats — e.g. for a future cross-item stat comparison
+// feature. `fdOptions` stays separate from CommonItemStats.fd because it's a
+// list of alternate values (shown as "a / b / c"), not a single diffable
+// number; name/rarity/craftable are display/gating metadata, not stats.
+export interface BDTalismanStat extends CommonItemStats {
   name: string;
   rarity: ITEM_RARITY;
-  maxHPPercent?: number;
-  attackPercent?: number;
-  fd?: number[];
+  fdOptions?: number[];
   craftable: boolean;
 }
 
-export interface BDBaofaTalismanStat extends BDTalismanStat {
-  maxHP?: number;
-}
-export interface BDUmbalaTalismanStat extends BDTalismanStat {
-  phyDef?: number;
-}
-export interface BDMelukaTalismanStat extends BDTalismanStat {
-  magDef?: number;
-}
-export interface BDTitanionTalismanStat extends BDTalismanStat {
-  attack?: number;
-}
-export interface BDKeenTalismanStat extends BDTalismanStat {
-  attack?: number;
-  critical?: number;
-  criticalDamage?: number;
-}
-export interface BDAncientElementTalismanStat
-  extends Omit<BDTalismanStat, "attackPercent"> {
-  attributePercent?: number;
-  attack?: number;
-}
+export type BDBaofaTalismanStat = BDTalismanStat;
+export type BDUmbalaTalismanStat = BDTalismanStat;
+export type BDMelukaTalismanStat = BDTalismanStat;
+export type BDTitanionTalismanStat = BDTalismanStat;
+export type BDKeenTalismanStat = BDTalismanStat;
+export type BDAncientElementTalismanStat = BDTalismanStat;
 
 export interface EternalWorldTalismanStat {
   encLevel: number;
