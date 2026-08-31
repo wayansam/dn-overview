@@ -2,7 +2,7 @@ import { Collapse, CollapseProps, theme, Typography } from "antd";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
-import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
+import RangeCalculatorPanel from "../../../components/RangeCalculatorPanel";
 import { ITEM_RARITY } from "../../../constants/InGame.constants";
 import {
   BDAncientElementTalismanStatTable,
@@ -617,7 +617,7 @@ const BlackDragonTalismanContent = () => {
   }, [baofaRange]);
 
   const getBaofaCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: baofaRange as [number, number],
         onChange: setBaofaRange,
@@ -669,7 +669,7 @@ const BlackDragonTalismanContent = () => {
   }, [umbalaRange]);
 
   const getUmbalaCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: umbalaRange as [number, number],
         onChange: setUmbalaRange,
@@ -721,7 +721,7 @@ const BlackDragonTalismanContent = () => {
   }, [melukaRange]);
 
   const getMelukaCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: melukaRange as [number, number],
         onChange: setMelukaRange,
@@ -777,7 +777,7 @@ const BlackDragonTalismanContent = () => {
   }, [titanRange]);
 
   const getTitanionCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: titanRange as [number, number],
         onChange: setTitanRange,

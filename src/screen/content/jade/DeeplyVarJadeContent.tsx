@@ -2,7 +2,7 @@ import { Card, Collapse, CollapseProps, Grid, Typography } from "antd";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useCallback, useMemo, useState } from "react";
-import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
+import RangeCalculatorPanel from "../../../components/RangeCalculatorPanel";
 import ListingCard, { ItemList } from "../../../components/ListingCard";
 import { EmptyCommonnStat } from "../../../constants/Common.constants";
 import {
@@ -233,7 +233,7 @@ const DeeplyVarJadeContent = () => {
   }, [checkedCraft, checkedEvoL, checkedEvoA, deepData]);
 
   const getCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: deepData,
         onChange: (value) => setDeepData(value as [number, number]),
@@ -424,7 +424,7 @@ const DeeplyVarJadeContent = () => {
   );
 
   const getLCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSelect={{
         from: selectStart,
         to: selectEnd,

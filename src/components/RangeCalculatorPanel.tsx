@@ -23,20 +23,22 @@ const sliderStyle: React.CSSProperties = {
   marginBottom: 30,
 };
 
-// The single-range "Calculate" tab every jade screen builds: an
-// enhancement-range picker next to a Settings card (toggles/selects/mats)
-// plus whichever of stats/rateSummary/tradingHouse the jade actually has.
-// Sibling to EquipmentCalculatorPanel with the same optional-section rule —
-// a section renders only when its data is passed in — but for a single
-// implicit item instead of a multi-row equipment table, so there's no
-// EquipmentTable/type-filter here, and reuses the same toggle/select/flag
-// shapes (EquipmentModule*) since those controls aren't equipment-specific.
+// The single-range "Calculate" tab pattern used by jade, heraldry, and
+// talisman screens alike: an enhancement-range picker next to a Settings
+// card (toggles/selects/mats) plus whichever of stats/rateSummary/
+// tradingHouse the item actually has. Sibling to EquipmentCalculatorPanel
+// with the same optional-section rule — a section renders only when its
+// data is passed in — but for a single implicit item instead of a
+// multi-row equipment table, so there's no EquipmentTable/type-filter here,
+// and it reuses the same toggle/select/flag shapes (EquipmentModule*) since
+// those controls aren't equipment-specific.
 //
-// The range picker itself comes in the two shapes jade screens actually use:
-// `rangeSlider` (a vertical two-handle Slider, e.g. Erosion) or `rangeSelect`
-// (a From/To Select pair via the same RangeFromTo Equipment screens use,
-// e.g. DeeplyVar's Legend/Ancient grade). Exactly one should be passed.
-interface JadeCalculatorPanelProps {
+// The range picker itself comes in the two shapes callers actually use:
+// `rangeSlider` (a vertical two-handle Slider, e.g. Erosion Jade, Black
+// Dragon's Talisman) or `rangeSelect` (a From/To Select pair via the same
+// RangeFromTo Equipment screens use, e.g. DeeplyVar Jade's Legend/Ancient
+// grade). Exactly one should be passed.
+interface RangeCalculatorPanelProps {
   rangeSlider?: {
     value: [number, number];
     onChange: (value: number[]) => void;
@@ -71,7 +73,7 @@ interface JadeCalculatorPanelProps {
   extra?: React.ReactNode;
 }
 
-const JadeCalculatorPanel = ({
+const RangeCalculatorPanel = ({
   rangeSlider,
   rangeSelect,
   invalid = false,
@@ -84,7 +86,7 @@ const JadeCalculatorPanel = ({
   rateSummary,
   tradingHouse,
   extra,
-}: JadeCalculatorPanelProps) => {
+}: RangeCalculatorPanelProps) => {
   return (
     <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
       {rangeSlider && (
@@ -185,4 +187,4 @@ const JadeCalculatorPanel = ({
   );
 };
 
-export default JadeCalculatorPanel;
+export default RangeCalculatorPanel;

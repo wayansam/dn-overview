@@ -2,7 +2,7 @@ import { Card, Collapse, CollapseProps, InputNumber, Space, Typography } from "a
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
-import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
+import RangeCalculatorPanel from "../../../components/RangeCalculatorPanel";
 import TradingHouseCalc, {
   CalcDataMapped,
 } from "../../../components/TradingHouseCalc";
@@ -263,7 +263,7 @@ const AncientHeraldryContent = () => {
   }, [heraldryData]);
 
   const getCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: heraldryData as [number, number],
         onChange: setHeraldryData,

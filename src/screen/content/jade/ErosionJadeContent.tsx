@@ -2,7 +2,7 @@ import { Collapse, CollapseProps } from "antd";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useCallback, useState } from "react";
-import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
+import RangeCalculatorPanel from "../../../components/RangeCalculatorPanel";
 import { useRangeAccumulator } from "../../../hooks/useJadeCalculator";
 import { ErosionConquerorJadeMaterialTable } from "../../../data/jade/ErosionData";
 import { ErosionConquerorJadeMaterial } from "../../../interface/Item.interface";
@@ -117,7 +117,7 @@ const ErosionJadeContent = () => {
   );
 
   const getCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: erosionData,
         onChange: (value) => setErosionData(value as [number, number]),

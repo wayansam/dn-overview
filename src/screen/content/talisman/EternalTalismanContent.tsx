@@ -1,7 +1,7 @@
 import { Collapse, CollapseProps, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
-import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
+import RangeCalculatorPanel from "../../../components/RangeCalculatorPanel";
 import ListingCard from "../../../components/ListingCard";
 import {
   EternalChaosTalismanStatTable,
@@ -442,7 +442,7 @@ const ExternalTalismanContent = () => {
   }, [worldData]);
 
   const getWorldCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: worldData as [number, number],
         onChange: setWorldData,
@@ -519,7 +519,7 @@ const ExternalTalismanContent = () => {
   }, [painData]);
 
   const getPainCalc = () => (
-    <JadeCalculatorPanel
+    <RangeCalculatorPanel
       rangeSlider={{
         value: painData as [number, number],
         onChange: setPainData,
