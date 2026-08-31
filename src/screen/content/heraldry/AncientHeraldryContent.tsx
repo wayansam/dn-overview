@@ -1,17 +1,8 @@
-import {
-  Card,
-  Checkbox,
-  Collapse,
-  CollapseProps,
-  Divider,
-  InputNumber,
-  Slider,
-  Space,
-  Typography,
-} from "antd";
+import { Card, Collapse, CollapseProps, InputNumber, Space, Typography } from "antd";
 import { SliderMarks } from "antd/es/slider";
 import Table, { ColumnsType } from "antd/es/table";
 import { useMemo, useState } from "react";
+import JadeCalculatorPanel from "../../../components/JadeCalculatorPanel";
 import TradingHouseCalc, {
   CalcDataMapped,
 } from "../../../components/TradingHouseCalc";
@@ -25,18 +16,8 @@ import {
   AncientGoddesHeraRequiredItem,
 } from "../../../interface/Item.interface";
 import { AncientGoddesHeraStat } from "../../../interface/ItemStat.interface";
-import { columnsResource } from "../../../utils/common.util";
 
 const { Text } = Typography;
-
-const style: React.CSSProperties = {
-  display: "inline-block",
-  height: 300,
-  marginLeft: 20,
-  marginRight: 50,
-  marginTop: 10,
-  marginBottom: 30,
-};
 
 const marks: SliderMarks = {
   0: "Don't have",
@@ -281,69 +262,44 @@ const AncientHeraldryContent = () => {
     return toStats.attackPercent - fromStats.attackPercent;
   }, [heraldryData]);
 
-  const getCalc = () => {
-    const onAfterChange = (value: number[]) => {
-      setHeraldryData(value);
-    };
-
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <div style={style}>
-          <Slider
-            vertical
-            range
-            marks={marks}
-            defaultValue={[0, 10]}
-            max={10}
-            min={0}
-            onChangeComplete={onAfterChange}
+  const getCalc = () => (
+    <JadeCalculatorPanel
+      rangeSlider={{
+        value: heraldryData as [number, number],
+        onChange: setHeraldryData,
+        max: 10,
+        marks,
+      }}
+      toggles={[
+        {
+          key: "convertToFrag",
+          label: "Change Blueprint to Fragment",
+          checked: convertToFrag,
+          onChange: setConvertToFrag,
+        },
+      ]}
+      mats={{ data: ancDataSource }}
+      extra={
+        <>
+          <Card size="small" style={{ marginTop: 4, marginBottom: 4 }}>
+            <Space direction="vertical">
+              <Text>Hero Skill +{statRange}%</Text>
+            </Space>
+          </Card>
+          <TradingHouseCalc
+            customTitle="My Progress"
+            data={progressData}
+            additionalTotal={progressDataSource.converterGold}
+            showProgress
+            disableFilter
+            progressPercent={progressDataSource.matsPercent}
+            copyFn={setDt}
+            additionalHeaderItem={additionalData}
           />
-        </div>
-        <div>
-          <Divider orientation="left">Material List</Divider>
-          <Table
-            size={"small"}
-            dataSource={Object.entries(ancDataSource).map(([key, value]) => ({
-              mats: key,
-              amount: value,
-            }))}
-            columns={columnsResource}
-            pagination={false}
-            bordered
-          />
-          <div>
-            <Card size="small" style={{ marginTop: 4, marginBottom: 4 }}>
-              <Space direction="vertical">
-                <Text>Hero Skill +{statRange}%</Text>
-              </Space>
-            </Card>
-          </div>
-
-          <div style={{ marginBottom: 4 }}>
-            <Divider type="vertical" />
-            <Checkbox
-              checked={convertToFrag}
-              onChange={(e) => {
-                setConvertToFrag(e.target.checked);
-              }}
-            >
-              Change Blueprint to Fragment
-            </Checkbox>
-          </div>
-        </div>
-        <TradingHouseCalc
-          customTitle="My Progress"
-          data={progressData}
-          additionalTotal={progressDataSource.converterGold}
-          showProgress
-          disableFilter
-          progressPercent={progressDataSource.matsPercent}
-          copyFn={setDt}
-          additionalHeaderItem={additionalData}
-        />
-      </div>
-    );
-  };
+        </>
+      }
+    />
+  );
 
   const items: CollapseProps["items"] = [
     {

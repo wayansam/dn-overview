@@ -26,6 +26,7 @@ const MaterialListTable: React.FC<MaterialListTableProps> = ({
           mats: key,
           amount: value,
         }))}
+      rowKey={"mats"}
       columns={columnsResource}
       pagination={false}
       bordered
