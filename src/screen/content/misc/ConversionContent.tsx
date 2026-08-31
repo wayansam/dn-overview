@@ -22,6 +22,7 @@ interface TableMaterialList {
   "Weapon Fragment": number;
   "Astral Powder": number;
   "Astral Stone": number;
+  "Astral Jewel": number;
 }
 
 const getLabel = (item: number) => {
@@ -42,14 +43,78 @@ const EV_AST_POW_WEAP = 1500;
 const EV_AST_POW_ACC = 1150;
 const EV_AST_POW_WTD = 1300;
 const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
+
+// Legend-tier enhancement (Legend -> +1 -> +2 ... ) material cost, per tap.
+// Rate increases past +3, and armor's final +6 -> +7 tap switches entirely
+// from Astral Stone to the new Astral Jewel material.
 const ENC_AST_POW_ARMOR = 450;
 const ENC_AST_STONE_ARMOR = 1;
+const ENC_AST_STONE_ARMOR_MID = 3; // +4, +5, +6
+const ENC_AST_POW_ARMOR_TOP = 1500; // +6 -> +7
+const ENC_AST_JEWEL_ARMOR_TOP = 25; // +6 -> +7
+
 const ENC_AST_POW_ACC = 500;
 const ENC_AST_STONE_ACC = 3;
+const ENC_AST_STONE_ACC_MID = 5; // +4, +5, +6
+
 const ENC_AST_POW_WEAP = 600;
 const ENC_AST_STONE_WEAP = 3;
+const ENC_AST_STONE_WEAP_MID = 5; // +4, +5, +6
+
 const ENC_AST_POW_WTD = 550;
 const ENC_AST_STONE_WTD = 3;
+const ENC_AST_STONE_WTD_MID = 5; // +4, +5, +6
+
+// encLevel index boundaries within the Legend chain (Legend = 12).
+const LEGEND_OLD_CAP = 15; // Legend +3, last level at the original rate
+const LEGEND_MID_CAP = 18; // Legend +6, last level shared by every category
+const LEGEND_ARMOR_MAX = 19; // Legend +7, armor only
+
+interface LegendRate {
+  powder: number;
+  stone?: number;
+  jewel?: number;
+}
+
+// Splits the [from, to] range into its Legend-rate tiers (original / mid /
+// top) and sums the material cost across whichever tiers it actually
+// crosses. Reduces to the original flat `enhLRange * rate` computation for
+// any range that doesn't reach past Legend +3.
+const getLegendMatsCost = (
+  from: number,
+  to: number,
+  categoryMax: number,
+  isEvo: boolean,
+  oldRate: LegendRate,
+  midRate: LegendRate,
+  topRate?: LegendRate
+) => {
+  const rangeLow = Math.max(from, 1);
+  const rangeHigh = Math.min(to, categoryMax);
+  const evoAdjust = isEvo ? 1 : 0;
+
+  const oldPortion = Math.max(
+    0,
+    Math.min(rangeHigh, LEGEND_OLD_CAP) - rangeLow - evoAdjust
+  );
+  const midPortion = Math.max(
+    0,
+    Math.min(rangeHigh, LEGEND_MID_CAP) - Math.max(rangeLow, LEGEND_OLD_CAP)
+  );
+  const topPortion = topRate
+    ? Math.max(0, rangeHigh - Math.max(rangeLow, LEGEND_MID_CAP))
+    : 0;
+
+  return {
+    powder:
+      oldPortion * oldRate.powder +
+      midPortion * midRate.powder +
+      topPortion * (topRate?.powder ?? 0),
+    stone:
+      oldPortion * (oldRate.stone ?? 0) + midPortion * (midRate.stone ?? 0),
+    jewel: topPortion * (topRate?.jewel ?? 0),
+  };
+};
 
 const ConversionContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -78,6 +143,7 @@ const ConversionContent = () => {
     "Weapon Fragment": 0,
     "Astral Powder": 0,
     "Astral Stone": 0,
+    "Astral Jewel": 0,
   };
 
   const reduceConversionRow = useCallback(
@@ -98,7 +164,7 @@ const ConversionContent = () => {
 
       let lgFrag = 0;
       let lgStone = 0;
-      let enhLRange = Math.min(to, 15) - Math.max(from, 1) - (isEvo ? 1 : 0);
+      let lgJewel = 0;
       switch (equipment) {
         case EQUIPMENT.HELM:
         case EQUIPMENT.UPPER:
@@ -111,8 +177,18 @@ const ConversionContent = () => {
             lgStone += EV_AST_STONE;
           }
           if (!isEnhUnique) {
-            lgFrag += enhLRange * ENC_AST_POW_ARMOR;
-            lgStone += enhLRange * ENC_AST_STONE_ARMOR;
+            const cost = getLegendMatsCost(
+              from,
+              to,
+              LEGEND_ARMOR_MAX,
+              isEvo,
+              { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR },
+              { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR_MID },
+              { powder: ENC_AST_POW_ARMOR_TOP, jewel: ENC_AST_JEWEL_ARMOR_TOP }
+            );
+            lgFrag += cost.powder;
+            lgStone += cost.stone;
+            lgJewel += cost.jewel;
           }
           break;
 
@@ -123,8 +199,16 @@ const ConversionContent = () => {
             lgStone += EV_AST_STONE;
           }
           if (!isEnhUnique) {
-            lgFrag += enhLRange * ENC_AST_POW_WEAP;
-            lgStone += enhLRange * ENC_AST_STONE_WEAP;
+            const cost = getLegendMatsCost(
+              from,
+              to,
+              LEGEND_MID_CAP,
+              isEvo,
+              { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP },
+              { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP_MID }
+            );
+            lgFrag += cost.powder;
+            lgStone += cost.stone;
           }
           break;
 
@@ -138,8 +222,16 @@ const ConversionContent = () => {
             lgStone += EV_AST_STONE;
           }
           if (!isEnhUnique) {
-            lgFrag += enhLRange * ENC_AST_POW_ACC;
-            lgStone += enhLRange * ENC_AST_STONE_ACC;
+            const cost = getLegendMatsCost(
+              from,
+              to,
+              LEGEND_MID_CAP,
+              isEvo,
+              { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC },
+              { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID }
+            );
+            lgFrag += cost.powder;
+            lgStone += cost.stone;
           }
           break;
 
@@ -152,8 +244,16 @@ const ConversionContent = () => {
             lgStone += EV_AST_STONE;
           }
           if (!isEnhUnique) {
-            lgFrag += enhLRange * ENC_AST_POW_WTD;
-            lgStone += enhLRange * ENC_AST_STONE_WTD;
+            const cost = getLegendMatsCost(
+              from,
+              to,
+              LEGEND_MID_CAP,
+              isEvo,
+              { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD },
+              { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD_MID }
+            );
+            lgFrag += cost.powder;
+            lgStone += cost.stone;
           }
           break;
 
@@ -163,6 +263,7 @@ const ConversionContent = () => {
 
       next["Astral Powder"] += lgFrag;
       next["Astral Stone"] += lgStone;
+      next["Astral Jewel"] += lgJewel;
 
       return next;
     },
@@ -313,7 +414,7 @@ const ConversionContent = () => {
         to: selectTo,
         onFromChange: setSelectFrom,
         onToChange: setSelectTo,
-        max: 15,
+        max: 19,
         customLabeling: getLabel,
       }}
       mats={{ data: tableResource, hideZero: true }}
@@ -606,13 +707,13 @@ const ConversionContent = () => {
     enhanceData,
     enhanceNote,
     evoData,
-    encLegendData,
+    encLegendTiers,
   }: {
     enhanceFooter: string;
     enhanceData: Record<string, number>;
     enhanceNote: React.ReactNode;
     evoData: Record<string, number>;
-    encLegendData: Record<string, number>;
+    encLegendTiers: { title: string; data: Record<string, number> }[];
   }) => (
     <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
       <div style={{ marginRight: 10, marginBottom: 10 }}>
@@ -626,9 +727,11 @@ const ConversionContent = () => {
       <div style={{ marginRight: 10, marginBottom: 10 }}>
         <MaterialListTable title="Evo Legend" data={evoData} />
       </div>
-      <div style={{ marginRight: 10, marginBottom: 10 }}>
-        <MaterialListTable title="Enhancement Legend" data={encLegendData} />
-      </div>
+      {encLegendTiers.map((tier) => (
+        <div key={tier.title} style={{ marginRight: 10, marginBottom: 10 }}>
+          <MaterialListTable title={tier.title} data={tier.data} />
+        </div>
+      ))}
     </div>
   );
 
@@ -638,19 +741,50 @@ const ConversionContent = () => {
       {
         key: "1",
         label: "Armor",
-        children: getEnhanceMatsGroup({
-          enhanceFooter: "Using Armor Fragment",
-          enhanceData: {
-            "Buy from Store": CONV_FRAG,
-            "Every tap from +0 to +10": CONV_FRAG,
-          },
-          enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
-          evoData: { "Astral Powder": EV_AST_POW_ARMOR, "Astral Stone": EV_AST_STONE },
-          encLegendData: {
-            "Astral Powder": ENC_AST_POW_ARMOR,
-            "Astral Stone": ENC_AST_STONE_ARMOR,
-          },
-        }),
+        children: (
+          <>
+            {getEnhanceMatsGroup({
+              enhanceFooter: "Using Armor Fragment",
+              enhanceData: {
+                "Buy from Store": CONV_FRAG,
+                "Every tap from +0 to +10": CONV_FRAG,
+              },
+              enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
+              evoData: {
+                "Astral Powder": EV_AST_POW_ARMOR,
+                "Astral Stone": EV_AST_STONE,
+              },
+              encLegendTiers: [
+                {
+                  title: "Enhancement Legend (+1~+3)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ARMOR,
+                    "Astral Stone": ENC_AST_STONE_ARMOR,
+                  },
+                },
+                {
+                  title: "Enhancement Legend (+4~+6)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ARMOR,
+                    "Astral Stone": ENC_AST_STONE_ARMOR_MID,
+                  },
+                },
+                {
+                  title: "Enhancement Legend (+7)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ARMOR_TOP,
+                    "Astral Jewel": ENC_AST_JEWEL_ARMOR_TOP,
+                  },
+                },
+              ],
+            })}
+            <Text>
+              * Astral Jewel can be bought from the Conversion Shop: 1 Astral
+              Jewel costs 5 Astral Stone (10/week limit), and 1 Astral Jewel
+              can be exchanged back for 50 Astral Powder (unlimited).
+            </Text>
+          </>
+        ),
       },
       {
         key: "2",
@@ -668,10 +802,22 @@ const ConversionContent = () => {
             </>
           ),
           evoData: { "Astral Powder": EV_AST_POW_WEAP, "Astral Stone": EV_AST_STONE },
-          encLegendData: {
-            "Astral Powder": ENC_AST_POW_WEAP,
-            "Astral Stone": ENC_AST_STONE_WEAP,
-          },
+          encLegendTiers: [
+            {
+              title: "Enhancement Legend (+1~+3)",
+              data: {
+                "Astral Powder": ENC_AST_POW_WEAP,
+                "Astral Stone": ENC_AST_STONE_WEAP,
+              },
+            },
+            {
+              title: "Enhancement Legend (+4~+6)",
+              data: {
+                "Astral Powder": ENC_AST_POW_WEAP,
+                "Astral Stone": ENC_AST_STONE_WEAP_MID,
+              },
+            },
+          ],
         }),
       },
       {
@@ -685,10 +831,22 @@ const ConversionContent = () => {
           },
           enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
           evoData: { "Astral Powder": EV_AST_POW_ACC, "Astral Stone": EV_AST_STONE },
-          encLegendData: {
-            "Astral Powder": ENC_AST_POW_ACC,
-            "Astral Stone": ENC_AST_STONE_ACC,
-          },
+          encLegendTiers: [
+            {
+              title: "Enhancement Legend (+1~+3)",
+              data: {
+                "Astral Powder": ENC_AST_POW_ACC,
+                "Astral Stone": ENC_AST_STONE_ACC,
+              },
+            },
+            {
+              title: "Enhancement Legend (+4~+6)",
+              data: {
+                "Astral Powder": ENC_AST_POW_ACC,
+                "Astral Stone": ENC_AST_STONE_ACC_MID,
+              },
+            },
+          ],
         }),
       },
       {
@@ -702,10 +860,22 @@ const ConversionContent = () => {
           },
           enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
           evoData: { "Astral Powder": EV_AST_POW_WTD, "Astral Stone": EV_AST_STONE },
-          encLegendData: {
-            "Astral Powder": ENC_AST_POW_WTD,
-            "Astral Stone": ENC_AST_STONE_WTD,
-          },
+          encLegendTiers: [
+            {
+              title: "Enhancement Legend (+1~+3)",
+              data: {
+                "Astral Powder": ENC_AST_POW_WTD,
+                "Astral Stone": ENC_AST_STONE_WTD,
+              },
+            },
+            {
+              title: "Enhancement Legend (+4~+6)",
+              data: {
+                "Astral Powder": ENC_AST_POW_WTD,
+                "Astral Stone": ENC_AST_STONE_WTD_MID,
+              },
+            },
+          ],
         }),
       },
     ];

@@ -80,6 +80,18 @@ export const miscHelpItems: HelpItem[] = [
               href: "https://patchnote.dragonnest.com/sea/174/c/15",
               label: "Enhancement Legend Conversion WTD (+1 to +3)",
             },
+            {
+              href: "https://patchnote.dragonnest.com/sea/177/c/4",
+              label: "Enhancement Legend Conversion Armor & Weapon (+4 to +6)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/184/c/3",
+              label: "Enhancement Legend Conversion Accessories & WTD (+4 to +6)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/194/c/7",
+              label: "Enhancement Legend Conversion Armor (+7)",
+            },
           ]}
         />
 

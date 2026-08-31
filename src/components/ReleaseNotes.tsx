@@ -102,6 +102,16 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "06-02-2026",
     },
+    {
+      key: keyUpdate.U,
+      label:
+        "Enhancement Legend Conversion Armor (+4 to +7), Weapon, Accessories & WTD (+4 to +6)",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "31-08-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
