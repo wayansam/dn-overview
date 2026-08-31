@@ -7,14 +7,12 @@ import {
   Divider,
   Form,
   Grid,
-  InputNumber,
   Radio,
   Space,
-  Table,
   Typography,
 } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   BestieGrowthTableMats,
   BestieMountV1TableStats,
@@ -22,17 +20,19 @@ import {
   BestieSpiritV1TableStats,
   BestieSpiritV2TableStats,
 } from "../../../data/misc/BestieCalculatorData";
-import { ColumnsType } from "antd/es/table";
 import { CommonItemStats } from "../../../interface/ItemStat.interface";
+import { EmptyCommonnStat } from "../../../constants/Common.constants";
 import {
-  columnsResource,
-  getTextEmpty,
-  typedEntries,
+  combineEqStats,
+  getComparedData,
+  getStatDif,
 } from "../../../utils/common.util";
 import CustomSlider from "../../../components/CustomSlider";
 import { BESTIE_TYPE } from "../../../constants/InGame.constants";
-import { TableResource } from "../../../constants/Common.constants";
 import ListingCard from "../../../components/ListingCard";
+import MaterialListTable from "../../../components/MaterialListTable";
+import MatsReferenceTables from "../../../components/MatsReferenceTables";
+import StatReferenceTables from "../../../components/StatReferenceTables";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -58,6 +58,24 @@ interface GrowthTableRes {
   errorDt?: string[];
 }
 
+const mountFlags = {
+  phyMagAtkFlag: true,
+  phyMagAtkPercentFlag: true,
+  attAtkPercentFlag: true,
+  crtFlag: true,
+  cdmFlag: true,
+  fdFlag: true,
+  moveSpeedPercentFlag: true,
+};
+const spiritFlags = {
+  phyMagAtkFlag: true,
+  phyMagAtkPercentFlag: true,
+  attAtkPercentFlag: true,
+  fdFlag: true,
+  hpFlag: true,
+  hpPercentFlag: true,
+};
+
 const BestieContent = () => {
   const screens = useBreakpoint();
   const [formEnhance] = Form.useForm<{ items: Array<FormEnhance> }>();
@@ -68,338 +86,74 @@ const BestieContent = () => {
   // Pure reference data — memoized so it isn't rebuilt (and reconciled,
   // since antd's Collapse keeps inactive panels mounted) on every keystroke
   // in the stateful "Grow" form below.
-  const statsContent = useMemo(() => {
-    const colMount: ColumnsType<CommonItemStats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            {[
-              "ATK",
-              "ATK(%)",
-              "ATT(%)",
-              "CRT",
-              "CDM",
-              "FD",
-              "Movespeed(%)",
-            ].map((it) => (
-              <p key={`title-${it}`}>{it}</p>
-            ))}
-          </div>
-        ),
-        responsive: ["xs"],
-        width: 150,
-        render: (
-          _,
-          {
-            phyMagAtk,
-            phyMagAtkPercent,
-            attAtkPercent,
-            crt,
-            cdm,
-            fd,
-            moveSpeedPercent,
-          }
-        ) => (
-          <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-            <p>CRT {getTextEmpty({ txt: crt })}</p>
-            <p>CDM {getTextEmpty({ txt: cdm })}</p>
-            <p>FD {getTextEmpty({ txt: fd })}</p>
-            <p>
-              Movespeed {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-            </p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { phyMagAtk }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attack(%)",
-        responsive: ["sm"],
-        render: (_, { phyMagAtkPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attribute(%)",
-        responsive: ["sm"],
-        render: (_, { attAtkPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "CRT",
-        responsive: ["sm"],
-        render: (_, { crt }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: crt })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "CDM",
-        responsive: ["sm"],
-        render: (_, { cdm }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: cdm })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "FD",
-        responsive: ["sm"],
-        render: (_, { fd }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: fd })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Movespeed(%)",
-        responsive: ["sm"],
-        render: (_, { moveSpeedPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: moveSpeedPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-    ];
-
-    const colSpirit: ColumnsType<CommonItemStats> = [
-      {
-        title: "Enhancement",
-        dataIndex: "encLevel",
-      },
-      {
-        title: (
-          <div>
-            {["ATK", "ATK(%)", "ATT(%)", "FD", "HP", "HP(%)"].map((it) => (
-              <p key={`title-${it}`}>{it}</p>
-            ))}
-          </div>
-        ),
-        responsive: ["xs"],
-        width: 150,
-        render: (
-          _,
-          { phyMagAtk, phyMagAtkPercent, attAtkPercent, fd, hp, hpPercent }
-        ) => (
-          <div>
-            <p>ATK {getTextEmpty({ txt: phyMagAtk })}</p>
-            <p>ATK {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}</p>
-            <p>Ele {getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</p>
-            <p>FD {getTextEmpty({ txt: fd })}</p>
-            <p>HP {getTextEmpty({ txt: hp })}</p>
-            <p>HP {getTextEmpty({ txt: hpPercent, tailText: "%" })}</p>
-          </div>
-        ),
-      },
-      {
-        title: "Attack",
-        responsive: ["sm"],
-        render: (_, { phyMagAtk }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: phyMagAtk })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attack(%)",
-        responsive: ["sm"],
-        render: (_, { phyMagAtkPercent }) => (
-          <div>
-            <Text>
-              {getTextEmpty({ txt: phyMagAtkPercent, tailText: "%" })}
-            </Text>
-          </div>
-        ),
-      },
-      {
-        title: "Attribute(%)",
-        responsive: ["sm"],
-        render: (_, { attAtkPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: attAtkPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "FD",
-        responsive: ["sm"],
-        render: (_, { fd }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: fd })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "HP",
-        responsive: ["sm"],
-        render: (_, { hp }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: hp })}</Text>
-          </div>
-        ),
-      },
-      {
-        title: "HP(%)",
-        responsive: ["sm"],
-        render: (_, { hpPercent }) => (
-          <div>
-            <Text>{getTextEmpty({ txt: hpPercent, tailText: "%" })}</Text>
-          </div>
-        ),
-      },
-    ];
-
-    const itemStatMount: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "1st",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              rowKey="encLevel"
-              dataSource={BestieMountV1TableStats}
-              columns={colMount}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "2nd & 3rd",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              rowKey="encLevel"
-              dataSource={BestieMountV2TableStats}
-              columns={colMount}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-    ];
-
-    const itemStatSpirit: CollapseProps["items"] = [
-      {
-        key: "1",
-        label: "1st",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              rowKey="encLevel"
-              dataSource={BestieSpiritV1TableStats}
-              columns={colSpirit}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-      {
-        key: "2",
-        label: "2nd & 3rd",
-        children: (
-          <div
-            style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}
-          >
-            <Table
-              style={{ marginRight: 10, marginBottom: 10 }}
-              size={"small"}
-              rowKey="encLevel"
-              dataSource={BestieSpiritV2TableStats}
-              columns={colSpirit}
-              pagination={false}
-              bordered
-            />
-          </div>
-        ),
-      },
-    ];
-    return (
+  const statsContent = useMemo(
+    () => (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <Divider orientation="left">Mount</Divider>
-        <Collapse items={itemStatMount} size="small" />
-
-        <Divider orientation="left">Spirit</Divider>
-        <Collapse items={itemStatSpirit} size="small" />
-      </div>
-    );
-  }, []);
-
-  const matsContent = useMemo(() => {
-    return (
-      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
-        <Table
-          style={{ marginRight: 10, marginBottom: 10 }}
-          size={"small"}
-          rowKey="encLevel"
-          dataSource={BestieGrowthTableMats}
-          columns={[
+        <StatReferenceTables
+          entries={[
             {
-              title: "Enhancement",
-              dataIndex: "encLevel",
+              key: "1",
+              label: "1st",
+              dataSource: BestieMountV1TableStats,
+              flags: mountFlags,
             },
             {
-              title: "Faded",
-              dataIndex: "faded",
-            },
-            {
-              title: "Shining",
-              dataIndex: "shining",
-            },
-            {
-              title: "Unbeatable",
-              dataIndex: "unbeatable",
+              key: "2",
+              label: "2nd & 3rd",
+              dataSource: BestieMountV2TableStats,
+              flags: mountFlags,
             },
           ]}
-          pagination={false}
-          bordered
-          footer={() =>
-            "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
-          }
+        />
+
+        <Divider orientation="left">Spirit</Divider>
+        <StatReferenceTables
+          entries={[
+            {
+              key: "1",
+              label: "1st",
+              dataSource: BestieSpiritV1TableStats,
+              flags: spiritFlags,
+            },
+            {
+              key: "2",
+              label: "2nd & 3rd",
+              dataSource: BestieSpiritV2TableStats,
+              flags: spiritFlags,
+            },
+          ]}
         />
       </div>
-    );
-  }, []);
+    ),
+    []
+  );
+
+  const matsContent = useMemo(
+    () => (
+      <MatsReferenceTables
+        entries={[
+          {
+            key: "1",
+            label: "Bestie Star Growth",
+            dataSource: BestieGrowthTableMats,
+            fields: [
+              { dataIndex: "faded", label: "Faded", shortLabel: "(Faded)" },
+              { dataIndex: "shining", label: "Shining", shortLabel: "(Shining)" },
+              {
+                dataIndex: "unbeatable",
+                label: "Unbeatable",
+                shortLabel: "(Unbeatable)",
+              },
+            ],
+            footer:
+              "* Growth only use one of the Bestie Star type, same for both Mount & Spirit",
+          },
+        ]}
+      />
+    ),
+    []
+  );
 
   const calcEnhanceDataSource = (temp: Array<FormEnhance>) => {
     if (!temp || !Array.isArray(temp) || temp.length < 1) {
@@ -412,17 +166,7 @@ const BestieContent = () => {
     let tempUnbeat = 0;
 
     // stats
-    let phyMagAtk = 0;
-    let phyMagAtkPercent = 0;
-    let attAtkPercent = 0;
-    let fd = 0;
-    // mount
-    let crt = 0;
-    let cdm = 0;
-    let moveSpeedPercent = 0;
-    // spirit
-    let hp = 0;
-    let hpPercent = 0;
+    let statsAcc: CommonItemStats = { ...EmptyCommonnStat };
 
     let errorMsg: string[] = [];
 
@@ -481,39 +225,14 @@ const BestieContent = () => {
                 break;
             }
 
-            const dt1 =
-              tempArrStats.length >= item?.range[0]
-                ? tempArrStats[item?.range[0] - 1]
-                : undefined;
-            const dt2 =
-              tempArrStats.length >= item?.range[1]
-                ? tempArrStats[item?.range[1] - 1]
-                : undefined;
-            const minusHandler = (n1?: number, n2?: number) => {
-              return (n1 ?? 0) - (n2 ?? 0);
-            };
-
+            const { dt1, dt2 } = getComparedData(
+              tempArrStats,
+              item.range[0],
+              item.range[1]
+            );
             if (dt2) {
-              phyMagAtk += minusHandler(dt2.phyMagAtk, dt1?.phyMagAtk);
-              phyMagAtkPercent += minusHandler(
-                dt2.phyMagAtkPercent,
-                dt1?.phyMagAtkPercent
-              );
-              attAtkPercent += minusHandler(
-                dt2.attAtkPercent,
-                dt1?.attAtkPercent
-              );
-              fd += minusHandler(dt2.fd, dt1?.fd);
-
-              crt += minusHandler(dt2.crt, dt1?.crt);
-              cdm += minusHandler(dt2.cdm, dt1?.cdm);
-              moveSpeedPercent += minusHandler(
-                dt2.moveSpeedPercent,
-                dt1?.moveSpeedPercent
-              );
-
-              hp += minusHandler(dt2.hp, dt1?.hp);
-              hpPercent += minusHandler(dt2.hpPercent, dt1?.hpPercent);
+              const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+              statsAcc = combineEqStats(statsAcc, dt, "add");
             }
           } else {
             let emsg = "";
@@ -546,22 +265,7 @@ const BestieContent = () => {
         "Shining Bestie Star": tempShining,
         "Unbeatable Bestie Star": tempUnbeat,
       },
-      statsData: {
-        encLevel: "",
-        phyMagAtk,
-        phyMagAtkPercent,
-        attAtkPercent,
-        fd,
-
-        // mount
-        crt,
-        cdm,
-        moveSpeedPercent,
-
-        // spirit
-        hp,
-        hpPercent,
-      },
+      statsData: { ...statsAcc, encLevel: "" },
       errorDt: errorMsg.length > 0 ? errorMsg : undefined,
     } as GrowthTableRes;
   };
@@ -672,7 +376,7 @@ const BestieContent = () => {
                                     >
                                       <Radio.Group>
                                         {BestieVersion.map((it) => (
-                                          <Radio.Button value={it}>
+                                          <Radio.Button key={it} value={it}>
                                             {it.toUpperCase()}
                                           </Radio.Button>
                                         ))}
@@ -748,7 +452,6 @@ const BestieContent = () => {
         </div>
 
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Growth Material List</Divider>
           {enhanceDataSource.errorDt && (
             <div>
               <Alert
@@ -758,77 +461,16 @@ const BestieContent = () => {
               />
             </div>
           )}
-          <Table
-            size={"small"}
-            rowKey="mats"
-            dataSource={
-              (enhanceDataSource.growthData
-                ? typedEntries(enhanceDataSource.growthData).map(
-                    ([key, value]) => ({
-                      mats: key,
-                      amount: value,
-                    })
-                  )
-                : []) as TableResource[]
-            }
-            columns={columnsResource}
-            pagination={false}
-            bordered
-            footer={() =>
-              "* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
-            }
+          <MaterialListTable
+            title="Growth Material List"
+            data={enhanceDataSource.growthData ?? {}}
+            footer="* Growth only use one of the Bestie Star type, same for both Mount & Spirit"
           />
         </div>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <ListingCard
             title="Status Increase"
-            data={[
-              {
-                title: "ATK",
-                value: enhanceDataSource.statsData?.phyMagAtk,
-                format: true,
-              },
-              {
-                title: "ATK",
-                value: enhanceDataSource.statsData?.phyMagAtkPercent,
-                suffix: "%",
-              },
-              {
-                title: "ATT",
-                value: enhanceDataSource.statsData?.attAtkPercent,
-                suffix: "%",
-              },
-              {
-                title: "FD",
-                value: enhanceDataSource.statsData?.fd,
-                format: true,
-              },
-              {
-                title: "CRT",
-                value: enhanceDataSource.statsData?.crt,
-                format: true,
-              },
-              {
-                title: "CDM",
-                value: enhanceDataSource.statsData?.cdm,
-                format: true,
-              },
-              {
-                title: "MvSpeed",
-                value: enhanceDataSource.statsData?.moveSpeedPercent,
-                suffix: "%",
-              },
-              {
-                title: "HP",
-                value: enhanceDataSource.statsData?.hp,
-                format: true,
-              },
-              {
-                title: "HP",
-                value: enhanceDataSource.statsData?.hpPercent,
-                suffix: "%",
-              },
-            ]}
+            data={getStatDif(enhanceDataSource.statsData)}
           />
         </div>
       </div>
