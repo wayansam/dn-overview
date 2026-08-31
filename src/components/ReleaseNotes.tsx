@@ -18,6 +18,7 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     P = "Planned",
     I = "In Progress",
     D = "Done",
+    M = "Maintenance",
   }
 
   interface FeatureItem {
@@ -38,6 +39,9 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
     }
     if (item.key === keyUpdate.I) {
       return "danger";
+    }
+    if (item.key === keyUpdate.M) {
+      return "secondary";
     }
     return;
   };
@@ -101,6 +105,12 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.miscConversion,
       },
       date: "06-02-2026",
+    },
+    {
+      key: keyUpdate.M,
+      label:
+        "Overall app performance improvement, bug fixes, and UI/UX enhancements.",
+      date: "31-08-2026",
     },
     {
       key: keyUpdate.U,
