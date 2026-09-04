@@ -80,6 +80,7 @@ const ENC_AST_STONE_WTD = 3;
 const ENC_AST_STONE_WTD_MID = 5; // +4, +5, +6
 
 // encLevel index boundaries within the Legend chain (Legend = 12).
+const LEGEND_START = 12; // Legend +0, first level that costs Legend-rate mats
 const LEGEND_OLD_CAP = 15; // Legend +3, last level at the original rate
 const LEGEND_MID_CAP = 18; // Legend +6, last level shared by every category
 const LEGEND_ARMOR_MAX = 19; // Legend +7, armor only
@@ -93,23 +94,26 @@ interface LegendRate {
 // Splits the [from, to] range into its Legend-rate tiers (original / mid /
 // top) and sums the material cost across whichever tiers it actually
 // crosses. Reduces to the original flat `enhLRange * rate` computation for
-// any range that doesn't reach past Legend +3.
+// any range that doesn't reach past Legend +3. `from` is clamped to
+// LEGEND_START (not just 1) since taps below Legend+0 (the +0..+10 unique
+// enhance range) never cost Legend-rate mats — only the evo step itself
+// (handled separately by the caller's `lgFrag += EV_AST_POW_*`) bridges
+// into this range, e.g. going from +5 all the way to Legend+0 costs only
+// the evo amount, not 5 phantom Legend-rate taps.
 const getLegendMatsCost = (
   from: number,
   to: number,
   categoryMax: number,
-  isEvo: boolean,
   oldRate: LegendRate,
   midRate: LegendRate,
   topRate?: LegendRate
 ) => {
-  const rangeLow = Math.max(from, 1);
+  const rangeLow = Math.max(from, LEGEND_START);
   const rangeHigh = Math.min(to, categoryMax);
-  const evoAdjust = isEvo ? 1 : 0;
 
   const oldPortion = Math.max(
     0,
-    Math.min(rangeHigh, LEGEND_OLD_CAP) - rangeLow - evoAdjust
+    Math.min(rangeHigh, LEGEND_OLD_CAP) - rangeLow
   );
   const midPortion = Math.max(
     0,
@@ -188,7 +192,6 @@ const computeConversionMats = (
           from,
           to,
           LEGEND_ARMOR_MAX,
-          isEvo,
           { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR },
           { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR_MID },
           { powder: ENC_AST_POW_ARMOR_TOP, jewel: ENC_AST_JEWEL_ARMOR_TOP }
@@ -211,7 +214,6 @@ const computeConversionMats = (
           from,
           to,
           LEGEND_MID_CAP,
-          isEvo,
           { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP },
           { powder: ENC_AST_POW_WEAP, stone: ENC_AST_STONE_WEAP_MID }
         );
@@ -234,7 +236,6 @@ const computeConversionMats = (
           from,
           to,
           LEGEND_MID_CAP,
-          isEvo,
           { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC },
           { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID }
         );
@@ -256,7 +257,6 @@ const computeConversionMats = (
           from,
           to,
           LEGEND_MID_CAP,
-          isEvo,
           { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD },
           { powder: ENC_AST_POW_WTD, stone: ENC_AST_STONE_WTD_MID }
         );
