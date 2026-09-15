@@ -30,7 +30,7 @@ const RangeFromTo: React.FC<RangeFromToProps> = ({
         <Divider type="vertical" />
         <Select
           defaultValue={from}
-          style={{ width: 120 }}
+          style={{ width: 130 }}
           onChange={onFromChange}
           options={options}
         />
@@ -40,7 +40,7 @@ const RangeFromTo: React.FC<RangeFromToProps> = ({
         <Divider type="vertical" />
         <Select
           defaultValue={to}
-          style={{ width: 120 }}
+          style={{ width: 130 }}
           onChange={onToChange}
           options={options}
         />

@@ -3,6 +3,7 @@ import { Collapse, CollapseProps, theme } from "antd";
 import { CSSProperties } from "react";
 import { TAB_KEY } from "../../constants/Common.constants";
 import { useAppSelector } from "../../hooks";
+import { broochHelpItems } from "./drawerHelp/broochHelp";
 import { equipmentHelpItems } from "./drawerHelp/equipmentHelp";
 import { heraldryHelpItems } from "./drawerHelp/heraldryHelp";
 import { jadeHelpItems } from "./drawerHelp/jadeHelp";
@@ -22,6 +23,7 @@ const listHelp = [
   ...jadeHelpItems,
   ...heraldryHelpItems,
   ...talismanHelpItems,
+  ...broochHelpItems,
   ...miscHelpItems,
 ];
 

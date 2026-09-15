@@ -33,6 +33,11 @@ export interface CommonItemStats {
   moveSpeedPercentTown?: number; //(?)
 }
 
+export interface BroochStats extends CommonItemStats {
+  rarity: string;
+  skillAtk?: string; // Dragon Jade skill ATK bonus text, Unique grade and up
+}
+
 export type columnCommonItemFlag = {
   [K in keyof CommonItemStats as `${K}Flag`]?: boolean;
 };

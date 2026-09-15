@@ -158,6 +158,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "15-09-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Brooch Calculator (Velskud, Nerwin, Terramai)",
+      link: {
+        key: TAB_KEY.broochTerramai,
+        name: TAB_KEY.broochTerramai,
+      },
+      date: "15-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

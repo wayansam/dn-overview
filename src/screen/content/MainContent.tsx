@@ -40,6 +40,7 @@ import SpunGoldEqContent from "./equipment/SpunGoldEqContent";
 import CollapseJadeContent from "./jade/CollapseJadeContent";
 import StageAoTContent from "./stage/StageAoTContent";
 import DeeplyVarJadeContent from "./jade/DeeplyVarJadeContent";
+import BroochContent from "./brooch/BroochContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -131,6 +132,17 @@ const MainContent = () => {
 
       case TAB_KEY.jadeDeepVariant:
         return <DeeplyVarJadeContent />;
+
+      case TAB_KEY.broochVelskud:
+      case TAB_KEY.broochNerwin:
+      case TAB_KEY.broochTerramai:
+        // Keyed so switching between brooch tabs resets the calculator state.
+        return (
+          <BroochContent
+            key={selectedSideBar.key}
+            tabKey={selectedSideBar.key}
+          />
+        );
 
       case TAB_KEY.heraldryAncientGoddes:
         return <AncientHeraldryContent />;

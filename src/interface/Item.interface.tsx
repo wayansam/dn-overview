@@ -208,3 +208,20 @@ export interface DeeplyVariantJadeEnhanceMaterial {
   gold: number;
   successRatePercent?: number;
 }
+
+// One crafting step of a brooch upgrade chain (e.g. "Rare Lv.3" is the
+// step that produces Rare Lv.3 from Rare Lv.2). The previous brooch itself
+// is implied and not listed; materials a brooch line doesn't use are omitted.
+export interface BroochCraftMaterial {
+  encLevel: string;
+  rarity: string;
+  remains?: number;
+  potentialShard?: number;
+  luckyStone?: number;
+  liberationFragment?: number;
+  rippleStone?: number;
+  shieldFragment?: number;
+  wandOfJudgement?: number;
+  terramaiPower?: number;
+  gold?: number;
+}
