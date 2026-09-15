@@ -13,6 +13,13 @@ export interface StageAotReward {
     "Warrior Equipment Protection Magic Jelly"?: number;
     "Rune Fragment"?: number;
     "Rune Crystal"?: number;
+    "Lunar Eclipse Stigmata"?: number;
+    "Lunar Eclipse Fragment x300 Pouch"?: number;
+    "Lunar Eclipse Fragment x600 Pouch"?: number;
+    "Lunar Eclipse Fragment x1000 Pouch"?: number;
+    "Lunar Eclipse Fragment x2000 Pouch"?: number;
+    "Lunar Eclipse Fragment x3000 Pouch"?: number;
+    "Eternal Enhancement Heraldry (Unique) Selection Pouch"?: number;
 
     // weekly
     "High Grade Lunar Eclipse Fragment (6 types)"?: number;
@@ -20,9 +27,11 @@ export interface StageAotReward {
     "Ancients' Blueprint Fragment"?: number;
     "Hero Coins"?: number;
     "Shiny Hero Coins"?: number;
+    "High Purity Core Selection Pouch"?: number;
 
     // season
     "Future Spacetime Cluster"?: number;
     "Ark Stone Fragment"?: number;
+    "Unknown Stone Fragment"?: number;
   };
 }

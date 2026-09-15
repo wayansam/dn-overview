@@ -2,10 +2,24 @@ import { Button, Divider, Select, Table } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import ListingCard, { ItemList } from "../../../components/ListingCard";
 import {
+  aotRewardS1FutureInit,
+  aotRewardS1FutureWeek,
+  aotRewardS1PastInit,
+  aotRewardS1PastWeek,
+  aotRewardS1PresentInit,
+  aotRewardS1PresentWeek,
   aotRewardS2FutureInit,
   aotRewardS2FutureWeek,
+  aotRewardS2PastInit,
+  aotRewardS2PastWeek,
+  aotRewardS2PresentInit,
+  aotRewardS2PresentWeek,
+  aotRewardS3FutureInit,
+  aotRewardS3FutureWeek,
   aotRewardS3PastInit,
   aotRewardS3PastWeek,
+  aotRewardS3PresentInit,
+  aotRewardS3PresentWeek,
 } from "../../../data/stage/StageAoTData";
 import { StageAotReward } from "../../../interface/reward.interface";
 import { getCustomColumnResource } from "../../../utils/common.util";
@@ -18,8 +32,15 @@ const floorPref = {
   last: "Last",
 };
 const seasonKey = {
+  s3Future: "Season 3 [Future]",
+  s3Present: "Season 3 [Present]",
   s3Past: "Season 3 [Past]",
   s2Future: "Season 2 [Future]",
+  s2Present: "Season 2 [Present]",
+  s2Past: "Season 2 [Past]",
+  s1Future: "Season 1 [Future]",
+  s1Present: "Season 1 [Present]",
+  s1Past: "Season 1 [Past]",
 };
 
 const StageAoTContent = () => {
@@ -50,10 +71,24 @@ const StageAoTContent = () => {
     weekly: StageAotReward[];
   } => {
     switch (selectSeason) {
-      case seasonKey.s2Future:
-        return { first: aotRewardS2FutureInit, weekly: aotRewardS2FutureWeek };
+      case seasonKey.s3Future:
+        return { first: aotRewardS3FutureInit, weekly: aotRewardS3FutureWeek };
+      case seasonKey.s3Present:
+        return { first: aotRewardS3PresentInit, weekly: aotRewardS3PresentWeek };
       case seasonKey.s3Past:
         return { first: aotRewardS3PastInit, weekly: aotRewardS3PastWeek };
+      case seasonKey.s2Future:
+        return { first: aotRewardS2FutureInit, weekly: aotRewardS2FutureWeek };
+      case seasonKey.s2Present:
+        return { first: aotRewardS2PresentInit, weekly: aotRewardS2PresentWeek };
+      case seasonKey.s2Past:
+        return { first: aotRewardS2PastInit, weekly: aotRewardS2PastWeek };
+      case seasonKey.s1Future:
+        return { first: aotRewardS1FutureInit, weekly: aotRewardS1FutureWeek };
+      case seasonKey.s1Present:
+        return { first: aotRewardS1PresentInit, weekly: aotRewardS1PresentWeek };
+      case seasonKey.s1Past:
+        return { first: aotRewardS1PastInit, weekly: aotRewardS1PastWeek };
 
       default:
         return { first: [], weekly: [] };

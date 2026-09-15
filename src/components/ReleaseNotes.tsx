@@ -140,6 +140,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "15-09-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "Ark of Transcendence Season 1 to Season 3 [Future] rewards",
+      link: {
+        key: TAB_KEY.stageArcOfTranscen,
+        name: TAB_KEY.stageArcOfTranscen,
+      },
+      date: "15-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

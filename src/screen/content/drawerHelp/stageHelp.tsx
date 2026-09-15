@@ -11,12 +11,40 @@ export const stageHelpItems: HelpItem[] = [
         <PatchNoteSection
           entries={[
             {
+              href: "https://patchnote.dragonnest.com/sea/94/c/1",
+              label: "Ark of Transcendence Season 1 [Past]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/102/c/4",
+              label: "Ark of Transcendence Season 1 [Present]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/114/c/1",
+              label: "Ark of Transcendence Season 1 [Future]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/129/c/5",
+              label: "Ark of Transcendence Season 2 [Past]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/142/c/1",
+              label: "Ark of Transcendence Season 2 [Present]",
+            },
+            {
               href: "https://patchnote.dragonnest.com/sea/153/c/3",
-              label: "Arc of Transcendence Season 2 [Future]",
+              label: "Ark of Transcendence Season 2 [Future]",
             },
             {
               href: "https://patchnote.dragonnest.com/sea/166/c/5",
-              label: "Arc of Transcendence Season 3 [Past]",
+              label: "Ark of Transcendence Season 3 [Past]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/177/c/1",
+              label: "Ark of Transcendence Season 3 [Present]",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/187/c/3",
+              label: "Ark of Transcendence Season 3 [Future]",
             },
           ]}
         />
