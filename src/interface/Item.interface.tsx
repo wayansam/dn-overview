@@ -160,6 +160,18 @@ export interface BoneDragonEqEnhanceMaterial {
   enhanceFailDeduction?: number;
 }
 
+export interface GoldDragonEqEnhanceMaterial {
+  encLevel: string;
+  scalePowder: number;
+  platePowder: number;
+  jewelFragment: number;
+  gold: number;
+  jelly?: number;
+  successRatePercent: number;
+  breakNoJellyPercent: number;
+  enhanceFailDeduction?: number;
+}
+
 export interface BestieGrowthMaterial {
   encLevel: string;
   faded: number;

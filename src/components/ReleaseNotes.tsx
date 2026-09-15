@@ -131,6 +131,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "01-09-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Gold Dragon Armor & Weapon Calculator",
+      link: {
+        key: TAB_KEY.eqGoldDragon,
+        name: TAB_KEY.eqGoldDragon,
+      },
+      date: "15-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

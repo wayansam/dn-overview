@@ -32,6 +32,7 @@ import SettingContent from "./utility/SettingContent";
 import SkillJadeContent from "./jade/SkillJadeContent";
 import ConversionContent from "./misc/ConversionContent";
 import BoneDragonEqContent from "./equipment/BoneDragonEqContent";
+import GoldDragonEqContent from "./equipment/GoldDragonEqContent";
 import BestieContent from "./misc/BestieContent";
 import VIPAccContent from "./equipment/VIPAccContent";
 import SpunGoldEqContent from "./equipment/SpunGoldEqContent";
@@ -102,6 +103,9 @@ const MainContent = () => {
 
       case TAB_KEY.eqBoneDragon:
         return <BoneDragonEqContent />;
+
+      case TAB_KEY.eqGoldDragon:
+        return <GoldDragonEqContent />;
 
       case TAB_KEY.eqVIPAcc:
         return <VIPAccContent />;

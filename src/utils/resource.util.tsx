@@ -26,6 +26,15 @@ import {
   BoneDragonStatsUpperTable,
 } from "../data/equipment/BoneDragonEqData";
 import {
+  GoldDragonStatsGlovesTable,
+  GoldDragonStatsHelmTable,
+  GoldDragonStatsLowerTable,
+  GoldDragonStatsMainTable,
+  GoldDragonStatsSecondTable,
+  GoldDragonStatsShoesTable,
+  GoldDragonStatsUpperTable,
+} from "../data/equipment/GoldDragonEqData";
+import {
   SpunGoldStatsGlovesTable,
   SpunGoldStatsHelmTable,
   SpunGoldStatsLowerTable,
@@ -119,6 +128,30 @@ export const getBoneDragonRscTable = (
   }
 };
 
+export const getGoldDragonRscTable = (
+  equipment: EQUIPMENT
+): CommonItemStats[] => {
+  switch (equipment) {
+    case EQUIPMENT.HELM:
+      return GoldDragonStatsHelmTable;
+    case EQUIPMENT.UPPER:
+      return GoldDragonStatsUpperTable;
+    case EQUIPMENT.LOWER:
+      return GoldDragonStatsLowerTable;
+    case EQUIPMENT.GLOVE:
+      return GoldDragonStatsGlovesTable;
+    case EQUIPMENT.SHOES:
+      return GoldDragonStatsShoesTable;
+    case EQUIPMENT.MAIN_WEAPON:
+      return GoldDragonStatsMainTable;
+    case EQUIPMENT.SECOND_WEAPON:
+      return GoldDragonStatsSecondTable;
+
+    default:
+      return [];
+  }
+};
+
 export const getSpunGoldRscTable = (
   equipment: EQUIPMENT
 ): CommonItemStats[] => {
@@ -167,6 +200,9 @@ export const getResource = (menu: string, equipment: EQUIPMENT) => {
 
     case TAB_KEY.eqBoneDragon:
       return getBoneDragonRscTable(equipment);
+
+    case TAB_KEY.eqGoldDragon:
+      return getGoldDragonRscTable(equipment);
 
     case TAB_KEY.eqSpunGold:
       return getSpunGoldRscTable(equipment);

@@ -126,6 +126,62 @@ export const equipmentHelpItems: HelpItem[] = [
     ),
   },
   {
+    key: TAB_KEY.eqGoldDragon,
+    label: TAB_KEY.eqGoldDragon,
+    children: (
+      <div>
+        <p>
+          <b>
+            Gold Dragon Armor is evolved from Amplified Ancient Dragon Armor
+            +15 or above with an enhanced Gold Dragon's Dragon Jade slot using
+            Gold Dragon's Protection Orb, and Gold Dragon Weapon from Blessed
+            Amplified Ancient Dragon Weapon +15 or above using Gold Dragon's
+            Sharp Jewel. Evolving decreases the enhancement level by 5 (stats
+            do not decrease). Gold Dragon Equipment also drops from Gold
+            Dragon Nest Hardcore.
+          </b>
+        </p>
+        <p>
+          To use the calculator, please select the equipment you want to
+          calculate.
+        </p>
+        <p>
+          You can always open Mats Reference if you are not sure about the
+          number.
+        </p>
+        <p>
+          Select the From &#38; To option in correct progression of the
+          equipment &#40;0 to 20&#41;.
+        </p>
+        <p>
+          Calculated material only shown when you input the correct From, To
+          and select the equipment.
+        </p>
+        <p>
+          <i>
+            You can always custom input everything in tab Specific Type, From,
+            and To, but remember your custom input will be override by The
+            Settings if you change it.
+          </i>
+        </p>
+        <p>
+          <i>
+            Best way to do this is setup everything in common from settings,
+            then adjust things you needed.
+          </i>
+        </p>
+        <PatchNoteSection
+          entries={[
+            {
+              href: "https://patchnote.dragonnest.com/sea/187/c/2",
+              label: "Gold Dragon Equipment",
+            },
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
     key: TAB_KEY.eqVIPAcc,
     label: TAB_KEY.eqVIPAcc,
     children: (
