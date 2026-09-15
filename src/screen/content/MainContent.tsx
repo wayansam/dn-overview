@@ -25,6 +25,7 @@ import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./jade/ErosionJadeContent";
 import ExternalTalismanContent from "./talisman/EternalTalismanContent";
 import GeneralContent from "./main/GeneralContent";
+import CompareEqContent from "./main/CompareEqContent";
 import KilosEqContent from "./equipment/KilosEqContent";
 import LunarJadeCalculatorContent from "./jade/LunarJadeCalculatorContent";
 import NamedEODEqContent from "./equipment/NamedEODEqContent";
@@ -88,6 +89,9 @@ const MainContent = () => {
     switch (selectedSideBar.key) {
       case TAB_KEY.mainGeneral:
         return <GeneralContent />;
+
+      case TAB_KEY.mainCompare:
+        return <CompareEqContent />;
 
       case TAB_KEY.stageArcOfTranscen:
         return <StageAoTContent />;

@@ -7,6 +7,7 @@ import {
 
 export const TAB_KEY = {
   mainGeneral: "General",
+  mainCompare: "Compare Equipment",
   setting: "Setting",
   stageNSTG: "Night Shadow Training Ground",
   stageArcOfTranscen: "Ark of Transcendence",
@@ -38,6 +39,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.mainGeneral,
         name: TAB_KEY.mainGeneral,
+      },
+      {
+        key: TAB_KEY.mainCompare,
+        name: TAB_KEY.mainCompare,
       },
     ],
   },

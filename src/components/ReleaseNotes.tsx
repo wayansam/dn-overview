@@ -149,6 +149,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "15-09-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Compare Equipment stats",
+      link: {
+        key: TAB_KEY.mainCompare,
+        name: TAB_KEY.mainCompare,
+      },
+      date: "15-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

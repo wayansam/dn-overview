@@ -6,6 +6,7 @@ import { useAppSelector } from "../../hooks";
 import { equipmentHelpItems } from "./drawerHelp/equipmentHelp";
 import { heraldryHelpItems } from "./drawerHelp/heraldryHelp";
 import { jadeHelpItems } from "./drawerHelp/jadeHelp";
+import { mainHelpItems } from "./drawerHelp/mainHelp";
 import { miscHelpItems } from "./drawerHelp/miscHelp";
 import { stageHelpItems } from "./drawerHelp/stageHelp";
 import { talismanHelpItems } from "./drawerHelp/talismanHelp";
@@ -15,6 +16,7 @@ import { talismanHelpItems } from "./drawerHelp/talismanHelp";
 // used for data/ and screen/content/ — keeps this file from growing into a
 // single giant JSX array again as new tabs get added.
 const listHelp = [
+  ...mainHelpItems,
   ...stageHelpItems,
   ...equipmentHelpItems,
   ...jadeHelpItems,
