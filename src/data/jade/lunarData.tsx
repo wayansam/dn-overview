@@ -986,3 +986,39 @@ export const LunarJadeDefEnhancementStatsTable: LunarJadeEnhancementStats[] = [
     hpPercent: 70,
   },
 ];
+
+// Collapse Dragon Jade (Unique): a Tiger Dragon Lunar Eclipse Dragon Jade
+// (Ancient, +20) evolves into it with one Collapse Jewel (Unique). Basic stats
+// are replaced by the values below; add-on stats and skill effects obtained
+// up to the Ancient grade are retained.
+// Source: https://patchnote.dragonnest.com/sea/166/c/4
+export const collapseJewelUniqueCraftMats = {
+  collapseFragment: 1500,
+  foundationStone: 200,
+  dimVestige: 1500,
+  gold: 10000,
+};
+
+type CollapseUniqueBaseStats = Omit<
+  LunarJadeEnhancementStats,
+  "encLevel" | "hsSkillPercent"
+>;
+
+export const collapseUniqueAttBaseStats: CollapseUniqueBaseStats = {
+  attack: 3000000,
+  attackPercent: 35,
+  attPercent: 6,
+  critical: 30000,
+  criticalDamage: 112500,
+  fd: 450,
+};
+
+export const collapseUniqueDefBaseStats: CollapseUniqueBaseStats = {
+  attack: 1500000,
+  hp: 4000000,
+  hpPercent: 70,
+  attPercent: 6,
+  phyDef: 30000,
+  magDef: 30000,
+  fd: 450,
+};

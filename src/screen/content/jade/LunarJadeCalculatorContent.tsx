@@ -14,6 +14,7 @@ import {
   Select,
   Space,
   Table,
+  Tooltip,
   Typography,
   theme,
 } from "antd";
@@ -40,6 +41,9 @@ import {
   LunarJadeDefEnhancementMatsTable,
   LunarJadeDefEnhancementStatsTable,
   LunarJadeEnhanceMaterialList,
+  collapseJewelUniqueCraftMats,
+  collapseUniqueAttBaseStats,
+  collapseUniqueDefBaseStats,
   concentratedDimensionalEnergyCraftMats,
   tigerIntactOrbCraftMats,
 } from "../../../data/jade/lunarData";
@@ -324,6 +328,7 @@ interface FormEnhance {
   listEnhance: Array<{
     range?: [number, number] | null;
     amt?: number | null;
+    evolve?: boolean | null;
   }> | null;
 }
 
@@ -342,6 +347,9 @@ interface EnhanceTableMaterialList {
   "HG Crystal Clear Lunar": LJade;
   "HG Tailwind Lunar": LJade;
   "HG Ardent Lunar": LJade;
+  "Collapse Dragon Jade Fragment": number;
+  "Ancient's Foundation Stone": number;
+  "Dimensional Vestige": number;
   Gold: number;
 }
 
@@ -1408,6 +1416,9 @@ const LunarJadeCalculatorContent = () => {
     let tempHgCrys = 0;
     let tempHgTail = 0;
     let tempHgArd = 0;
+    let tempCollapseFragment = 0;
+    let tempFoundationStone = 0;
+    let tempDimVestige = 0;
 
     // stats
     let tempAttack = 0;
@@ -1534,6 +1545,63 @@ const LunarJadeCalculatorContent = () => {
               tempPhyDef += minusAndMulti(dt2.phyDef, dt1.phyDef, item?.amt);
               tempMagDef += minusAndMulti(dt2.magDef, dt1.magDef, item?.amt);
             }
+
+            // Evolving +20 Ancient into Collapse Dragon Jade (Unique): add the
+            // Collapse Jewel (Unique) mats and swap +20 basic stats for the
+            // Unique ones. Hero Skill ATK is a retained skill effect.
+            if (item?.evolve) {
+              const maxLevel = tempArrStats.length - 1;
+              const lunarMax = tempArrStats[maxLevel];
+              if (item.range[1] !== maxLevel) {
+                errorMsg.push(
+                  `Evolve in Enhance ${idx + 1}, item ${
+                    i + 1
+                  } needs the range to end at +${maxLevel}`
+                );
+              } else if (lunarMax) {
+                const unique = isAtt
+                  ? collapseUniqueAttBaseStats
+                  : collapseUniqueDefBaseStats;
+                tempCollapseFragment +=
+                  collapseJewelUniqueCraftMats.collapseFragment * item.amt;
+                tempFoundationStone +=
+                  collapseJewelUniqueCraftMats.foundationStone * item.amt;
+                tempDimVestige +=
+                  collapseJewelUniqueCraftMats.dimVestige * item.amt;
+                tempGold += collapseJewelUniqueCraftMats.gold * item.amt;
+
+                tempAttack += minusAndMulti(unique.attack, lunarMax.attack, item.amt);
+                tempAttPercent += minusAndMulti(
+                  unique.attPercent,
+                  lunarMax.attPercent,
+                  item.amt
+                );
+                tempFd += minusAndMulti(unique.fd, lunarMax.fd, item.amt);
+                tempAttackPercent += minusAndMulti(
+                  unique.attackPercent,
+                  lunarMax.attackPercent,
+                  item.amt
+                );
+                tempCritical += minusAndMulti(
+                  unique.critical,
+                  lunarMax.critical,
+                  item.amt
+                );
+                tempCriticalDamage += minusAndMulti(
+                  unique.criticalDamage,
+                  lunarMax.criticalDamage,
+                  item.amt
+                );
+                tempHpPercent += minusAndMulti(
+                  unique.hpPercent,
+                  lunarMax.hpPercent,
+                  item.amt
+                );
+                tempHp += minusAndMulti(unique.hp, lunarMax.hp, item.amt);
+                tempPhyDef += minusAndMulti(unique.phyDef, lunarMax.phyDef, item.amt);
+                tempMagDef += minusAndMulti(unique.magDef, lunarMax.magDef, item.amt);
+              }
+            }
           } else {
             let emsg = "";
             if (!item?.amt) {
@@ -1582,6 +1650,9 @@ const LunarJadeCalculatorContent = () => {
           type: LunarFragmentList.tailwind,
         },
         "HG Ardent Lunar": { amt: tempHgArd, type: LunarFragmentList.ardent },
+        "Collapse Dragon Jade Fragment": tempCollapseFragment,
+        "Ancient's Foundation Stone": tempFoundationStone,
+        "Dimensional Vestige": tempDimVestige,
         Gold: tempGold,
       },
       statsData: {
@@ -1727,6 +1798,24 @@ const LunarJadeCalculatorContent = () => {
                                     <CustomSlider
                                       id={`${subField.name}-range-${idx}`}
                                     />
+                                  </Form.Item>
+                                  <Form.Item
+                                    noStyle
+                                    name={[subField.name, "evolve"]}
+                                    valuePropName="checked"
+                                  >
+                                    <Checkbox
+                                      id={`${subField.name}-evolve-${idx}`}
+                                    >
+                                      <Tooltip
+                                        title={`Range must end at +20. Adds 1 Collapse Jewel (Unique) per jade: ${collapseJewelUniqueCraftMats.collapseFragment.toLocaleString()} Collapse Dragon Jade Fragment, ${collapseJewelUniqueCraftMats.foundationStone.toLocaleString()} Ancient's Foundation Stone, ${collapseJewelUniqueCraftMats.dimVestige.toLocaleString()} Dimensional Vestige, ${collapseJewelUniqueCraftMats.gold.toLocaleString()} Gold`}
+                                        trigger="hover"
+                                        color="blue"
+                                        placement="right"
+                                      >
+                                        Evolve to Collapse Dragon Jade (Unique)
+                                      </Tooltip>
+                                    </Checkbox>
                                   </Form.Item>
                                 </Card>
                               ))}
@@ -1919,6 +2008,10 @@ const LunarJadeCalculatorContent = () => {
               {
                 name: "HG Ardent Lunar",
                 amt: enhanceDataSource.matsData["HG Ardent Lunar"].amt,
+              },
+              {
+                name: "Dimensional Vestige",
+                amt: enhanceDataSource.matsData["Dimensional Vestige"],
               },
             ]}
             additionalTotal={enhanceDataSource.matsData?.Gold}

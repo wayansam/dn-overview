@@ -87,9 +87,22 @@ export const jadeHelpItems: HelpItem[] = [
             (yellow text).
           </i>
         </p>
+        <p>
+          <b>~Evolve to Unique~</b>
+        </p>
+        <p>
+          A +20 Ancient Lunar Eclipse Dragon Jade can evolve into a Collapse
+          Dragon Jade (Unique) with a Collapse Jewel (Unique). Tick "Evolve" on
+          an enhance item whose range ends at +20 to add the jewel materials and
+          the basic stat change. Add-on stats and skill effects are retained.
+        </p>
         <PatchNoteLink
           href="https://patchnote.dragonnest.com/sea/108/c/5"
           label="Lunar Eclipse Dragon Jade Ancient Grade – Enhancement"
+        />
+        <PatchNoteLink
+          href="https://patchnote.dragonnest.com/sea/166/c/4"
+          label="Collapse Dragon Jade (Unique)"
         />
       </div>
     ),
