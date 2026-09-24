@@ -159,6 +159,7 @@ export const getColumnsStats = ({
   hpPercentFlag,
   moveSpeedPercentFlag,
   moveSpeedPercentTownFlag,
+  hsSkillPercentFlag,
 }: columnCommonItemFlag): ColumnsType<CommonItemStats> => {
   const temp: ColumnsType<CommonItemStats> = [];
   const smallItemTitle: string[] = [];
@@ -187,6 +188,7 @@ export const getColumnsStats = ({
     hpPercentDesc,
     moveSpeedPercentDesc,
     moveSpeedPercentTownDesc,
+    hsSkillPercentDesc,
   } = getAllStatDesc();
 
   if (phyMagAtkFlag && phyMagAtkDesc) {
@@ -510,6 +512,19 @@ export const getColumnsStats = ({
       ),
     });
   }
+  if (hsSkillPercentFlag && hsSkillPercentDesc) {
+    const { long, short } = hsSkillPercentDesc;
+    smallItemTitle.push(short);
+    temp.push({
+      title: long,
+      responsive: ["sm"],
+      render: (_, { hsSkillPercent }) => (
+        <div>
+          <Text>{getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}</Text>
+        </div>
+      ),
+    });
+  }
 
   return [
     {
@@ -554,6 +569,7 @@ export const getColumnsStats = ({
           hpPercent,
           moveSpeedPercent,
           moveSpeedPercentTown,
+          hsSkillPercent,
         }
       ) => (
         <div>
@@ -704,6 +720,12 @@ export const getColumnsStats = ({
             <p>
               {`${moveSpeedPercentTownDesc?.short} `}
               {getTextEmpty({ txt: moveSpeedPercentTown, tailText: "%" })}
+            </p>
+          )}
+          {hsSkillPercentFlag && (
+            <p>
+              {`${hsSkillPercentDesc?.short} `}
+              {getTextEmpty({ txt: hsSkillPercent, tailText: "%" })}
             </p>
           )}
         </div>
@@ -940,6 +962,12 @@ export const getStatDif = (statDif?: CommonItemStats) => {
       suffix: "%",
       format: true,
     },
+    {
+      title: getStatDesc("hsSkillPercent").short,
+      value: statDif.hsSkillPercent,
+      suffix: "%",
+      format: true,
+    },
   ];
 };
 
@@ -997,6 +1025,8 @@ export const getStatDesc = (
       return { long: "Movespeed(%)", short: "Movespeed(%)" };
     case "moveSpeedPercentTown":
       return { long: "Movespeed Town(%)", short: "Movespeed Town(%)" };
+    case "hsSkillPercent":
+      return { long: "Hero Skill ATK", short: "HS ATK" };
 
     default:
       return { long: "-", short: "-" };

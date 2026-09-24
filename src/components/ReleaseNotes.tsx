@@ -167,6 +167,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "15-09-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "Lunar Jade evolve to Collapse Dragon Jade (Unique)",
+      link: {
+        key: TAB_KEY.jadeLunar,
+        name: TAB_KEY.jadeLunar,
+      },
+      date: "24-09-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

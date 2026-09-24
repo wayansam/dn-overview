@@ -1,24 +1,17 @@
-import { CloseOutlined } from "@ant-design/icons";
 import type { CollapseProps } from "antd";
 import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
   Collapse,
   Divider,
   Form,
   Grid,
-  InputNumber,
-  Radio,
-  Space,
   Table,
   Typography,
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import Title from "antd/es/typography/Title";
 import { useEffect, useState } from "react";
-import CustomSlider from "../../../components/CustomSlider";
+import FlagAlert from "../../../components/FlagAlert";
+import JadeEnhanceListForm from "../../../components/JadeEnhanceListForm";
 import ListingCard from "../../../components/ListingCard";
 import TradingHouseCalc from "../../../components/TradingHouseCalc";
 import {
@@ -26,6 +19,7 @@ import {
   TableResource,
 } from "../../../constants/Common.constants";
 import { COLLAPSE_JADE_TYPE } from "../../../constants/InGame.constants";
+import { reduceJadeEnhanceList } from "../../../hooks/useJadeCalculator";
 import { CollapseJadeCraftEnhanceMaterial } from "../../../interface/Item.interface";
 import { CommonItemStats } from "../../../interface/ItemStat.interface";
 import {
@@ -48,13 +42,15 @@ import {
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
 
+interface CollapseEnhanceItem {
+  range?: [number, number] | null;
+  amt?: number | null;
+  craft?: boolean | null;
+}
+
 interface FormEnhance {
   type: string | null;
-  listEnhance: Array<{
-    range?: [number, number] | null;
-    amt?: number | null;
-    craft?: boolean | null;
-  }> | null;
+  listEnhance: CollapseEnhanceItem[] | null;
 }
 
 interface EnhanceTableMaterialList {
@@ -160,87 +156,54 @@ const CollapseJadeContent = () => {
     // stats
     let tempStat: CommonItemStats = { ...EmptyCommonnStat };
 
-    let errorMsg: string[] = [];
+    const errorMsg = reduceJadeEnhanceList<CollapseEnhanceItem>(
+      temp,
+      ({ type, item, amt, range }) => {
+        // mats
+        const { collapseFragment, foundationStone, dimVestige, gold } =
+          CollapseJadeCraftMats;
+        let tempCollapseFragmentC = item?.craft ? collapseFragment : 0;
+        let tempFoundationStoneC = item?.craft ? foundationStone : 0;
+        let tempDimVestigeC = item?.craft ? dimVestige : 0;
+        let tempGoldC = item?.craft ? gold : 0;
 
-    temp.forEach((enhItem, idx) => {
-      if (!enhItem || (!enhItem?.type && !enhItem?.listEnhance)) {
-        errorMsg.push(`Nothing to calculate in Enhance ${idx + 1}`);
-      } else if (
-        enhItem?.type &&
-        enhItem?.listEnhance &&
-        enhItem?.listEnhance.length > 0
-      ) {
-        enhItem?.listEnhance.forEach((item, i) => {
-          if (!item || !item?.amt) {
-            errorMsg.push(
-              `Nothing to calculate on Enhance ${idx + 1} list ${i + 1}`
-            );
-          } else if (item?.amt) {
-            // mats
-            const range = item?.range ?? [0, 0];
-            const { collapseFragment, foundationStone, dimVestige, gold } =
-              CollapseJadeCraftMats;
-            let tempCollapseFragmentC = item?.craft ? collapseFragment : 0;
-            let tempFoundationStoneC = item?.craft ? foundationStone : 0;
-            let tempDimVestigeC = item?.craft ? dimVestige : 0;
-            let tempGoldC = item?.craft ? gold : 0;
+        const isAtt = type === COLLAPSE_JADE_TYPE.ATT;
 
-            const isAtt = enhItem?.type === COLLAPSE_JADE_TYPE.ATT;
+        const tempSliceMats = CollapseJadeEnhanceMatsTable.slice(
+          range[0],
+          range[1]
+        );
 
-            const tempSliceMats = CollapseJadeEnhanceMatsTable.slice(
-              range[0],
-              range[1]
-            );
-
-            tempSliceMats.forEach((slicedItem) => {
-              tempCollapseFragmentC += slicedItem.collapseFragment;
-              tempFoundationStoneC += slicedItem.foundationStone;
-              tempDimVestigeC += slicedItem.dimVestige;
-              tempGoldC += slicedItem.gold;
-            });
-
-            tempCollapseFragment += tempCollapseFragmentC * item?.amt;
-            tempFoundationStone += tempFoundationStoneC * item?.amt;
-            tempDimVestige += tempDimVestigeC * item?.amt;
-            tempGold += tempGoldC * item?.amt;
-
-            // stats
-            const tempArrStats = isAtt
-              ? CollapseJadeAttackStatsTable
-              : CollapseJadeDefendStatsTable;
-
-            const { dt1, dt2 } = getComparedData(
-              tempArrStats,
-              range[0] + 1,
-              range[1] + 1
-            );
-            if (dt2) {
-              const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
-              const dtn = multiplyEqStats(dt, item?.amt);
-              tempStat = combineEqStats(tempStat, dtn, "add");
-            }
-          } else {
-            let emsg = "";
-            if (!item?.amt) {
-              emsg = "Amount";
-            }
-            errorMsg.push(
-              `The ${emsg} in Enhance ${idx + 1}, item ${
-                i + 1
-              } haven't inputted properly`
-            );
-          }
+        tempSliceMats.forEach((slicedItem) => {
+          tempCollapseFragmentC += slicedItem.collapseFragment;
+          tempFoundationStoneC += slicedItem.foundationStone;
+          tempDimVestigeC += slicedItem.dimVestige;
+          tempGoldC += slicedItem.gold;
         });
-      } else {
-        let msg = "";
-        if (!enhItem?.type) {
-          msg = "Type";
-        } else if (!enhItem?.listEnhance || enhItem?.listEnhance.length === 0) {
-          msg = "List";
+
+        tempCollapseFragment += tempCollapseFragmentC * amt;
+        tempFoundationStone += tempFoundationStoneC * amt;
+        tempDimVestige += tempDimVestigeC * amt;
+        tempGold += tempGoldC * amt;
+
+        // stats
+        const tempArrStats = isAtt
+          ? CollapseJadeAttackStatsTable
+          : CollapseJadeDefendStatsTable;
+
+        const { dt1, dt2 } = getComparedData(
+          tempArrStats,
+          range[0] + 1,
+          range[1] + 1
+        );
+        if (dt2) {
+          const dt = dt1 ? combineEqStats(dt2, dt1, "minus") : dt2;
+          const dtn = multiplyEqStats(dt, amt);
+          tempStat = combineEqStats(tempStat, dtn, "add");
         }
-        errorMsg.push(`Empty ${msg} in Enhance ${idx + 1}`);
-      }
-    });
+      },
+      { emptyRow: "amount" }
+    );
 
     return {
       matsData: {
@@ -260,10 +223,6 @@ const CollapseJadeContent = () => {
     );
   }, []);
 
-  const onValuesChange = (_: any, allValues: { items: Array<FormEnhance> }) => {
-    setEnhanceDataSource(calcEnhanceDataSource(allValues.items));
-  };
-
   const getWidthSetting = () => {
     if (screens.xs) {
       return 200;
@@ -275,188 +234,36 @@ const CollapseJadeContent = () => {
     return (
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
-          <Divider orientation="left">Enhance List</Divider>
-          <Form
-            labelCol={{ span: 5 }}
-            wrapperCol={{ span: 19 }}
+          <JadeEnhanceListForm<CollapseEnhanceItem>
             form={formEnhance}
-            name="dynamic_form_complex"
-            style={{ maxWidth: 600 }}
-            autoComplete="off"
-            initialValues={{ items: [{}] }}
-            onValuesChange={onValuesChange}
-          >
-            <Form.List name="items">
-              {(fields, { add, remove }) => (
-                <div
-                  style={{
-                    display: "flex",
-                    rowGap: 16,
-                    flexDirection: "column",
-                  }}
-                >
-                  {fields.map((field, index) => (
-                    <Card
-                      size="small"
-                      title={`Enhance ${field.name + 1}`}
-                      style={{ minWidth: getWidthSetting() }}
-                      key={field.key}
-                      id={`${field.name}-card-${index}`}
-                      extra={
-                        <CloseOutlined
-                          onClick={() => {
-                            remove(field.name);
-                          }}
-                        />
-                      }
-                    >
-                      <Form.Item
-                        label="Type"
-                        name={[field.name, "type"]}
-                        rules={[{ required: true }]}
-                        id={`${field.name}-type-${index}`}
-                      >
-                        <Radio.Group>
-                          <Radio.Button value={COLLAPSE_JADE_TYPE.ATT}>
-                            Attack
-                          </Radio.Button>
-                          <Radio.Button value={COLLAPSE_JADE_TYPE.DEF}>
-                            Defense
-                          </Radio.Button>
-                        </Radio.Group>
-                      </Form.Item>
-
-                      {/* Nest Form.List */}
-                      <Form.Item label="List">
-                        <Form.List name={[field.name, "listEnhance"]}>
-                          {(subFields, subOpt) => (
-                            <div
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                rowGap: 18,
-                              }}
-                            >
-                              {subFields.map((subField, idx) => (
-                                <Card
-                                  key={subField.key}
-                                  size="small"
-                                  style={{ width: "100%" }}
-                                  id={`${subField.name}-card-${idx}`}
-                                >
-                                  <Space
-                                    direction="horizontal"
-                                    style={{
-                                      display: "flex",
-                                      justifyContent: "space-between",
-                                      alignItems: "flex-start",
-                                      marginBottom: 8,
-                                    }}
-                                  >
-                                    <Form.Item
-                                      noStyle
-                                      name={[subField.name, "amt"]}
-                                      id={`${subField.name}-amt-${idx}`}
-                                    >
-                                      <InputNumber
-                                        placeholder="amount"
-                                        max={20}
-                                        min={0}
-                                      />
-                                    </Form.Item>
-
-                                    <CloseOutlined
-                                      onClick={() => {
-                                        subOpt.remove(subField.name);
-                                      }}
-                                    />
-                                  </Space>
-
-                                  <Form.Item
-                                    noStyle
-                                    name={[subField.name, "craft"]}
-                                    valuePropName="checked"
-                                    label={null}
-                                  >
-                                    <Checkbox>Craft</Checkbox>
-                                  </Form.Item>
-
-                                  <Form.Item
-                                    noStyle
-                                    name={[subField.name, "range"]}
-                                  >
-                                    <CustomSlider
-                                      id={`${subField.name}-range-${idx}`}
-                                      min={0}
-                                      max={5}
-                                    />
-                                  </Form.Item>
-                                </Card>
-                              ))}
-                              <Button
-                                type="dashed"
-                                onClick={() => subOpt.add()}
-                                block
-                                disabled={subFields && subFields.length >= 20}
-                              >
-                                + Add Enhancement
-                              </Button>
-                            </div>
-                          )}
-                        </Form.List>
-                      </Form.Item>
-                    </Card>
-                  ))}
-
-                  <Button
-                    type="dashed"
-                    onClick={() => add()}
-                    block
-                    disabled={fields && fields.length >= 2}
-                  >
-                    + Add Type
-                  </Button>
-                </div>
-              )}
-            </Form.List>
-
-            {/* <Form.Item noStyle shouldUpdate>
-              {() => (
-                <Typography>
-                  <pre>
-                    {JSON.stringify(formEnhance.getFieldsValue(), null, 2)}
-                  </pre>
-                </Typography>
-              )}
-            </Form.Item> */}
-          </Form>
-          {enhanceDataSource.errorDt &&
-            enhanceDataSource.errorDt.length > 0 && (
-              <div style={{ marginTop: 4, maxWidth: getWidthSetting() }}>
-                <Space direction="vertical" size={"small"}>
-                  {enhanceDataSource.errorDt.map((it, x) => (
-                    <Text type="warning" key={`error-label-${x}`}>
-                      {it}
-                    </Text>
-                  ))}
-                </Space>
-              </div>
-            )}
+            types={[
+              { label: "Attack", value: COLLAPSE_JADE_TYPE.ATT },
+              { label: "Defense", value: COLLAPSE_JADE_TYPE.DEF },
+            ]}
+            onValuesChange={(values) =>
+              setEnhanceDataSource(calcEnhanceDataSource(values.items))
+            }
+            errors={enhanceDataSource.errorDt}
+            width={getWidthSetting()}
+            range={{ min: 0, max: 5 }}
+            itemToggle={{
+              name: "craft",
+              label: "Craft",
+              placement: "beforeRange",
+            }}
+          />
         </div>
 
         <div style={{ marginRight: 10, marginBottom: 10, overflowX: "auto" }}>
           <Divider orientation="left">Material List</Divider>
-          {enhanceDataSource.errorDt && (
-            <div>
-              <Alert
-                banner
-                message="Some of the item you input is not valid"
-                type="warning"
-              />
-            </div>
-          )}
+          <FlagAlert
+            show={!!enhanceDataSource.errorDt}
+            message="Some of the item you input is not valid"
+            type="warning"
+          />
           <Table
             size={"small"}
+            rowKey="mats"
             dataSource={
               (enhanceDataSource.matsData
                 ? typedEntries(enhanceDataSource.matsData)
@@ -508,6 +315,7 @@ const CollapseJadeContent = () => {
             <Title level={5}>{"Enhance Attack Jade Stats"}</Title>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={CollapseJadeAttackStatsTable}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
@@ -525,6 +333,7 @@ const CollapseJadeContent = () => {
             <Title level={5}>{"Enhance Defense Jade Stats"}</Title>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={CollapseJadeDefendStatsTable}
               columns={getColumnsStats({
                 phyMagAtkFlag: true,
@@ -553,6 +362,7 @@ const CollapseJadeContent = () => {
             <Title level={5}>{"Craft Mats"}</Title>
             <Table
               size={"small"}
+              rowKey="mats"
               dataSource={
                 typedEntries(craftMat)
                   .filter(([key]) => key !== "encLevel")
@@ -570,6 +380,7 @@ const CollapseJadeContent = () => {
             <Title level={5}>{"Enhance Mats"}</Title>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={CollapseJadeEnhanceMatsTable}
               columns={getMatsCol()}
               pagination={false}

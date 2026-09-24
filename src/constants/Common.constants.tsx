@@ -234,6 +234,7 @@ export const EmptyCommonnStat: CommonItemStats = {
   hpPercent: 0,
   moveSpeedPercent: 0,
   moveSpeedPercentTown: 0,
+  hsSkillPercent: 0,
 };
 
 export const EmptyCommonStatDesc: columnCommonItemDesc = {
@@ -262,6 +263,7 @@ export const EmptyCommonStatDesc: columnCommonItemDesc = {
   hpPercentDesc: { long: "", short: "" },
   moveSpeedPercentDesc: { long: "", short: "" },
   moveSpeedPercentTownDesc: { long: "", short: "" },
+  hsSkillPercentDesc: { long: "", short: "" },
   encLevelDesc: {
     long: "",
     short: "",

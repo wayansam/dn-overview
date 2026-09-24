@@ -31,6 +31,7 @@ export interface CommonItemStats {
   hpPercent?: number;
   moveSpeedPercent?: number;
   moveSpeedPercentTown?: number; //(?)
+  hsSkillPercent?: number; // Hero Skill ATK (Lunar Eclipse jade)
 }
 
 export interface BroochStats extends CommonItemStats {
@@ -98,23 +99,4 @@ export interface EternalChaosTalismanStat {
   phyDef: number[];
   magDef: number[];
   fd: number[];
-}
-
-export interface LunarJadeEnhancementStats {
-  encLevel: number;
-  attack: number;
-  attPercent: number;
-  fd: number;
-  hsSkillPercent: number;
-
-  // att
-  attackPercent?: number;
-  critical?: number;
-  criticalDamage?: number;
-
-  // def
-  hpPercent?: number;
-  hp?: number;
-  phyDef?: number;
-  magDef?: number;
 }
