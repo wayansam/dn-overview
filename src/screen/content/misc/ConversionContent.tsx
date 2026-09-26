@@ -879,6 +879,7 @@ const ConversionContent = () => {
             total: val,
             step: dif,
             type: equipment,
+            order: from + idx,
           });
         });
       }

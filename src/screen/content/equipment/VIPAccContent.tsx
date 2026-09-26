@@ -190,6 +190,7 @@ const VIPAccContent = () => {
             total: val,
             step: dif,
             type: equipment,
+            order: from + idx,
           });
         });
       }

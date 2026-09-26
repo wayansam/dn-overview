@@ -22,6 +22,14 @@ export interface ChartItem {
   total: number;
   step: number;
   type: EQUIPMENT;
+  // Absolute level index (e.g. the 0=Buy..19=Legend+7 scheme used by the
+  // conversion screens) for this point. AntV's Line chart infers its
+  // categorical x-axis order from first appearance in `data`, so without an
+  // explicit sort here, ticking equipment/rows in a different order can
+  // scramble the axis instead of leaving it in level order. Optional so
+  // callers that don't have (or need) a meaningful level ordering can omit
+  // it and keep whatever order they push points in.
+  order?: number;
 }
 interface ChartsCardProps {
   title?: string;
@@ -45,9 +53,17 @@ const ChartsCard = ({
   const screens = useBreakpoint();
   const isDarkMode = useAppSelector((state) => state.UIState.isDarkMode);
 
+  const sortedData = useMemo(
+    () =>
+      data.every((it) => it.order !== undefined)
+        ? [...data].sort((a, b) => (a.order as number) - (b.order as number))
+        : data,
+    [data]
+  );
+
   const config = useMemo(
     () => ({
-      data,
+      data: sortedData,
       height: 500,
       xField: "enhance",
       yField:
@@ -69,7 +85,7 @@ const ChartsCard = ({
       theme: { type: isDarkMode ? "dark" : "light" },
       colorField: "type",
     }),
-    [data, isDarkMode, statPrev]
+    [sortedData, isDarkMode, statPrev]
   );
 
   const allDesc = Object.entries(getAllStatDesc())
