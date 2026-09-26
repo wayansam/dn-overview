@@ -185,6 +185,10 @@ export const jadeHelpItems: HelpItem[] = [
           href="https://patchnote.dragonnest.com/sea/160/c/2"
           label="Collapse Dragon Jade"
         />
+        <PatchNoteLink
+          href="https://patchnote.dragonnest.com/sea/180/c/3"
+          label="Collapse Dragon Jade (Epic) – Enhancement Expansion"
+        />
       </div>
     ),
   },

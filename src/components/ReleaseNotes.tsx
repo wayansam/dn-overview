@@ -80,39 +80,6 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
 
   const dataNew: Array<FeatureItem> = [
     {
-      key: keyUpdate.N,
-      label: "Deeply Rooted Variant Jade",
-      link: {
-        key: TAB_KEY.jadeDeepVariant,
-        name: TAB_KEY.jadeDeepVariant,
-      },
-      date: "12-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "VIP Accessories charts",
-      link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
-      },
-      date: "17-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Legend Conversion Weapon & WTD (+1 to +3)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "06-02-2026",
-    },
-    {
-      key: keyUpdate.M,
-      label:
-        "Overall app performance improvement, bug fixes, and UI/UX enhancements.",
-      date: "31-08-2026",
-    },
-    {
       key: keyUpdate.U,
       label:
         "Enhancement Legend Conversion Armor (+4 to +7), Weapon, Accessories & WTD (+4 to +6)",
@@ -175,6 +142,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         name: TAB_KEY.jadeLunar,
       },
       date: "24-09-2026",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Collapse Dragon Jade (Epic) enhancement levels expanded (0-15)",
+      link: {
+        key: TAB_KEY.jadeCollapse,
+        name: TAB_KEY.jadeCollapse,
+      },
+      date: "26-09-2026",
     },
   ];
 
@@ -386,6 +362,33 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "10-11-2025",
     },
+    {
+      key: keyUpdate.N,
+      label: "Deeply Rooted Variant Jade",
+      link: {
+        key: TAB_KEY.jadeDeepVariant,
+        name: TAB_KEY.jadeDeepVariant,
+      },
+      date: "12-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "VIP Accessories charts",
+      link: {
+        key: TAB_KEY.eqVIPAcc,
+        name: TAB_KEY.eqVIPAcc,
+      },
+      date: "17-11-2025",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Enhancement Legend Conversion Weapon & WTD (+1 to +3)",
+      link: {
+        key: TAB_KEY.miscConversion,
+        name: TAB_KEY.miscConversion,
+      },
+      date: "06-02-2026",
+    },
   ];
   const dataPastUpdate: Array<FeatureItem> = [
     {
@@ -411,6 +414,12 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       key: keyUpdate.U,
       label: "Update Chart Visualization to show data by total or step",
       date: "18-11-2025",
+    },
+    {
+      key: keyUpdate.M,
+      label:
+        "Overall app performance improvement, bug fixes, and UI/UX enhancements.",
+      date: "31-08-2026",
     },
   ];
 

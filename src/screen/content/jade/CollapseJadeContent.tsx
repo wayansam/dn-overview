@@ -245,7 +245,11 @@ const CollapseJadeContent = () => {
             }
             errors={enhanceDataSource.errorDt}
             width={getWidthSetting()}
-            range={{ min: 0, max: 5 }}
+            range={{
+              min: 0,
+              max: 15,
+              marks: { 0: "+0", 5: "+5", 10: "+10", 15: "+15" },
+            }}
             itemToggle={{
               name: "craft",
               label: "Craft",
