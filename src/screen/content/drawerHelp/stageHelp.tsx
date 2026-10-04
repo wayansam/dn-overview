@@ -4,6 +4,27 @@ import { HelpItem } from "./helpItem.type";
 
 export const stageHelpItems: HelpItem[] = [
   {
+    key: TAB_KEY.stageFissionMaze,
+    label: TAB_KEY.stageFissionMaze,
+    children: (
+      <div>
+        <PatchNoteSection
+          entries={[
+            {
+              href: "https://patchnote.dragonnest.com/sea/81/c/1",
+              label: "Fission Maze Erosion Mode (Labyrinth 18F-24F)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/180/c/7",
+              label:
+                "Ascension Difficulty Split - Erosion Rewards (3-1F to 6-2F)",
+            },
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
     key: TAB_KEY.stageArcOfTranscen,
     label: TAB_KEY.stageArcOfTranscen,
     children: (

@@ -35,3 +35,23 @@ export interface StageAotReward {
     "Unknown Stone Fragment"?: number;
   };
 }
+
+export interface FissionMazeErosionReward {
+  floor: string;
+  // stored in copper (1g = 100s, 1s = 100c) to keep patch note values exact
+  gold: number;
+  erosionFragment: number;
+  concentratedErosionFragment?: { min: number; max: number };
+}
+
+export interface FissionMazeRangeReward {
+  name: string;
+  min: number;
+  max?: number;
+}
+
+export interface FissionMazeStageClear {
+  floor: string;
+  goldenBox: FissionMazeRangeReward[];
+  silverBox: FissionMazeRangeReward[];
+}

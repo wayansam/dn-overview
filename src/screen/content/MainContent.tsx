@@ -39,6 +39,7 @@ import VIPAccContent from "./equipment/VIPAccContent";
 import SpunGoldEqContent from "./equipment/SpunGoldEqContent";
 import CollapseJadeContent from "./jade/CollapseJadeContent";
 import StageAoTContent from "./stage/StageAoTContent";
+import StageFissionMazeContent from "./stage/StageFissionMazeContent";
 import DeeplyVarJadeContent from "./jade/DeeplyVarJadeContent";
 import BroochContent from "./brooch/BroochContent";
 
@@ -93,6 +94,9 @@ const MainContent = () => {
 
       case TAB_KEY.mainCompare:
         return <CompareEqContent />;
+
+      case TAB_KEY.stageFissionMaze:
+        return <StageFissionMazeContent />;
 
       case TAB_KEY.stageArcOfTranscen:
         return <StageAoTContent />;

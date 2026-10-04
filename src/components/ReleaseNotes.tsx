@@ -152,6 +152,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "26-09-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Fission Maze Erosion rewards (Labyrinth & Ascension)",
+      link: {
+        key: TAB_KEY.stageFissionMaze,
+        name: TAB_KEY.stageFissionMaze,
+      },
+      date: "04-10-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
