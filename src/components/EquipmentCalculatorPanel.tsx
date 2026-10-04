@@ -67,6 +67,7 @@ interface EquipmentCalculatorPanelProps<T extends EquipmentTableCalculator> {
   setDataSource: React.Dispatch<React.SetStateAction<T[]>>;
   customLabeling?: (item: number) => string;
   extraColumns?: ExtraColumnConfig<T>[];
+  allowSameRange?: boolean;
 
   invalid: boolean;
   invalidMessage?: string;
@@ -102,6 +103,7 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
   setDataSource,
   customLabeling,
   extraColumns,
+  allowSameRange,
   invalid,
   invalidMessage = "From cannot exceed the To option",
   flags = [],
@@ -126,6 +128,7 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
           setDataSource={setDataSource}
           customLabeling={customLabeling}
           extraColumns={extraColumns}
+          allowSameRange={allowSameRange}
         />
       </CalcCard>
       <CalcCard>

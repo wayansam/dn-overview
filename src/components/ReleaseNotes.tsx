@@ -161,6 +161,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "04-10-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Gold Dragon Jade",
+      link: {
+        key: TAB_KEY.jadeGoldDragon,
+        name: TAB_KEY.jadeGoldDragon,
+      },
+      date: "04-10-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

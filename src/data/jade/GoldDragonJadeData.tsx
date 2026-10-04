@@ -1,0 +1,228 @@
+import { EQUIPMENT } from "../../constants/InGame.constants";
+import { GoldDragonJadeCalculator } from "../../interface/Common.interface";
+import { GoldDragonJadeEnhanceMaterial } from "../../interface/Item.interface";
+import { CommonItemStats } from "../../interface/ItemStat.interface";
+
+// Every step costs 1 Golden Memory. Failing any step beyond +5 destroys the
+// jade, hence the 100% break rate from +6 onward.
+export const GoldDragonJadeEnhanceMaterialTable: GoldDragonJadeEnhanceMaterial[] =
+  [
+    {
+      encLevel: 1,
+      gold: 100000,
+      goldenMemory: 1,
+      fadedMemory: 10,
+      successRatePercent: 100,
+      breakRatePercent: 0,
+    },
+    {
+      encLevel: 2,
+      gold: 110000,
+      goldenMemory: 1,
+      fadedMemory: 15,
+      successRatePercent: 100,
+      breakRatePercent: 0,
+    },
+    {
+      encLevel: 3,
+      gold: 120000,
+      goldenMemory: 1,
+      fadedMemory: 20,
+      successRatePercent: 100,
+      breakRatePercent: 0,
+    },
+    {
+      encLevel: 4,
+      gold: 130000,
+      goldenMemory: 1,
+      fadedMemory: 25,
+      successRatePercent: 100,
+      breakRatePercent: 0,
+    },
+    {
+      encLevel: 5,
+      gold: 140000,
+      goldenMemory: 1,
+      fadedMemory: 30,
+      successRatePercent: 100,
+      breakRatePercent: 0,
+    },
+    {
+      encLevel: 6,
+      gold: 150000,
+      goldenMemory: 1,
+      fadedMemory: 35,
+      successRatePercent: 50,
+      breakRatePercent: 100,
+    },
+    {
+      encLevel: 7,
+      gold: 200000,
+      goldenMemory: 1,
+      fadedMemory: 40,
+      successRatePercent: 45,
+      breakRatePercent: 100,
+    },
+    {
+      encLevel: 8,
+      gold: 200000,
+      goldenMemory: 1,
+      fadedMemory: 45,
+      successRatePercent: 35,
+      breakRatePercent: 100,
+    },
+    {
+      encLevel: 9,
+      gold: 200000,
+      goldenMemory: 1,
+      fadedMemory: 50,
+      successRatePercent: 25,
+      breakRatePercent: 100,
+    },
+    {
+      encLevel: 10,
+      gold: 200000,
+      goldenMemory: 1,
+      fadedMemory: 100,
+      successRatePercent: 15,
+      breakRatePercent: 100,
+    },
+  ];
+
+// ATK and Max HP apply to every part; the secondary stat depends on the part:
+// Helmet crt, Upper fd, Lower cdm, Gloves def, Shoes magdef.
+export const GoldDragonJadeStatsTable: CommonItemStats[] = [
+  {
+    encLevel: "0",
+    phyMagAtk: 1000000,
+    hp: 2000000,
+    crt: 50000,
+    fd: 600,
+    cdm: 225000,
+    def: 30000,
+    magdef: 30000,
+  },
+  {
+    encLevel: "1",
+    phyMagAtk: 1100000,
+    hp: 2400000,
+    crt: 55000,
+    fd: 650,
+    cdm: 247500,
+    def: 35000,
+    magdef: 35000,
+  },
+  {
+    encLevel: "2",
+    phyMagAtk: 1250000,
+    hp: 2900000,
+    crt: 60000,
+    fd: 700,
+    cdm: 270000,
+    def: 40000,
+    magdef: 40000,
+  },
+  {
+    encLevel: "3",
+    phyMagAtk: 1450000,
+    hp: 3500000,
+    crt: 65000,
+    fd: 750,
+    cdm: 292500,
+    def: 45000,
+    magdef: 45000,
+  },
+  {
+    encLevel: "4",
+    phyMagAtk: 1700000,
+    hp: 4200000,
+    crt: 70000,
+    fd: 800,
+    cdm: 315000,
+    def: 50000,
+    magdef: 50000,
+  },
+  {
+    encLevel: "5",
+    phyMagAtk: 2000000,
+    hp: 5000000,
+    crt: 75000,
+    fd: 900,
+    cdm: 337500,
+    def: 55000,
+    magdef: 55000,
+  },
+  {
+    encLevel: "6",
+    phyMagAtk: 2350000,
+    hp: 6000000,
+    crt: 80000,
+    fd: 1000,
+    cdm: 360000,
+    def: 65000,
+    magdef: 65000,
+  },
+  {
+    encLevel: "7",
+    phyMagAtk: 2750000,
+    hp: 7000000,
+    crt: 85000,
+    fd: 1100,
+    cdm: 382500,
+    def: 75000,
+    magdef: 75000,
+  },
+  {
+    encLevel: "8",
+    phyMagAtk: 3200000,
+    hp: 8000000,
+    crt: 90000,
+    fd: 1200,
+    cdm: 405000,
+    def: 90000,
+    magdef: 90000,
+  },
+  {
+    encLevel: "9",
+    phyMagAtk: 3700000,
+    hp: 9000000,
+    crt: 95000,
+    fd: 1350,
+    cdm: 427500,
+    def: 105000,
+    magdef: 105000,
+  },
+  {
+    encLevel: "10",
+    phyMagAtk: 4500000,
+    hp: 10000000,
+    crt: 100000,
+    fd: 1500,
+    cdm: 450000,
+    def: 120000,
+    magdef: 120000,
+  },
+];
+
+export const dataGoldDragonJadeCalculator: GoldDragonJadeCalculator[] = [
+  EQUIPMENT.HELM,
+  EQUIPMENT.UPPER,
+  EQUIPMENT.LOWER,
+  EQUIPMENT.GLOVE,
+  EQUIPMENT.SHOES,
+].map((equipment, idx) => ({
+  key: `${idx + 1}`,
+  equipment,
+  min: 0,
+  max: 10,
+  from: 0,
+  to: 0,
+  craft: false,
+}));
+
+// Crafting one Gold Dragon Jade (any part) at +0.
+export const GoldDragonJadeCraftMaterial = {
+  goldenMemory: 5,
+  fadedMemory: 25,
+  gold: 100000,
+};

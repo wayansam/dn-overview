@@ -24,6 +24,7 @@ export const TAB_KEY = {
   jadeErosion: "Erosion Jade",
   jadeCollapse: "Collapse Jade",
   jadeDeepVariant: "Deeply Rooted Variant Jade",
+  jadeGoldDragon: "Gold Dragons",
   heraldryAncientGoddes: "Ancients' Goddess",
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
@@ -124,6 +125,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.jadeDeepVariant,
         name: TAB_KEY.jadeDeepVariant,
+      },
+      {
+        key: TAB_KEY.jadeGoldDragon,
+        name: TAB_KEY.jadeGoldDragon,
       },
     ],
   },

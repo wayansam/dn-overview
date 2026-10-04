@@ -1,3 +1,5 @@
+import { Image } from "antd";
+import goldDragonJadeEnhancementImg from "../../../assets/help/gold-dragon-jade-enhancement.png";
 import {
   PatchNoteLink,
   PatchNoteSection,
@@ -229,6 +231,53 @@ export const jadeHelpItems: HelpItem[] = [
               label: "Deeply Rooted Variant Dragon Jade",
             },
           ]}
+        />
+        <p>Special Thanks</p>
+        <p>
+          <i>~BananaCredits~</i>
+        </p>
+      </div>
+    ),
+  },
+  {
+    key: TAB_KEY.jadeGoldDragon,
+    label: TAB_KEY.jadeGoldDragon,
+    children: (
+      <div>
+        <p>
+          <b>
+            Expand the Ancient Dragon Equipment slot with Guardian's Blessing
+            (Blacksmith craft) before equipping this jade.
+          </b>
+        </p>
+        <p>
+          Golden Memory drops from Gold Dragon Nest. Blessed Gold Dragon's
+          Dragon Jade cannot be enhanced.
+        </p>
+        <p>
+          To use the calculator, please select the parts you want to calculate,
+          then set the range (current enhance level to your target) for all
+          parts in Settings, or click From/To in the table to set each part.
+          Turn on Craft for a part to include its craft mats (5 Golden Memory,
+          25 Faded Memory, 100,000 Gold).
+        </p>
+        <p>
+          <i>
+            Enhancing beyond +5 can fail, and a failed attempt destroys the
+            jade.
+          </i>
+        </p>
+        <PatchNoteLink
+          href="https://patchnote.dragonnest.com/sea/174/c/4"
+          label="Gold Dragon's Dragon Jade"
+        />
+        <p>
+          <i>Click the table below to view it in full screen.</i>
+        </p>
+        <Image
+          src={goldDragonJadeEnhancementImg}
+          alt="Gold Dragon Jade enhancement table"
+          style={{ maxWidth: "100%", height: "auto" }}
         />
         <p>Special Thanks</p>
         <p>

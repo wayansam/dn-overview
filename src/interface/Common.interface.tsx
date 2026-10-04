@@ -80,3 +80,7 @@ export interface BoneCalculator {
   from: number;
   to: number;
 }
+
+export interface GoldDragonJadeCalculator extends BoneCalculator {
+  craft: boolean;
+}

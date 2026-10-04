@@ -41,6 +41,7 @@ import CollapseJadeContent from "./jade/CollapseJadeContent";
 import StageAoTContent from "./stage/StageAoTContent";
 import StageFissionMazeContent from "./stage/StageFissionMazeContent";
 import DeeplyVarJadeContent from "./jade/DeeplyVarJadeContent";
+import GoldDragonJadeContent from "./jade/GoldDragonJadeContent";
 import BroochContent from "./brooch/BroochContent";
 
 const { useBreakpoint } = Grid;
@@ -136,6 +137,9 @@ const MainContent = () => {
 
       case TAB_KEY.jadeDeepVariant:
         return <DeeplyVarJadeContent />;
+
+      case TAB_KEY.jadeGoldDragon:
+        return <GoldDragonJadeContent />;
 
       case TAB_KEY.broochVelskud:
       case TAB_KEY.broochNerwin:

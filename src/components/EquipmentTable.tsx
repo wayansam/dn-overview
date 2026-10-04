@@ -73,6 +73,9 @@ interface EquipmentTableProps<T extends EquipmentTableCalculator> {
   // Items only appear on tables whose data actually provides the field, so older
   // equipment calculators are unaffected unless they opt in.
   extraColumns?: ExtraColumnConfig<T>[];
+  // Treat From === To as valid (nothing to enhance) instead of an error, for
+  // tables where a row can still be meaningful without enhancing, e.g. craft-only.
+  allowSameRange?: boolean;
 }
 
 const getLabel = (item: number) => {
@@ -98,7 +101,11 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
   setDataSource,
   customLabeling,
   extraColumns = [],
+  allowSameRange = false,
 }: EquipmentTableProps<T>) => {
+  const isBadRange = (from: number, to: number) =>
+    allowSameRange ? to < from : to <= from;
+
   interface EditableCellProps {
     title: React.ReactNode;
     editable: boolean;
@@ -196,15 +203,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
           onBlur={saveSelect}
           autoFocus
           status={
-            rangeKind === "from"
-              ? findTo <= findFr
-                ? "error"
-                : undefined
-              : rangeKind === "to"
-                ? findFr >= findTo
-                  ? "error"
-                  : undefined
-                : undefined
+            rangeKind && isBadRange(findFr, findTo) ? "error" : undefined
           }
           size="small"
         ></Select>
@@ -213,7 +212,7 @@ const EquipmentTable = <T extends EquipmentTableCalculator>({
           className="editable-cell-value-wrap"
           style={{
             paddingRight: 24,
-            color: rangeKind && findTo <= findFr ? "red" : "unset",
+            color: rangeKind && isBadRange(findFr, findTo) ? "red" : "unset",
             minWidth: 120,
             paddingTop: 1,
             paddingBottom: 1,
