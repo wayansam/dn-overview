@@ -24,7 +24,7 @@ export const TAB_KEY = {
   jadeErosion: "Erosion Jade",
   jadeCollapse: "Collapse Jade",
   jadeDeepVariant: "Deeply Rooted Variant Jade",
-  jadeGoldDragon: "Gold Dragon's",
+  jadeGoldDragon: "Gold Dragon's Jade",
   heraldryAncientGoddes: "Ancients' Goddess",
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
