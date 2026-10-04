@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/dn-overview/static/css/main.4b5be791.css",
-    "main.js": "/dn-overview/static/js/main.65a3dee2.js",
+    "main.js": "/dn-overview/static/js/main.e1ce0865.js",
     "static/js/206.16f548d8.chunk.js": "/dn-overview/static/js/206.16f548d8.chunk.js",
     "static/media/gold-dragon-jade-enhancement.png": "/dn-overview/static/media/gold-dragon-jade-enhancement.ca2c7b3b0ea68d5da314.png",
     "index.html": "/dn-overview/index.html"
   },
   "entrypoints": [
     "static/css/main.4b5be791.css",
-    "static/js/main.65a3dee2.js"
+    "static/js/main.e1ce0865.js"
   ]
 }
