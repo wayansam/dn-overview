@@ -1,4 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
+import { OrderedListOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Form,
@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
+import ReorderListModal from "../../../components/ReorderListModal";
 import {
   CHARACTER_GROUP_LIMIT,
   CHARACTER_GROUP_NAME_MAX_LENGTH,
@@ -26,6 +27,7 @@ import {
 import {
   addCharacterGroup,
   deleteCharacterGroup,
+  reorderCharacterGroups,
   updateCharacterGroup,
 } from "../../../slice/Character.reducer";
 import { isNameTaken } from "../../../utils/characterStorage.util";
@@ -48,6 +50,7 @@ const CharacterIdContent = () => {
   const [editingGroup, setEditingGroup] = useState<
     CharacterGroup | null | undefined
   >(undefined);
+  const [isReorderOpen, setIsReorderOpen] = useState(false);
 
   const isFull = groups.length >= CHARACTER_GROUP_LIMIT;
   const getMembers = (groupId: string) =>
@@ -163,19 +166,45 @@ const CharacterIdContent = () => {
         <Text strong>
           IDs ({groups.length}/{CHARACTER_GROUP_LIMIT})
         </Text>
-        <Tooltip
-          title={isFull ? `Limited to ${CHARACTER_GROUP_LIMIT} IDs` : ""}
-        >
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            disabled={isFull}
-            onClick={() => openForm(null)}
+        <Space>
+          <Tooltip title="Arrange ID order">
+            <Button
+              icon={<OrderedListOutlined />}
+              disabled={groups.length < 2}
+              onClick={() => setIsReorderOpen(true)}
+            />
+          </Tooltip>
+          <Tooltip
+            title={isFull ? `Limited to ${CHARACTER_GROUP_LIMIT} IDs` : ""}
           >
-            Add
-          </Button>
-        </Tooltip>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              disabled={isFull}
+              onClick={() => openForm(null)}
+            >
+              Add
+            </Button>
+          </Tooltip>
+        </Space>
       </Space>
+      <ReorderListModal
+        title="Arrange IDs"
+        open={isReorderOpen}
+        items={groups.map((item) => ({
+          id: item.id,
+          content: (
+            <>
+              <Text>{item.name}</Text>
+              <Text type="secondary">
+                {getMembers(item.id).length} character(s)
+              </Text>
+            </>
+          ),
+        }))}
+        onSave={(ids) => dispatch(reorderCharacterGroups(ids))}
+        onClose={() => setIsReorderOpen(false)}
+      />
       <Table
         columns={groupColumns}
         dataSource={groups}

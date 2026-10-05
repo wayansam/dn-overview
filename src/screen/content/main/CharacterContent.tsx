@@ -1,4 +1,4 @@
-import { PlusOutlined } from "@ant-design/icons";
+import { OrderedListOutlined, PlusOutlined } from "@ant-design/icons";
 import {
   Button,
   Checkbox,
@@ -12,11 +12,13 @@ import {
   Popconfirm,
   Select,
   Space,
+  Tag,
   Tooltip,
   Typography,
   message,
 } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import ReorderListModal from "../../../components/ReorderListModal";
 import {
   CHARACTER_LEVEL_MAX,
   CHARACTER_LEVEL_MIN,
@@ -35,6 +37,7 @@ import { Character } from "../../../interface/Account.interface";
 import {
   addCharacter,
   deleteCharacter,
+  reorderCharacters,
   updateCharacter,
 } from "../../../slice/Character.reducer";
 import { setHasUnsavedChanges } from "../../../slice/UIState.reducer";
@@ -86,6 +89,7 @@ const CharacterContent = () => {
   const [isDirty, setIsDirty] = useState(false);
   // Bumped to force a blank form even when already in "new" mode.
   const [resetToken, setResetToken] = useState(0);
+  const [isReorderOpen, setIsReorderOpen] = useState(false);
 
   const selectedCharacter = characters.find((item) => item.id === selectedId);
   const mainCharacter = characters.find((item) => item.id === mainCharacterId);
@@ -220,6 +224,24 @@ const CharacterContent = () => {
     <div>
       {modalContextHolder}
       {messageContextHolder}
+      <ReorderListModal
+        title="Arrange Characters"
+        open={isReorderOpen}
+        items={characters.map((item) => ({
+          id: item.id,
+          content: (
+            <>
+              <Text>{item.name}</Text>
+              <Text type="secondary">
+                Lv.{item.level} {getClassById(item.classId)?.name}
+              </Text>
+              {item.id === mainCharacterId && <Tag color="gold">Main</Tag>}
+            </>
+          ),
+        }))}
+        onSave={(ids) => dispatch(reorderCharacters(ids))}
+        onClose={() => setIsReorderOpen(false)}
+      />
       <Space wrap style={{ marginBottom: 16 }}>
         <Select
           style={{ minWidth: 280 }}
@@ -231,6 +253,13 @@ const CharacterContent = () => {
           onChange={(id: string) => confirmUnsaved(() => goToView(id))}
           notFoundContent="No character yet"
         />
+        <Tooltip title="Arrange character order">
+          <Button
+            icon={<OrderedListOutlined />}
+            disabled={characters.length < 2}
+            onClick={() => setIsReorderOpen(true)}
+          />
+        </Tooltip>
         <Tooltip
           title={isFull ? `Limited to ${CHARACTER_LIMIT} characters` : ""}
         >
