@@ -439,6 +439,11 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
         "Overall app performance improvement, bug fixes, and UI/UX enhancements.",
       date: "31-08-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "Update Character & ID screen to show all characters",
+      date: "05-10-2026",
+    },
   ];
 
   return (
