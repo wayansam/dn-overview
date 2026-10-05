@@ -1,86 +1,96 @@
-import { Table, Typography } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Button, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { CharacterInGameData } from "../../../interface/Account.interface";
 import ReleaseNotes from "../../../components/ReleaseNotes";
+import { CHARACTER_LIMIT } from "../../../constants/Character.constants";
+import { getClassById } from "../../../data/character/ClassData";
+import { useAppSelector } from "../../../hooks";
+import useCharacterNavigation from "../../../hooks/useCharacterNavigation";
+import { Character } from "../../../interface/Account.interface";
 const { Text } = Typography;
 
 const GeneralContent = () => {
-  interface DataType {
-    key: string;
-    name: string;
-    age: number;
-    address: string;
-    tags: string[];
-  }
+  const openCharacterScreen = useCharacterNavigation();
+  const { characters, groups, mainCharacterId } = useAppSelector(
+    (state) => state.Character,
+  );
+  const isFull = characters.length >= CHARACTER_LIMIT;
 
-  const columns: ColumnsType<CharacterInGameData> = [
+  const columns: ColumnsType<Character> = [
     {
       title: "Name",
-      dataIndex: "ign",
-      //   key: "ign",
-      render: (text) => <Text>{text}</Text>,
-    },
-    {
-      title: "Job",
-      dataIndex: "job",
+      dataIndex: "name",
+      render: (_, { id, name }) => (
+        <Space size={4}>
+          <Text>{name}</Text>
+          {id === mainCharacterId && <Tag color="gold">Main</Tag>}
+        </Space>
+      ),
     },
     {
       title: "Level",
       dataIndex: "level",
     },
     {
-      title: "STG",
-      dataIndex: "stg",
+      title: "Class",
+      dataIndex: "classId",
+      render: (_, { classId }) => getClassById(classId)?.name ?? classId,
     },
     {
-      title: "Skill Jade",
-      dataIndex: "skillJade",
-      //   key: "ign",
-      render: (_, { skillJade }) => (
-        <Text>
-          {skillJade?.map((item) => `${item.name}(${item.level})`).toString()}
-        </Text>
+      title: "Base Class",
+      key: "baseClass",
+      render: (_, { classId }) => getClassById(classId)?.baseClass ?? "-",
+    },
+    {
+      title: "ID",
+      dataIndex: "groupId",
+      render: (_, { groupId }) =>
+        groups.find((item) => item.id === groupId)?.name ?? "-",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, { id }) => (
+        <Button
+          size="small"
+          onClick={() => openCharacterScreen({ characterId: id })}
+        >
+          Details
+        </Button>
       ),
     },
-
-    // {
-    //   title: "Tags",
-    //   key: "tags",
-    //   dataIndex: "tags",
-    //   render: (_, { tags }) => (
-    //     <>
-    //       {tags.map((tag) => {
-    //         let color = tag.length > 5 ? "geekblue" : "green";
-    //         if (tag === "loser") {
-    //           color = "volcano";
-    //         }
-    //         return (
-    //           <Tag color={color} key={tag}>
-    //             {tag.toUpperCase()}
-    //           </Tag>
-    //         );
-    //       })}
-    //     </>
-    //   ),
-    // },
-    // {
-    //   title: "Action",
-    //   key: "action",
-    //   render: (_, record) => (
-    //     <Space size="middle">
-    //       <a>Invite {record.name}</a>
-    //       <a>Delete</a>
-    //     </Space>
-    //   ),
-    // },
   ];
 
   return (
     <div style={{ overflowX: "auto" }}>
+      <Space
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
+      >
+        <Text strong>
+          Characters ({characters.length}/{CHARACTER_LIMIT})
+        </Text>
+        <Tooltip
+          title={isFull ? `Limited to ${CHARACTER_LIMIT} characters` : ""}
+        >
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            disabled={isFull}
+            onClick={() => openCharacterScreen({ isNew: true })}
+          >
+            Add
+          </Button>
+        </Tooltip>
+      </Space>
       <Table
         columns={columns}
-        // dataSource={exampleAccount.characters}
-        dataSource={[]}
+        dataSource={characters}
+        rowKey="id"
+        pagination={{ pageSize: 5, hideOnSinglePage: false }}
       />
       <ReleaseNotes onlyNew={true} />
     </div>

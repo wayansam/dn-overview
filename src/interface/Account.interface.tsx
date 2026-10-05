@@ -1,38 +1,42 @@
 import {
   CHARACTER_2NDJOB,
-  CHARACTER_3RDJOB,
   CHARACTER_CLASS,
+  SKILL_SLOT,
 } from "../constants/InGame.constants";
-import { Rune, SkillJade } from "./Item.interface";
 
-export interface AccountData {
-  characters: CharacterInGameData[];
+// Static reference data (src/data/character/ClassData.tsx).
+export interface ClassInfo {
+  id: string;
+  name: string;
+  baseClass: CHARACTER_CLASS;
+  secondJob: CHARACTER_2NDJOB;
 }
 
-export interface Classes {
-  name: CHARACTER_CLASS;
-  list: SecondJob[];
+export interface ClassSkill {
+  id: string;
+  classId: string;
+  slot: SKILL_SLOT;
+  name: string;
 }
 
-export interface SecondJob {
-  name: CHARACTER_2NDJOB;
-  list: ThirdJob[];
-}
-
-export interface ThirdJob {
-  name: CHARACTER_3RDJOB;
-}
-
-export interface CharacterInGameData {
-  ign: string;
-  job: CHARACTER_3RDJOB;
+// User data, persisted to localStorage (src/utils/characterStorage.util.tsx).
+export interface Character {
+  id: string;
+  name: string;
   level: number;
-  stg?: number;
-  skillJade?: SkillJade[];
-  rune?: {
-    tria?: Rune;
-    circu?: Rune;
-    recta?: Rune;
-    trape?: Rune;
-  };
+  classId: string;
+  groupId?: string;
+}
+
+// Shown as "ID" in the UI: an in-game account holding several characters.
+export interface CharacterGroup {
+  id: string;
+  name: string;
+}
+
+export interface CharacterStore {
+  version: number;
+  characters: Character[];
+  groups: CharacterGroup[];
+  mainCharacterId?: string;
 }

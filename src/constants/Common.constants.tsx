@@ -7,6 +7,8 @@ import {
 
 export const TAB_KEY = {
   mainGeneral: "General",
+  mainId: "ID",
+  mainCharacter: "Character",
   mainCompare: "Compare Equipment",
   setting: "Setting",
   stageNSTG: "Night Shadow Training Ground",
@@ -43,6 +45,14 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.mainGeneral,
         name: TAB_KEY.mainGeneral,
+      },
+      {
+        key: TAB_KEY.mainId,
+        name: TAB_KEY.mainId,
+      },
+      {
+        key: TAB_KEY.mainCharacter,
+        name: TAB_KEY.mainCharacter,
       },
       {
         key: TAB_KEY.mainCompare,

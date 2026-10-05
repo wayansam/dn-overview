@@ -9,33 +9,50 @@ export enum CHARACTER_CLASS {
   LANCEA = "Lancea",
   MACHINA = "Machina",
   VANDAR = "Vandar",
+  ARTA = "Arta",
 }
 
 export enum CHARACTER_2NDJOB {
   SWORDSMAN = "Swordsman",
   MERCENARY = "Mercenary",
+  AVENGER = "Avenger",
   KNIGHT = "Knight",
   BOWMASTER = "Bowmaster",
   ACROBAT = "Acrobat",
+  HUNTER = "Hunter",
   FORCEUSER = "Force User",
   ELEMENTALLORD = "Elemental Lord",
+  MARA = "Mara",
   PALADIN = "Paladin",
   PRIEST = "Priest",
+  HERETIC = "Heretic",
   ENGINEER = "Engineer",
   ALCHEMIST = "Alchemist",
+  MECHANIC = "Mechanic",
   SCREAMER = "Screamer",
   DANCER = "Dancer",
+  ORACLE = "Oracle",
   CHASER = "Chaser",
   BRINGER = "Bringer",
+  PHANTOM = "Phantom",
   PIERCER = "Piercer",
   KNIGHTESS = "Knightess",
+  PLAGA = "Plaga",
   PATRONA = "Patrona",
   LAUNCHER = "Launcher",
+  BEASTIA = "Beastia",
   TREASUREHUNTER = "Treasure Hunter",
+  WANDERER = "Wanderer",
+  ASCENDANT = "Ascendant",
+  ARTIST = "Artist",
 }
 
-export enum CHARACTER_3RDJOB {
-  SAINT = "Saint",
+export enum SKILL_SLOT {
+  MASTERY3 = "Class Mastery 3",
+  ULTIMATE1 = "1st Ultimate Skill",
+  EX50 = "2nd Lv.50 EX Original Skill",
+  SECONDARY = "Secondary Skill",
+  MAIN = "Main Skill",
 }
 
 export enum SKILL_JADE {

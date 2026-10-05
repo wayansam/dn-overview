@@ -1,8 +1,18 @@
-import { Button, Card, Divider, Grid, Layout, Space, theme } from "antd";
+import {
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Layout,
+  Modal,
+  Space,
+  theme,
+} from "antd";
 import { useMemo, useState } from "react";
 import { TAB_GROUP_LIST } from "../constants/Common.constants";
 import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
+import { SideBarTab } from "../interface/Common.interface";
 import {
   setIsCollapsedSideBar,
   setSelectedSideBar,
@@ -24,8 +34,19 @@ const SideBar = () => {
     (state) => state.UIState.isCollapsedSideBar,
   );
   const isKeepScreen = useAppSelector((state) => state.UIState.isKeepScreen);
+  const hasUnsavedChanges = useAppSelector(
+    (state) => state.UIState.hasUnsavedChanges,
+  );
 
+  const [modal, modalContextHolder] = Modal.useModal();
   const [isSmall, setIsSmall] = useState(false);
+
+  const goToTab = (item: SideBarTab) => {
+    dispatch(setSelectedSideBar(item));
+    if (isKeepScreen) {
+      localStorage.setItem(LS_KEYS.last_screen, JSON.stringify(item));
+    }
+  };
 
   const getWidthSetting = () => {
     if (screens.xs) {
@@ -71,6 +92,7 @@ const SideBar = () => {
       onBlur={() => setCollapse(true)}
       onFocus={() => setCollapse(false)}
     >
+      {modalContextHolder}
       <div
         style={{
           height: "100%",
@@ -120,13 +142,22 @@ const SideBar = () => {
                     selectedSideBar.key === item.key ? "primary" : "default"
                   }
                   onClick={() => {
-                    dispatch(setSelectedSideBar(item));
-                    if (isKeepScreen) {
-                      localStorage.setItem(
-                        LS_KEYS.last_screen,
-                        JSON.stringify(item),
-                      );
+                    if (
+                      hasUnsavedChanges &&
+                      selectedSideBar.key !== item.key
+                    ) {
+                      modal.confirm({
+                        title: "Discard unsaved changes?",
+                        content:
+                          "Your character changes have not been saved yet.",
+                        okText: "Discard",
+                        okButtonProps: { danger: true },
+                        cancelText: "Stay",
+                        onOk: () => goToTab(item),
+                      });
+                      return;
                     }
+                    goToTab(item);
                   }}
                   size={"middle"}
                 >

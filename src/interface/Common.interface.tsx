@@ -11,6 +11,10 @@ export interface ExtraPayload {
   skillJadeScreen?: {
     tabOpen: string[];
   };
+  characterScreen?: {
+    characterId?: string;
+    isNew?: boolean;
+  };
 }
 export interface SideBarTab {
   key: string;
