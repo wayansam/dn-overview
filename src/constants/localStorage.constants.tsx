@@ -5,4 +5,5 @@ export enum LS_KEYS {
   keep_screen = "KEEP_SCREEN_DN",
   last_screen = "LAST_SCREEN_DN",
   characters = "CHARACTERS_DN",
+  character_columns = "CHARACTER_COLUMNS_DN",
 }
