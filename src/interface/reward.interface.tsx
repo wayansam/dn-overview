@@ -20,6 +20,7 @@ export interface StageAotReward {
     "Lunar Eclipse Fragment x2000 Pouch"?: number;
     "Lunar Eclipse Fragment x3000 Pouch"?: number;
     "Eternal Enhancement Heraldry (Unique) Selection Pouch"?: number;
+    "Ark of Transcendence [Past] Coin"?: number;
 
     // weekly
     "High Grade Lunar Eclipse Fragment (6 types)"?: number;

@@ -67,6 +67,10 @@ export const stageHelpItems: HelpItem[] = [
               href: "https://patchnote.dragonnest.com/sea/187/c/3",
               label: "Ark of Transcendence Season 3 [Future]",
             },
+            {
+              href: "https://patchnote.dragonnest.com/sea/199/c/1",
+              label: "Ark of Transcendence Season 4 [Past]",
+            },
           ]}
         />
       </div>

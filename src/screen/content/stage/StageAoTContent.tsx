@@ -20,6 +20,8 @@ import {
   aotRewardS3PastWeek,
   aotRewardS3PresentInit,
   aotRewardS3PresentWeek,
+  aotRewardS4PastInit,
+  aotRewardS4PastWeek,
 } from "../../../data/stage/StageAoTData";
 import { StageAotReward } from "../../../interface/reward.interface";
 import { getCustomColumnResource } from "../../../utils/common.util";
@@ -32,6 +34,7 @@ const floorPref = {
   last: "Last",
 };
 const seasonKey = {
+  s4Past: "Season 4 [Past]",
   s3Future: "Season 3 [Future]",
   s3Present: "Season 3 [Present]",
   s3Past: "Season 3 [Past]",
@@ -71,6 +74,8 @@ const StageAoTContent = () => {
     weekly: StageAotReward[];
   } => {
     switch (selectSeason) {
+      case seasonKey.s4Past:
+        return { first: aotRewardS4PastInit, weekly: aotRewardS4PastWeek };
       case seasonKey.s3Future:
         return { first: aotRewardS3FutureInit, weekly: aotRewardS3FutureWeek };
       case seasonKey.s3Present:
