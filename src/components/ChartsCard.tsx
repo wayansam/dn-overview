@@ -88,12 +88,16 @@ const ChartsCard = ({
     [sortedData, isDarkMode, statPrev]
   );
 
-  const allDesc = Object.entries(getAllStatDesc())
-    .map(([key, value]) => ({
-      label: value.long,
-      value: key,
-    }))
-    .filter((it) => it.label !== "-");
+  const allDesc = useMemo(
+    () =>
+      Object.entries(getAllStatDesc())
+        .map(([key, value]) => ({
+          label: value.long,
+          value: key,
+        }))
+        .filter((it) => it.label !== "-"),
+    []
+  );
 
   useEffect(() => {
     if (allDesc.length > 0) {
@@ -101,7 +105,7 @@ const ChartsCard = ({
       setStatVal?.(stat);
     }
     setStatPrev?.(previewOpt[0]);
-  }, []);
+  }, [allDesc, setStatVal, setStatPrev]);
   return (
     <div key={keyId} style={{ minWidth: screens?.xs ? 200 : 400 }}>
       {title && (

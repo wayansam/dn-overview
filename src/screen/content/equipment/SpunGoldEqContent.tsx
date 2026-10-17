@@ -94,13 +94,14 @@ const SpunGoldEqContent = () => {
       }
       return 0;
     };
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from: selectFrom,
-      to: selectTo,
-      craft: getCraftValue(item.equipment, selectCr, item.craft),
-    }));
-    setDataSource(newData);
+    setDataSource((prev) =>
+      prev.map((item) => ({
+        ...item,
+        from: selectFrom,
+        to: selectTo,
+        craft: getCraftValue(item.equipment, selectCr, item.craft),
+      }))
+    );
   }, [selectFrom, selectTo, selectCr]);
 
   const getSpunGoldMatsTable = useCallback(

@@ -125,15 +125,15 @@ const SkillJadeCalcComp = ({
       Gold: tempGold,
     };
     return temp;
-  }, [data]);
+  }, [data, matsTable]);
 
   const statRange: SkillJadeStat = useMemo(() => {
     return getStatDiff(statsTable, data[0], data[1]);
-  }, [data]);
+  }, [data, statsTable]);
 
   const succRange = useMemo(() => {
     return getChanceDiff(statsTable, data[0], data[1]);
-  }, [data]);
+  }, [data, statsTable]);
 
   const onAfterChange = (value: number[]) => {
     setData(value);

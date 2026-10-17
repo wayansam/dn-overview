@@ -176,14 +176,15 @@ const KilosEqContent = () => {
   );
 
   useEffect(() => {
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from: selectFrom,
-      to: selectTo,
-      craft: checkedCraft,
-      evoTier2: checkedEvo,
-    }));
-    setDataSource(newData);
+    setDataSource((prev) =>
+      prev.map((item) => ({
+        ...item,
+        from: selectFrom,
+        to: selectTo,
+        craft: checkedCraft,
+        evoTier2: checkedEvo,
+      }))
+    );
   }, [selectFrom, selectTo, checkedCraft, checkedEvo]);
 
   const getCalculator = () => (

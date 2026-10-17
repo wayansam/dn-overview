@@ -176,12 +176,13 @@ const AncientEqContent = () => {
   );
 
   useEffect(() => {
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from: selectFrom,
-      to: selectTo,
-    }));
-    setDataSource(newData);
+    setDataSource((prev) =>
+      prev.map((item) => ({
+        ...item,
+        from: selectFrom,
+        to: selectTo,
+      }))
+    );
   }, [selectFrom, selectTo]);
 
   const getCalculator = () => (

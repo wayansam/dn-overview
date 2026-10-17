@@ -838,17 +838,18 @@ const ConversionContent = () => {
   }, [selectedRowKeys, dataSource, invalidDtSrc]);
 
   useEffect(() => {
-    const newData = dataSource.map((item) => ({
-      ...item,
-      from:
-        selectFrom < item.min
-          ? item.min
-          : selectFrom >= item.max
-            ? item.max
-            : selectFrom,
-      to: selectTo > item.max ? item.max : selectTo,
-    }));
-    setDataSource(newData);
+    setDataSource((prev) =>
+      prev.map((item) => ({
+        ...item,
+        from:
+          selectFrom < item.min
+            ? item.min
+            : selectFrom >= item.max
+              ? item.max
+              : selectFrom,
+        to: selectTo > item.max ? item.max : selectTo,
+      }))
+    );
   }, [selectFrom, selectTo]);
 
   const chartItems = useMemo((): ChartItem[] => {

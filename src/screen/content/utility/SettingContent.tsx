@@ -24,7 +24,7 @@ const SettingContent = () => {
   // test https://media.tenor.com/_iNTPDlgTgEAAAAj/coffee-bara-capybara.gif
   useEffect(() => {
     form.setFieldsValue(imgData);
-  }, [imgData]);
+  }, [imgData, form]);
 
   const onFinish = (values: any) => {
     dispatch(setImgData(values));

@@ -71,14 +71,6 @@ const MainContent = () => {
   const screens = useBreakpoint();
   const isShowingImg = !!(isImgEnabled && imgData);
 
-  const openNotification = () => {
-    api.open({
-      message: "Don't miss out",
-      description: "Reload this page once in a while to get it latest content.",
-      icon: <SmileOutlined style={{ color: "#108ee9" }} />,
-    });
-  };
-
   useEffect(() => {
     if (typeof window?.gtag === "function") {
       window?.gtag("event", "screen_view", {
@@ -236,8 +228,12 @@ const MainContent = () => {
   );
 
   useEffect(() => {
-    openNotification();
-  }, []);
+    api.open({
+      message: "Don't miss out",
+      description: "Reload this page once in a while to get it latest content.",
+      icon: <SmileOutlined style={{ color: "#108ee9" }} />,
+    });
+  }, [api]);
 
   return (
     <>

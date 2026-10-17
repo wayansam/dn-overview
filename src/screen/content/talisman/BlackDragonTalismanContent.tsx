@@ -54,7 +54,7 @@ const marks: SliderMarks = {
 
 const BlackDragonTalismanContent = () => {
   const {
-    token: { colorBgContainer, colorText },
+    token: { colorText },
   } = theme.useToken();
 
   const defaultRange: number[] = [0, 5];
