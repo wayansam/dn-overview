@@ -59,8 +59,8 @@ const EV_AST_POW_WTD = 1300;
 const WEAP_ENH_SUC_RATE = [50, 40, 35, 20, 10, 7, 5, 5, 3, 3];
 
 // Legend-tier enhancement (Legend -> +1 -> +2 ... ) material cost, per tap.
-// Rate increases past +3, and armor's final +6 -> +7 tap switches entirely
-// from Astral Stone to the new Astral Jewel material.
+// Rate increases past +3, and the final +6 -> +7 tap (armor & accessories)
+// switches entirely from Astral Stone to the new Astral Jewel material.
 const ENC_AST_POW_ARMOR = 450;
 const ENC_AST_STONE_ARMOR = 1;
 const ENC_AST_STONE_ARMOR_MID = 3; // +4, +5, +6
@@ -70,6 +70,8 @@ const ENC_AST_JEWEL_ARMOR_TOP = 25; // +6 -> +7
 const ENC_AST_POW_ACC = 500;
 const ENC_AST_STONE_ACC = 3;
 const ENC_AST_STONE_ACC_MID = 5; // +4, +5, +6
+const ENC_AST_POW_ACC_TOP = 1500; // +6 -> +7
+const ENC_AST_JEWEL_ACC_TOP = 30; // +6 -> +7
 
 const ENC_AST_POW_WEAP = 600;
 const ENC_AST_STONE_WEAP = 3;
@@ -83,7 +85,7 @@ const ENC_AST_STONE_WTD_MID = 5; // +4, +5, +6
 const LEGEND_START = 12; // Legend +0, first level that costs Legend-rate mats
 const LEGEND_OLD_CAP = 15; // Legend +3, last level at the original rate
 const LEGEND_MID_CAP = 18; // Legend +6, last level shared by every category
-const LEGEND_ARMOR_MAX = 19; // Legend +7, armor only
+const LEGEND_TOP_MAX = 19; // Legend +7, armor & accessories only
 
 interface LegendRate {
   powder: number;
@@ -191,7 +193,7 @@ const computeConversionMats = (
         const cost = getLegendMatsCost(
           from,
           to,
-          LEGEND_ARMOR_MAX,
+          LEGEND_TOP_MAX,
           { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR },
           { powder: ENC_AST_POW_ARMOR, stone: ENC_AST_STONE_ARMOR_MID },
           { powder: ENC_AST_POW_ARMOR_TOP, jewel: ENC_AST_JEWEL_ARMOR_TOP }
@@ -235,12 +237,14 @@ const computeConversionMats = (
         const cost = getLegendMatsCost(
           from,
           to,
-          LEGEND_MID_CAP,
+          LEGEND_TOP_MAX,
           { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC },
-          { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID }
+          { powder: ENC_AST_POW_ACC, stone: ENC_AST_STONE_ACC_MID },
+          { powder: ENC_AST_POW_ACC_TOP, jewel: ENC_AST_JEWEL_ACC_TOP }
         );
         lgFrag += cost.powder;
         lgStone += cost.stone;
+        lgJewel += cost.jewel;
       }
       break;
 
@@ -1389,31 +1393,50 @@ const ConversionContent = () => {
       {
         key: "3",
         label: "Accesories",
-        children: getEnhanceMatsGroup({
-          enhanceFooter: "Using Acc Fragment",
-          enhanceData: {
-            "Buy from Store": CONV_FRAG,
-            "Every tap from +0 to +10": CONV_FRAG,
-          },
-          enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
-          evoData: { "Astral Powder": EV_AST_POW_ACC, "Astral Stone": EV_AST_STONE },
-          encLegendTiers: [
-            {
-              title: "Enhancement Legend (+1~+3)",
-              data: {
-                "Astral Powder": ENC_AST_POW_ACC,
-                "Astral Stone": ENC_AST_STONE_ACC,
+        children: (
+          <>
+            {getEnhanceMatsGroup({
+              enhanceFooter: "Using Acc Fragment",
+              enhanceData: {
+                "Buy from Store": CONV_FRAG,
+                "Every tap from +0 to +10": CONV_FRAG,
               },
-            },
-            {
-              title: "Enhancement Legend (+4~+6)",
-              data: {
-                "Astral Powder": ENC_AST_POW_ACC,
-                "Astral Stone": ENC_AST_STONE_ACC_MID,
+              enhanceNote: <Text>* +1 to +10 have 100% success rate</Text>,
+              evoData: {
+                "Astral Powder": EV_AST_POW_ACC,
+                "Astral Stone": EV_AST_STONE,
               },
-            },
-          ],
-        }),
+              encLegendTiers: [
+                {
+                  title: "Enhancement Legend (+1~+3)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ACC,
+                    "Astral Stone": ENC_AST_STONE_ACC,
+                  },
+                },
+                {
+                  title: "Enhancement Legend (+4~+6)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ACC,
+                    "Astral Stone": ENC_AST_STONE_ACC_MID,
+                  },
+                },
+                {
+                  title: "Enhancement Legend (+7)",
+                  data: {
+                    "Astral Powder": ENC_AST_POW_ACC_TOP,
+                    "Astral Jewel": ENC_AST_JEWEL_ACC_TOP,
+                  },
+                },
+              ],
+            })}
+            <Text>
+              * Astral Jewel can be bought from the Conversion Shop: 1 Astral
+              Jewel costs 5 Astral Stone (10/week limit), and 1 Astral Jewel
+              can be exchanged back for 50 Astral Powder (unlimited).
+            </Text>
+          </>
+        ),
       },
       {
         key: "4",

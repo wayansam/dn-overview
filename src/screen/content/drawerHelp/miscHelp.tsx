@@ -92,6 +92,10 @@ export const miscHelpItems: HelpItem[] = [
               href: "https://patchnote.dragonnest.com/sea/194/c/7",
               label: "Enhancement Legend Conversion Armor (+7)",
             },
+            {
+              href: "https://patchnote.dragonnest.com/sea/199/c/4",
+              label: "Enhancement Legend Conversion Accessories (+7)",
+            },
           ]}
         />
 
