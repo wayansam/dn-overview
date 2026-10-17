@@ -18,5 +18,20 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/setupTests.ts",
+    coverage: {
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/**/*.d.ts",
+        "src/setupTests.ts",
+        "src/testUtils.tsx",
+      ],
+      reporter: ["text-summary", "html"],
+      // `npm run coverage` fails below these.
+      thresholds: {
+        lines: 80,
+        statements: 80,
+      },
+    },
   },
 });

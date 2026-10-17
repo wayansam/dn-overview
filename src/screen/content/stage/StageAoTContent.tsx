@@ -241,6 +241,7 @@ const StageAoTContent = () => {
               }))}
             columns={getCustomColumnResource({ customMatsTitle: "Name" })}
             pagination={false}
+            rowKey="mats"
             bordered
           />
         </div>
@@ -261,6 +262,7 @@ const StageAoTContent = () => {
               }))}
             columns={getCustomColumnResource({ customMatsTitle: "Name" })}
             pagination={false}
+            rowKey="mats"
             bordered
           />
         </div>
