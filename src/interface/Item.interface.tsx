@@ -182,6 +182,14 @@ export interface BestieGrowthMaterial {
 export interface IonaEqEnhanceMaterial {
   encLevel: string;
   whiteCore: number;
+  // Only on the Iona +15 -> White Dragon +15 evolution step.
+  frigidWhiteDragonFragment?: number;
+  successRatePercent: number;
+}
+
+export interface RubinartEqEnhanceMaterial {
+  encLevel: string;
+  crimsonCore: number;
   successRatePercent: number;
 }
 

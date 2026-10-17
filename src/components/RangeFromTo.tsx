@@ -9,6 +9,8 @@ interface RangeFromToProps {
   min?: number;
   max: number;
   customLabeling?: (item: number) => string;
+  // Wider for screens whose labels are long (e.g. "White Dragon +20").
+  width?: number;
 }
 
 // The repeated "From" / "To" enhancement-range Select pair used by every
@@ -21,6 +23,7 @@ const RangeFromTo: React.FC<RangeFromToProps> = ({
   min = 0,
   max,
   customLabeling,
+  width = 130,
 }) => {
   const options = getListOpt(min, max, customLabeling);
   return (
@@ -30,7 +33,7 @@ const RangeFromTo: React.FC<RangeFromToProps> = ({
         <Divider type="vertical" />
         <Select
           defaultValue={from}
-          style={{ width: 130 }}
+          style={{ width }}
           onChange={onFromChange}
           options={options}
         />
@@ -40,7 +43,7 @@ const RangeFromTo: React.FC<RangeFromToProps> = ({
         <Divider type="vertical" />
         <Select
           defaultValue={to}
-          style={{ width: 130 }}
+          style={{ width }}
           onChange={onToChange}
           options={options}
         />

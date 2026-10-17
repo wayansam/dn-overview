@@ -59,7 +59,12 @@ import {
   IonaEarringEnhancementStatsTable,
   IonaNecklaceEnhancementStatsTable,
   IonaRingEnhancementStatsTable,
-} from "./equipment/VIPAccData";
+} from "./equipment/IonaAccData";
+import {
+  RubinartEarringEnhancementStatsTable,
+  RubinartNecklaceEnhancementStatsTable,
+  RubinartRingEnhancementStatsTable,
+} from "./equipment/RubinartAccData";
 import {
   CollapseJadeAttackStatsTable,
   CollapseJadeDefendStatsTable,
@@ -99,9 +104,9 @@ const zeroBased = {
   SpunGoldStatsShoesTable,
   NamedEODMainStatTable,
   NamedEODSecondStatTable,
-  IonaRingEnhancementStatsTable,
-  IonaEarringEnhancementStatsTable,
-  IonaNecklaceEnhancementStatsTable,
+  RubinartRingEnhancementStatsTable,
+  RubinartEarringEnhancementStatsTable,
+  RubinartNecklaceEnhancementStatsTable,
   CollapseJadeAttackStatsTable,
   CollapseJadeDefendStatsTable,
   DeeplyVariantUJadeStatsTable,
@@ -145,6 +150,17 @@ const conversionLevel = (i: number) =>
       ? "Legend"
       : `Legend +${i - LEGEND_START}`;
 
+// Iona levels 0..15, then evolved White Dragon +15..+20, one continuous
+// progression (evolving never lowers a stat).
+const iona = {
+  IonaRingEnhancementStatsTable,
+  IonaEarringEnhancementStatsTable,
+  IonaNecklaceEnhancementStatsTable,
+};
+const WHITE_DRAGON_START = 16;
+const ionaLevel = (i: number) =>
+  i < WHITE_DRAGON_START ? String(i) : "White Dragon +" + (i - 1);
+
 const knownStats = new Set(Object.keys(EmptyCommonnStat));
 
 const statEntries = (row: CommonItemStats) =>
@@ -170,7 +186,7 @@ const findDecreases = (rows: CommonItemStats[]) => {
   return problems;
 };
 
-const allTables = { ...zeroBased, ...oneBased, ...conversion };
+const allTables = { ...zeroBased, ...oneBased, ...conversion, ...iona };
 
 describe.each(Object.entries(allTables))("%s", (_, rows) => {
   test("is not empty", () => {
@@ -200,6 +216,18 @@ describe.each(Object.entries(zeroBased))("%s", (_, rows) => {
   test("lists levels 0, 1, 2, ... in order", () => {
     expect(rows.map((row) => row.encLevel)).toEqual(
       rows.map((_, i) => String(i))
+    );
+  });
+
+  test("stats never decrease between levels", () => {
+    expect(findDecreases(rows)).toEqual([]);
+  });
+});
+
+describe.each(Object.entries(iona))("%s", (_, rows) => {
+  test("lists Iona 0..15 then White Dragon +15..+20", () => {
+    expect(rows.map((row) => row.encLevel)).toEqual(
+      rows.map((_, i) => ionaLevel(i))
     );
   });
 

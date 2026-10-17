@@ -16,7 +16,8 @@ const SOURCE_OPTIONS = [
   TAB_KEY.eqBoneDragon,
   TAB_KEY.eqSpunGold,
   TAB_KEY.eqNamedEOD,
-  TAB_KEY.eqVIPAcc,
+  TAB_KEY.eqIonaAcc,
+  TAB_KEY.eqRubinartAcc,
   TAB_KEY.miscConversion,
 ].map((source) => ({ value: source, label: source }));
 

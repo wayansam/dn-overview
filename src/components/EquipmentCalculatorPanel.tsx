@@ -34,6 +34,7 @@ export interface EquipmentModuleRange {
   onToChange: (value: number) => void;
   max: number;
   customLabeling?: (item: number) => string;
+  width?: number;
 }
 
 // A Settings dropdown (e.g. Ancient's old/new craft-table version, SpunGold's
@@ -86,7 +87,7 @@ interface EquipmentCalculatorPanelProps<T extends EquipmentTableCalculator> {
     customTitle?: string;
   };
   // Escape hatch for one-off sections that don't fit the shapes above (e.g.
-  // VIPAcc's enhancement-level stat chart). Rendered last, wrapped in the
+  // IonaAcc's enhancement-level stat chart). Rendered last, wrapped in the
   // same CalcCard every other section gets, so the caller only supplies the
   // inner content.
   extra?: React.ReactNode;
@@ -154,6 +155,7 @@ const EquipmentCalculatorPanel = <T extends EquipmentTableCalculator>({
             onToChange={range.onToChange}
             max={range.max}
             customLabeling={range.customLabeling}
+            width={range.width}
           />
         )}
         {selects.map((sel) => (

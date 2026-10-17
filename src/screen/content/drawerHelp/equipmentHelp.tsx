@@ -182,8 +182,8 @@ export const equipmentHelpItems: HelpItem[] = [
     ),
   },
   {
-    key: TAB_KEY.eqVIPAcc,
-    label: TAB_KEY.eqVIPAcc,
+    key: TAB_KEY.eqIonaAcc,
+    label: TAB_KEY.eqIonaAcc,
     children: (
       <div>
         <p>
@@ -192,6 +192,11 @@ export const equipmentHelpItems: HelpItem[] = [
             Farvana in certain towns. Additionally, Iona Accessories can be
             obtained by exchanging your Argenta or Gerraint Accessories.
           </b>
+        </p>
+        <p>
+          A +15 Iona Accessory can be evolved into a White Dragon Accessory
+          with a Frigid White Dragon Fragment, then enhanced up to +20. The
+          calculator continues from Iona +15 into White Dragon +15 to +20.
         </p>
         <p>
           To use the calculator, please select the equipment you want to
@@ -239,6 +244,53 @@ export const equipmentHelpItems: HelpItem[] = [
             {
               href: "https://patchnote.dragonnest.com/sea/162/c/4",
               label: "Iona Accessory New Level release (+13 to +15)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/177/c/8",
+              label: "Iona Accessory evolution to White Dragon Accessory",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/180/c/10",
+              label: "White Dragon Accessory New Level release (+16 to +20)",
+            },
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
+    key: TAB_KEY.eqRubinartAcc,
+    label: TAB_KEY.eqRubinartAcc,
+    children: (
+      <div>
+        <p>
+          <b>
+            Rubinart Accessories are evolved from +15 to +20 Iona Accessories
+            using Rubinart's Blood Crystal, bought with Crimson Core at
+            Merchant Pania.
+          </b>
+        </p>
+        <p>
+          To use the calculator, please select the equipment you want to
+          calculate.
+        </p>
+        <p>
+          You can always open Mats Reference if you are not sure about the
+          number.
+        </p>
+        <p>
+          Select the From &#38; To option in correct progression of the
+          equipment &#40;0 to 8&#41;.
+        </p>
+        <p>
+          Calculated material only shown when you input the correct From, To
+          and select the equipment.
+        </p>
+        <PatchNoteSection
+          entries={[
+            {
+              href: "https://patchnote.dragonnest.com/sea/199/c/5",
+              label: "Rubinart Accessory",
             },
           ]}
         />

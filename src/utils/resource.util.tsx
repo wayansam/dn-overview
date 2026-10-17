@@ -15,7 +15,12 @@ import {
   conversionUpperStats,
   conversionWingStats,
 } from "../data/misc/ConversionCalculatorData";
-import { IonaEarringEnhancementStatsTable, IonaNecklaceEnhancementStatsTable, IonaRingEnhancementStatsTable } from "../data/equipment/VIPAccData";
+import { IonaEarringEnhancementStatsTable, IonaNecklaceEnhancementStatsTable, IonaRingEnhancementStatsTable } from "../data/equipment/IonaAccData";
+import {
+  RubinartEarringEnhancementStatsTable,
+  RubinartNecklaceEnhancementStatsTable,
+  RubinartRingEnhancementStatsTable,
+} from "../data/equipment/RubinartAccData";
 import {
   BoneDragonStatsGlovesTable,
   BoneDragonStatsHelmTable,
@@ -98,6 +103,25 @@ export const getIonaRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {
 
     case EQUIPMENT.NECKLACE:
       return IonaNecklaceEnhancementStatsTable;
+
+    default:
+      return [];
+  }
+};
+
+export const getRubinartRscTable = (
+  equipment: EQUIPMENT
+): CommonItemStats[] => {
+  switch (equipment) {
+    case EQUIPMENT.RING1:
+    case EQUIPMENT.RING2:
+      return RubinartRingEnhancementStatsTable;
+
+    case EQUIPMENT.EARRING:
+      return RubinartEarringEnhancementStatsTable;
+
+    case EQUIPMENT.NECKLACE:
+      return RubinartNecklaceEnhancementStatsTable;
 
     default:
       return [];
@@ -195,8 +219,11 @@ export const getResource = (menu: string, equipment: EQUIPMENT) => {
     case TAB_KEY.miscConversion:
       return getConveRscTable(equipment);
 
-    case TAB_KEY.eqVIPAcc:
+    case TAB_KEY.eqIonaAcc:
       return getIonaRscTable(equipment);
+
+    case TAB_KEY.eqRubinartAcc:
+      return getRubinartRscTable(equipment);
 
     case TAB_KEY.eqBoneDragon:
       return getBoneDragonRscTable(equipment);

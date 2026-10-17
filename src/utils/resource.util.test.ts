@@ -17,7 +17,11 @@ const ARMOR_AND_WEAPONS = [
 const supported: [string, EQUIPMENT[]][] = [
   [TAB_KEY.miscConversion, ALL],
   [
-    TAB_KEY.eqVIPAcc,
+    TAB_KEY.eqIonaAcc,
+    [EQUIPMENT.NECKLACE, EQUIPMENT.EARRING, EQUIPMENT.RING1, EQUIPMENT.RING2],
+  ],
+  [
+    TAB_KEY.eqRubinartAcc,
     [EQUIPMENT.NECKLACE, EQUIPMENT.EARRING, EQUIPMENT.RING1, EQUIPMENT.RING2],
   ],
   [TAB_KEY.eqBoneDragon, ARMOR_AND_WEAPONS],
@@ -37,11 +41,14 @@ describe.each(supported)("getResource(%s)", (menu, equipment) => {
   });
 });
 
-test("both rings share one table", () => {
-  expect(getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING1)).toBe(
-    getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING2)
-  );
-});
+test.each([TAB_KEY.eqIonaAcc, TAB_KEY.eqRubinartAcc])(
+  "%s rings share one table",
+  (menu) => {
+    expect(getResource(menu, EQUIPMENT.RING1)).toBe(
+      getResource(menu, EQUIPMENT.RING2)
+    );
+  }
+);
 
 test("unknown menus have no tables", () => {
   expect(getResource("unknown", EQUIPMENT.HELM)).toEqual([]);

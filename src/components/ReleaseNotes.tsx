@@ -188,6 +188,34 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "17-10-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "VIP Accessories renamed to Iona Accessories",
+      link: {
+        key: TAB_KEY.eqIonaAcc,
+        name: TAB_KEY.eqIonaAcc,
+      },
+      date: "17-10-2026",
+    },
+    {
+      key: keyUpdate.U,
+      label:
+        "Iona Accessories evolution to White Dragon Accessories (+15 to +20)",
+      link: {
+        key: TAB_KEY.eqIonaAcc,
+        name: TAB_KEY.eqIonaAcc,
+      },
+      date: "17-10-2026",
+    },
+    {
+      key: keyUpdate.N,
+      label: "Rubinart Accessories Calculator",
+      link: {
+        key: TAB_KEY.eqRubinartAcc,
+        name: TAB_KEY.eqRubinartAcc,
+      },
+      date: "17-10-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
@@ -289,8 +317,8 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       key: keyUpdate.D,
       label: "VIP accessories",
       link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
+        key: TAB_KEY.eqIonaAcc,
+        name: TAB_KEY.eqIonaAcc,
       },
       date: "07-09-2025",
     },
@@ -366,8 +394,8 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       key: keyUpdate.U,
       label: "Enhancement Iona Accessories (+13 to +15)",
       link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
+        key: TAB_KEY.eqIonaAcc,
+        name: TAB_KEY.eqIonaAcc,
       },
       date: "30-10-2025",
     },
@@ -411,8 +439,8 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       key: keyUpdate.U,
       label: "VIP Accessories charts",
       link: {
-        key: TAB_KEY.eqVIPAcc,
-        name: TAB_KEY.eqVIPAcc,
+        key: TAB_KEY.eqIonaAcc,
+        name: TAB_KEY.eqIonaAcc,
       },
       date: "17-11-2025",
     },

@@ -15,7 +15,7 @@ import {
 import {
   dataIonaCalculator,
   IonaEqEnhanceMaterialTable,
-} from "../../../data/equipment/VIPAccData";
+} from "../../../data/equipment/IonaAccData";
 import { CommonEquipmentCalculator } from "../../../interface/Common.interface";
 import { IonaEqEnhanceMaterial } from "../../../interface/Item.interface";
 import { CommonItemStats } from "../../../interface/ItemStat.interface";
@@ -44,9 +44,16 @@ type EquipmentExtraData = {
 };
 interface TableMaterialList {
   "White Core": number;
+  "Frigid White Dragon Fragment": number;
 }
 
-const VIPAccContent = () => {
+// Levels 0..15 are Iona +0..+15; evolving at +15 moves to White Dragon +15
+// (index 16), which then enhances up to White Dragon +20 (index 21).
+const WHITE_DRAGON_START = 16;
+const getLabel = (item: number) =>
+  item < WHITE_DRAGON_START ? `${item}` : `White Dragon +${item - 1}`;
+
+const IonaAccContent = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [dataSource, setDataSource] =
     useState<CommonEquipmentCalculator[]>(dataIonaCalculator);
@@ -90,7 +97,7 @@ const VIPAccContent = () => {
   );
 
   const emptyIonaResource: { res1: TableMaterialList; res2: EquipmentExtraData } = {
-    res1: { "White Core": 0 },
+    res1: { "White Core": 0, "Frigid White Dragon Fragment": 0 },
     res2: {},
   };
 
@@ -106,13 +113,16 @@ const VIPAccContent = () => {
       };
 
       let whiteCoreTemp = 0;
+      let fragmentTemp = 0;
       const srTemp: number[] = [];
       slice.forEach((slicedItem) => {
         whiteCoreTemp += slicedItem.whiteCore;
+        fragmentTemp += slicedItem.frigidWhiteDragonFragment ?? 0;
         srTemp.push(slicedItem.successRatePercent);
       });
 
       next.res1["White Core"] += whiteCoreTemp;
+      next.res1["Frigid White Dragon Fragment"] += fragmentTemp;
 
       const exData = { "Success Rate": srTemp };
       switch (row.equipment) {
@@ -142,7 +152,7 @@ const VIPAccContent = () => {
   );
 
   const getIonaStatsTable = useCallback(
-    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqVIPAcc, equipment),
+    (equipment: EQUIPMENT) => getResource(TAB_KEY.eqIonaAcc, equipment),
     []
   );
 
@@ -175,7 +185,7 @@ const VIPAccContent = () => {
 
       if (found) {
         const { equipment, from, to } = found;
-        const tableHolder = getResource(TAB_KEY.eqVIPAcc, equipment);
+        const tableHolder = getResource(TAB_KEY.eqIonaAcc, equipment);
         const clippedTable = tableHolder.slice(from, to + 1);
         let prevStatVal: number = 0;
         clippedTable.forEach((it, idx) => {
@@ -205,13 +215,16 @@ const VIPAccContent = () => {
       setSelectedRowKeys={setSelectedRowKeys}
       dataSource={dataSource}
       setDataSource={setDataSource}
+      customLabeling={(item) => getLabel(item)}
       invalid={invalidDtSrc}
       range={{
         from: selectFrom,
         to: selectTo,
         onFromChange: setSelectFrom,
         onToChange: setSelectTo,
-        max: 15,
+        max: 21,
+        customLabeling: getLabel,
+        width: 180,
       }}
       mats={{ data: tableResource.res1, hideZero: true }}
       rateSummary={{ items: extraInfo }}
@@ -234,49 +247,59 @@ const VIPAccContent = () => {
   // the stateful "Calculate" panel.
   const statContent = useMemo(() => {
     return (
-      <StatReferenceTables
-        entries={[
-          {
-            key: "1",
-            label: "Ring",
-            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.RING1),
-            flags: {
-              phyMagAtkFlag: true,
-              phyMagAtkPercentFlag: true,
-              attAtkPercentFlag: true,
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <StatReferenceTables
+          entries={[
+            {
+              key: "1",
+              label: "Ring",
+              dataSource: getResource(TAB_KEY.eqIonaAcc, EQUIPMENT.RING1),
+              flags: {
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+              },
             },
-          },
-          {
-            key: "2",
-            label: "Earring",
-            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.EARRING),
-            flags: {
-              phyMagAtkFlag: true,
-              phyMagAtkPercentFlag: true,
-              crtFlag: true,
-              cdmFlag: true,
-              fdFlag: true,
-              strFlag: true,
-              agiFlag: true,
-              intFlag: true,
+            {
+              key: "2",
+              label: "Earring",
+              dataSource: getResource(TAB_KEY.eqIonaAcc, EQUIPMENT.EARRING),
+              flags: {
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                crtFlag: true,
+                cdmFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+              },
             },
-          },
-          {
-            key: "3",
-            label: "Necklace",
-            dataSource: getResource(TAB_KEY.eqVIPAcc, EQUIPMENT.NECKLACE),
-            flags: {
-              phyMagAtkFlag: true,
-              phyMagAtkPercentFlag: true,
-              attAtkPercentFlag: true,
-              fdFlag: true,
-              strFlag: true,
-              agiFlag: true,
-              intFlag: true,
+            {
+              key: "3",
+              label: "Necklace",
+              dataSource: getResource(TAB_KEY.eqIonaAcc, EQUIPMENT.NECKLACE),
+              flags: {
+                phyMagAtkFlag: true,
+                phyMagAtkPercentFlag: true,
+                attAtkPercentFlag: true,
+                fdFlag: true,
+                strFlag: true,
+                agiFlag: true,
+                intFlag: true,
+              },
             },
-          },
-        ]}
-      />
+          ]}
+        />
+        <Text>
+          * White Dragon Set Effects (shared with Iona Accessories):
+        </Text>
+        <Text>- 2-Piece Set: Phy/Mag ATK +300,000, Final Damage +2,500</Text>
+        <Text>
+          - 4-Piece Set: Phy/Mag ATK +2,500,000, All Attribute ATK +20%
+        </Text>
+      </div>
     );
   }, []);
 
@@ -308,6 +331,16 @@ const VIPAccContent = () => {
                 Accessories (look the link in (?) button on the bottom right
                 corner of the screen).
               </Text>
+              <Text>
+                * Evolve a +15 Iona Accessory into a +15 White Dragon Accessory
+                with 1 Frigid White Dragon Fragment (exchanged with White Core
+                at the Hero's Store).
+              </Text>
+              <Text>
+                * Frigid Aura only works on Iona Accessories; Essence of Extreme
+                Cold only works on White Dragon Accessories (exchange 2 Frigid
+                Aura for 1 Essence at Merchant Pania's Hero's Shop).
+              </Text>
             </div>
           ),
         },
@@ -318,13 +351,19 @@ const VIPAccContent = () => {
           fields: [
             { dataIndex: "whiteCore", label: "White Core", shortLabel: "(White Core)" },
             {
+              dataIndex: "frigidWhiteDragonFragment",
+              label: "Frigid White Dragon Fragment",
+              shortLabel: "(Frigid Fragment)",
+            },
+            {
               dataIndex: "successRatePercent",
               label: "Success Rate",
               shortLabel: "(Success%)",
               tailText: "%",
             },
           ] satisfies CraftMaterialField<IonaEqEnhanceMaterial>[],
-          footer: "*Necklace, Earring & Ring have same enhancement requirement",
+          footer:
+            "*Necklace, Earring & Ring have same enhancement requirement. White Dragon levels do not drop on failure.",
         },
       ]}
     />
@@ -354,4 +393,4 @@ const VIPAccContent = () => {
   );
 };
 
-export default VIPAccContent;
+export default IonaAccContent;

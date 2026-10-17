@@ -37,7 +37,8 @@ import ConversionContent from "./misc/ConversionContent";
 import BoneDragonEqContent from "./equipment/BoneDragonEqContent";
 import GoldDragonEqContent from "./equipment/GoldDragonEqContent";
 import BestieContent from "./misc/BestieContent";
-import VIPAccContent from "./equipment/VIPAccContent";
+import IonaAccContent from "./equipment/IonaAccContent";
+import RubinartAccContent from "./equipment/RubinartAccContent";
 import SpunGoldEqContent from "./equipment/SpunGoldEqContent";
 import CollapseJadeContent from "./jade/CollapseJadeContent";
 import StageAoTContent from "./stage/StageAoTContent";
@@ -117,8 +118,10 @@ const MainContent = () => {
       case TAB_KEY.eqGoldDragon:
         return <GoldDragonEqContent />;
 
-      case TAB_KEY.eqVIPAcc:
-        return <VIPAccContent />;
+      case TAB_KEY.eqIonaAcc:
+        return <IonaAccContent />;
+      case TAB_KEY.eqRubinartAcc:
+        return <RubinartAccContent />;
 
       case TAB_KEY.eqSpunGold:
         return <SpunGoldEqContent />;

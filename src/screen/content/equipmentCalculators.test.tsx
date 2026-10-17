@@ -25,7 +25,8 @@ const screens: { key: string; invalidMessage: string | null }[] = [
   { key: TAB_KEY.eqNamedEOD, invalidMessage: null },
   { key: TAB_KEY.eqBoneDragon, invalidMessage: DEFAULT_INVALID },
   { key: TAB_KEY.eqGoldDragon, invalidMessage: DEFAULT_INVALID },
-  { key: TAB_KEY.eqVIPAcc, invalidMessage: DEFAULT_INVALID },
+  { key: TAB_KEY.eqIonaAcc, invalidMessage: DEFAULT_INVALID },
+  { key: TAB_KEY.eqRubinartAcc, invalidMessage: DEFAULT_INVALID },
   { key: TAB_KEY.eqSpunGold, invalidMessage: DEFAULT_INVALID },
   // From === To is allowed here (craft only), hence its own message.
   { key: TAB_KEY.jadeGoldDragon, invalidMessage: "To cannot be lower than From" },

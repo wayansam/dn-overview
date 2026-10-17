@@ -12,9 +12,14 @@ import {
 } from "../slice/UIState.reducer";
 import SideBar from "./SideBar";
 import MainContent from "./content/MainContent";
-import { TAB_GROUP_LIST } from "../constants/Common.constants";
+import { TAB_GROUP_LIST, TAB_KEY } from "../constants/Common.constants";
 
 const { Header, Content, Footer } = Layout;
+
+// Tabs renamed since a last screen may have been saved under the old key.
+const RENAMED_TABS: Record<string, string> = {
+  "VIP Accessories": TAB_KEY.eqIonaAcc,
+};
 
 const MainPage = () => {
   const dispatch = useAppDispatch();
@@ -34,6 +39,11 @@ const MainPage = () => {
     dispatch(setIsKeepScreen(ks === "true"));
     if (ks === "true") {
       const dt = ls ? JSON.parse(ls) : TAB_GROUP_LIST[0].children[0];
+      const renamed = RENAMED_TABS[dt?.key];
+      if (renamed) {
+        dt.key = renamed;
+        dt.name = renamed;
+      }
       dispatch(setSelectedSideBar(dt));
     }
   }, [dispatch]);
