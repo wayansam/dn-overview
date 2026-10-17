@@ -6,27 +6,12 @@
   "dependencies": {
     "@ant-design/charts": "^2.6.6",
     "@reduxjs/toolkit": "^1.9.5",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/axios": "^0.14.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.41",
-    "@types/react": "^18.2.20",
-    "@types/react-dom": "^18.2.7",
-    "@types/react-redux": "^7.1.25",
-    "@types/redux-saga": "^0.10.5",
     "antd": "^5.25.2",
-    "axios": "^1.4.0",
-    "gh-pages": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.1.2",
-    "react-scripts": "5.0.1",
     "redux": "^4.2.1",
     "redux-saga": "^1.2.3",
-    "reselect": "^4.1.8",
-    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -57,9 +42,18 @@
     ]
   },
   "devDependencies": {
-    "@types/redux-logger": "^3.0.9",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.41",
+    "@types/react": "^18.2.20",
+    "@types/react-dom": "^18.2.7",
+    "@types/react-redux": "^7.1.25",
     "baseline-browser-mapping": "^2.9.19",
-    "redux-logger": "^3.0.6"
+    "gh-pages": "^6.0.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5"
   },
   "overrides": {
     "@types/d3-dispatch": "3.0.6"
