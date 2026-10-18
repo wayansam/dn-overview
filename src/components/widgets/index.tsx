@@ -1,6 +1,7 @@
 import { Card } from "antd";
 import { ReactNode } from "react";
 import ReleaseNotes from "../ReleaseNotes";
+import CharacterIdWidget from "./CharacterIdWidget";
 import CharacterWidget from "./CharacterWidget";
 
 export interface Widget {
@@ -16,6 +17,11 @@ export const WIDGETS: Widget[] = [
     key: "characters",
     label: "Characters",
     render: () => <CharacterWidget />,
+  },
+  {
+    key: "ids",
+    label: "IDs",
+    render: () => <CharacterIdWidget />,
   },
   {
     key: "releaseNotes",

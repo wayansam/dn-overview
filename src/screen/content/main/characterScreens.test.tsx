@@ -57,7 +57,11 @@ describe("General", () => {
 
   test("shows every widget by default", () => {
     renderScreen(TAB_KEY.mainGeneral);
-    expect(widgetTitles()).toEqual(["Characters (3/25)", "Release Notes"]);
+    expect(widgetTitles()).toEqual([
+      "Characters (3/25)",
+      "IDs (1/5)",
+      "Release Notes",
+    ]);
   });
 
   test("Customize hides and reorders widgets, and is saved", () => {
@@ -68,13 +72,17 @@ describe("General", () => {
     const row = within(popover).getByText("Characters").closest(".ant-space")!;
     const [, down] = within(row as HTMLElement).getAllByRole("button");
     click(down);
-    expect(widgetTitles()).toEqual(["Release Notes", "Characters (3/25)"]);
+    expect(widgetTitles()).toEqual([
+      "IDs (1/5)",
+      "Characters (3/25)",
+      "Release Notes",
+    ]);
 
     click(within(popover).getByText("Release Notes"));
-    expect(widgetTitles()).toEqual(["Characters (3/25)"]);
+    expect(widgetTitles()).toEqual(["IDs (1/5)", "Characters (3/25)"]);
     expect(JSON.parse(localStorage.getItem(LS_KEYS.general_widgets)!)).toEqual({
-      order: ["releaseNotes", "characters"],
-      visible: ["characters"],
+      order: ["ids", "characters", "releaseNotes"],
+      visible: ["characters", "ids"],
     });
   });
 
@@ -99,10 +107,47 @@ describe("General", () => {
 
   test("character widget links to the Character tab", () => {
     const { store } = renderScreen(TAB_KEY.mainGeneral);
-    click(screen.getByRole("button", { name: "View all" }));
+    const card = screen
+      .getByText("Characters (3/25)")
+      .closest(".ant-card")! as HTMLElement;
+    click(within(card).getByRole("button", { name: "View all" }));
     expect(store.getState().UIState.selectedSideBar.key).toBe(
       TAB_KEY.mainCharacter
     );
+  });
+});
+
+describe("ID widget", () => {
+  // Only the ID widget, so character names are not also listed by the
+  // Characters widget.
+  beforeEach(() =>
+    localStorage.setItem(
+      LS_KEYS.general_widgets,
+      JSON.stringify({ order: ["ids"], visible: ["ids"] })
+    )
+  );
+
+  test("lists IDs with their character count", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    const row = screen.getByText("MainID").closest("tr")!;
+    expect(within(row).getByText("2")).toBeInTheDocument();
+    expect(screen.getByText("1 character(s) have no ID.")).toBeInTheDocument();
+  });
+
+  test("expands an ID and opens a character's details", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    const row = screen.getByText("MainID").closest("tr")!;
+    click(row.querySelector("button")!);
+    click(within(screen.getByText("Bob").closest("tr")!).getByText("Details"));
+    expect(
+      within(screen.getByRole("dialog")).getByLabelText("Name")
+    ).toHaveValue("Bob");
+  });
+
+  test("links to the ID tab", () => {
+    const { store } = renderScreen(TAB_KEY.mainGeneral);
+    click(screen.getByRole("button", { name: "View all" }));
+    expect(store.getState().UIState.selectedSideBar.key).toBe(TAB_KEY.mainId);
   });
 });
 
