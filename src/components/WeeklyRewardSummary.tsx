@@ -13,21 +13,14 @@ import { useState } from "react";
 import { AOT_WEEKLY, FISSION_MAZE_WEEKLY } from "../data/task/TaskData";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { setShownRewards } from "../slice/Task.reducer";
-import { formatGold, formatRange } from "../utils/reward.util";
 import {
-  GOLD,
-  RewardAmount,
   WeeklyRewardRow,
+  formatRewardAmount as formatAmount,
   getAllRewardNames,
   pickRewardRows,
   summarizeWeeklyRewards,
 } from "../utils/weeklyReward.util";
 const { Text } = Typography;
-
-const formatAmount = (name: string, { min, max }: RewardAmount) => {
-  if (name === GOLD) return formatGold(min);
-  return formatRange(min, max);
-};
 
 // Rewards from the Weekly [Character] floors: what the ticked activities
 // gave so far, and the total once everything is cleared.

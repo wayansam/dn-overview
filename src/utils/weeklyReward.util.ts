@@ -1,6 +1,7 @@
 import { AOT_WEEKLY, FISSION_MAZE_WEEKLY } from "../data/task/TaskData";
 import { Character } from "../interface/Account.interface";
 import { TaskStore } from "../interface/Task.interface";
+import { formatGold, formatRange } from "./reward.util";
 
 // Item name for Fission Maze gold, which is stored in copper.
 export const GOLD = "Gold";
@@ -26,6 +27,10 @@ export interface WeeklyRewardSummary {
 }
 
 type RewardMap = Map<string, RewardAmount>;
+
+// Gold is shown as g/s/c, everything else as a number or min ~ max range.
+export const formatRewardAmount = (name: string, { min, max }: RewardAmount) =>
+  name === GOLD ? formatGold(min) : formatRange(min, max);
 
 // Rewards of one weekly clear at `floor`. Activities without reward data
 // (e.g. Nightmare) give nothing.

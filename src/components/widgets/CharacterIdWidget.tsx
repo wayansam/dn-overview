@@ -3,22 +3,17 @@ import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import { CHARACTER_GROUP_LIMIT } from "../../constants/Character.constants";
 import { TAB_KEY } from "../../constants/Common.constants";
-import { LS_KEYS } from "../../constants/localStorage.constants";
 import { getClassById } from "../../data/character/ClassData";
-import { useAppDispatch, useAppSelector } from "../../hooks";
+import { useAppSelector } from "../../hooks";
+import useTabNavigation from "../../hooks/useTabNavigation";
 import { Character, CharacterGroup } from "../../interface/Account.interface";
-import { SideBarTab } from "../../interface/Common.interface";
-import { setSelectedSideBar } from "../../slice/UIState.reducer";
 import CharacterDetailModal from "../CharacterDetailModal";
 const { Text } = Typography;
-
-const ID_TAB: SideBarTab = { key: TAB_KEY.mainId, name: TAB_KEY.mainId };
 
 // Read-only ID overview for the General dashboard. Adding, renaming and
 // deleting IDs stays in the ID tab.
 const CharacterIdWidget = () => {
-  const dispatch = useAppDispatch();
-  const isKeepScreen = useAppSelector((state) => state.UIState.isKeepScreen);
+  const openTab = useTabNavigation();
   const { characters, groups, mainCharacterId } = useAppSelector(
     (state) => state.Character,
   );
@@ -27,13 +22,6 @@ const CharacterIdWidget = () => {
   const getMembers = (groupId: string) =>
     characters.filter((item) => item.groupId === groupId);
   const unassignedCount = characters.filter((item) => !item.groupId).length;
-
-  const openIdScreen = () => {
-    dispatch(setSelectedSideBar(ID_TAB));
-    if (isKeepScreen) {
-      localStorage.setItem(LS_KEYS.last_screen, JSON.stringify(ID_TAB));
-    }
-  };
 
   const groupColumns: ColumnsType<CharacterGroup> = [
     {
@@ -81,7 +69,11 @@ const CharacterIdWidget = () => {
       size="small"
       title={`IDs (${groups.length}/${CHARACTER_GROUP_LIMIT})`}
       extra={
-        <Button size="small" type="link" onClick={openIdScreen}>
+        <Button
+          size="small"
+          type="link"
+          onClick={() => openTab(TAB_KEY.mainId)}
+        >
           View all
         </Button>
       }

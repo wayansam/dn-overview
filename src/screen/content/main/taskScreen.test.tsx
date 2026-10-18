@@ -513,6 +513,112 @@ describe("Weekly Rewards", () => {
   });
 });
 
+describe("Task widget", () => {
+  // Only the Task widget on the General dashboard.
+  beforeEach(() =>
+    localStorage.setItem(
+      LS_KEYS.general_widgets,
+      JSON.stringify({ order: ["tasks"], visible: ["tasks"] }),
+    ),
+  );
+  const part = (name: string) => screen.getByRole("region", { name });
+
+  test("shows account progress and marks a pending task done", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [
+        {
+          id: "t1",
+          category: "weeklyAccount",
+          taskId: "goldDragonNest",
+          groupId: "g1",
+          characterId: "c1",
+        },
+        {
+          id: "t2",
+          category: "weeklyAccount",
+          taskId: "chaosDuelNest",
+          lastCleared: "2026-10-01",
+        },
+      ],
+      characterClears: {},
+      characterFloors: {},
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    const { store } = renderScreen(TAB_KEY.mainGeneral);
+    const account = part("Weekly [Account] progress");
+    expect(account).toHaveTextContent("1/2 done");
+    expect(account).toHaveTextContent("Gold Dragon NestMainID · Alice");
+    expect(account).not.toHaveTextContent("Chaos Duel Nest");
+
+    click(within(account).getByRole("button", { name: "Done" }));
+    expect(store.getState().Task.entries[0].lastCleared).toBe(getToday());
+    expect(account).toHaveTextContent("2/2 done");
+    expect(account).toHaveTextContent("All done");
+  });
+
+  test("counts characters per activity, skipping excluded and hidden", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: { c1: { fissionMaze: "2026-10-01" } },
+      characterFloors: {},
+      excludedCharacters: { arkOfTranscendence: ["c2"] },
+      hiddenActivities: ["nightmare"],
+    });
+    renderScreen(TAB_KEY.mainGeneral);
+    const progress = part("Weekly [Character] progress");
+    const line = (id: string) =>
+      progress.querySelector(`[data-activity="${id}"]`);
+    expect(line("fissionMaze")).toHaveTextContent("Fission Maze1/2");
+    expect(line("arkOfTranscendence")).toHaveTextContent(
+      "Ark of Transcendence0/1",
+    );
+    expect(line("nightmare")).toBeNull();
+  });
+
+  test("lists only the always-shown rewards as cleared / total", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: { c1: { fissionMaze: "2026-10-01" } },
+      characterFloors: {
+        c1: { fissionMaze: "Ascension 2F" },
+        c2: { fissionMaze: "Ascension 2F" },
+      },
+      excludedCharacters: {},
+      hiddenActivities: [],
+      shownRewards: ["Erosion Fragment", "Hero Coins"],
+    });
+    renderScreen(TAB_KEY.mainGeneral);
+    const rewards = part("Weekly Rewards summary");
+    const names = Array.from(rewards.querySelectorAll("[data-reward]")).map(
+      (el) => el.getAttribute("data-reward")
+    );
+    expect(names).toEqual(["Erosion Fragment", "Hero Coins"]);
+    expect(
+      rewards.querySelector('[data-reward="Erosion Fragment"]')
+    ).toHaveTextContent("Erosion Fragment32 / 64");
+    expect(
+      rewards.querySelector('[data-reward="Hero Coins"]')
+    ).toHaveTextContent("Hero Coins0 / 0");
+  });
+
+  test("points to Customize until rewards are picked", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    expect(part("Weekly Rewards summary")).toHaveTextContent(
+      "Pick the rewards to show with Customize in the Task tab"
+    );
+  });
+
+  test("View all opens the Task tab", () => {
+    const { store } = renderScreen(TAB_KEY.mainGeneral);
+    click(screen.getByRole("button", { name: "View all" }));
+    expect(store.getState().UIState.selectedSideBar.key).toBe(TAB_KEY.mainTask);
+  });
+});
+
 describe("taskStorage.util", () => {
   test("formats dates and shows a dash when missing", () => {
     expect(getToday(new Date(2026, 0, 5))).toBe("2026-01-05");

@@ -60,6 +60,7 @@ describe("General", () => {
     expect(widgetTitles()).toEqual([
       "Characters (3/25)",
       "IDs (1/5)",
+      "Tasks",
       "Release Notes",
     ]);
   });
@@ -75,14 +76,15 @@ describe("General", () => {
     expect(widgetTitles()).toEqual([
       "IDs (1/5)",
       "Characters (3/25)",
+      "Tasks",
       "Release Notes",
     ]);
 
     click(within(popover).getByText("Release Notes"));
-    expect(widgetTitles()).toEqual(["IDs (1/5)", "Characters (3/25)"]);
+    expect(widgetTitles()).toEqual(["IDs (1/5)", "Characters (3/25)", "Tasks"]);
     expect(JSON.parse(localStorage.getItem(LS_KEYS.general_widgets)!)).toEqual({
-      order: ["ids", "characters", "releaseNotes"],
-      visible: ["characters", "ids"],
+      order: ["ids", "characters", "tasks", "releaseNotes"],
+      visible: ["characters", "ids", "tasks"],
     });
   });
 

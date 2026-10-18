@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import ReleaseNotes from "../ReleaseNotes";
 import CharacterIdWidget from "./CharacterIdWidget";
 import CharacterWidget from "./CharacterWidget";
+import TaskWidget from "./TaskWidget";
 
 export interface Widget {
   // Saved in localStorage, so never rename an existing key.
@@ -22,6 +23,11 @@ export const WIDGETS: Widget[] = [
     key: "ids",
     label: "IDs",
     render: () => <CharacterIdWidget />,
+  },
+  {
+    key: "tasks",
+    label: "Tasks",
+    render: () => <TaskWidget />,
   },
   {
     key: "releaseNotes",
