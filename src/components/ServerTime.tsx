@@ -2,6 +2,7 @@ import { ClockCircleOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
 import { useEffect, useState } from "react";
 import { SERVER_TIME_ZONE } from "../constants/Task.constants";
+import { formatCountdown, getNextReset } from "../utils/weeklyReset.util";
 const { Text } = Typography;
 
 const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -29,11 +30,20 @@ const ServerTime = () => {
   }, []);
 
   return (
-    <Space size={6} aria-label="Server time">
-      <ClockCircleOutlined />
-      <Text type="secondary">Server Time (UTC+8):</Text>
-      <Text strong style={{ fontVariantNumeric: "tabular-nums" }}>
-        {formatServerTime(now)}
+    <Space size={[12, 0]} wrap>
+      <Space size={6} aria-label="Server time">
+        <ClockCircleOutlined />
+        <Text type="secondary">Server Time (UTC+8):</Text>
+        <Text strong style={{ fontVariantNumeric: "tabular-nums" }}>
+          {formatServerTime(now)}
+        </Text>
+      </Space>
+      <Text type="secondary" aria-label="Weekly reset">
+        Weekly reset in {formatCountdown(getNextReset(now) - now.getTime())}
+        <Text type="secondary" style={{ fontSize: 12 }}>
+          {" "}
+          (Sat 09:00)
+        </Text>
       </Text>
     </Space>
   );

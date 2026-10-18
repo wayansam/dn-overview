@@ -5,6 +5,7 @@ import {
 } from "../constants/Task.constants";
 import { getTaskById } from "../data/task/TaskData";
 import { DateMap, TaskEntry, TaskStore } from "../interface/Task.interface";
+import { clearBeforeReset, getLastReset } from "./weeklyReset.util";
 import { getAllRewardNames } from "./weeklyReward.util";
 
 export const emptyTaskStore = (): TaskStore => ({
@@ -28,12 +29,13 @@ const serverDateFormatter = new Intl.DateTimeFormat("en-CA", {
 // user's own time zone.
 export const getToday = (now = new Date()) => serverDateFormatter.format(now);
 
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+// A server date, optionally with the time it happened.
+const CLEAR_PATTERN = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})?$/;
 
-// "2026-10-18" -> "18 Oct 2026".
+// "2026-10-18" or "2026-10-18T14:05:09+08:00" -> "18 Oct 2026".
 export const formatDate = (value?: string) => {
-  if (!value || !DATE_PATTERN.test(value)) return "-";
-  const [year, month, day] = value.split("-").map(Number);
+  if (!value || !CLEAR_PATTERN.test(value)) return "-";
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
   return new Date(year, month - 1, day).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -56,7 +58,7 @@ const toEntry = (value: unknown): TaskEntry | null => {
     groupId: typeof groupId === "string" ? groupId : undefined,
     characterId: typeof characterId === "string" ? characterId : undefined,
     lastCleared:
-      typeof lastCleared === "string" && DATE_PATTERN.test(lastCleared)
+      typeof lastCleared === "string" && CLEAR_PATTERN.test(lastCleared)
         ? lastCleared
         : undefined,
   };
@@ -89,7 +91,7 @@ const toCharacterMap = (
   return result;
 };
 
-const isDate = (_: string, value: string) => DATE_PATTERN.test(value);
+const isClearTime = (_: string, value: string) => CLEAR_PATTERN.test(value);
 // Floors removed from the Stage data are dropped.
 const isKnownFloor = (activityId: string, value: string) =>
   !!getTaskById(activityId)?.floors?.some((item) => item.value === value);
@@ -125,12 +127,12 @@ export const loadTaskStore = (): TaskStore => {
       hiddenActivities,
       shownRewards,
     } = parsed as Record<string, unknown>;
-    return {
+    const store: TaskStore = {
       version: TASK_STORE_VERSION,
       entries: (Array.isArray(entries) ? entries : [])
         .map(toEntry)
         .filter((item): item is TaskEntry => !!item),
-      characterClears: toCharacterMap(characterClears, isDate),
+      characterClears: toCharacterMap(characterClears, isClearTime),
       characterFloors: toCharacterMap(characterFloors, isKnownFloor),
       excludedCharacters: toExcludedCharacters(excludedCharacters),
       hiddenActivities: (Array.isArray(hiddenActivities)
@@ -145,6 +147,9 @@ export const loadTaskStore = (): TaskStore => {
         ? getAllRewardNames().filter((name) => shownRewards.includes(name))
         : undefined,
     };
+    // Clears from before the latest weekly reset are gone.
+    clearBeforeReset(store, getLastReset());
+    return store;
   } catch {
     return emptyTaskStore();
   }

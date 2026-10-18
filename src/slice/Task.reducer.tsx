@@ -2,7 +2,12 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { TASK_LIMIT } from "../constants/Task.constants";
 import { TaskEntry, TaskStore } from "../interface/Task.interface";
 import { generateId } from "../utils/characterStorage.util";
-import { getToday, loadTaskStore } from "../utils/taskStorage.util";
+import { loadTaskStore } from "../utils/taskStorage.util";
+import {
+  clearBeforeReset,
+  getLastReset,
+  getServerTimestamp,
+} from "../utils/weeklyReset.util";
 
 const TaskSlice = createSlice({
   name: "Task",
@@ -20,7 +25,7 @@ const TaskSlice = createSlice({
         payload: { ...entry, id: generateId() },
       }),
     },
-    // Records today as the clear date.
+    // Records now (server time) as the clear time.
     markTaskDone: {
       reducer: (state, action: PayloadAction<{ id: string; date: string }>) => {
         const entry = state.entries.find(
@@ -28,7 +33,16 @@ const TaskSlice = createSlice({
         );
         if (entry) entry.lastCleared = action.payload.date;
       },
-      prepare: (id: string) => ({ payload: { id, date: getToday() } }),
+      prepare: (id: string) => ({
+        payload: { id, date: getServerTimestamp() },
+      }),
+    },
+    // Clears everything done before the latest weekly reset.
+    applyWeeklyReset: {
+      reducer: (state, action: PayloadAction<number>) => {
+        clearBeforeReset(state, action.payload);
+      },
+      prepare: () => ({ payload: getLastReset() }),
     },
     resetTask: (state, action: PayloadAction<string>) => {
       const entry = state.entries.find((item) => item.id === action.payload);
@@ -66,7 +80,7 @@ const TaskSlice = createSlice({
         payload: {
           characterId,
           activityId,
-          date: checked ? getToday() : undefined,
+          date: checked ? getServerTimestamp() : undefined,
         },
       }),
     },
@@ -115,6 +129,7 @@ export const TaskReducer = TaskSlice.reducer;
 export const {
   addTask,
   markTaskDone,
+  applyWeeklyReset,
   resetTask,
   deleteTask,
   setActivityCleared,

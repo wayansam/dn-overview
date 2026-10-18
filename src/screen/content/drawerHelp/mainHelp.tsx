@@ -50,6 +50,11 @@ export const mainHelpItems: HelpItem[] = [
           Done records today as Last Cleared, Reset clears it back to "-".
         </p>
         <p>
+          Both weekly tables reset every Saturday at 09:00 server time
+          (UTC+8): anything done before then is cleared, floors and settings
+          are kept.
+        </p>
+        <p>
           Weekly Character lists every character: tick an activity to record
           today, untick to remove it. Customize excludes characters from an
           activity, Details shows the dates for one character.

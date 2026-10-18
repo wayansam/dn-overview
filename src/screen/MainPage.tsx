@@ -3,6 +3,7 @@ import Title from "antd/es/typography/Title";
 import { useEffect } from "react";
 import { LS_KEYS } from "../constants/localStorage.constants";
 import { useAppDispatch, useAppSelector } from "../hooks";
+import useWeeklyReset from "../hooks/useWeeklyReset";
 import {
   setImgData,
   setIsDarkMode,
@@ -24,6 +25,7 @@ const RENAMED_TABS: Record<string, string> = {
 const MainPage = () => {
   const dispatch = useAppDispatch();
   const { defaultAlgorithm, darkAlgorithm } = theme;
+  useWeeklyReset();
 
   useEffect(() => {
     const dm = localStorage.getItem(LS_KEYS.dark_mode);

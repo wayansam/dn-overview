@@ -17,7 +17,8 @@ export interface TaskEntry {
   taskId: string;
   groupId?: string;
   characterId?: string;
-  // Local date as YYYY-MM-DD, missing until marked done.
+  // Server time it was marked done ("2026-10-18T14:05:09+08:00"; older saves
+  // hold a date only), missing until done or after the weekly reset.
   lastCleared?: string;
 }
 

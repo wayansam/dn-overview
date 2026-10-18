@@ -11,7 +11,7 @@ import { CHARACTER_STORE_VERSION } from "../../../constants/Character.constants"
 import { TASK_STORE_VERSION } from "../../../constants/Task.constants";
 import { LS_KEYS } from "../../../constants/localStorage.constants";
 import { chooseOption, renderScreen } from "../../../testUtils";
-import { addTask } from "../../../slice/Task.reducer";
+import { addTask, applyWeeklyReset } from "../../../slice/Task.reducer";
 import { formatGold } from "../../../utils/reward.util";
 import { saveCharacterStore } from "../../../utils/characterStorage.util";
 import {
@@ -33,6 +33,18 @@ const field = (id: string) =>
     .closest<HTMLElement>(".ant-select")!;
 const fieldText = (id: string) =>
   field(id).querySelector(".ant-select-selection-item")?.textContent;
+
+// Weekly tasks reset on Saturday 09:00 server time, so the clock is pinned
+// to just before one (fixtures are dated 1-3 Oct, after the 26 Sep reset).
+// Only Date is faked, timers and animations run as usual.
+const NOW = new Date("2026-10-03T08:00:00+08:00");
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(NOW);
+});
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(() => {
   localStorage.clear();
@@ -213,8 +225,10 @@ describe.each(LAYOUTS)("Weekly Account (%s)", (_, isWide) => {
     const row = () => screen.getByText("Gold Dragon Nest").closest("tr")!;
 
     click(within(row()).getByRole("button", { name: "Done" }));
-    expect(store.getState().Task.entries[0].lastCleared).toBe(getToday());
-    expect(row()).toHaveTextContent(formatDate(getToday()));
+    expect(store.getState().Task.entries[0].lastCleared).toBe(
+      "2026-10-03T08:00:00+08:00"
+    );
+    expect(row()).toHaveTextContent("03 Oct 2026");
 
     click(within(row()).getByRole("button", { name: "Reset" }));
     expect(store.getState().Task.entries[0].lastCleared).toBeUndefined();
@@ -261,7 +275,7 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
     });
     click(box);
     expect(store.getState().Task.characterClears).toEqual({
-      c1: { nightmare: getToday() },
+      c1: { nightmare: "2026-10-03T08:00:00+08:00" },
     });
     expect(box).toBeChecked();
 
@@ -553,7 +567,9 @@ describe("Task widget", () => {
     expect(account).not.toHaveTextContent("Chaos Duel Nest");
 
     click(within(account).getByRole("button", { name: "Done" }));
-    expect(store.getState().Task.entries[0].lastCleared).toBe(getToday());
+    expect(store.getState().Task.entries[0].lastCleared).toBe(
+      "2026-10-03T08:00:00+08:00"
+    );
     expect(account).toHaveTextContent("2/2 done");
     expect(account).toHaveTextContent("All done");
   });
@@ -616,6 +632,67 @@ describe("Task widget", () => {
     const { store } = renderScreen(TAB_KEY.mainGeneral);
     click(screen.getByRole("button", { name: "View all" }));
     expect(store.getState().UIState.selectedSideBar.key).toBe(TAB_KEY.mainTask);
+  });
+});
+
+describe("Weekly reset (Saturday 09:00 server time)", () => {
+  const seed = () =>
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [
+        {
+          id: "t1",
+          category: "weeklyAccount",
+          taskId: "goldDragonNest",
+          lastCleared: "2026-10-02T20:00:00+08:00",
+        },
+      ],
+      characterClears: { c1: { nightmare: "2026-10-01T10:00:00+08:00" } },
+      characterFloors: { c1: { fissionMaze: "Ascension 2F" } },
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+
+  test("clears last week's tasks while the page is open", () => {
+    seed();
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    const row = () => screen.getByText("Gold Dragon Nest").closest("tr")!;
+    expect(row()).toHaveTextContent("02 Oct 2026");
+
+    // 08:59: nothing changes yet.
+    act(() => {
+      vi.setSystemTime(new Date("2026-10-03T08:59:00+08:00"));
+      store.dispatch(applyWeeklyReset());
+    });
+    expect(store.getState().Task.entries[0].lastCleared).toBeDefined();
+
+    act(() => {
+      vi.setSystemTime(new Date("2026-10-03T09:00:00+08:00"));
+      store.dispatch(applyWeeklyReset());
+    });
+    expect(store.getState().Task.entries[0].lastCleared).toBeUndefined();
+    expect(store.getState().Task.characterClears).toEqual({});
+    // Floors are kept.
+    expect(store.getState().Task.characterFloors).toEqual({
+      c1: { fissionMaze: "Ascension 2F" },
+    });
+    expect(row()).not.toHaveTextContent("02 Oct 2026");
+  });
+
+  test("clears last week's tasks when the page is opened after the reset", () => {
+    seed();
+    vi.setSystemTime(new Date("2026-10-05T12:00:00+08:00"));
+    const task = loadTaskStore();
+    expect(task.entries[0].lastCleared).toBeUndefined();
+    expect(task.characterClears).toEqual({});
+  });
+
+  test("shows the countdown to the next reset", () => {
+    renderScreen(TAB_KEY.mainTask);
+    // Pinned to Saturday 08:00, one hour before the reset.
+    expect(screen.getByLabelText("Weekly reset")).toHaveTextContent(
+      "Weekly reset in 1h 0m"
+    );
   });
 });
 
