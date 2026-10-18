@@ -65,6 +65,29 @@ const TaskSlice = createSlice({
         },
       }),
     },
+    // Clearing (no floor) removes the entry.
+    setActivityFloor: (
+      state,
+      action: PayloadAction<{
+        characterId: string;
+        activityId: string;
+        floor?: string;
+      }>,
+    ) => {
+      const { characterId, activityId, floor } = action.payload;
+      const floors = { ...state.characterFloors[characterId] };
+      if (floor) {
+        floors[activityId] = floor;
+      } else {
+        delete floors[activityId];
+      }
+      if (Object.keys(floors).length) {
+        state.characterFloors[characterId] = floors;
+      } else {
+        delete state.characterFloors[characterId];
+      }
+    },
+    // Unchecks every activity; the chosen floors are kept.
     resetCharacterActivities: (state, action: PayloadAction<string>) => {
       delete state.characterClears[action.payload];
     },
@@ -87,6 +110,7 @@ export const {
   resetTask,
   deleteTask,
   setActivityCleared,
+  setActivityFloor,
   resetCharacterActivities,
   saveWeeklyCharacterSetting,
 } = TaskSlice.actions;

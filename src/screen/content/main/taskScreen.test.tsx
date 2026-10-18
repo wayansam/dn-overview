@@ -101,6 +101,7 @@ describe("Weekly Account", () => {
       characterClears: {},
       excludedCharacters: {},
       hiddenActivities: [],
+      characterFloors: {},
     });
     const { store } = renderScreen(TAB_KEY.mainTask);
     const row = () => screen.getByText("Gold Dragon Nest").closest("tr")!;
@@ -166,6 +167,7 @@ describe("Weekly Character", () => {
       },
       excludedCharacters: {},
       hiddenActivities: [],
+      characterFloors: {},
     });
     const { store } = renderScreen(TAB_KEY.mainTask);
     click(within(row("Alice")).getByRole("button", { name: "Reset" }));
@@ -181,6 +183,7 @@ describe("Weekly Character", () => {
       characterClears: { c1: { fissionMaze: "2026-10-01" } },
       excludedCharacters: { nightmare: ["c1"] },
       hiddenActivities: [],
+      characterFloors: {},
     });
     renderScreen(TAB_KEY.mainTask);
     click(within(row("Alice")).getByRole("button", { name: "Details" }));
@@ -264,6 +267,39 @@ describe("Weekly Character", () => {
       expect(store.getState().Task.hiddenActivities).toEqual([])
     );
   });
+
+  test("only Fission Maze and Ark of Transcendence have a floor dropdown", () => {
+    renderScreen(TAB_KEY.mainTask);
+    const floors = within(row("Alice")).getAllByRole("combobox");
+    expect(floors.map((el) => el.getAttribute("aria-label"))).toEqual([
+      "Fission Maze floor",
+      "Ark of Transcendence floor",
+    ]);
+  });
+
+  test("picking a floor saves it, Reset keeps it, Details shows it", () => {
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    const floorSelect = (label: string) =>
+      within(row("Alice"))
+        .getByRole("combobox", { name: label })
+        .closest<HTMLElement>(".ant-select")!;
+    chooseOption(floorSelect("Ark of Transcendence floor"), "12F");
+    expect(store.getState().Task.characterFloors).toEqual({
+      c1: { arkOfTranscendence: "12" },
+    });
+
+    click(within(row("Alice")).getByRole("checkbox", { name: "Ark of Transcendence" }));
+    click(within(row("Alice")).getByRole("button", { name: "Reset" }));
+    expect(store.getState().Task.characterClears).toEqual({});
+    expect(store.getState().Task.characterFloors.c1).toEqual({
+      arkOfTranscendence: "12",
+    });
+
+    click(within(row("Alice")).getByRole("button", { name: "Details" }));
+    expect(screen.getByRole("dialog")).toHaveTextContent(
+      "Ark of Transcendence- (12F)"
+    );
+  });
 });
 
 describe("taskStorage.util", () => {
@@ -311,6 +347,24 @@ describe("taskStorage.util", () => {
     const store = loadTaskStore();
     expect(store.characterClears).toEqual({ c1: { nightmare: "2026-10-01" } });
     expect(store.excludedCharacters).toEqual({ nightmare: ["c1"] });
+  });
+
+  test("keeps only floors that exist in the Stage data", () => {
+    localStorage.setItem(
+      LS_KEYS.tasks,
+      JSON.stringify({
+        characterFloors: {
+          c1: {
+            fissionMaze: "Ascension 3-1F",
+            arkOfTranscendence: "99",
+            nightmare: "1",
+          },
+        },
+      })
+    );
+    expect(loadTaskStore().characterFloors).toEqual({
+      c1: { fissionMaze: "Ascension 3-1F" },
+    });
   });
 
   test("falls back to empty on unreadable storage", () => {

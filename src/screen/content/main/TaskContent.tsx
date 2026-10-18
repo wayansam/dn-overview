@@ -111,6 +111,7 @@ const TaskTable = ({ category, title }: TaskTableProps) => {
         scroll={{ x: true }}
         pagination={false}
         locale={{ emptyText: "No task yet, use Add to create one" }}
+        size={"small"}
       />
       {isFormOpen && (
         <TaskFormModal

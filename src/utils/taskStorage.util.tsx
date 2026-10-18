@@ -7,6 +7,7 @@ export const emptyTaskStore = (): TaskStore => ({
   version: TASK_STORE_VERSION,
   entries: [],
   characterClears: {},
+  characterFloors: {},
   excludedCharacters: {},
   hiddenActivities: [],
 });
@@ -59,23 +60,31 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isWeeklyCharacterTask = (id: string) =>
   getTaskById(id)?.category === "weeklyCharacter";
 
-// characterId -> activityId -> date, keeping only known activities and
-// valid dates.
-const toCharacterClears = (value: unknown): DateMap => {
+// characterId -> activityId -> value, keeping only known activities and
+// values that pass `isValid`.
+const toCharacterMap = (
+  value: unknown,
+  isValid: (activityId: string, value: string) => boolean,
+): DateMap => {
   if (!isObject(value)) return {};
   const result: DateMap = {};
-  Object.entries(value).forEach(([characterId, clears]) => {
-    if (!isObject(clears)) return;
-    const valid = Object.entries(clears).filter(
+  Object.entries(value).forEach(([characterId, byActivity]) => {
+    if (!isObject(byActivity)) return;
+    const valid = Object.entries(byActivity).filter(
       (pair): pair is [string, string] =>
         isWeeklyCharacterTask(pair[0]) &&
         typeof pair[1] === "string" &&
-        DATE_PATTERN.test(pair[1]),
+        isValid(pair[0], pair[1]),
     );
     if (valid.length) result[characterId] = Object.fromEntries(valid);
   });
   return result;
 };
+
+const isDate = (_: string, value: string) => DATE_PATTERN.test(value);
+// Floors removed from the Stage data are dropped.
+const isKnownFloor = (activityId: string, value: string) =>
+  !!getTaskById(activityId)?.floors?.some((item) => item.value === value);
 
 const toExcludedCharacters = (value: unknown): Record<string, string[]> => {
   if (!isObject(value)) return {};
@@ -100,14 +109,20 @@ export const loadTaskStore = (): TaskStore => {
     if (!raw) return emptyTaskStore();
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null) return emptyTaskStore();
-    const { entries, characterClears, excludedCharacters, hiddenActivities } =
-      parsed as Record<string, unknown>;
+    const {
+      entries,
+      characterClears,
+      characterFloors,
+      excludedCharacters,
+      hiddenActivities,
+    } = parsed as Record<string, unknown>;
     return {
       version: TASK_STORE_VERSION,
       entries: (Array.isArray(entries) ? entries : [])
         .map(toEntry)
         .filter((item): item is TaskEntry => !!item),
-      characterClears: toCharacterClears(characterClears),
+      characterClears: toCharacterMap(characterClears, isDate),
+      characterFloors: toCharacterMap(characterFloors, isKnownFloor),
       excludedCharacters: toExcludedCharacters(excludedCharacters),
       hiddenActivities: (Array.isArray(hiddenActivities)
         ? hiddenActivities

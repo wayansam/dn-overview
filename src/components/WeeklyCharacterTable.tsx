@@ -23,6 +23,7 @@ import {
   resetCharacterActivities,
   saveWeeklyCharacterSetting,
   setActivityCleared,
+  setActivityFloor,
 } from "../slice/Task.reducer";
 import { formatDate } from "../utils/taskStorage.util";
 const { Text } = Typography;
@@ -34,13 +35,24 @@ const ACTIVITIES = getTasksByCategory("weeklyCharacter");
 const WeeklyCharacterTable = () => {
   const dispatch = useAppDispatch();
   const characters = useAppSelector((state) => state.Character.characters);
-  const { characterClears, excludedCharacters, hiddenActivities } =
-    useAppSelector((state) => state.Task);
+  const {
+    characterClears,
+    characterFloors,
+    excludedCharacters,
+    hiddenActivities,
+  } = useAppSelector((state) => state.Task);
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [detailCharacter, setDetailCharacter] = useState<Character>();
 
   const isExcluded = (activityId: string, characterId: string) =>
     !!excludedCharacters[activityId]?.includes(characterId);
+
+  const getFloorLabel = (activityId: string, characterId: string) => {
+    const floor = characterFloors[characterId]?.[activityId];
+    return ACTIVITIES.find((item) => item.id === activityId)?.floors?.find(
+      (item) => item.value === floor,
+    )?.label;
+  };
 
   const columns: ColumnsType<Character> = [
     { title: "Character", dataIndex: "name", key: "name" },
@@ -54,15 +66,42 @@ const WeeklyCharacterTable = () => {
         if (isExcluded(activity.id, id)) return "-";
         const date = characterClears[id]?.[activity.id];
         return (
-          <Tooltip title={date ? `Cleared ${formatDate(date)}` : ""}>
-            <Checkbox
-              aria-label={activity.name}
-              checked={!!date}
-              onChange={(e) =>
-                dispatch(setActivityCleared(id, activity.id, e.target.checked))
-              }
-            />
-          </Tooltip>
+          <Space size={8}>
+            <Tooltip title={date ? `Cleared ${formatDate(date)}` : ""}>
+              <Checkbox
+                aria-label={activity.name}
+                checked={!!date}
+                onChange={(e) =>
+                  dispatch(
+                    setActivityCleared(id, activity.id, e.target.checked),
+                  )
+                }
+              />
+            </Tooltip>
+            {activity.floors && (
+              <Select
+                size="small"
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                placeholder="Floor"
+                aria-label={`${activity.name} floor`}
+                options={activity.floors}
+                value={characterFloors[id]?.[activity.id]}
+                onChange={(floor?: string) =>
+                  dispatch(
+                    setActivityFloor({
+                      characterId: id,
+                      activityId: activity.id,
+                      floor,
+                    }),
+                  )
+                }
+                popupMatchSelectWidth={false}
+                style={{ width: activity.id === "fissionMaze" ? 150 : 80 }}
+              />
+            )}
+          </Space>
         );
       },
     })),
@@ -130,7 +169,17 @@ const WeeklyCharacterTable = () => {
                 {isExcluded(activity.id, detailCharacter.id) ? (
                   <Text type="secondary">Excluded</Text>
                 ) : (
-                  formatDate(characterClears[detailCharacter.id]?.[activity.id])
+                  <>
+                    {formatDate(
+                      characterClears[detailCharacter.id]?.[activity.id],
+                    )}
+                    {getFloorLabel(activity.id, detailCharacter.id) && (
+                      <Text type="secondary">
+                        {" "}
+                        ({getFloorLabel(activity.id, detailCharacter.id)})
+                      </Text>
+                    )}
+                  </>
                 )}
               </Descriptions.Item>
             ))}
