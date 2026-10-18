@@ -7,4 +7,5 @@ export enum LS_KEYS {
   characters = "CHARACTERS_DN",
   character_columns = "CHARACTER_COLUMNS_DN",
   general_widgets = "GENERAL_WIDGETS_DN",
+  tasks = "TASKS_DN",
 }

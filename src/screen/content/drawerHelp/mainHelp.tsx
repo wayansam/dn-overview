@@ -38,6 +38,22 @@ export const mainHelpItems: HelpItem[] = [
     ),
   },
   {
+    key: TAB_KEY.mainTask,
+    label: TAB_KEY.mainTask,
+    children: (
+      <div>
+        <p>
+          Use Add to track a task, optionally for an ID and a character. Picking
+          an ID narrows the character list.
+        </p>
+        <p>
+          Done records today as Last Cleared, Reset clears it back to "-".
+        </p>
+        <p>Data is saved in this browser only.</p>
+      </div>
+    ),
+  },
+  {
     key: TAB_KEY.mainCompare,
     label: TAB_KEY.mainCompare,
     children: (

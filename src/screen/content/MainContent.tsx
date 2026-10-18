@@ -27,6 +27,7 @@ import ExternalTalismanContent from "./talisman/EternalTalismanContent";
 import GeneralContent from "./main/GeneralContent";
 import CompareEqContent from "./main/CompareEqContent";
 import CharacterContent from "./main/CharacterContent";
+import TaskContent from "./main/TaskContent";
 import CharacterIdContent from "./main/CharacterIdContent";
 import KilosEqContent from "./equipment/KilosEqContent";
 import LunarJadeCalculatorContent from "./jade/LunarJadeCalculatorContent";
@@ -93,6 +94,9 @@ const MainContent = () => {
 
       case TAB_KEY.mainCharacter:
         return <CharacterContent />;
+
+      case TAB_KEY.mainTask:
+        return <TaskContent />;
 
       case TAB_KEY.mainCompare:
         return <CompareEqContent />;
