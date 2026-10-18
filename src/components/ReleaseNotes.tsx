@@ -216,6 +216,70 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "17-10-2026",
     },
+    {
+      key: keyUpdate.N,
+      label:
+        "General dashboard with customizable widgets (Characters, IDs, Tasks, Release Notes)",
+      link: {
+        key: TAB_KEY.mainGeneral,
+        name: TAB_KEY.mainGeneral,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.U,
+      label:
+        "Character list moved to the Character tab, Details opens the character in a popup",
+      link: {
+        key: TAB_KEY.mainCharacter,
+        name: TAB_KEY.mainCharacter,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.N,
+      label:
+        "Task tab: Weekly [Account] & Weekly [Character] checklists with Fission Maze & Ark of Transcendence floors",
+      link: {
+        key: TAB_KEY.mainTask,
+        name: TAB_KEY.mainTask,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.N,
+      label: "Weekly reward summary from the picked floors",
+      link: {
+        key: TAB_KEY.mainTask,
+        name: TAB_KEY.mainTask,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.N,
+      label:
+        "Server time (UTC+8) and automatic weekly reset every Saturday 09:00, with a Last Week summary",
+      link: {
+        key: TAB_KEY.mainTask,
+        name: TAB_KEY.mainTask,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.N,
+      label:
+        "Backup & Transfer: export / import your data to another browser or device",
+      link: {
+        key: TAB_KEY.setting,
+        name: TAB_KEY.setting,
+      },
+      date: "18-10-2026",
+    },
+    {
+      key: keyUpdate.U,
+      label: "Phone friendly layout for the Character & Task tables and widgets",
+      date: "18-10-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
