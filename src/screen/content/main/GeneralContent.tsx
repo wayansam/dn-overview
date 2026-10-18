@@ -2,6 +2,7 @@ import { AppstoreOutlined } from "@ant-design/icons";
 import { Button, Col, Empty, Popover, Row, Space } from "antd";
 import { useState } from "react";
 import OrderSettingList from "../../../components/OrderSettingList";
+import ServerTime from "../../../components/ServerTime";
 import { WIDGET_KEYS, WIDGETS } from "../../../components/widgets";
 import { LS_KEYS } from "../../../constants/localStorage.constants";
 import {
@@ -32,7 +33,11 @@ const GeneralContent = () => {
 
   return (
     <div>
-      <Space style={{ width: "100%", justifyContent: "flex-end" }}>
+      <Space
+        wrap
+        style={{ width: "100%", justifyContent: "space-between" }}
+      >
+        <ServerTime />
         <Popover
           title="Widgets"
           trigger="click"
