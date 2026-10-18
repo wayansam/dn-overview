@@ -25,8 +25,9 @@ export const mainHelpItems: HelpItem[] = [
     children: (
       <div>
         <p>
-          Pick a character from the dropdown, it opens the main character by
-          default. Use Edit to change it, Add to create a new one (up to 25).
+          The table lists every character, with filters and adjustable
+          columns. Details opens a character, use Edit there to change it.
+          Add creates a new one (up to 25).
         </p>
         <p>
           Names are letters and numbers only, up to 15 characters, and must be

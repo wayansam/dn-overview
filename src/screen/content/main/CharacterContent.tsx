@@ -1,229 +1,415 @@
-import { OrderedListOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  ArrowDownOutlined,
+  ArrowUpOutlined,
+  OrderedListOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   Checkbox,
-  Descriptions,
-  Divider,
-  Empty,
-  Form,
+  Grid,
   Input,
-  InputNumber,
-  Modal,
-  Popconfirm,
+  Popover,
   Select,
   Space,
+  Table,
   Tag,
   Tooltip,
   Typography,
-  message,
 } from "antd";
-import { useEffect, useMemo, useState } from "react";
+import { ColumnType } from "antd/es/table";
+import { Fragment, ReactNode, useMemo, useState } from "react";
+import CharacterDetailModal from "../../../components/CharacterDetailModal";
 import ReorderListModal from "../../../components/ReorderListModal";
-import {
-  CHARACTER_LEVEL_MAX,
-  CHARACTER_LEVEL_MIN,
-  CHARACTER_LIMIT,
-  CHARACTER_NAME_MAX_LENGTH,
-  CHARACTER_NAME_PATTERN,
-} from "../../../constants/Character.constants";
-import { CHARACTER_CLASS } from "../../../constants/InGame.constants";
-import {
-  ClassData,
-  getClassById,
-  getSkillsByClassId,
-} from "../../../data/character/ClassData";
+import { CHARACTER_LIMIT } from "../../../constants/Character.constants";
+import { LS_KEYS } from "../../../constants/localStorage.constants";
+import { getClassById } from "../../../data/character/ClassData";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Character } from "../../../interface/Account.interface";
-import {
-  addCharacter,
-  deleteCharacter,
-  reorderCharacters,
-  updateCharacter,
-} from "../../../slice/Character.reducer";
-import { setHasUnsavedChanges } from "../../../slice/UIState.reducer";
-import { isNameTaken } from "../../../utils/characterStorage.util";
+import { reorderCharacters } from "../../../slice/Character.reducer";
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
-type Mode = "view" | "edit" | "new";
+// Filter value for characters without an ID (real ids are UUIDs).
+const NO_ID_FILTER = "__no_id__";
 
-interface CharacterFormValues {
-  name: string;
-  level: number;
-  classId: string;
-  groupId?: string;
-  isMain: boolean;
+// Columns the user can show / hide. Name and Action are always shown.
+const OPTIONAL_COLUMNS = [
+  { label: "Level", value: "level" },
+  { label: "Class", value: "classId" },
+  { label: "Base Class", value: "baseClass" },
+  { label: "ID", value: "groupId" },
+];
+const OPTIONAL_COLUMN_KEYS = OPTIONAL_COLUMNS.map((item) => item.value);
+
+interface ColumnSetting {
+  order: string[];
+  visible: string[];
 }
+const DEFAULT_COLUMN_SETTING: ColumnSetting = {
+  order: OPTIONAL_COLUMN_KEYS,
+  visible: OPTIONAL_COLUMN_KEYS,
+};
 
-const classOptions = Object.values(CHARACTER_CLASS).map((baseClass) => ({
-  label: baseClass,
-  options: ClassData.filter((item) => item.baseClass === baseClass).map(
-    (item) => ({ label: item.name, value: item.id }),
-  ),
-}));
+const toKnownKeys = (value: unknown) =>
+  Array.isArray(value)
+    ? OPTIONAL_COLUMN_KEYS.filter((key) => value.includes(key))
+    : OPTIONAL_COLUMN_KEYS;
+
+// Never throws: unknown keys from old / hand-edited storage are dropped and
+// columns missing from the saved order are appended at the end. A plain array
+// is the older format that only stored the visible columns.
+const loadColumnSetting = (): ColumnSetting => {
+  try {
+    const raw = localStorage.getItem(LS_KEYS.character_columns);
+    if (!raw) return DEFAULT_COLUMN_SETTING;
+    const parsed: unknown = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return { order: OPTIONAL_COLUMN_KEYS, visible: toKnownKeys(parsed) };
+    }
+    if (typeof parsed !== "object" || parsed === null) {
+      return DEFAULT_COLUMN_SETTING;
+    }
+    const { order, visible } = parsed as Record<string, unknown>;
+    const savedOrder = Array.isArray(order)
+      ? order.filter(
+          (key, index): key is string =>
+            OPTIONAL_COLUMN_KEYS.includes(key) && order.indexOf(key) === index,
+        )
+      : [];
+    return {
+      order: [
+        ...savedOrder,
+        ...OPTIONAL_COLUMN_KEYS.filter((key) => !savedOrder.includes(key)),
+      ],
+      visible: toKnownKeys(visible),
+    };
+  } catch {
+    return DEFAULT_COLUMN_SETTING;
+  }
+};
+
+// Filter options only list values that exist in the current data.
+const toFilters = (values: { label: string; value: string }[]) =>
+  Array.from(new Map(values.map((item) => [item.value, item])).values()).sort(
+    (a, b) => a.label.localeCompare(b.label),
+  );
 
 const CharacterContent = () => {
   const dispatch = useAppDispatch();
-  const [form] = Form.useForm<CharacterFormValues>();
-  const [modal, modalContextHolder] = Modal.useModal();
-  const [messageApi, messageContextHolder] = message.useMessage();
-
+  // Small screens show only Name and Action, the other columns are listed
+  // under the name instead.
+  const isCompact = !useBreakpoint().md;
   const { characters, groups, mainCharacterId } = useAppSelector(
     (state) => state.Character,
   );
+  const [search, setSearch] = useState("");
+  const [classIds, setClassIds] = useState<string[]>([]);
+  const [baseClasses, setBaseClasses] = useState<string[]>([]);
+  const [groupIds, setGroupIds] = useState<string[]>([]);
+  const [columnSetting, setColumnSetting] =
+    useState<ColumnSetting>(loadColumnSetting);
+  const isFull = characters.length >= CHARACTER_LIMIT;
   const payload = useAppSelector(
     (state) => state.UIState.selectedSideBar.payload?.characterScreen,
   );
-  const isFull = characters.length >= CHARACTER_LIMIT;
-
-  // Payload is only read on mount: Details / Add from other screens always
-  // mount this screen fresh.
-  const [selectedId, setSelectedId] = useState<string | undefined>(() =>
-    payload?.characterId &&
-    characters.some((item) => item.id === payload.characterId)
-      ? payload.characterId
-      : mainCharacterId,
-  );
-  const [mode, setMode] = useState<Mode>(() =>
-    payload?.isNew && !isFull ? "new" : "view",
-  );
-  const [isDirty, setIsDirty] = useState(false);
-  // Bumped to force a blank form even when already in "new" mode.
-  const [resetToken, setResetToken] = useState(0);
-  const [isReorderOpen, setIsReorderOpen] = useState(false);
-
-  const selectedCharacter = characters.find((item) => item.id === selectedId);
-  const mainCharacter = characters.find((item) => item.id === mainCharacterId);
-  const watchedClassId = Form.useWatch("classId", form);
-  const watchedClass = getClassById(watchedClassId);
-  const watchedSkills = getSkillsByClassId(watchedClassId);
-  const isEditing = mode !== "view";
-  const isFormVisible = mode === "new" || !!selectedCharacter;
-
-  useEffect(() => {
-    if (mode === "new") {
-      form.resetFields();
-    } else if (mode === "view" && selectedCharacter) {
-      form.setFieldsValue({
-        name: selectedCharacter.name,
-        level: selectedCharacter.level,
-        classId: selectedCharacter.classId,
-        groupId: selectedCharacter.groupId,
-        isMain: selectedCharacter.id === mainCharacterId,
-      });
-    }
-  }, [form, mode, selectedCharacter, mainCharacterId, resetToken]);
-
-  // Lets the sidebar warn before leaving with unsaved changes.
-  useEffect(() => {
-    dispatch(setHasUnsavedChanges(isDirty));
-  }, [dispatch, isDirty]);
-  useEffect(
-    () => () => {
-      dispatch(setHasUnsavedChanges(false));
+  // Character shown in the detail modal, `{}` for a new one. The payload
+  // (Details / Add from other screens) is only read on mount.
+  const [detail, setDetail] = useState<{ characterId?: string } | undefined>(
+    () => {
+      const id = payload?.characterId;
+      if (id && characters.some((item) => item.id === id)) {
+        return { characterId: id };
+      }
+      return payload?.isNew && !isFull ? {} : undefined;
     },
-    [dispatch],
   );
+  const [isReorderOpen, setIsReorderOpen] = useState(false);
+  const hasFilter =
+    !!search || !!classIds.length || !!baseClasses.length || !!groupIds.length;
 
-  const characterOptions = useMemo(
-    () =>
-      characters.map((item) => ({
-        value: item.id,
-        label: `${item.id === mainCharacterId ? "★ " : ""}${item.name} - Lv.${
-          item.level
-        } ${getClassById(item.classId)?.name ?? ""}`,
-      })),
-    [characters, mainCharacterId],
-  );
-
-  const goToView = (id: string | undefined) => {
-    setSelectedId(id);
-    setMode("view");
-    setIsDirty(false);
+  const saveColumnSetting = (setting: ColumnSetting) => {
+    setColumnSetting(setting);
+    localStorage.setItem(LS_KEYS.character_columns, JSON.stringify(setting));
   };
 
-  const startNew = () => {
-    setMode("new");
-    setIsDirty(false);
-    setResetToken((prev) => prev + 1);
-  };
-
-  const save = async (): Promise<boolean> => {
-    let values: CharacterFormValues;
-    try {
-      values = await form.validateFields();
-    } catch {
-      return false;
-    }
-    const data: Omit<Character, "id"> = {
-      name: values.name.trim(),
-      level: values.level,
-      classId: values.classId,
-      groupId: values.groupId ?? undefined,
-    };
-    if (mode === "new") {
-      const action = dispatch(addCharacter(data, values.isMain));
-      goToView(action.payload.character.id);
-    } else if (selectedId) {
-      dispatch(
-        updateCharacter({
-          character: { ...data, id: selectedId },
-          isMain: values.isMain,
-        }),
-      );
-      goToView(selectedId);
-    }
-    messageApi.success(`${data.name} saved`);
-    return true;
-  };
-
-  // Runs `proceed` right away, or after the user chooses Save / Discard.
-  const confirmUnsaved = (proceed: () => void) => {
-    if (!isDirty) {
-      proceed();
-      return;
-    }
-    const instance = modal.confirm({
-      title: "Save current changes?",
-      content: "This character has unsaved changes.",
-      footer: (
-        <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-          <Button onClick={() => instance.destroy()}>Cancel</Button>
-          <Button
-            danger
-            onClick={() => {
-              instance.destroy();
-              proceed();
-            }}
-          >
-            Discard
-          </Button>
-          <Button
-            type="primary"
-            onClick={async () => {
-              instance.destroy();
-              if (await save()) proceed();
-            }}
-          >
-            Save
-          </Button>
-        </Space>
-      ),
+  const toggleColumn = (key: string, checked: boolean) =>
+    saveColumnSetting({
+      ...columnSetting,
+      visible: checked
+        ? [...columnSetting.visible, key]
+        : columnSetting.visible.filter((item) => item !== key),
     });
+
+  const moveColumn = (index: number, offset: -1 | 1) => {
+    const order = [...columnSetting.order];
+    [order[index], order[index + offset]] = [
+      order[index + offset],
+      order[index],
+    ];
+    saveColumnSetting({ ...columnSetting, order });
   };
 
-  const onDelete = () => {
-    if (!selectedCharacter) return;
-    dispatch(deleteCharacter(selectedCharacter.id));
-    goToView(
-      mainCharacterId !== selectedCharacter.id ? mainCharacterId : undefined,
-    );
-    messageApi.success(`${selectedCharacter.name} deleted`);
+  const clearFilters = () => {
+    setSearch("");
+    setClassIds([]);
+    setBaseClasses([]);
+    setGroupIds([]);
   };
+
+  const filteredCharacters = useMemo(() => {
+    const keyword = search.trim().toLowerCase();
+    return characters.filter(({ name, classId, groupId }) => {
+      if (keyword && !name.toLowerCase().includes(keyword)) return false;
+      if (classIds.length && !classIds.includes(classId)) return false;
+      if (baseClasses.length) {
+        const baseClass = getClassById(classId)?.baseClass;
+        if (!baseClass || !baseClasses.includes(baseClass)) return false;
+      }
+      if (groupIds.length && !groupIds.includes(groupId ?? NO_ID_FILTER)) {
+        return false;
+      }
+      return true;
+    });
+  }, [characters, search, classIds, baseClasses, groupIds]);
+
+  const classOptions = toFilters(
+    characters.map(({ classId }) => ({
+      label: getClassById(classId)?.name ?? classId,
+      value: classId,
+    })),
+  );
+  const baseClassOptions = toFilters(
+    characters.flatMap(({ classId }) => {
+      const baseClass = getClassById(classId)?.baseClass;
+      return baseClass ? [{ label: baseClass, value: baseClass }] : [];
+    }),
+  );
+  const idOptions = [
+    ...groups.map((item) => ({ label: item.name, value: item.id })),
+    { label: "No ID", value: NO_ID_FILTER },
+  ];
+
+  const shownColumnKeys = columnSetting.order.filter((key) =>
+    columnSetting.visible.includes(key),
+  );
+  const renderValue: Record<string, (character: Character) => ReactNode> = {
+    level: ({ level }) => level,
+    classId: ({ classId }) => getClassById(classId)?.name ?? classId,
+    baseClass: ({ classId }) => getClassById(classId)?.baseClass ?? "-",
+    groupId: ({ groupId }) =>
+      groups.find((item) => item.id === groupId)?.name ?? "-",
+  };
+
+  const nameColumn: ColumnType<Character> = {
+    title: "Name",
+    key: "name",
+    dataIndex: "name",
+    sorter: (a, b) => a.name.localeCompare(b.name),
+    render: (_, character) => (
+      <Space direction="vertical" size={0}>
+        <Space size={4}>
+          <Text>{character.name}</Text>
+          {character.id === mainCharacterId && <Tag color="gold">Main</Tag>}
+        </Space>
+        {isCompact && !!shownColumnKeys.length && (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {shownColumnKeys.map((key, index) => (
+              <Fragment key={key}>
+                {index > 0 && " · "}
+                {
+                  OPTIONAL_COLUMNS.find((item) => item.value === key)?.label
+                }: {renderValue[key](character)}
+              </Fragment>
+            ))}
+          </Text>
+        )}
+      </Space>
+    ),
+  };
+  const optionalColumns: ColumnType<Character>[] = shownColumnKeys.map(
+    (key) => ({
+      title: OPTIONAL_COLUMNS.find((item) => item.value === key)?.label,
+      key,
+      sorter:
+        key === "level"
+          ? (a: Character, b: Character) => a.level - b.level
+          : undefined,
+      render: (_: unknown, character: Character) => renderValue[key](character),
+    }),
+  );
+  const actionColumn: ColumnType<Character> = {
+    title: "Action",
+    key: "action",
+    render: (_, { id }) => (
+      <Button
+        size="small"
+        onClick={() => setDetail({ characterId: id })}
+      >
+        Details
+      </Button>
+    ),
+  };
+  // Name stays first and Action stays last, only the columns between them
+  // follow the user's order.
+  const columns = isCompact
+    ? [nameColumn, actionColumn]
+    : [nameColumn, ...optionalColumns, actionColumn];
+
+  const filterStyle = { width: isCompact ? "100%" : 200 };
+
+  const columnSettingContent = (
+    <Space direction="vertical" size={4}>
+      <Checkbox checked disabled>
+        Name
+      </Checkbox>
+      {columnSetting.order.map((key, index) => (
+        <Space
+          key={key}
+          style={{ width: "100%", justifyContent: "space-between" }}
+        >
+          <Checkbox
+            checked={columnSetting.visible.includes(key)}
+            onChange={(e) => toggleColumn(key, e.target.checked)}
+          >
+            {OPTIONAL_COLUMNS.find((item) => item.value === key)?.label}
+          </Checkbox>
+          <Space size={0}>
+            <Button
+              size="small"
+              type="text"
+              icon={<ArrowUpOutlined />}
+              disabled={index === 0}
+              onClick={() => moveColumn(index, -1)}
+            />
+            <Button
+              size="small"
+              type="text"
+              icon={<ArrowDownOutlined />}
+              disabled={index === columnSetting.order.length - 1}
+              onClick={() => moveColumn(index, 1)}
+            />
+          </Space>
+        </Space>
+      ))}
+      <Checkbox checked disabled>
+        Action
+      </Checkbox>
+    </Space>
+  );
 
   return (
-    <div>
-      {modalContextHolder}
-      {messageContextHolder}
+    <div style={{ overflowX: "auto" }}>
+      <Space
+        wrap
+        style={{
+          width: "100%",
+          justifyContent: "space-between",
+          marginBottom: 12,
+        }}
+      >
+        <Text strong>
+          Characters ({characters.length}/{CHARACTER_LIMIT})
+        </Text>
+        <Space wrap>
+          <Tooltip title="Arrange character order">
+            <Button
+              icon={<OrderedListOutlined />}
+              disabled={characters.length < 2}
+              onClick={() => setIsReorderOpen(true)}
+            />
+          </Tooltip>
+          <Popover
+            title="Columns"
+            trigger="click"
+            placement="bottomRight"
+            content={columnSettingContent}
+          >
+            <Button icon={<SettingOutlined />}>Columns</Button>
+          </Popover>
+          <Tooltip
+            title={isFull ? `Limited to ${CHARACTER_LIMIT} characters` : ""}
+          >
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              disabled={isFull}
+              onClick={() => setDetail({})}
+            >
+              Add
+            </Button>
+          </Tooltip>
+        </Space>
+      </Space>
+      <Space
+        wrap={!isCompact}
+        direction={isCompact ? "vertical" : "horizontal"}
+        style={{ width: isCompact ? "100%" : undefined, marginBottom: 12 }}
+      >
+        <Input
+          allowClear
+          placeholder="Find by name"
+          prefix={<SearchOutlined />}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={filterStyle}
+        />
+        <Select
+          mode="multiple"
+          allowClear
+          maxTagCount="responsive"
+          placeholder="Class"
+          options={classOptions}
+          value={classIds}
+          onChange={setClassIds}
+          optionFilterProp="label"
+          style={filterStyle}
+        />
+        <Select
+          mode="multiple"
+          allowClear
+          maxTagCount="responsive"
+          placeholder="Base Class"
+          options={baseClassOptions}
+          value={baseClasses}
+          onChange={setBaseClasses}
+          optionFilterProp="label"
+          style={filterStyle}
+        />
+        <Select
+          mode="multiple"
+          allowClear
+          maxTagCount="responsive"
+          placeholder="ID"
+          options={idOptions}
+          value={groupIds}
+          onChange={setGroupIds}
+          optionFilterProp="label"
+          style={filterStyle}
+        />
+        <Button type="link" disabled={!hasFilter} onClick={clearFilters}>
+          Clear filters
+        </Button>
+      </Space>
+      <Table
+        columns={columns}
+        dataSource={filteredCharacters}
+        rowKey="id"
+        pagination={{ pageSize: 5, hideOnSinglePage: false }}
+        locale={{
+          emptyText: characters.length
+            ? "No character matches"
+            : "No character yet, use Add to create one",
+        }}
+      />
+      {detail && (
+        <CharacterDetailModal
+          characterId={detail.characterId}
+          onClose={() => setDetail(undefined)}
+        />
+      )}
       <ReorderListModal
         title="Arrange Characters"
         open={isReorderOpen}
@@ -242,189 +428,6 @@ const CharacterContent = () => {
         onSave={(ids) => dispatch(reorderCharacters(ids))}
         onClose={() => setIsReorderOpen(false)}
       />
-      <Space wrap style={{ marginBottom: 16 }}>
-        <Select
-          style={{ minWidth: 280 }}
-          placeholder={mode === "new" ? "New character" : "Select character"}
-          value={mode === "new" ? undefined : selectedCharacter?.id}
-          options={characterOptions}
-          showSearch
-          optionFilterProp="label"
-          onChange={(id: string) => confirmUnsaved(() => goToView(id))}
-          notFoundContent="No character yet"
-        />
-        <Tooltip title="Arrange character order">
-          <Button
-            icon={<OrderedListOutlined />}
-            disabled={characters.length < 2}
-            onClick={() => setIsReorderOpen(true)}
-          />
-        </Tooltip>
-        <Tooltip
-          title={isFull ? `Limited to ${CHARACTER_LIMIT} characters` : ""}
-        >
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            disabled={isFull}
-            onClick={() => confirmUnsaved(startNew)}
-          >
-            Add
-          </Button>
-        </Tooltip>
-      </Space>
-
-      {!isFormVisible ? (
-        <Empty
-          description={
-            characters.length
-              ? "Select a character, or set one as main to open it by default"
-              : "No character yet, use Add to create one"
-          }
-        />
-      ) : (
-        <>
-          <Form<CharacterFormValues>
-            form={form}
-            layout="vertical"
-            style={{ maxWidth: 480 }}
-            disabled={!isEditing}
-            initialValues={{ level: CHARACTER_LEVEL_MAX, isMain: false }}
-            onValuesChange={() => {
-              if (isEditing) setIsDirty(true);
-            }}
-          >
-            <Form.Item
-              label="Name"
-              name="name"
-              rules={[
-                { required: true, message: "Name is required" },
-                {
-                  pattern: CHARACTER_NAME_PATTERN,
-                  message: "Only letters and numbers",
-                },
-                {
-                  validator: (_, value?: string) =>
-                    value &&
-                    isNameTaken(
-                      characters,
-                      value,
-                      mode === "edit" ? selectedId : undefined,
-                    )
-                      ? Promise.reject(new Error("Name is already used"))
-                      : Promise.resolve(),
-                },
-              ]}
-            >
-              <Input maxLength={CHARACTER_NAME_MAX_LENGTH} showCount />
-            </Form.Item>
-            <Form.Item
-              label="Level"
-              name="level"
-              rules={[{ required: true, message: "Level is required" }]}
-            >
-              <InputNumber
-                min={CHARACTER_LEVEL_MIN}
-                max={CHARACTER_LEVEL_MAX}
-                precision={0}
-                style={{ width: "100%" }}
-              />
-            </Form.Item>
-            <Form.Item
-              label="Class"
-              name="classId"
-              rules={[{ required: true, message: "Class is required" }]}
-            >
-              <Select
-                options={classOptions}
-                showSearch
-                optionFilterProp="label"
-                placeholder="Select class"
-              />
-            </Form.Item>
-            <Form.Item label="ID" name="groupId">
-              <Select
-                allowClear
-                placeholder="No ID"
-                options={groups.map((item) => ({
-                  label: item.name,
-                  value: item.id,
-                }))}
-                notFoundContent="No ID yet, add one in the ID screen"
-              />
-            </Form.Item>
-            <Form.Item
-              name="isMain"
-              valuePropName="checked"
-              extra={
-                isEditing &&
-                mainCharacter &&
-                mainCharacter.id !== selectedId
-                  ? `Current main: ${mainCharacter.name}. Checking this replaces it.`
-                  : undefined
-              }
-            >
-              <Checkbox>Main character</Checkbox>
-            </Form.Item>
-          </Form>
-
-          <Space wrap>
-            {isEditing ? (
-              <>
-                <Button type="primary" onClick={save}>
-                  Save
-                </Button>
-                <Button onClick={() => goToView(selectedId)}>Cancel</Button>
-              </>
-            ) : (
-              <>
-                <Button type="primary" onClick={() => setMode("edit")}>
-                  Edit
-                </Button>
-                <Popconfirm
-                  title={`Delete ${selectedCharacter?.name}?`}
-                  description="This cannot be undone."
-                  okText="Delete"
-                  okButtonProps={{ danger: true }}
-                  onConfirm={onDelete}
-                >
-                  <Button danger>Delete</Button>
-                </Popconfirm>
-              </>
-            )}
-          </Space>
-
-          {watchedClass && (
-            <>
-              <Divider orientation="left">{watchedClass.name}</Divider>
-              <Descriptions
-                size="small"
-                column={1}
-                bordered
-                style={{ maxWidth: 640 }}
-              >
-                <Descriptions.Item label="Base Class">
-                  {watchedClass.baseClass}
-                </Descriptions.Item>
-                <Descriptions.Item label="2nd Job">
-                  {watchedClass.secondJob}
-                </Descriptions.Item>
-                {watchedSkills.length ? (
-                  watchedSkills.map((skill) => (
-                    <Descriptions.Item key={skill.id} label={skill.slot}>
-                      {skill.name}
-                    </Descriptions.Item>
-                  ))
-                ) : (
-                  <Descriptions.Item label="Skills">
-                    <Text type="secondary">Not added yet</Text>
-                  </Descriptions.Item>
-                )}
-              </Descriptions>
-            </>
-          )}
-        </>
-      )}
     </div>
   );
 };

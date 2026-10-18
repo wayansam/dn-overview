@@ -1,4 +1,4 @@
-// User flows on the General, ID and Character screens, which manage the
+// User flows on the ID and Character screens, which manage the
 // characters saved in localStorage.
 import {
   act,
@@ -49,9 +49,9 @@ beforeEach(() => {
   saveCharacterStore(seed);
 });
 
-describe("General", () => {
+describe("Character list", () => {
   test("lists characters and tags the main one", () => {
-    const { container } = renderScreen(TAB_KEY.mainGeneral);
+    const { container } = renderScreen(TAB_KEY.mainCharacter);
     expect(screen.getByText("Characters (3/25)")).toBeInTheDocument();
     expect(listedNames(container)).toEqual(["Alice", "Bob", "Cara"]);
     const aliceRow = screen.getByText("Alice").closest("tr")!;
@@ -59,7 +59,7 @@ describe("General", () => {
   });
 
   test("filters by name and clears the filter", () => {
-    const { container } = renderScreen(TAB_KEY.mainGeneral);
+    const { container } = renderScreen(TAB_KEY.mainCharacter);
     type(screen.getByPlaceholderText("Find by name"), "BO");
     expect(listedNames(container)).toEqual(["Bob"]);
 
@@ -68,7 +68,7 @@ describe("General", () => {
   });
 
   test("filters by class, base class and ID", () => {
-    const { container } = renderScreen(TAB_KEY.mainGeneral);
+    const { container } = renderScreen(TAB_KEY.mainCharacter);
     chooseOption(getSelectByPlaceholder(container, "Class"), "Moonlord");
     expect(listedNames(container)).toEqual(["Cara"]);
 
@@ -82,27 +82,24 @@ describe("General", () => {
   });
 
   test("says so when no character matches", () => {
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     type(screen.getByPlaceholderText("Find by name"), "zzz");
     expect(screen.getByText("No character matches")).toBeInTheDocument();
   });
 
-  test("Details opens that character", () => {
-    const { store } = renderScreen(TAB_KEY.mainGeneral);
+  test("Details opens that character in a modal", () => {
+    renderScreen(TAB_KEY.mainCharacter);
     const bobRow = screen.getByText("Bob").closest("tr")!;
     click(within(bobRow).getByText("Details"));
-    expect(store.getState().UIState.selectedSideBar).toMatchObject({
-      key: TAB_KEY.mainCharacter,
-      payload: { characterScreen: { characterId: "c2" } },
-    });
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByLabelText("Name")).toHaveValue("Bob");
   });
 
-  test("Add opens a blank character form", () => {
-    const { store } = renderScreen(TAB_KEY.mainGeneral);
+  test("Add opens a blank character form in a modal", () => {
+    renderScreen(TAB_KEY.mainCharacter);
     click(screen.getByRole("button", { name: /Add/ }));
-    expect(store.getState().UIState.selectedSideBar.payload).toEqual({
-      characterScreen: { isNew: true },
-    });
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByLabelText("Name")).toHaveValue("");
   });
 
   // The phone layout (jsdom has no screen width) lists the optional columns
@@ -112,7 +109,7 @@ describe("General", () => {
       ?.textContent;
 
   test("lists every optional column by default", () => {
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     expect(details("Alice")).toBe(
       "Level: 90 · Class: Gladiator · Base Class: Warrior · ID: MainID"
     );
@@ -120,7 +117,7 @@ describe("General", () => {
   });
 
   test("column settings hide and reorder columns, and are saved", () => {
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     click(screen.getByRole("button", { name: /Columns/ }));
     const popover = document.querySelector(".ant-popover")! as HTMLElement;
 
@@ -140,7 +137,7 @@ describe("General", () => {
 
   test("reads the older saved format (visible columns only)", () => {
     localStorage.setItem(LS_KEYS.character_columns, JSON.stringify(["classId"]));
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     expect(details("Alice")).toBe("Class: Gladiator");
   });
 
@@ -149,7 +146,7 @@ describe("General", () => {
       LS_KEYS.character_columns,
       JSON.stringify({ order: ["bogus", "groupId", "groupId"], visible: "x" })
     );
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     expect(details("Alice")).toBe(
       "ID: MainID · Level: 90 · Class: Gladiator · Base Class: Warrior"
     );
@@ -157,7 +154,7 @@ describe("General", () => {
 
   test("falls back to the defaults when the saved setting is unreadable", () => {
     localStorage.setItem(LS_KEYS.character_columns, "{broken");
-    renderScreen(TAB_KEY.mainGeneral);
+    renderScreen(TAB_KEY.mainCharacter);
     expect(details("Alice")).toBe(
       "Level: 90 · Class: Gladiator · Base Class: Warrior · ID: MainID"
     );
@@ -238,31 +235,35 @@ describe("ID", () => {
   });
 });
 
-describe("Character", () => {
-  const field = (label: string) => screen.getByLabelText(label);
+describe("Character detail", () => {
+  const field = (label: string) =>
+    within(screen.getByRole("dialog")).getByLabelText(label);
+  const openDetails = (name: string) =>
+    click(within(screen.getByText(name).closest("tr")!).getByText("Details"));
 
-  test("opens the main character, read-only, with class details", () => {
+  test("opens read-only, with class details", () => {
     renderScreen(TAB_KEY.mainCharacter);
+    openDetails("Alice");
     expect(field("Name")).toHaveValue("Alice");
     expect(field("Name")).toBeDisabled();
     expect(screen.getByText("Warrior")).toBeInTheDocument();
   });
 
-  test("shows an empty state without characters", () => {
-    localStorage.clear();
-    renderScreen(TAB_KEY.mainCharacter);
-    expect(
-      screen.getByText("No character yet, use Add to create one")
-    ).toBeInTheDocument();
+  test("opens the character requested by another screen", () => {
+    const { store } = renderScreen(TAB_KEY.mainId);
+    click(within(screen.getByText("Bob").closest("tr")!).getByText("Details"));
+    expect(store.getState().UIState.selectedSideBar.key).toBe(
+      TAB_KEY.mainCharacter
+    );
   });
 
   test("creates a character", async () => {
-    const { store, container } = renderScreen(TAB_KEY.mainCharacter);
+    const { store } = renderScreen(TAB_KEY.mainCharacter);
     click(screen.getByRole("button", { name: /Add/ }));
     type(field("Name"), "Dan");
     type(field("Level"), "55");
     chooseOption(
-      container.querySelector<HTMLElement>("#classId")!.closest(".ant-select")!,
+      document.querySelector<HTMLElement>("#classId")!.closest(".ant-select")!,
       "Sniper"
     );
     click(screen.getByRole("button", { name: "Save" }));
@@ -289,6 +290,7 @@ describe("Character", () => {
 
   test("edits a character", async () => {
     const { store } = renderScreen(TAB_KEY.mainCharacter);
+    openDetails("Alice");
     click(screen.getByRole("button", { name: "Edit" }));
     type(field("Level"), "95");
     click(screen.getByRole("button", { name: "Save" }));
@@ -300,6 +302,7 @@ describe("Character", () => {
 
   test("deletes a character after confirming", async () => {
     const { store } = renderScreen(TAB_KEY.mainCharacter);
+    openDetails("Alice");
     click(screen.getByRole("button", { name: "Delete" }));
     const confirm = await screen.findByText("Delete Alice?");
     click(within(confirm.closest(".ant-popover")! as HTMLElement).getByRole("button", { name: "Delete" }));
@@ -315,16 +318,19 @@ describe("Character", () => {
 
   test("asks before discarding unsaved changes", async () => {
     const { store } = renderScreen(TAB_KEY.mainCharacter);
+    openDetails("Alice");
     click(screen.getByRole("button", { name: "Edit" }));
     type(field("Level"), "1");
     expect(store.getState().UIState.hasUnsavedChanges).toBe(true);
 
-    click(screen.getByRole("button", { name: /Add/ }));
-    const dialog = await screen.findByRole("dialog");
-    expect(dialog).toHaveTextContent("Save current changes?");
-    click(within(dialog).getByRole("button", { name: "Discard" }));
+    click(screen.getByRole("button", { name: "Close" }));
+    expect(
+      (await screen.findAllByText("Save current changes?")).length
+    ).toBeGreaterThan(0);
+    click(screen.getByRole("button", { name: "Discard" }));
 
-    await waitFor(() => expect(field("Name")).toHaveValue(""));
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    expect(store.getState().UIState.hasUnsavedChanges).toBe(false);
     expect(store.getState().Character.characters[0].level).toBe(90);
   });
 });
