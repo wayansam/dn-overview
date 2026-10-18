@@ -105,6 +105,9 @@ const TaskSlice = createSlice({
       state.excludedCharacters = action.payload.excludedCharacters;
       state.hiddenActivities = action.payload.hiddenActivities;
     },
+    setShownRewards: (state, action: PayloadAction<string[]>) => {
+      state.shownRewards = action.payload;
+    },
   },
 });
 
@@ -118,4 +121,5 @@ export const {
   setActivityFloor,
   resetCharacterActivities,
   saveWeeklyCharacterSetting,
+  setShownRewards,
 } = TaskSlice.actions;

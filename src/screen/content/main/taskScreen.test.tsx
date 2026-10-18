@@ -12,6 +12,7 @@ import { TASK_STORE_VERSION } from "../../../constants/Task.constants";
 import { LS_KEYS } from "../../../constants/localStorage.constants";
 import { chooseOption, renderScreen } from "../../../testUtils";
 import { addTask } from "../../../slice/Task.reducer";
+import { formatGold } from "../../../utils/reward.util";
 import { saveCharacterStore } from "../../../utils/characterStorage.util";
 import {
   formatDate,
@@ -306,7 +307,7 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
 
   test("Customize excludes a character from an activity", async () => {
     const { store } = renderScreen(TAB_KEY.mainTask);
-    click(screen.getByRole("button", { name: /Customize/ }));
+    click(within(section()).getByRole("button", { name: /Customize/ }));
     chooseOption(
       document
         .querySelector<HTMLElement>("#exclude-fissionMaze")!
@@ -330,7 +331,7 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
 
   test("Add All excludes every character from an activity", async () => {
     const { store } = renderScreen(TAB_KEY.mainTask);
-    click(screen.getByRole("button", { name: /Customize/ }));
+    click(within(section()).getByRole("button", { name: /Customize/ }));
     const addAll = within(activityBlock("nightmare")).getByRole("button", {
       name: "Add All",
     });
@@ -348,7 +349,7 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
 
   test("Hide removes an activity column, Show brings it back", async () => {
     const { store } = renderScreen(TAB_KEY.mainTask);
-    click(screen.getByRole("button", { name: /Customize/ }));
+    click(within(section()).getByRole("button", { name: /Customize/ }));
     click(
       within(activityBlock("fissionMaze")).getByRole("button", {
         name: /Hide/,
@@ -364,7 +365,7 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
     ).toBeNull();
     expect(within(row("Alice")).getAllByRole("checkbox")).toHaveLength(2);
 
-    click(screen.getByRole("button", { name: /Customize/ }));
+    click(within(section()).getByRole("button", { name: /Customize/ }));
     await waitFor(() =>
       expect(
         within(activityBlock("fissionMaze")).getByRole("button", {
@@ -418,6 +419,97 @@ describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
     expect(screen.getByRole("dialog")).toHaveTextContent(
       "Ark of Transcendence- (12F)",
     );
+  });
+});
+
+describe("Weekly Rewards", () => {
+  const section = () => screen.getByRole("region", { name: "Weekly Rewards" });
+
+  test("asks for a floor when none is picked", () => {
+    renderScreen(TAB_KEY.mainTask);
+    expect(section()).toHaveTextContent(
+      "Pick a Fission Maze or Ark of Transcendence floor",
+    );
+  });
+
+  test("Customize keeps chosen resources shown, Show all lists the rest", async () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: {},
+      characterFloors: { c1: { fissionMaze: "Ascension 2F" } },
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    const items = () =>
+      Array.from(section().querySelectorAll("tbody tr td:first-child")).map(
+        (cell) => cell.textContent,
+      );
+    expect(items()).toEqual([
+      "Gold",
+      "Erosion Fragment",
+      "Concentrated Erosion Fragment",
+    ]);
+    expect(
+      within(section()).queryByRole("button", { name: /Show all/ }),
+    ).toBeNull();
+
+    click(within(section()).getByRole("button", { name: /Customize/ }));
+    const dialog = await screen.findByRole("dialog");
+    click(within(dialog).getByRole("button", { name: "Clear" }));
+    click(within(dialog).getByLabelText("Erosion Fragment"));
+    click(within(dialog).getByLabelText("Hero Coins"));
+    click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(store.getState().Task.shownRewards).toEqual([
+        "Erosion Fragment",
+        "Hero Coins",
+      ]),
+    );
+    expect(items()).toEqual(["Erosion Fragment", "Hero Coins"]);
+
+    click(within(section()).getByRole("button", { name: /Show all/ }));
+    expect(items()).toEqual([
+      "Gold",
+      "Erosion Fragment",
+      "Concentrated Erosion Fragment",
+      "Hero Coins",
+    ]);
+    click(within(section()).getByRole("button", { name: /Show selected/ }));
+    expect(items()).toEqual(["Erosion Fragment", "Hero Coins"]);
+  });
+
+  test("sums the picked floors and updates when one is ticked", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: {},
+      characterFloors: {
+        c1: { fissionMaze: "Ascension 2F" },
+        c2: { fissionMaze: "Ascension 2F" },
+      },
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    renderScreen(TAB_KEY.mainTask);
+    expect(section()).toHaveTextContent("0/2 cleared");
+    const row = (name: string) =>
+      within(section()).getByText(name).closest("tr")!;
+    expect(row("Gold")).toHaveTextContent(
+      formatGold(0) + formatGold(2 * 189750000),
+    );
+    expect(row("Concentrated Erosion Fragment")).toHaveTextContent("08 ~ 24");
+
+    const aliceCard = within(
+      screen.getByRole("region", { name: "Weekly [Character]" }),
+    )
+      .getByText("Alice")
+      .closest(".ant-card")! as HTMLElement;
+    click(within(aliceCard).getByRole("checkbox", { name: "Fission Maze" }));
+    expect(section()).toHaveTextContent("1/2 cleared");
+    expect(row("Erosion Fragment")).toHaveTextContent("3264");
   });
 });
 
@@ -497,6 +589,18 @@ describe("taskStorage.util", () => {
     expect(loadTaskStore().characterFloors).toEqual({
       c1: { fissionMaze: "Ascension 3-1F" },
     });
+  });
+
+  test("keeps only known shown rewards", () => {
+    localStorage.setItem(
+      LS_KEYS.tasks,
+      JSON.stringify({
+        shownRewards: ["Hero Coins", "Removed Item", 3, "Gold"],
+      }),
+    );
+    expect(loadTaskStore().shownRewards).toEqual(["Gold", "Hero Coins"]);
+    localStorage.setItem(LS_KEYS.tasks, JSON.stringify({}));
+    expect(loadTaskStore().shownRewards).toBeUndefined();
   });
 
   test("falls back to empty on unreadable storage", () => {

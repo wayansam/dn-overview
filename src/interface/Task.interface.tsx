@@ -36,4 +36,7 @@ export interface TaskStore {
   excludedCharacters: Record<string, string[]>;
   // Weekly Character: activities left out of the table.
   hiddenActivities: string[];
+  // Weekly Rewards: resources always listed. Missing until customized, which
+  // lists every resource being earned.
+  shownRewards?: string[];
 }

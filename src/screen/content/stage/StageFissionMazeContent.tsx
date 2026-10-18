@@ -14,6 +14,7 @@ import {
   FissionMazeErosionReward,
   FissionMazeRangeReward,
 } from "../../../interface/reward.interface";
+import { formatGold, formatRange } from "../../../utils/reward.util";
 
 const { Text } = Typography;
 
@@ -26,19 +27,6 @@ interface RewardRow {
   mats: string;
   amount: string;
 }
-
-const formatGold = (copper: number) => {
-  const g = Math.floor(copper / 10000);
-  const s = Math.floor((copper % 10000) / 100);
-  const c = copper % 100;
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  return `${g.toLocaleString()}g ${pad(s)}s ${pad(c)}c`;
-};
-
-const formatRange = (min: number, max?: number) =>
-  max === undefined
-    ? min.toLocaleString()
-    : `${min.toLocaleString()} ~ ${max.toLocaleString()}`;
 
 const toRows = (list: FissionMazeRangeReward[]): RewardRow[] =>
   list.map((it) => ({ mats: it.name, amount: formatRange(it.min, it.max) }));

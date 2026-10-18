@@ -2,14 +2,22 @@ import { TaskCategory, TaskInfo } from "../../interface/Task.interface";
 import { aotRewardS4PastWeek } from "../stage/StageAoTData";
 import { fmErosionAscension } from "../stage/StageFissionMazeData";
 
-// Floors from the Stage screens, latest era / season only: Fission Maze
-// Ascension (v180) and Ark of Transcendence Season 4 [Past]. Update these
-// when a new era or season is added.
-const fissionMazeFloors = fmErosionAscension.map(({ floor }) => ({
+// Floors and weekly rewards come from the Stage data, latest era / season
+// only. Update these two when a new era or season is added.
+export const FISSION_MAZE_WEEKLY = {
+  label: "Erosion Reward Box, Ascension (v180)",
+  data: fmErosionAscension,
+};
+export const AOT_WEEKLY = {
+  label: "Weekly Clear, Season 4 [Past]",
+  data: aotRewardS4PastWeek,
+};
+
+const fissionMazeFloors = FISSION_MAZE_WEEKLY.data.map(({ floor }) => ({
   label: floor,
   value: floor,
 }));
-const aotFloors = aotRewardS4PastWeek.map(({ floor }) => ({
+const aotFloors = AOT_WEEKLY.data.map(({ floor }) => ({
   label: `${floor}F`,
   value: String(floor),
 }));

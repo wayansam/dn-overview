@@ -2,6 +2,7 @@ import { LS_KEYS } from "../constants/localStorage.constants";
 import { TASK_STORE_VERSION } from "../constants/Task.constants";
 import { getTaskById } from "../data/task/TaskData";
 import { DateMap, TaskEntry, TaskStore } from "../interface/Task.interface";
+import { getAllRewardNames } from "./weeklyReward.util";
 
 export const emptyTaskStore = (): TaskStore => ({
   version: TASK_STORE_VERSION,
@@ -115,6 +116,7 @@ export const loadTaskStore = (): TaskStore => {
       characterFloors,
       excludedCharacters,
       hiddenActivities,
+      shownRewards,
     } = parsed as Record<string, unknown>;
     return {
       version: TASK_STORE_VERSION,
@@ -131,6 +133,10 @@ export const loadTaskStore = (): TaskStore => {
         (id): id is string =>
           typeof id === "string" && isWeeklyCharacterTask(id),
       ),
+      // Resources no longer in the Stage data are dropped.
+      shownRewards: Array.isArray(shownRewards)
+        ? getAllRewardNames().filter((name) => shownRewards.includes(name))
+        : undefined,
     };
   } catch {
     return emptyTaskStore();

@@ -17,6 +17,7 @@ import { ColumnsType } from "antd/es/table";
 import { ComponentProps, ReactNode, useState } from "react";
 import TaskFormModal from "../../../components/TaskFormModal";
 import WeeklyCharacterTable from "../../../components/WeeklyCharacterTable";
+import WeeklyRewardSummary from "../../../components/WeeklyRewardSummary";
 import { TASK_LIMIT } from "../../../constants/Task.constants";
 import { getTaskById } from "../../../data/task/TaskData";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
@@ -190,6 +191,7 @@ const TaskContent = () => (
   <div>
     <TaskTable category="weeklyAccount" title="Weekly [Account]" />
     <WeeklyCharacterTable />
+    <WeeklyRewardSummary />
   </div>
 );
 
