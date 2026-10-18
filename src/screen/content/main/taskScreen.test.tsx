@@ -1,10 +1,17 @@
 // User flows on the Task screen.
-import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { TAB_KEY } from "../../../constants/Common.constants";
 import { CHARACTER_STORE_VERSION } from "../../../constants/Character.constants";
 import { TASK_STORE_VERSION } from "../../../constants/Task.constants";
 import { LS_KEYS } from "../../../constants/localStorage.constants";
 import { chooseOption, renderScreen } from "../../../testUtils";
+import { addTask } from "../../../slice/Task.reducer";
 import { saveCharacterStore } from "../../../utils/characterStorage.util";
 import {
   formatDate,
@@ -20,9 +27,9 @@ const click = (element: Element) =>
 
 // The antd Select of a form field in the open dialog.
 const field = (id: string) =>
-  document.querySelector<HTMLElement>(`#${id}`)!.closest<HTMLElement>(
-    ".ant-select"
-  )!;
+  document
+    .querySelector<HTMLElement>(`#${id}`)!
+    .closest<HTMLElement>(".ant-select")!;
 const fieldText = (id: string) =>
   field(id).querySelector(".ant-select-selection-item")?.textContent;
 
@@ -35,13 +42,86 @@ beforeEach(() => {
       { id: "g2", name: "AltID" },
     ],
     characters: [
-      { id: "c1", name: "Alice", level: 90, classId: "gladiator", groupId: "g1" },
+      {
+        id: "c1",
+        name: "Alice",
+        level: 90,
+        classId: "gladiator",
+        groupId: "g1",
+      },
       { id: "c2", name: "Bob", level: 80, classId: "sniper", groupId: "g2" },
     ],
   });
 });
 
-describe("Weekly Account", () => {
+// Both tables switch layout below antd's md breakpoint. jsdom has no screen
+// width, so matchMedia is faked: "wide" matches every breakpoint, "phone"
+// none (the default from setupTests).
+const LAYOUTS = [
+  ["wide", true],
+  ["phone", false],
+] as const;
+const useLayout = (isWide: boolean) => {
+  const original = window.matchMedia;
+  beforeEach(() => {
+    window.matchMedia = ((query: string) => ({
+      ...original(query),
+      matches: isWide,
+    })) as typeof window.matchMedia;
+  });
+  afterEach(() => {
+    window.matchMedia = original;
+  });
+};
+
+describe.each(LAYOUTS)("Weekly Account (%s)", (_, isWide) => {
+  useLayout(isWide);
+
+  test("phones list ID, character and date under the name", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [
+        {
+          id: "t1",
+          category: "weeklyAccount",
+          taskId: "goldDragonNest",
+          groupId: "g1",
+          characterId: "c1",
+        },
+      ],
+      characterClears: {},
+      characterFloors: {},
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    renderScreen(TAB_KEY.mainTask);
+    const headers = within(
+      screen.getByRole("region", { name: "Weekly [Account]" }),
+    )
+      .getAllByRole("columnheader")
+      .map((el) => el.textContent);
+    if (isWide) {
+      expect(headers).toEqual([
+        "Name",
+        "ID",
+        "Character",
+        "Last Cleared",
+        "Action",
+      ]);
+      expect(screen.getByRole("button", { name: "Done" })).toHaveTextContent(
+        "Done",
+      );
+    } else {
+      expect(headers).toEqual(["Name", "Action"]);
+      expect(screen.getByText("MainID · Alice")).toBeInTheDocument();
+      expect(screen.getByText("Last cleared: -")).toBeInTheDocument();
+      // Icon-only, still named for screen readers.
+      expect(screen.getByRole("button", { name: "Done" })).toHaveTextContent(
+        "",
+      );
+    }
+  });
+
   test("adds a task with ID and character", async () => {
     const { store } = renderScreen(TAB_KEY.mainTask);
     click(screen.getByRole("button", { name: /Add/ }));
@@ -58,12 +138,37 @@ describe("Weekly Account", () => {
           groupId: "g1",
           characterId: "c1",
         }),
-      ])
+      ]),
     );
     const row = screen.getByText("Chaos Duel Nest").closest("tr")!;
-    expect(within(row).getByText("MainID")).toBeInTheDocument();
-    expect(within(row).getByText("Alice")).toBeInTheDocument();
-    expect(within(row).getByText("-")).toBeInTheDocument();
+    expect(row).toHaveTextContent("MainID");
+    expect(row).toHaveTextContent("Alice");
+    expect(row).toHaveTextContent("-");
+  });
+
+  test("is limited to 20 tasks", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: Array.from({ length: 20 }, (_, i) => ({
+        id: `t${i}`,
+        category: "weeklyAccount" as const,
+        taskId: "chaosDuelNest",
+      })),
+      characterClears: {},
+      characterFloors: {},
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    expect(screen.getByText("Weekly [Account] (20/20)")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Add/ })).toBeDisabled();
+
+    act(() => {
+      store.dispatch(
+        addTask({ category: "weeklyAccount", taskId: "goldDragonNest" }),
+      );
+    });
+    expect(store.getState().Task.entries).toHaveLength(20);
   });
 
   test("requires a task", async () => {
@@ -108,7 +213,7 @@ describe("Weekly Account", () => {
 
     click(within(row()).getByRole("button", { name: "Done" }));
     expect(store.getState().Task.entries[0].lastCleared).toBe(getToday());
-    expect(within(row()).getByText(formatDate(getToday()))).toBeInTheDocument();
+    expect(row()).toHaveTextContent(formatDate(getToday()));
 
     click(within(row()).getByRole("button", { name: "Reset" }));
     expect(store.getState().Task.entries[0].lastCleared).toBeUndefined();
@@ -118,23 +223,29 @@ describe("Weekly Account", () => {
     click(
       within(confirm.closest(".ant-popover")! as HTMLElement).getByRole(
         "button",
-        { name: "Delete" }
-      )
+        { name: "Delete" },
+      ),
     );
     await waitFor(() => expect(store.getState().Task.entries).toEqual([]));
   });
 });
 
-describe("Weekly Character", () => {
+describe.each(LAYOUTS)("Weekly Character (%s)", (_, isWide) => {
+  useLayout(isWide);
+
+  test("uses a table on wide screens and a card per character on phones", () => {
+    renderScreen(TAB_KEY.mainTask);
+    expect(within(section()).queryByRole("table") !== null).toBe(isWide);
+    expect(section().querySelectorAll(".ant-card")).toHaveLength(
+      isWide ? 0 : 2,
+    );
+  });
+
   // The Weekly Character table, found by any activity column header.
-  const table = () =>
-    screen
-      .getAllByRole("columnheader", {
-        name: /^(Fission Maze|Ark of Transcendence|Nightmare)$/,
-      })[0]
-      .closest("table")!;
+  const section = () =>
+    screen.getByRole("region", { name: "Weekly [Character]" });
   const row = (name: string) =>
-    within(table()).getByText(name).closest("tr")! as HTMLElement;
+    within(section()).getByText(name).closest("tr, .ant-card")! as HTMLElement;
 
   test("lists every character with a checkbox per activity", () => {
     renderScreen(TAB_KEY.mainTask);
@@ -200,14 +311,14 @@ describe("Weekly Character", () => {
       document
         .querySelector<HTMLElement>("#exclude-fissionMaze")!
         .closest<HTMLElement>(".ant-select")!,
-      "Bob"
+      "Bob",
     );
     click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() =>
       expect(store.getState().Task.excludedCharacters.fissionMaze).toEqual([
         "c2",
-      ])
+      ]),
     );
     expect(within(row("Bob")).getAllByRole("checkbox")).toHaveLength(2);
     expect(within(row("Bob")).getByText("-")).toBeInTheDocument();
@@ -231,7 +342,7 @@ describe("Weekly Character", () => {
       expect(store.getState().Task.excludedCharacters.nightmare).toEqual([
         "c1",
         "c2",
-      ])
+      ]),
     );
   });
 
@@ -239,15 +350,17 @@ describe("Weekly Character", () => {
     const { store } = renderScreen(TAB_KEY.mainTask);
     click(screen.getByRole("button", { name: /Customize/ }));
     click(
-      within(activityBlock("fissionMaze")).getByRole("button", { name: /Hide/ })
+      within(activityBlock("fissionMaze")).getByRole("button", {
+        name: /Hide/,
+      }),
     );
     click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() =>
-      expect(store.getState().Task.hiddenActivities).toEqual(["fissionMaze"])
+      expect(store.getState().Task.hiddenActivities).toEqual(["fissionMaze"]),
     );
     expect(
-      screen.queryByRole("columnheader", { name: "Fission Maze" })
+      screen.queryByRole("columnheader", { name: "Fission Maze" }),
     ).toBeNull();
     expect(within(row("Alice")).getAllByRole("checkbox")).toHaveLength(2);
 
@@ -256,15 +369,17 @@ describe("Weekly Character", () => {
       expect(
         within(activityBlock("fissionMaze")).getByRole("button", {
           name: /Show/,
-        })
-      ).toBeInTheDocument()
+        }),
+      ).toBeInTheDocument(),
     );
     click(
-      within(activityBlock("fissionMaze")).getByRole("button", { name: /Show/ })
+      within(activityBlock("fissionMaze")).getByRole("button", {
+        name: /Show/,
+      }),
     );
     click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() =>
-      expect(store.getState().Task.hiddenActivities).toEqual([])
+      expect(store.getState().Task.hiddenActivities).toEqual([]),
     );
   });
 
@@ -288,7 +403,11 @@ describe("Weekly Character", () => {
       c1: { arkOfTranscendence: "12" },
     });
 
-    click(within(row("Alice")).getByRole("checkbox", { name: "Ark of Transcendence" }));
+    click(
+      within(row("Alice")).getByRole("checkbox", {
+        name: "Ark of Transcendence",
+      }),
+    );
     click(within(row("Alice")).getByRole("button", { name: "Reset" }));
     expect(store.getState().Task.characterClears).toEqual({});
     expect(store.getState().Task.characterFloors.c1).toEqual({
@@ -297,7 +416,7 @@ describe("Weekly Character", () => {
 
     click(within(row("Alice")).getByRole("button", { name: "Details" }));
     expect(screen.getByRole("dialog")).toHaveTextContent(
-      "Ark of Transcendence- (12F)"
+      "Ark of Transcendence- (12F)",
     );
   });
 });
@@ -315,11 +434,16 @@ describe("taskStorage.util", () => {
       LS_KEYS.tasks,
       JSON.stringify({
         entries: [
-          { id: "a", category: "weeklyAccount", taskId: "chaosDuelNest", lastCleared: "x" },
+          {
+            id: "a",
+            category: "weeklyAccount",
+            taskId: "chaosDuelNest",
+            lastCleared: "x",
+          },
           { id: "b", category: "weeklyAccount", taskId: "removedTask" },
           "junk",
         ],
-      })
+      }),
     );
     expect(loadTaskStore().entries).toEqual([
       {
@@ -338,11 +462,19 @@ describe("taskStorage.util", () => {
       LS_KEYS.tasks,
       JSON.stringify({
         characterClears: {
-          c1: { nightmare: "2026-10-01", chaosDuelNest: "2026-10-01", fissionMaze: "x" },
+          c1: {
+            nightmare: "2026-10-01",
+            chaosDuelNest: "2026-10-01",
+            fissionMaze: "x",
+          },
           c2: "junk",
         },
-        excludedCharacters: { nightmare: ["c1", 5], removed: ["c2"], fissionMaze: "x" },
-      })
+        excludedCharacters: {
+          nightmare: ["c1", 5],
+          removed: ["c2"],
+          fissionMaze: "x",
+        },
+      }),
     );
     const store = loadTaskStore();
     expect(store.characterClears).toEqual({ c1: { nightmare: "2026-10-01" } });
@@ -360,7 +492,7 @@ describe("taskStorage.util", () => {
             nightmare: "1",
           },
         },
-      })
+      }),
     );
     expect(loadTaskStore().characterFloors).toEqual({
       c1: { fissionMaze: "Ascension 3-1F" },

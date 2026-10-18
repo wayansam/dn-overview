@@ -5,8 +5,11 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
+  Card,
   Checkbox,
   Descriptions,
+  Empty,
+  Grid,
   Modal,
   Select,
   Space,
@@ -27,13 +30,19 @@ import {
 } from "../slice/Task.reducer";
 import { formatDate } from "../utils/taskStorage.util";
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const ACTIVITIES = getTasksByCategory("weeklyCharacter");
+type Activity = (typeof ACTIVITIES)[number];
+
+const FLOOR_WIDTH: Record<string, number> = { fissionMaze: 150 };
 
 // Every character as a row, with a checkbox per activity. Excluded
-// characters show "-" for that activity.
+// characters show "-" for that activity. Small screens show one card per
+// character instead, with one line per activity.
 const WeeklyCharacterTable = () => {
   const dispatch = useAppDispatch();
+  const isCompact = !useBreakpoint().md;
   const characters = useAppSelector((state) => state.Character.characters);
   const {
     characterClears,
@@ -54,79 +63,143 @@ const WeeklyCharacterTable = () => {
     )?.label;
   };
 
+  const shownActivities = ACTIVITIES.filter(
+    (activity) => !hiddenActivities.includes(activity.id),
+  );
+
+  // `label` shows the activity name next to the box (card layout).
+  const renderCheckbox = (
+    activity: Activity,
+    characterId: string,
+    label?: string,
+  ) => {
+    const date = characterClears[characterId]?.[activity.id];
+    return (
+      <Tooltip title={date ? `Cleared ${formatDate(date)}` : ""}>
+        <Checkbox
+          aria-label={activity.name}
+          checked={!!date}
+          onChange={(e) =>
+            dispatch(
+              setActivityCleared(characterId, activity.id, e.target.checked),
+            )
+          }
+        >
+          {label}
+        </Checkbox>
+      </Tooltip>
+    );
+  };
+
+  const renderFloor = (activity: Activity, id: string) =>
+    activity.floors && (
+      <Select
+        size="small"
+        allowClear
+        showSearch
+        optionFilterProp="label"
+        placeholder="Floor"
+        aria-label={`${activity.name} floor`}
+        options={activity.floors}
+        value={characterFloors[id]?.[activity.id]}
+        onChange={(floor?: string) =>
+          dispatch(
+            setActivityFloor({
+              characterId: id,
+              activityId: activity.id,
+              floor,
+            }),
+          )
+        }
+        popupMatchSelectWidth={false}
+        style={{ width: FLOOR_WIDTH[activity.id] ?? 80 }}
+      />
+    );
+
+  const renderActions = (character: Character) => (
+    <Space size={4}>
+      <Button size="small" onClick={() => setDetailCharacter(character)}>
+        Details
+      </Button>
+      <Button
+        size="small"
+        disabled={!characterClears[character.id]}
+        onClick={() => dispatch(resetCharacterActivities(character.id))}
+      >
+        Reset
+      </Button>
+    </Space>
+  );
+
   const columns: ColumnsType<Character> = [
     { title: "Character", dataIndex: "name", key: "name" },
-    ...ACTIVITIES.filter(
-      (activity) => !hiddenActivities.includes(activity.id),
-    ).map((activity): ColumnsType<Character>[number] => ({
+    ...shownActivities.map((activity): ColumnsType<Character>[number] => ({
       title: activity.name,
       key: activity.id,
       align: "center",
-      render: (_, { id }) => {
-        if (isExcluded(activity.id, id)) return "-";
-        const date = characterClears[id]?.[activity.id];
-        return (
+      render: (_, { id }) =>
+        isExcluded(activity.id, id) ? (
+          "-"
+        ) : (
           <Space size={8}>
-            <Tooltip title={date ? `Cleared ${formatDate(date)}` : ""}>
-              <Checkbox
-                aria-label={activity.name}
-                checked={!!date}
-                onChange={(e) =>
-                  dispatch(
-                    setActivityCleared(id, activity.id, e.target.checked),
-                  )
-                }
-              />
-            </Tooltip>
-            {activity.floors && (
-              <Select
-                size="small"
-                allowClear
-                showSearch
-                optionFilterProp="label"
-                placeholder="Floor"
-                aria-label={`${activity.name} floor`}
-                options={activity.floors}
-                value={characterFloors[id]?.[activity.id]}
-                onChange={(floor?: string) =>
-                  dispatch(
-                    setActivityFloor({
-                      characterId: id,
-                      activityId: activity.id,
-                      floor,
-                    }),
-                  )
-                }
-                popupMatchSelectWidth={false}
-                style={{ width: activity.id === "fissionMaze" ? 150 : 80 }}
-              />
-            )}
+            {renderCheckbox(activity, id)}
+            {renderFloor(activity, id)}
           </Space>
-        );
-      },
+        ),
     })),
     {
       title: "Action",
       key: "action",
-      render: (_, character) => (
-        <Space wrap>
-          <Button size="small" onClick={() => setDetailCharacter(character)}>
-            Details
-          </Button>
-          <Button
-            size="small"
-            disabled={!characterClears[character.id]}
-            onClick={() => dispatch(resetCharacterActivities(character.id))}
-          >
-            Reset
-          </Button>
-        </Space>
-      ),
+      render: (_, character) => renderActions(character),
     },
   ];
 
+  const cards = characters.length ? (
+    <Space direction="vertical" size={8} style={{ width: "100%" }}>
+      {characters.map((character) => (
+        <Card
+          key={character.id}
+          size="small"
+          title={character.name}
+          extra={renderActions(character)}
+        >
+          {shownActivities.length ? (
+            shownActivities.map((activity) => (
+              <div
+                key={activity.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 8,
+                  minHeight: 32,
+                }}
+              >
+                {isExcluded(activity.id, character.id) ? (
+                  <>
+                    <Text type="secondary">{activity.name}</Text>
+                    <Text type="secondary">-</Text>
+                  </>
+                ) : (
+                  <>
+                    {renderCheckbox(activity, character.id, activity.name)}
+                    {renderFloor(activity, character.id)}
+                  </>
+                )}
+              </div>
+            ))
+          ) : (
+            <Text type="secondary">Every activity is hidden</Text>
+          )}
+        </Card>
+      ))}
+    </Space>
+  ) : (
+    <Empty description="No character yet, add one in the Character screen" />
+  );
+
   return (
-    <div style={{ marginBottom: 24 }}>
+    <section aria-label="Weekly [Character]" style={{ marginBottom: 24 }}>
       <Space
         style={{
           width: "100%",
@@ -142,17 +215,21 @@ const WeeklyCharacterTable = () => {
           Customize
         </Button>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={characters}
-        rowKey="id"
-        scroll={{ x: true }}
-        pagination={false}
-        locale={{
-          emptyText: "No character yet, add one in the Character screen",
-        }}
-        size={"small"}
-      />
+      {isCompact ? (
+        cards
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={characters}
+          rowKey="id"
+          scroll={{ x: true }}
+          pagination={false}
+          locale={{
+            emptyText: "No character yet, add one in the Character screen",
+          }}
+          size={"small"}
+        />
+      )}
       {isCustomizeOpen && (
         <CustomizeModal onClose={() => setIsCustomizeOpen(false)} />
       )}
@@ -186,7 +263,7 @@ const WeeklyCharacterTable = () => {
           </Descriptions>
         )}
       </Modal>
-    </div>
+    </section>
   );
 };
 

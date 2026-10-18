@@ -1,4 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { TASK_LIMIT } from "../constants/Task.constants";
 import { TaskEntry, TaskStore } from "../interface/Task.interface";
 import { generateId } from "../utils/characterStorage.util";
 import { getToday, loadTaskStore } from "../utils/taskStorage.util";
@@ -9,6 +10,10 @@ const TaskSlice = createSlice({
   reducers: {
     addTask: {
       reducer: (state, action: PayloadAction<TaskEntry>) => {
+        const count = state.entries.filter(
+          (item) => item.category === action.payload.category,
+        ).length;
+        if (count >= TASK_LIMIT) return;
         state.entries.push(action.payload);
       },
       prepare: (entry: Omit<TaskEntry, "id" | "lastCleared">) => ({
