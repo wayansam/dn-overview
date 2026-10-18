@@ -1,5 +1,14 @@
 import { PlusOutlined } from "@ant-design/icons";
-import { Button, Card, Space, Table, Tag, Tooltip, Typography } from "antd";
+import {
+  Button,
+  Card,
+  Grid,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from "antd";
 import { ColumnType } from "antd/es/table";
 import { useState } from "react";
 import { CHARACTER_LIMIT } from "../../constants/Character.constants";
@@ -9,6 +18,7 @@ import useCharacterNavigation from "../../hooks/useCharacterNavigation";
 import { Character } from "../../interface/Account.interface";
 import CharacterDetailModal from "../CharacterDetailModal";
 const { Text } = Typography;
+const { useBreakpoint } = Grid;
 
 // Compact character list for the General dashboard. The full table with
 // filters lives in the Character tab.
@@ -20,34 +30,51 @@ const CharacterWidget = () => {
   // Character shown in the detail modal, `{}` for a new one.
   const [detail, setDetail] = useState<{ characterId?: string }>();
   const isFull = characters.length >= CHARACTER_LIMIT;
+  const isCompact = !useBreakpoint().md;
 
-  const columns: ColumnType<Character>[] = [
-    {
-      title: "Name",
-      key: "name",
-      render: (_, { id, name }) => (
+  const getClassName = (classId: string) =>
+    getClassById(classId)?.name ?? classId;
+
+  const nameColumn: ColumnType<Character> = {
+    title: "Name",
+    key: "name",
+    render: (_, { id, name, level, classId }) => (
+      <Space direction="vertical" size={0}>
         <Space size={4}>
           <Text>{name}</Text>
           {id === mainCharacterId && <Tag color="gold">Main</Tag>}
         </Space>
-      ),
-    },
-    { title: "Level", key: "level", dataIndex: "level" },
-    {
-      title: "Class",
-      key: "classId",
-      render: (_, { classId }) => getClassById(classId)?.name ?? classId,
-    },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, { id }) => (
-        <Button size="small" onClick={() => setDetail({ characterId: id })}>
-          Details
-        </Button>
-      ),
-    },
-  ];
+        {isCompact && (
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Level: {level} · Class: {getClassName(classId)}
+          </Text>
+        )}
+      </Space>
+    ),
+  };
+  const actionColumn: ColumnType<Character> = {
+    title: "Action",
+    key: "action",
+    render: (_, { id }) => (
+      <Button size="small" onClick={() => setDetail({ characterId: id })}>
+        Details
+      </Button>
+    ),
+  };
+  // Small screens list level and class under the name, like the Character
+  // tab does.
+  const columns: ColumnType<Character>[] = isCompact
+    ? [nameColumn, actionColumn]
+    : [
+        nameColumn,
+        { title: "Level", key: "level", dataIndex: "level" },
+        {
+          title: "Class",
+          key: "classId",
+          render: (_, { classId }) => getClassName(classId),
+        },
+        actionColumn,
+      ];
 
   return (
     <Card

@@ -97,6 +97,22 @@ describe("General", () => {
     ).toBeInTheDocument();
   });
 
+  // jsdom has no screen width, so this is the small-screen layout.
+  test("character widget lists level and class under the name", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    const card = screen
+      .getByText("Characters (3/25)")
+      .closest(".ant-card")! as HTMLElement;
+    expect(
+      within(card)
+        .getAllByRole("columnheader")
+        .map((el) => el.textContent)
+    ).toEqual(["Name", "Action"]);
+    expect(
+      within(card).getByText("Level: 90 · Class: Gladiator")
+    ).toBeInTheDocument();
+  });
+
   test("character widget opens details in a modal", () => {
     renderScreen(TAB_KEY.mainGeneral);
     click(within(screen.getByText("Bob").closest("tr")!).getByText("Details"));
