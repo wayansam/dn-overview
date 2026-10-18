@@ -1,6 +1,4 @@
 import {
-  ArrowDownOutlined,
-  ArrowUpOutlined,
   OrderedListOutlined,
   PlusOutlined,
   SearchOutlined,
@@ -8,7 +6,6 @@ import {
 } from "@ant-design/icons";
 import {
   Button,
-  Checkbox,
   Grid,
   Input,
   Popover,
@@ -22,6 +19,7 @@ import {
 import { ColumnType } from "antd/es/table";
 import { Fragment, ReactNode, useMemo, useState } from "react";
 import CharacterDetailModal from "../../../components/CharacterDetailModal";
+import OrderSettingList from "../../../components/OrderSettingList";
 import ReorderListModal from "../../../components/ReorderListModal";
 import { CHARACTER_LIMIT } from "../../../constants/Character.constants";
 import { LS_KEYS } from "../../../constants/localStorage.constants";
@@ -29,6 +27,11 @@ import { getClassById } from "../../../data/character/ClassData";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { Character } from "../../../interface/Account.interface";
 import { reorderCharacters } from "../../../slice/Character.reducer";
+import {
+  OrderSetting,
+  loadOrderSetting,
+  saveOrderSetting,
+} from "../../../utils/orderSetting.util";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -43,53 +46,6 @@ const OPTIONAL_COLUMNS = [
   { label: "ID", value: "groupId" },
 ];
 const OPTIONAL_COLUMN_KEYS = OPTIONAL_COLUMNS.map((item) => item.value);
-
-interface ColumnSetting {
-  order: string[];
-  visible: string[];
-}
-const DEFAULT_COLUMN_SETTING: ColumnSetting = {
-  order: OPTIONAL_COLUMN_KEYS,
-  visible: OPTIONAL_COLUMN_KEYS,
-};
-
-const toKnownKeys = (value: unknown) =>
-  Array.isArray(value)
-    ? OPTIONAL_COLUMN_KEYS.filter((key) => value.includes(key))
-    : OPTIONAL_COLUMN_KEYS;
-
-// Never throws: unknown keys from old / hand-edited storage are dropped and
-// columns missing from the saved order are appended at the end. A plain array
-// is the older format that only stored the visible columns.
-const loadColumnSetting = (): ColumnSetting => {
-  try {
-    const raw = localStorage.getItem(LS_KEYS.character_columns);
-    if (!raw) return DEFAULT_COLUMN_SETTING;
-    const parsed: unknown = JSON.parse(raw);
-    if (Array.isArray(parsed)) {
-      return { order: OPTIONAL_COLUMN_KEYS, visible: toKnownKeys(parsed) };
-    }
-    if (typeof parsed !== "object" || parsed === null) {
-      return DEFAULT_COLUMN_SETTING;
-    }
-    const { order, visible } = parsed as Record<string, unknown>;
-    const savedOrder = Array.isArray(order)
-      ? order.filter(
-          (key, index): key is string =>
-            OPTIONAL_COLUMN_KEYS.includes(key) && order.indexOf(key) === index,
-        )
-      : [];
-    return {
-      order: [
-        ...savedOrder,
-        ...OPTIONAL_COLUMN_KEYS.filter((key) => !savedOrder.includes(key)),
-      ],
-      visible: toKnownKeys(visible),
-    };
-  } catch {
-    return DEFAULT_COLUMN_SETTING;
-  }
-};
 
 // Filter options only list values that exist in the current data.
 const toFilters = (values: { label: string; value: string }[]) =>
@@ -109,8 +65,9 @@ const CharacterContent = () => {
   const [classIds, setClassIds] = useState<string[]>([]);
   const [baseClasses, setBaseClasses] = useState<string[]>([]);
   const [groupIds, setGroupIds] = useState<string[]>([]);
-  const [columnSetting, setColumnSetting] =
-    useState<ColumnSetting>(loadColumnSetting);
+  const [columnSetting, setColumnSetting] = useState<OrderSetting>(() =>
+    loadOrderSetting(LS_KEYS.character_columns, OPTIONAL_COLUMN_KEYS),
+  );
   const isFull = characters.length >= CHARACTER_LIMIT;
   const payload = useAppSelector(
     (state) => state.UIState.selectedSideBar.payload?.characterScreen,
@@ -130,26 +87,9 @@ const CharacterContent = () => {
   const hasFilter =
     !!search || !!classIds.length || !!baseClasses.length || !!groupIds.length;
 
-  const saveColumnSetting = (setting: ColumnSetting) => {
+  const changeColumnSetting = (setting: OrderSetting) => {
     setColumnSetting(setting);
-    localStorage.setItem(LS_KEYS.character_columns, JSON.stringify(setting));
-  };
-
-  const toggleColumn = (key: string, checked: boolean) =>
-    saveColumnSetting({
-      ...columnSetting,
-      visible: checked
-        ? [...columnSetting.visible, key]
-        : columnSetting.visible.filter((item) => item !== key),
-    });
-
-  const moveColumn = (index: number, offset: -1 | 1) => {
-    const order = [...columnSetting.order];
-    [order[index], order[index + offset]] = [
-      order[index + offset],
-      order[index],
-    ];
-    saveColumnSetting({ ...columnSetting, order });
+    saveOrderSetting(LS_KEYS.character_columns, setting);
   };
 
   const clearFilters = () => {
@@ -261,43 +201,13 @@ const CharacterContent = () => {
   const filterStyle = { width: isCompact ? "100%" : 200 };
 
   const columnSettingContent = (
-    <Space direction="vertical" size={4}>
-      <Checkbox checked disabled>
-        Name
-      </Checkbox>
-      {columnSetting.order.map((key, index) => (
-        <Space
-          key={key}
-          style={{ width: "100%", justifyContent: "space-between" }}
-        >
-          <Checkbox
-            checked={columnSetting.visible.includes(key)}
-            onChange={(e) => toggleColumn(key, e.target.checked)}
-          >
-            {OPTIONAL_COLUMNS.find((item) => item.value === key)?.label}
-          </Checkbox>
-          <Space size={0}>
-            <Button
-              size="small"
-              type="text"
-              icon={<ArrowUpOutlined />}
-              disabled={index === 0}
-              onClick={() => moveColumn(index, -1)}
-            />
-            <Button
-              size="small"
-              type="text"
-              icon={<ArrowDownOutlined />}
-              disabled={index === columnSetting.order.length - 1}
-              onClick={() => moveColumn(index, 1)}
-            />
-          </Space>
-        </Space>
-      ))}
-      <Checkbox checked disabled>
-        Action
-      </Checkbox>
-    </Space>
+    <OrderSettingList
+      items={OPTIONAL_COLUMNS}
+      setting={columnSetting}
+      onChange={changeColumnSetting}
+      fixedTop={["Name"]}
+      fixedBottom={["Action"]}
+    />
   );
 
   return (

@@ -1,4 +1,4 @@
-// User flows on the ID and Character screens, which manage the
+// User flows on the General, ID and Character screens, which manage the
 // characters saved in localStorage.
 import {
   act,
@@ -47,6 +47,63 @@ const listedNames = (container: HTMLElement) =>
 beforeEach(() => {
   localStorage.clear();
   saveCharacterStore(seed);
+});
+
+describe("General", () => {
+  const widgetTitles = () =>
+    Array.from(document.querySelectorAll(".ant-card-head-title")).map(
+      (el) => el.textContent
+    );
+
+  test("shows every widget by default", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    expect(widgetTitles()).toEqual(["Characters (3/25)", "Release Notes"]);
+  });
+
+  test("Customize hides and reorders widgets, and is saved", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    click(screen.getByRole("button", { name: /Customize/ }));
+    const popover = document.querySelector(".ant-popover")! as HTMLElement;
+
+    const row = within(popover).getByText("Characters").closest(".ant-space")!;
+    const [, down] = within(row as HTMLElement).getAllByRole("button");
+    click(down);
+    expect(widgetTitles()).toEqual(["Release Notes", "Characters (3/25)"]);
+
+    click(within(popover).getByText("Release Notes"));
+    expect(widgetTitles()).toEqual(["Characters (3/25)"]);
+    expect(JSON.parse(localStorage.getItem(LS_KEYS.general_widgets)!)).toEqual({
+      order: ["releaseNotes", "characters"],
+      visible: ["characters"],
+    });
+  });
+
+  test("says so when every widget is hidden", () => {
+    localStorage.setItem(
+      LS_KEYS.general_widgets,
+      JSON.stringify({ order: [], visible: [] })
+    );
+    renderScreen(TAB_KEY.mainGeneral);
+    expect(
+      screen.getByText("No widget shown, use Customize to add some")
+    ).toBeInTheDocument();
+  });
+
+  test("character widget opens details in a modal", () => {
+    renderScreen(TAB_KEY.mainGeneral);
+    click(within(screen.getByText("Bob").closest("tr")!).getByText("Details"));
+    expect(
+      within(screen.getByRole("dialog")).getByLabelText("Name")
+    ).toHaveValue("Bob");
+  });
+
+  test("character widget links to the Character tab", () => {
+    const { store } = renderScreen(TAB_KEY.mainGeneral);
+    click(screen.getByRole("button", { name: "View all" }));
+    expect(store.getState().UIState.selectedSideBar.key).toBe(
+      TAB_KEY.mainCharacter
+    );
+  });
 });
 
 describe("Character list", () => {
