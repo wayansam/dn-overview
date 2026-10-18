@@ -25,6 +25,22 @@ export interface TaskEntry {
 // Dates (YYYY-MM-DD) keyed by id, e.g. characterId -> activityId -> date.
 export type DateMap = Record<string, Record<string, string>>;
 
+// What was cleared during one finished week, saved at its weekly reset.
+export interface WeeklyHistory {
+  // Server timestamps of the reset that started and the one that ended it.
+  weekStart: string;
+  weekEnd: string;
+  accountClears: {
+    taskId: string;
+    groupId?: string;
+    characterId?: string;
+    clearedAt: string;
+  }[];
+  characterClears: DateMap;
+  // Floors picked at the end of the week, for the rewards.
+  characterFloors: Record<string, Record<string, string>>;
+}
+
 export interface TaskStore {
   version: number;
   // Weekly Account rows.
@@ -40,4 +56,6 @@ export interface TaskStore {
   // Weekly Rewards: resources always listed. Missing until customized, which
   // lists every resource being earned.
   shownRewards?: string[];
+  // The week before the latest reset, missing until a reset has happened.
+  lastWeek?: WeeklyHistory;
 }

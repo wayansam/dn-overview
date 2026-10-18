@@ -4,8 +4,13 @@ import {
   TASK_STORE_VERSION,
 } from "../constants/Task.constants";
 import { getTaskById } from "../data/task/TaskData";
-import { DateMap, TaskEntry, TaskStore } from "../interface/Task.interface";
-import { clearBeforeReset, getLastReset } from "./weeklyReset.util";
+import {
+  DateMap,
+  TaskEntry,
+  TaskStore,
+  WeeklyHistory,
+} from "../interface/Task.interface";
+import { getLastReset, resetWeek } from "./weeklyReset.util";
 import { getAllRewardNames } from "./weeklyReward.util";
 
 export const emptyTaskStore = (): TaskStore => ({
@@ -111,6 +116,44 @@ const toExcludedCharacters = (value: unknown): Record<string, string[]> => {
   );
 };
 
+const isClearValue = (value: unknown): value is string =>
+  typeof value === "string" && CLEAR_PATTERN.test(value);
+
+const toWeeklyHistory = (value: unknown): WeeklyHistory | undefined => {
+  if (!isObject(value)) return undefined;
+  const {
+    weekStart,
+    weekEnd,
+    accountClears,
+    characterClears,
+    characterFloors,
+  } = value;
+  if (!isClearValue(weekStart) || !isClearValue(weekEnd)) return undefined;
+  return {
+    weekStart,
+    weekEnd,
+    accountClears: (Array.isArray(accountClears) ? accountClears : []).flatMap(
+      (item: unknown) => {
+        if (!isObject(item)) return [];
+        const { taskId, groupId, characterId, clearedAt } = item;
+        if (typeof taskId !== "string" || !getTaskById(taskId)) return [];
+        if (!isClearValue(clearedAt)) return [];
+        return [
+          {
+            taskId,
+            groupId: typeof groupId === "string" ? groupId : undefined,
+            characterId:
+              typeof characterId === "string" ? characterId : undefined,
+            clearedAt,
+          },
+        ];
+      },
+    ),
+    characterClears: toCharacterMap(characterClears, isClearTime),
+    characterFloors: toCharacterMap(characterFloors, isKnownFloor),
+  };
+};
+
 // Never throws: corrupted or hand-edited storage falls back to what can be
 // salvaged.
 export const loadTaskStore = (): TaskStore => {
@@ -126,6 +169,7 @@ export const loadTaskStore = (): TaskStore => {
       excludedCharacters,
       hiddenActivities,
       shownRewards,
+      lastWeek,
     } = parsed as Record<string, unknown>;
     const store: TaskStore = {
       version: TASK_STORE_VERSION,
@@ -146,9 +190,10 @@ export const loadTaskStore = (): TaskStore => {
       shownRewards: Array.isArray(shownRewards)
         ? getAllRewardNames().filter((name) => shownRewards.includes(name))
         : undefined,
+      lastWeek: toWeeklyHistory(lastWeek),
     };
-    // Clears from before the latest weekly reset are gone.
-    clearBeforeReset(store, getLastReset());
+    // A reset passed while the app was closed: save that week, clear it.
+    resetWeek(store, getLastReset());
     return store;
   } catch {
     return emptyTaskStore();

@@ -4,9 +4,9 @@ import { TaskEntry, TaskStore } from "../interface/Task.interface";
 import { generateId } from "../utils/characterStorage.util";
 import { loadTaskStore } from "../utils/taskStorage.util";
 import {
-  clearBeforeReset,
   getLastReset,
   getServerTimestamp,
+  resetWeek,
 } from "../utils/weeklyReset.util";
 
 const TaskSlice = createSlice({
@@ -37,10 +37,11 @@ const TaskSlice = createSlice({
         payload: { id, date: getServerTimestamp() },
       }),
     },
-    // Clears everything done before the latest weekly reset.
+    // Saves last week, then clears everything done before the latest
+    // weekly reset.
     applyWeeklyReset: {
       reducer: (state, action: PayloadAction<number>) => {
-        clearBeforeReset(state, action.payload);
+        resetWeek(state, action.payload);
       },
       prepare: () => ({ payload: getLastReset() }),
     },

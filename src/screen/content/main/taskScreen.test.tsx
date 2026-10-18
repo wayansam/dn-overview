@@ -687,6 +687,59 @@ describe("Weekly reset (Saturday 09:00 server time)", () => {
     expect(task.characterClears).toEqual({});
   });
 
+  test("Last Week lists what was cleared before the reset", async () => {
+    seed();
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    act(() => {
+      vi.setSystemTime(new Date("2026-10-03T09:00:00+08:00"));
+      store.dispatch(applyWeeklyReset());
+    });
+
+    click(screen.getByRole("button", { name: /Last Week/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent(
+      `Last Week: ${formatDate("2026-09-26")} - 03 Oct 2026`
+    );
+    expect(
+      within(dialog).getByRole("region", { name: "Last week account" })
+    ).toHaveTextContent("Gold Dragon Nest02 Oct 2026");
+    expect(
+      within(dialog).getByRole("region", { name: "Last week character" })
+    ).toHaveTextContent("AliceNightmare01 Oct 2026");
+    // Nightmare has no reward data and no floor was cleared.
+    expect(
+      within(dialog).getByRole("region", { name: "Last week rewards" })
+    ).toHaveTextContent("No Fission Maze or Ark of Transcendence clear");
+  });
+
+  test("Last Week shows rewards from the cleared floors", async () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: { c1: { fissionMaze: "2026-10-02T10:00:00+08:00" } },
+      characterFloors: { c1: { fissionMaze: "Ascension 2F" } },
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    vi.setSystemTime(new Date("2026-10-04T12:00:00+08:00"));
+    renderScreen(TAB_KEY.mainTask);
+    click(screen.getByRole("button", { name: /Last Week/ }));
+    const dialog = await screen.findByRole("dialog");
+    expect(
+      within(dialog).getByRole("region", { name: "Last week character" })
+    ).toHaveTextContent("Fission Maze (Ascension 2F)02 Oct 2026");
+    expect(
+      within(dialog).getByRole("region", { name: "Last week rewards" })
+    ).toHaveTextContent("Erosion Fragment32");
+  });
+
+  test("Last Week is disabled until a reset has been seen", () => {
+    // jsdom renders without the app-wide reset check, and empty storage
+    // loads without history.
+    renderScreen(TAB_KEY.mainTask);
+    expect(screen.getByRole("button", { name: /Last Week/ })).toBeDisabled();
+  });
+
   test("shows the countdown to the next reset", () => {
     renderScreen(TAB_KEY.mainTask);
     // Pinned to Saturday 08:00, one hour before the reset.

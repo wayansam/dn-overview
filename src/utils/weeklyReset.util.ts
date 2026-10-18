@@ -3,7 +3,7 @@ import {
   WEEKLY_RESET_DAY,
   WEEKLY_RESET_HOUR,
 } from "../constants/Task.constants";
-import { TaskStore } from "../interface/Task.interface";
+import { TaskStore, WeeklyHistory } from "../interface/Task.interface";
 
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -52,6 +52,54 @@ export const formatCountdown = (ms: number) => {
 };
 
 type ClearData = Pick<TaskStore, "entries" | "characterClears">;
+
+// What was cleared in the week ending at `lastReset`. Copies plain values,
+// so it is safe to call on Immer drafts.
+const snapshotWeek = (
+  task: Pick<TaskStore, "entries" | "characterClears" | "characterFloors">,
+  lastReset: number,
+): WeeklyHistory => {
+  const weekStart = lastReset - WEEK;
+  const inWeek = (value: string) => {
+    const time = parseClearTime(value);
+    return time >= weekStart && time < lastReset;
+  };
+  const characterClears: WeeklyHistory["characterClears"] = {};
+  Object.entries(task.characterClears).forEach(([characterId, clears]) => {
+    const kept = Object.entries(clears).filter(([, value]) => inWeek(value));
+    if (kept.length) characterClears[characterId] = Object.fromEntries(kept);
+  });
+  return {
+    weekStart: getServerTimestamp(new Date(weekStart)),
+    weekEnd: getServerTimestamp(new Date(lastReset)),
+    accountClears: task.entries
+      .filter((entry) => entry.lastCleared && inWeek(entry.lastCleared))
+      .map(({ taskId, groupId, characterId, lastCleared }) => ({
+        taskId,
+        groupId,
+        characterId,
+        clearedAt: lastCleared!,
+      })),
+    characterClears,
+    characterFloors: Object.fromEntries(
+      Object.keys(characterClears).map((characterId) => [
+        characterId,
+        { ...task.characterFloors[characterId] },
+      ]),
+    ),
+  };
+};
+
+// Runs the weekly reset as of `lastReset`: the first time a reset is seen,
+// the week it ended is saved as `lastWeek`, then older clears are dropped.
+// Mutates (works on Immer drafts).
+export const resetWeek = (task: TaskStore, lastReset: number) => {
+  const weekEnd = getServerTimestamp(new Date(lastReset));
+  if (task.lastWeek?.weekEnd !== weekEnd) {
+    task.lastWeek = snapshotWeek(task, lastReset);
+  }
+  clearBeforeReset(task, lastReset);
+};
 
 // Drops clears from before `lastReset` (mutates; works on Immer drafts).
 // Returns whether anything changed.
