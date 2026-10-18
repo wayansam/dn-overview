@@ -9,6 +9,7 @@ import {
   setIsImgEnabled,
   setIsKeepScreen,
 } from "../../../slice/UIState.reducer";
+import DataTransfer from "../../../components/DataTransfer";
 import ReleaseNotes from "../../../components/ReleaseNotes";
 import { TAB_KEY } from "../../../constants/Common.constants";
 
@@ -130,6 +131,9 @@ const SettingContent = () => {
             </Form>
           </Card>
         </Space>
+
+        <Divider orientation="left">Backup & Transfer</Divider>
+        <DataTransfer />
 
         <ReleaseNotes />
 
