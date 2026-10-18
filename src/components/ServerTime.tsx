@@ -1,10 +1,8 @@
 import { ClockCircleOutlined } from "@ant-design/icons";
 import { Space, Typography } from "antd";
 import { useEffect, useState } from "react";
+import { SERVER_TIME_ZONE } from "../constants/Task.constants";
 const { Text } = Typography;
-
-// The game server runs on Singapore time (UTC+8, no daylight saving).
-export const SERVER_TIME_ZONE = "Asia/Singapore";
 
 const formatter = new Intl.DateTimeFormat("en-GB", {
   timeZone: SERVER_TIME_ZONE,

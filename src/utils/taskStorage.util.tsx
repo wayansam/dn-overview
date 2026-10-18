@@ -1,5 +1,8 @@
 import { LS_KEYS } from "../constants/localStorage.constants";
-import { TASK_STORE_VERSION } from "../constants/Task.constants";
+import {
+  SERVER_TIME_ZONE,
+  TASK_STORE_VERSION,
+} from "../constants/Task.constants";
 import { getTaskById } from "../data/task/TaskData";
 import { DateMap, TaskEntry, TaskStore } from "../interface/Task.interface";
 import { getAllRewardNames } from "./weeklyReward.util";
@@ -13,13 +16,17 @@ export const emptyTaskStore = (): TaskStore => ({
   hiddenActivities: [],
 });
 
-// Today in the user's timezone, as YYYY-MM-DD.
-export const getToday = (now = new Date()) =>
-  [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-");
+// en-CA formats dates as YYYY-MM-DD.
+const serverDateFormatter = new Intl.DateTimeFormat("en-CA", {
+  timeZone: SERVER_TIME_ZONE,
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+});
+
+// Today on the game server (Singapore time), as YYYY-MM-DD, whatever the
+// user's own time zone.
+export const getToday = (now = new Date()) => serverDateFormatter.format(now);
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 

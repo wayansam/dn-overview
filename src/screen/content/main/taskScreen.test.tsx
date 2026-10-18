@@ -621,7 +621,11 @@ describe("Task widget", () => {
 
 describe("taskStorage.util", () => {
   test("formats dates and shows a dash when missing", () => {
-    expect(getToday(new Date(2026, 0, 5))).toBe("2026-01-05");
+    // Server time is UTC+8: 15:59 UTC is still the same day there, 16:00 is
+    // already the next one.
+    expect(getToday(new Date("2026-01-05T15:59:59Z"))).toBe("2026-01-05");
+    expect(getToday(new Date("2026-01-05T16:00:00Z"))).toBe("2026-01-06");
+    expect(getToday(new Date("2025-12-31T20:00:00Z"))).toBe("2026-01-01");
     expect(formatDate("2026-10-18")).toBe("18 Oct 2026");
     expect(formatDate(undefined)).toBe("-");
     expect(formatDate("bad")).toBe("-");
