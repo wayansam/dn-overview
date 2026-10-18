@@ -49,6 +49,11 @@ export const mainHelpItems: HelpItem[] = [
         <p>
           Done records today as Last Cleared, Reset clears it back to "-".
         </p>
+        <p>
+          Weekly Character lists every character: tick an activity to record
+          today, untick to remove it. Customize excludes characters from an
+          activity, Details shows the dates for one character.
+        </p>
         <p>Data is saved in this browser only.</p>
       </div>
     ),

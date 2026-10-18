@@ -1,11 +1,14 @@
 import { LS_KEYS } from "../constants/localStorage.constants";
 import { TASK_STORE_VERSION } from "../constants/Task.constants";
 import { getTaskById } from "../data/task/TaskData";
-import { TaskEntry, TaskStore } from "../interface/Task.interface";
+import { DateMap, TaskEntry, TaskStore } from "../interface/Task.interface";
 
 export const emptyTaskStore = (): TaskStore => ({
   version: TASK_STORE_VERSION,
   entries: [],
+  characterClears: {},
+  excludedCharacters: {},
+  hiddenActivities: [],
 });
 
 // Today in the user's timezone, as YYYY-MM-DD.
@@ -50,6 +53,45 @@ const toEntry = (value: unknown): TaskEntry | null => {
   };
 };
 
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const isWeeklyCharacterTask = (id: string) =>
+  getTaskById(id)?.category === "weeklyCharacter";
+
+// characterId -> activityId -> date, keeping only known activities and
+// valid dates.
+const toCharacterClears = (value: unknown): DateMap => {
+  if (!isObject(value)) return {};
+  const result: DateMap = {};
+  Object.entries(value).forEach(([characterId, clears]) => {
+    if (!isObject(clears)) return;
+    const valid = Object.entries(clears).filter(
+      (pair): pair is [string, string] =>
+        isWeeklyCharacterTask(pair[0]) &&
+        typeof pair[1] === "string" &&
+        DATE_PATTERN.test(pair[1]),
+    );
+    if (valid.length) result[characterId] = Object.fromEntries(valid);
+  });
+  return result;
+};
+
+const toExcludedCharacters = (value: unknown): Record<string, string[]> => {
+  if (!isObject(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value)
+      .filter(
+        ([activityId, ids]) =>
+          isWeeklyCharacterTask(activityId) && Array.isArray(ids),
+      )
+      .map(([activityId, ids]) => [
+        activityId,
+        (ids as unknown[]).filter((id): id is string => typeof id === "string"),
+      ]),
+  );
+};
+
 // Never throws: corrupted or hand-edited storage falls back to what can be
 // salvaged.
 export const loadTaskStore = (): TaskStore => {
@@ -58,12 +100,22 @@ export const loadTaskStore = (): TaskStore => {
     if (!raw) return emptyTaskStore();
     const parsed: unknown = JSON.parse(raw);
     if (typeof parsed !== "object" || parsed === null) return emptyTaskStore();
-    const { entries } = parsed as Record<string, unknown>;
+    const { entries, characterClears, excludedCharacters, hiddenActivities } =
+      parsed as Record<string, unknown>;
     return {
       version: TASK_STORE_VERSION,
       entries: (Array.isArray(entries) ? entries : [])
         .map(toEntry)
         .filter((item): item is TaskEntry => !!item),
+      characterClears: toCharacterClears(characterClears),
+      excludedCharacters: toExcludedCharacters(excludedCharacters),
+      hiddenActivities: (Array.isArray(hiddenActivities)
+        ? hiddenActivities
+        : []
+      ).filter(
+        (id): id is string =>
+          typeof id === "string" && isWeeklyCharacterTask(id),
+      ),
     };
   } catch {
     return emptyTaskStore();

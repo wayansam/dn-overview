@@ -30,6 +30,13 @@ export const TaskData: TaskInfo[] = [
     name: "Gold Dragon Nest Hardcore",
     category: "weeklyAccount",
   },
+  { id: "fissionMaze", name: "Fission Maze", category: "weeklyCharacter" },
+  {
+    id: "arkOfTranscendence",
+    name: "Ark of Transcendence",
+    category: "weeklyCharacter",
+  },
+  { id: "nightmare", name: "Nightmare", category: "weeklyCharacter" },
 ];
 
 export const getTaskById = (id?: string) =>

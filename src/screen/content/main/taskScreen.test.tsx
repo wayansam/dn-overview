@@ -98,6 +98,9 @@ describe("Weekly Account", () => {
       entries: [
         { id: "t1", category: "weeklyAccount", taskId: "goldDragonNest" },
       ],
+      characterClears: {},
+      excludedCharacters: {},
+      hiddenActivities: [],
     });
     const { store } = renderScreen(TAB_KEY.mainTask);
     const row = () => screen.getByText("Gold Dragon Nest").closest("tr")!;
@@ -118,6 +121,148 @@ describe("Weekly Account", () => {
       )
     );
     await waitFor(() => expect(store.getState().Task.entries).toEqual([]));
+  });
+});
+
+describe("Weekly Character", () => {
+  // The Weekly Character table, found by any activity column header.
+  const table = () =>
+    screen
+      .getAllByRole("columnheader", {
+        name: /^(Fission Maze|Ark of Transcendence|Nightmare)$/,
+      })[0]
+      .closest("table")!;
+  const row = (name: string) =>
+    within(table()).getByText(name).closest("tr")! as HTMLElement;
+
+  test("lists every character with a checkbox per activity", () => {
+    renderScreen(TAB_KEY.mainTask);
+    expect(within(row("Alice")).getAllByRole("checkbox")).toHaveLength(3);
+    expect(within(row("Bob")).getAllByRole("checkbox")).toHaveLength(3);
+  });
+
+  test("checking saves today, unchecking removes it", () => {
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    const box = within(row("Alice")).getByRole("checkbox", {
+      name: "Nightmare",
+    });
+    click(box);
+    expect(store.getState().Task.characterClears).toEqual({
+      c1: { nightmare: getToday() },
+    });
+    expect(box).toBeChecked();
+
+    click(box);
+    expect(store.getState().Task.characterClears).toEqual({});
+  });
+
+  test("Reset clears every activity of that character only", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: {
+        c1: { fissionMaze: "2026-10-01", nightmare: "2026-10-02" },
+        c2: { nightmare: "2026-10-03" },
+      },
+      excludedCharacters: {},
+      hiddenActivities: [],
+    });
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    click(within(row("Alice")).getByRole("button", { name: "Reset" }));
+    expect(store.getState().Task.characterClears).toEqual({
+      c2: { nightmare: "2026-10-03" },
+    });
+  });
+
+  test("Details lists the date of each activity", () => {
+    saveTaskStore({
+      version: TASK_STORE_VERSION,
+      entries: [],
+      characterClears: { c1: { fissionMaze: "2026-10-01" } },
+      excludedCharacters: { nightmare: ["c1"] },
+      hiddenActivities: [],
+    });
+    renderScreen(TAB_KEY.mainTask);
+    click(within(row("Alice")).getByRole("button", { name: "Details" }));
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveTextContent("Fission Maze01 Oct 2026");
+    expect(dialog).toHaveTextContent("Ark of Transcendence-");
+    expect(dialog).toHaveTextContent("NightmareExcluded");
+  });
+
+  test("Customize excludes a character from an activity", async () => {
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    click(screen.getByRole("button", { name: /Customize/ }));
+    chooseOption(
+      document
+        .querySelector<HTMLElement>("#exclude-fissionMaze")!
+        .closest<HTMLElement>(".ant-select")!,
+      "Bob"
+    );
+    click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(store.getState().Task.excludedCharacters.fissionMaze).toEqual([
+        "c2",
+      ])
+    );
+    expect(within(row("Bob")).getAllByRole("checkbox")).toHaveLength(2);
+    expect(within(row("Bob")).getByText("-")).toBeInTheDocument();
+  });
+
+  // The Customize popup's block for one activity.
+  const activityBlock = (id: string) =>
+    document.querySelector<HTMLElement>(`[data-activity="${id}"]`)!;
+
+  test("Add All excludes every character from an activity", async () => {
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    click(screen.getByRole("button", { name: /Customize/ }));
+    const addAll = within(activityBlock("nightmare")).getByRole("button", {
+      name: "Add All",
+    });
+    click(addAll);
+    expect(addAll).toBeDisabled();
+    click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(store.getState().Task.excludedCharacters.nightmare).toEqual([
+        "c1",
+        "c2",
+      ])
+    );
+  });
+
+  test("Hide removes an activity column, Show brings it back", async () => {
+    const { store } = renderScreen(TAB_KEY.mainTask);
+    click(screen.getByRole("button", { name: /Customize/ }));
+    click(
+      within(activityBlock("fissionMaze")).getByRole("button", { name: /Hide/ })
+    );
+    click(screen.getByRole("button", { name: "Save" }));
+
+    await waitFor(() =>
+      expect(store.getState().Task.hiddenActivities).toEqual(["fissionMaze"])
+    );
+    expect(
+      screen.queryByRole("columnheader", { name: "Fission Maze" })
+    ).toBeNull();
+    expect(within(row("Alice")).getAllByRole("checkbox")).toHaveLength(2);
+
+    click(screen.getByRole("button", { name: /Customize/ }));
+    await waitFor(() =>
+      expect(
+        within(activityBlock("fissionMaze")).getByRole("button", {
+          name: /Show/,
+        })
+      ).toBeInTheDocument()
+    );
+    click(
+      within(activityBlock("fissionMaze")).getByRole("button", { name: /Show/ })
+    );
+    click(screen.getByRole("button", { name: "Save" }));
+    await waitFor(() =>
+      expect(store.getState().Task.hiddenActivities).toEqual([])
+    );
   });
 });
 
@@ -150,6 +295,22 @@ describe("taskStorage.util", () => {
         lastCleared: undefined,
       },
     ]);
+  });
+
+  test("keeps only known activities and valid dates", () => {
+    localStorage.setItem(
+      LS_KEYS.tasks,
+      JSON.stringify({
+        characterClears: {
+          c1: { nightmare: "2026-10-01", chaosDuelNest: "2026-10-01", fissionMaze: "x" },
+          c2: "junk",
+        },
+        excludedCharacters: { nightmare: ["c1", 5], removed: ["c2"], fissionMaze: "x" },
+      })
+    );
+    const store = loadTaskStore();
+    expect(store.characterClears).toEqual({ c1: { nightmare: "2026-10-01" } });
+    expect(store.excludedCharacters).toEqual({ nightmare: ["c1"] });
   });
 
   test("falls back to empty on unreadable storage", () => {

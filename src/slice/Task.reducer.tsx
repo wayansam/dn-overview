@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { TaskEntry } from "../interface/Task.interface";
+import { TaskEntry, TaskStore } from "../interface/Task.interface";
 import { generateId } from "../utils/characterStorage.util";
 import { getToday, loadTaskStore } from "../utils/taskStorage.util";
 
@@ -17,10 +17,7 @@ const TaskSlice = createSlice({
     },
     // Records today as the clear date.
     markTaskDone: {
-      reducer: (
-        state,
-        action: PayloadAction<{ id: string; date: string }>,
-      ) => {
+      reducer: (state, action: PayloadAction<{ id: string; date: string }>) => {
         const entry = state.entries.find(
           (item) => item.id === action.payload.id,
         );
@@ -37,9 +34,59 @@ const TaskSlice = createSlice({
         (item) => item.id !== action.payload,
       );
     },
+    // Checking records today, unchecking removes the date.
+    setActivityCleared: {
+      reducer: (
+        state,
+        action: PayloadAction<{
+          characterId: string;
+          activityId: string;
+          date?: string;
+        }>,
+      ) => {
+        const { characterId, activityId, date } = action.payload;
+        const clears = { ...state.characterClears[characterId] };
+        if (date) {
+          clears[activityId] = date;
+        } else {
+          delete clears[activityId];
+        }
+        if (Object.keys(clears).length) {
+          state.characterClears[characterId] = clears;
+        } else {
+          delete state.characterClears[characterId];
+        }
+      },
+      prepare: (characterId: string, activityId: string, checked: boolean) => ({
+        payload: {
+          characterId,
+          activityId,
+          date: checked ? getToday() : undefined,
+        },
+      }),
+    },
+    resetCharacterActivities: (state, action: PayloadAction<string>) => {
+      delete state.characterClears[action.payload];
+    },
+    saveWeeklyCharacterSetting: (
+      state,
+      action: PayloadAction<
+        Pick<TaskStore, "excludedCharacters" | "hiddenActivities">
+      >,
+    ) => {
+      state.excludedCharacters = action.payload.excludedCharacters;
+      state.hiddenActivities = action.payload.hiddenActivities;
+    },
   },
 });
 
 export const TaskReducer = TaskSlice.reducer;
-export const { addTask, markTaskDone, resetTask, deleteTask } =
-  TaskSlice.actions;
+export const {
+  addTask,
+  markTaskDone,
+  resetTask,
+  deleteTask,
+  setActivityCleared,
+  resetCharacterActivities,
+  saveWeeklyCharacterSetting,
+} = TaskSlice.actions;

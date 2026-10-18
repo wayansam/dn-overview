@@ -1,5 +1,5 @@
-// Task tables in the Task tab. Only "weeklyAccount" exists for now.
-export type TaskCategory = "weeklyAccount";
+// Task tables in the Task tab.
+export type TaskCategory = "weeklyAccount" | "weeklyCharacter";
 
 // Static reference data (src/data/task/TaskData.tsx).
 export interface TaskInfo {
@@ -19,7 +19,17 @@ export interface TaskEntry {
   lastCleared?: string;
 }
 
+// Dates (YYYY-MM-DD) keyed by id, e.g. characterId -> activityId -> date.
+export type DateMap = Record<string, Record<string, string>>;
+
 export interface TaskStore {
   version: number;
+  // Weekly Account rows.
   entries: TaskEntry[];
+  // Weekly Character: when each character last cleared each activity.
+  characterClears: DateMap;
+  // Weekly Character: activityId -> characters that skip it.
+  excludedCharacters: Record<string, string[]>;
+  // Weekly Character: activities left out of the table.
+  hiddenActivities: string[];
 }

@@ -3,6 +3,7 @@ import { Button, Popconfirm, Space, Table, Typography } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
 import TaskFormModal from "../../../components/TaskFormModal";
+import WeeklyCharacterTable from "../../../components/WeeklyCharacterTable";
 import { getTaskById } from "../../../data/task/TaskData";
 import { useAppDispatch, useAppSelector } from "../../../hooks";
 import { TaskCategory, TaskEntry } from "../../../interface/Task.interface";
@@ -124,7 +125,8 @@ const TaskTable = ({ category, title }: TaskTableProps) => {
 
 const TaskContent = () => (
   <div>
-    <TaskTable category="weeklyAccount" title="Weekly Account" />
+    <TaskTable category="weeklyAccount" title="Weekly [Account]" />
+    <WeeklyCharacterTable />
   </div>
 );
 
