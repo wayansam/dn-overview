@@ -311,6 +311,7 @@ const DeeplyVarJadeContent = () => {
         label: `${start + 1}-${end}`,
         children: (
           <Table
+            rowKey="encLevel"
             size={"small"}
             dataSource={DeeplyVariantLJadeStatsTable.slice(start, end)}
             columns={col}
@@ -338,6 +339,7 @@ const DeeplyVarJadeContent = () => {
         label: `${start + 1}-${end}`,
         children: (
           <Table
+            rowKey="encLevel"
             size={"small"}
             dataSource={DeeplyVariantLJadeEnhanceMaterialTable.slice(
               start,
@@ -445,6 +447,7 @@ const DeeplyVarJadeContent = () => {
       label: "Stats - Unique Grade",
       children: (
         <Table
+          rowKey="encLevel"
           style={{ marginRight: 10, marginBottom: 10 }}
           size={"small"}
           dataSource={DeeplyVariantUJadeStatsTable}
@@ -467,6 +470,7 @@ const DeeplyVarJadeContent = () => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ marginRight: 10 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={DeeplyVariantUJadeEnhanceMaterialTable}
               columns={getColumnsMats()}

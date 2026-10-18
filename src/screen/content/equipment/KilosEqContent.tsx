@@ -258,6 +258,7 @@ const KilosEqContent = () => {
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={KilosT1ArmorEnhanceMaterialTable}
               columns={columnsArmorT1}
               pagination={false}
@@ -275,6 +276,7 @@ const KilosEqContent = () => {
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
               size={"small"}
+              rowKey="encLevel"
               dataSource={KilosT2ArmorEnhanceMaterialTable}
               columns={columnsArmorT2}
               pagination={false}

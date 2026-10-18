@@ -158,6 +158,7 @@ const SkillJadeContent = () => {
               {"Dreamy / Blood Moon / Verdure Dragon Jade"}
             </Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={DMFDJSkillStatTable}
               columns={getColumnsStats(true)}
@@ -168,6 +169,7 @@ const SkillJadeContent = () => {
           <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Ancient Dragon Jade"}</Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientDJSkillStatTable}
               columns={getColumnsStats()}
@@ -178,6 +180,7 @@ const SkillJadeContent = () => {
           <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Dimensional / Otherworldly Dragon Jade"}</Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={DimeOtherDJSkillStatTable}
               columns={getColumnsStats(true)}
@@ -200,6 +203,7 @@ const SkillJadeContent = () => {
               {"Dreamy / Blood Moon / Verdure Dragon Jade"}
             </Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={DMFDJSkillMaterialTable}
               columns={getColumnsMats()}
@@ -210,6 +214,7 @@ const SkillJadeContent = () => {
           <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Ancient Dragon Jade"}</Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientDJSkillMaterialTable}
               columns={getColumnsMats()}
@@ -220,6 +225,7 @@ const SkillJadeContent = () => {
           <div style={{ width: 500, marginRight: 30 }}>
             <Title level={5}>{"Dimensional / Otherworldly Dragon Jade"}</Title>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={DimeOtherDJSkillMaterialTable}
               columns={getColumnsMats()}

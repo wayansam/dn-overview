@@ -312,6 +312,7 @@ const GoldDragonJadeContent = () => {
             Magical Defense.
           </Text>
           <Table
+            rowKey="encLevel"
             style={{ marginRight: 10, marginBottom: 10, marginTop: 8 }}
             size={"small"}
             dataSource={GoldDragonJadeStatsTable}
@@ -342,6 +343,7 @@ const GoldDragonJadeContent = () => {
           </Text>
           <div style={{ marginRight: 10, marginTop: 8 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={GoldDragonJadeEnhanceMaterialTable}
               columns={columnsMats}

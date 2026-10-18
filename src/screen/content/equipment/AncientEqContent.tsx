@@ -263,6 +263,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "New table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientArmorCraftMaterialTableV2}
               columns={columnsArmor}
@@ -273,6 +274,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "Old table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientArmorCraftMaterialTable}
               columns={columnsArmor}
@@ -293,6 +295,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "New table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientWeaponT2CraftMaterialTableV2}
               columns={columnsWeapon}
@@ -303,6 +306,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "Old table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientWeaponT2CraftMaterialTable}
               columns={columnsWeapon}
@@ -323,6 +327,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "New table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientAccessoryCraftMaterialTableV2}
               columns={columnsAccessory}
@@ -333,6 +338,7 @@ const AncientEqContent = () => {
           <div style={{ marginRight: 10, marginBottom: 10 }}>
             <Table
               title={() => "Old table"}
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientAccessoryCraftMaterialTable}
               columns={columnsAccessory}

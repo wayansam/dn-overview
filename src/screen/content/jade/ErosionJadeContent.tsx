@@ -152,6 +152,7 @@ const ErosionJadeContent = () => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={ErosionConquerorJadeMaterialTable}
               columns={columnsMats}

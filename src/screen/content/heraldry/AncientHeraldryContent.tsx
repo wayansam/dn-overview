@@ -309,6 +309,7 @@ const AncientHeraldryContent = () => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientGoddesHeraRequiredItemTable}
               columns={columnsRequired}
@@ -326,6 +327,7 @@ const AncientHeraldryContent = () => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientGoddesHeraDisassemblyItemTable}
               columns={columnsDisassembly}
@@ -343,6 +345,7 @@ const AncientHeraldryContent = () => {
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ width: 250, marginRight: 10 }}>
             <Table
+              rowKey="encLevel"
               size={"small"}
               dataSource={AncientGoddesHeraStatTable}
               columns={columnsStat}
