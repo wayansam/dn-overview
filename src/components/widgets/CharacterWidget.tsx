@@ -5,7 +5,6 @@ import {
   Grid,
   Space,
   Table,
-  Tag,
   Tooltip,
   Typography,
 } from "antd";
@@ -17,6 +16,7 @@ import { useAppSelector } from "../../hooks";
 import useCharacterNavigation from "../../hooks/useCharacterNavigation";
 import { Character } from "../../interface/Account.interface";
 import CharacterDetailModal from "../CharacterDetailModal";
+import CharacterNameLabel from "../CharacterNameLabel";
 const { Text } = Typography;
 const { useBreakpoint } = Grid;
 
@@ -40,10 +40,11 @@ const CharacterWidget = () => {
     key: "name",
     render: (_, { id, name, level, classId }) => (
       <Space direction="vertical" size={0}>
-        <Space size={4}>
-          <Text>{name}</Text>
-          {id === mainCharacterId && <Tag color="gold">Main</Tag>}
-        </Space>
+        <CharacterNameLabel
+          name={name}
+          classId={classId}
+          isMain={id === mainCharacterId}
+        />
         {isCompact && (
           <Text type="secondary" style={{ fontSize: 12 }}>
             Level: {level} · Class: {getClassName(classId)}

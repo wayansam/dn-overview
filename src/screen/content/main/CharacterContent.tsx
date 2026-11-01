@@ -19,6 +19,7 @@ import {
 import { ColumnType } from "antd/es/table";
 import { Fragment, ReactNode, useMemo, useState } from "react";
 import CharacterDetailModal from "../../../components/CharacterDetailModal";
+import CharacterNameLabel from "../../../components/CharacterNameLabel";
 import OrderSettingList from "../../../components/OrderSettingList";
 import ReorderListModal from "../../../components/ReorderListModal";
 import { CHARACTER_LIMIT } from "../../../constants/Character.constants";
@@ -150,10 +151,11 @@ const CharacterContent = () => {
     sorter: (a, b) => a.name.localeCompare(b.name),
     render: (_, character) => (
       <Space direction="vertical" size={0}>
-        <Space size={4}>
-          <Text>{character.name}</Text>
-          {character.id === mainCharacterId && <Tag color="gold">Main</Tag>}
-        </Space>
+        <CharacterNameLabel
+          name={character.name}
+          classId={character.classId}
+          isMain={character.id === mainCharacterId}
+        />
         {isCompact && !!shownColumnKeys.length && (
           <Text type="secondary" style={{ fontSize: 12 }}>
             {shownColumnKeys.map((key, index) => (
