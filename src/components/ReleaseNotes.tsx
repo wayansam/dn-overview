@@ -280,6 +280,26 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       label: "Phone friendly layout for the Character & Task tables and widgets",
       date: "18-10-2026",
     },
+    {
+      key: keyUpdate.N,
+      label:
+        "Class icon next to character names for every class, 2nd job & specialization",
+      link: {
+        key: TAB_KEY.mainCharacter,
+        name: TAB_KEY.mainCharacter,
+      },
+      date: "01-11-2026",
+    },
+    {
+      key: keyUpdate.U,
+      label:
+        "Cleaner character name layout, the Main tag no longer breaks the row",
+      link: {
+        key: TAB_KEY.mainCharacter,
+        name: TAB_KEY.mainCharacter,
+      },
+      date: "01-11-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
