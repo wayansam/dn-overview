@@ -261,6 +261,7 @@ export const jadeHelpItems: HelpItem[] = [
           Turn on Craft for a part to include its craft mats (5 Golden Memory,
           25 Faded Memory, 100,000 Gold).
         </p>
+        <p>Faded Memory can be bought from the Trading House.</p>
         <p>
           <i>
             Enhancing beyond +5 can fail, and a failed attempt destroys the

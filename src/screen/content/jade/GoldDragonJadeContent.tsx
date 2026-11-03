@@ -297,6 +297,12 @@ const GoldDragonJadeContent = () => {
       mats={{ data: tableResource.res1, hideZero: true }}
       rateSummary={{ items: extraInfo }}
       stats={{ statDif }}
+      tradingHouse={{
+        data: [
+          { name: "Faded Memory", amt: tableResource.res1["Faded Memory"] },
+        ],
+        additionalTotal: tableResource.res1.Gold,
+      }}
     />
   );
 
