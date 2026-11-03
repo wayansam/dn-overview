@@ -32,6 +32,7 @@ export const TAB_KEY = {
   heraldryAncientGoddes: "Ancients' Goddess",
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
+  talismanParadox: "Paradox",
   broochVelskud: "Velskud's Dimensional Brooch",
   broochNerwin: "Otherworldly Nerwin Brooch",
   broochTerramai: "Terramai Brooch of Faith",
@@ -173,6 +174,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.talismanEternal,
         name: TAB_KEY.talismanEternal,
+      },
+      {
+        key: TAB_KEY.talismanParadox,
+        name: TAB_KEY.talismanParadox,
       },
     ],
   },

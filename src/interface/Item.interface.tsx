@@ -139,6 +139,15 @@ export interface EternalPainTalismanMats {
   gold: number;
 }
 
+export interface ParadoxTalismanEnhanceMats {
+  encLevel: number;
+  successRatePercent: number;
+  dropLevel: number;
+  manaEgg: number;
+  afterimageRecord: number;
+  gold: number;
+}
+
 export interface LunarJadeEnhancementMats {
   encLevel: number;
   stigmata: number;

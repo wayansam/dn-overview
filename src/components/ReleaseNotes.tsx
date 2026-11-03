@@ -300,6 +300,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "01-11-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Paradox Talisman stats, mats & enhancement calculator",
+      link: {
+        key: TAB_KEY.talismanParadox,
+        name: TAB_KEY.talismanParadox,
+      },
+      date: "03-11-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

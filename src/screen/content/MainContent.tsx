@@ -24,6 +24,7 @@ import BlackDragonTalismanContent from "./talisman/BlackDragonTalismanContent";
 import DrawerContent from "./DrawerContent";
 import ErosionJadeContent from "./jade/ErosionJadeContent";
 import ExternalTalismanContent from "./talisman/EternalTalismanContent";
+import ParadoxTalismanContent from "./talisman/ParadoxTalismanContent";
 import GeneralContent from "./main/GeneralContent";
 import CompareEqContent from "./main/CompareEqContent";
 import CharacterContent from "./main/CharacterContent";
@@ -167,6 +168,9 @@ const MainContent = () => {
 
       case TAB_KEY.talismanEternal:
         return <ExternalTalismanContent />;
+
+      case TAB_KEY.talismanParadox:
+        return <ParadoxTalismanContent />;
 
       case TAB_KEY.miscConversion:
         return <ConversionContent />;

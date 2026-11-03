@@ -63,4 +63,37 @@ export const talismanHelpItems: HelpItem[] = [
       </div>
     ),
   },
+  {
+    key: TAB_KEY.talismanParadox,
+    label: TAB_KEY.talismanParadox,
+    children: (
+      <div>
+        <p>
+          <b>
+            There are 6 Paradox Talisman type, all can be enhanced up to +15
+            and evolved into Blessed (enhancement level is kept).
+          </b>
+        </p>
+        <p>
+          All 6 share the same enhancement mats, pick the talisman & Blessed
+          toggle only to see the status increase.
+        </p>
+        <p>
+          To use the calculator, set the bottom point to your state right now
+          and the top point to where you want to.
+        </p>
+        <p>
+          Mats are for one successful attempt per level. From +6 the rate drops
+          below 100%, and failing at +12 and above drops 1 level.
+        </p>
+        <p>
+          <i>Talismans drop from Paradox Frozen Dragon Nest.</i>
+        </p>
+        <PatchNoteLink
+          href="https://patchnote.dragonnest.com/sea/197/c/2"
+          label="Paradox Talisman/Resonance Slot"
+        />
+      </div>
+    ),
+  },
 ];
