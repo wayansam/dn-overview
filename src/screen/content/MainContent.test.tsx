@@ -4,7 +4,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { TAB_GROUP_LIST, TAB_KEY } from "../../constants/Common.constants";
+import { TAB_GROUP_LIST } from "../../constants/Common.constants";
 import allReducers from "../../slice";
 import { setSelectedSideBar } from "../../slice/UIState.reducer";
 import MainContent from "./MainContent";
@@ -16,7 +16,7 @@ vi.mock("@ant-design/charts", () => ({
 
 // Tabs listed in the sidebar on purpose before their screen exists; they
 // show the "Crafting..." placeholder. Remove a tab here once it's built.
-const WORK_IN_PROGRESS: string[] = [TAB_KEY.stageNSTG];
+const WORK_IN_PROGRESS: string[] = [];
 
 const tabs = TAB_GROUP_LIST.flatMap((group) =>
   group.children.map((tab) => ({ ...tab, group: group.name }))

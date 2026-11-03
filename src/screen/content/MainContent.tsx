@@ -45,6 +45,7 @@ import SpunGoldEqContent from "./equipment/SpunGoldEqContent";
 import CollapseJadeContent from "./jade/CollapseJadeContent";
 import StageAoTContent from "./stage/StageAoTContent";
 import StageFissionMazeContent from "./stage/StageFissionMazeContent";
+import StageNSTGContent from "./stage/StageNSTGContent";
 import DeeplyVarJadeContent from "./jade/DeeplyVarJadeContent";
 import GoldDragonJadeContent from "./jade/GoldDragonJadeContent";
 import BroochContent from "./brooch/BroochContent";
@@ -104,6 +105,9 @@ const MainContent = () => {
 
       case TAB_KEY.stageFissionMaze:
         return <StageFissionMazeContent />;
+
+      case TAB_KEY.stageNSTG:
+        return <StageNSTGContent />;
 
       case TAB_KEY.stageArcOfTranscen:
         return <StageAoTContent />;

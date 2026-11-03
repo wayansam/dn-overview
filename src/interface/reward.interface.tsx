@@ -56,3 +56,23 @@ export interface FissionMazeStageClear {
   goldenBox: FissionMazeRangeReward[];
   silverBox: FissionMazeRangeReward[];
 }
+
+// Nightshade Reward Chest, opened with a Night Shadow Starlight Key.
+// Fields left out were not listed in the patch note for that floor.
+export interface NSTGChestReward {
+  floor: string;
+  dragonJadePouch?: string;
+  lunarEclipseCrystal?: number;
+  lunarEclipseRemains?: number;
+  // stored in copper (1g = 100s, 1s = 100c), same as Fission Maze
+  gold?: number;
+  heroCoins?: number;
+  shinyHeroCoins?: number;
+}
+
+export interface NSTGResonanceMission {
+  // matches NSTGChestReward.floor
+  floor: string;
+  timeLimit?: string;
+  twistedResonanceFragment: number;
+}

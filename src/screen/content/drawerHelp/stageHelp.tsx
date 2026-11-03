@@ -25,6 +25,34 @@ export const stageHelpItems: HelpItem[] = [
     ),
   },
   {
+    key: TAB_KEY.stageNSTG,
+    label: TAB_KEY.stageNSTG,
+    children: (
+      <div>
+        <PatchNoteSection
+          entries={[
+            {
+              href: "https://patchnote.dragonnest.com/sea/150/c/1",
+              label: "Night Shadow Training Ground (Labyrinth 15F-Dimension 4F)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/160/c/6",
+              label: "Labyrinth to Ascension Difficulty Merge",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/180/c/7",
+              label: "Difficulty Expansion & Split (3-1F to Dimension 14F)",
+            },
+            {
+              href: "https://patchnote.dragonnest.com/sea/197/c/1",
+              label: "Resonance Mission - Paradox Frozen Dragon Nest",
+            },
+          ]}
+        />
+      </div>
+    ),
+  },
+  {
     key: TAB_KEY.stageArcOfTranscen,
     label: TAB_KEY.stageArcOfTranscen,
     children: (

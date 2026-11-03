@@ -309,6 +309,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "03-11-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Night Shadow Training Ground chest & Resonance rewards",
+      link: {
+        key: TAB_KEY.stageNSTG,
+        name: TAB_KEY.stageNSTG,
+      },
+      date: "03-11-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [
