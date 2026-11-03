@@ -18,6 +18,9 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/setupTests.ts",
+    // Screen tests render full antd pages; under coverage instrumentation
+    // several take 5-8s, so the default 5s timeout made them fail at random.
+    testTimeout: 30000,
     coverage: {
       include: ["src/**/*.{ts,tsx}"],
       exclude: [

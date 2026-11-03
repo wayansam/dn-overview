@@ -13,7 +13,7 @@ export const renderScreen = (key: string, name = key) => {
   const view = render(
     <Provider store={store}>
       <MainContent />
-    </Provider>
+    </Provider>,
   );
   return { store, ...view };
 };
@@ -24,7 +24,7 @@ export const getSelectByLabel = (container: HTMLElement, label: string) => {
     (div) =>
       div.firstChild?.nodeType === Node.TEXT_NODE &&
       div.firstChild.textContent?.trim() === label &&
-      div.querySelector(".ant-select")
+      div.querySelector(".ant-select"),
   );
   if (!row) throw new Error(`No select labelled "${label}"`);
   return row.querySelector<HTMLElement>(".ant-select")!;
@@ -51,14 +51,14 @@ const openSelect = (select: HTMLElement) => {
 // The antd Select showing a placeholder, e.g. the "Class" filter.
 export const getSelectByPlaceholder = (
   container: HTMLElement,
-  placeholder: string
+  placeholder: string,
 ) => {
   const select = Array.from(
-    container.querySelectorAll<HTMLElement>(".ant-select")
+    container.querySelectorAll<HTMLElement>(".ant-select"),
   ).find(
     (el) =>
       el.querySelector(".ant-select-selection-placeholder")?.textContent ===
-      placeholder
+      placeholder,
   );
   if (!select) throw new Error(`No select with placeholder "${placeholder}"`);
   return select;
@@ -97,12 +97,14 @@ export const chooseOption = (select: HTMLElement, label: string) => {
   const active = () => {
     const dropdown = Array.from(
       document.querySelectorAll(
-        ".ant-select-dropdown:not(.ant-select-dropdown-hidden)"
-      )
+        ".ant-select-dropdown:not(.ant-select-dropdown-hidden)",
+      ),
     ).pop();
     const id = input.getAttribute("aria-activedescendant");
     const option = id && dropdown?.querySelector(`[role="option"][id="${id}"]`);
-    return option ? option.getAttribute("aria-label") ?? option.textContent : null;
+    return option
+      ? (option.getAttribute("aria-label") ?? option.textContent)
+      : null;
   };
 
   for (let step = 0; step < 500 && active() !== label; step++) {
@@ -120,8 +122,26 @@ export const visitAllTabs = (container: HTMLElement) =>
         fireEvent.click(tab);
       });
       return tab.textContent ?? "";
-    }
+    },
   );
+
+// Expands every antd Collapse panel on the page, including the ones nested
+// inside panels that only appear once their parent is open.
+export const openAllPanels = (container: HTMLElement) => {
+  for (let round = 0; round < 10; round++) {
+    const closed = Array.from(
+      container.querySelectorAll<HTMLElement>(
+        ".ant-collapse-item:not(.ant-collapse-item-active) > .ant-collapse-header",
+      ),
+    );
+    if (closed.length === 0) return;
+    closed.forEach((header) =>
+      act(() => {
+        fireEvent.click(header);
+      }),
+    );
+  }
+};
 
 // Ticks the "select all" checkbox of the first selectable table.
 export const selectAllRows = (container: HTMLElement) => {
@@ -138,12 +158,12 @@ export const materialAmounts = (container: HTMLElement) =>
   Array.from(container.querySelectorAll("table"))
     .filter((table) => {
       const headers = Array.from(table.querySelectorAll("th")).map(
-        (th) => th.textContent
+        (th) => th.textContent,
       );
       return headers.includes("Materials") && headers.includes("Amount");
     })
     .flatMap((table) =>
-      Array.from(table.querySelectorAll("tbody tr td:nth-child(2)")).map(
-        (td) => Number((td.textContent ?? "").replace(/\D/g, "") || 0)
-      )
+      Array.from(table.querySelectorAll("tbody tr td:nth-child(2)")).map((td) =>
+        Number((td.textContent ?? "").replace(/\D/g, "") || 0),
+      ),
     );

@@ -18,3 +18,8 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: () => false,
   }),
 });
+
+// jsdom doesn't support getComputedStyle with a pseudo-element (antd asks
+// for ::-webkit-scrollbar to measure scrollbars) and logs "Not implemented".
+const { getComputedStyle } = window;
+window.getComputedStyle = (elt: Element) => getComputedStyle(elt);
