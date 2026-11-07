@@ -1,678 +1,269 @@
-import { Collapse, Divider, List, Space, Typography } from "antd";
-import { BaseType } from "antd/es/typography/Base";
-import Link from "antd/es/typography/Link";
-import { TAB_KEY } from "../constants/Common.constants";
+import {
+  Divider,
+  Input,
+  List,
+  Space,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { useMemo, useState } from "react";
+import {
+  PLANNED_NOTES,
+  RELEASE_NOTES,
+  ReleaseNote,
+  ReleaseType,
+} from "../constants/ReleaseNotes.constants";
 import { useAppDispatch } from "../hooks";
-import { SideBarTab } from "../interface/Common.interface";
 import { setSelectedSideBar } from "../slice/UIState.reducer";
 
 interface ReleaseNotesProps {
   onlyNew?: boolean;
 }
 
-const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
+const TYPE_COLOR: Record<ReleaseType, string> = {
+  [ReleaseType.N]: "green",
+  [ReleaseType.U]: "gold",
+  [ReleaseType.D]: "blue",
+  [ReleaseType.M]: "purple",
+  [ReleaseType.P]: "default",
+  [ReleaseType.I]: "red",
+};
+
+// "DD-MM-YYYY" -> YYYYMMDD as a number, 0 when missing or unparsable.
+export const dateValue = (date?: string): number => {
+  const match = date?.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+  if (!match) return 0;
+  const [, d, m, y] = match;
+  return Number(y) * 10000 + Number(m) * 100 + Number(d);
+};
+
+export const matchesSearch = (note: ReleaseNote, search: string) => {
+  const term = search.trim().toLowerCase();
+  if (!term) return true;
+  return [note.label, note.type, note.date ?? ""].some((text) =>
+    text.toLowerCase().includes(term),
+  );
+};
+
+const byDateDesc = (a: ReleaseNote, b: ReleaseNote) =>
+  dateValue(b.date) - dateValue(a.date);
+
+export const WHATS_NEW_MIN = 5;
+
+export const WHATS_NEW_DAYS = 14;
+
+// Entries released in the last WHATS_NEW_DAYS days; when that's fewer than
+// WHATS_NEW_MIN, the WHATS_NEW_MIN latest entries instead.
+export const getWhatsNew = (notes: ReleaseNote[], now = new Date()) => {
+  const sorted = [...notes].sort(byDateDesc);
+  const since = new Date(now);
+  since.setDate(since.getDate() - WHATS_NEW_DAYS);
+  const cutoff =
+    since.getFullYear() * 10000 +
+    (since.getMonth() + 1) * 100 +
+    since.getDate();
+  const recent = sorted.filter((note) => dateValue(note.date) >= cutoff);
+  return recent.length >= WHATS_NEW_MIN
+    ? recent
+    : sorted.slice(0, WHATS_NEW_MIN);
+};
+
+const sortedNotes = [...RELEASE_NOTES].sort(byDateDesc);
+const featureNotes = sortedNotes.filter((note) => note.category === "feature");
+const appNotes = sortedNotes.filter((note) => note.category === "app");
+
+const noteKey = (note: ReleaseNote) =>
+  `${note.type}-${note.label}-${note.date ?? ""}`;
+
+const TypeTag = ({ type }: { type: ReleaseType }) => (
+  <Tag
+    color={TYPE_COLOR[type]}
+    style={{ marginInlineEnd: 0, minWidth: 64, textAlign: "center" }}
+  >
+    {type}
+  </Tag>
+);
+
+const NoteLabel = ({ note }: { note: ReleaseNote }) => {
   const dispatch = useAppDispatch();
-  enum keyUpdate {
-    N = "New",
-    U = "Update",
-    P = "Planned",
-    I = "In Progress",
-    D = "Done",
-    M = "Maintenance",
-  }
+  if (!note.link) return <>{note.label}</>;
+  return (
+    <Typography.Link
+      onClick={() => note.link && dispatch(setSelectedSideBar(note.link))}
+    >
+      {note.label}
+    </Typography.Link>
+  );
+};
 
-  interface FeatureItem {
-    label: string;
-    key: keyUpdate;
-    link?: SideBarTab;
-    date?: string;
-  }
-  const getType = (item: FeatureItem): BaseType | undefined => {
-    if (item.key === keyUpdate.N) {
-      return "success";
-    }
-    if (item.key === keyUpdate.U) {
-      return "warning";
-    }
-    if (item.key === keyUpdate.P) {
-      return "secondary";
-    }
-    if (item.key === keyUpdate.I) {
-      return "danger";
-    }
-    if (item.key === keyUpdate.M) {
-      return "secondary";
-    }
-    return;
-  };
-  const getRowKey = (item: FeatureItem) => `${item.key}-${item.label}`;
-
-  const renderItem = (item: FeatureItem, idx: number) => (
-    <List.Item key={`item-${item.key}-${item.label}`}>
-      <Typography.Text
-        key={`item-tag-${item.key}-${idx}-${item.label}`}
-        type={getType(item)}
-      >
-        [{item.key}]{" "}
-      </Typography.Text>
-      {`${item.label} `}
-      {item?.link && (
-        <Link
-          key={`item-link-${item.key}-${item.label}`}
-          onClick={() => {
-            if (item?.link) {
-              dispatch(setSelectedSideBar(item.link));
-            }
-          }}
-          target="_blank"
-        >
-          [Check Out]
-        </Link>
-      )}
-      {item?.date && (
-        <Typography.Text key={`item-date-${item.key}-${item.label}`}>
-          {" "}
-          [{item.date}]{" "}
+// Tag on the left, description with the date under it. Same layout at any
+// width, so it reads well on phones and in the narrow dashboard widget.
+const NoteRow = ({ note }: { note: ReleaseNote }) => (
+  <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+    <div style={{ flex: "none" }}>
+      <TypeTag type={note.type} />
+    </div>
+    <div style={{ minWidth: 0 }}>
+      <div>
+        <NoteLabel note={note} />
+      </div>
+      {note.date && (
+        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+          {note.date}
         </Typography.Text>
       )}
-    </List.Item>
+    </div>
+  </div>
+);
+
+interface ReleaseTableProps {
+  data: ReleaseNote[];
+}
+
+const ReleaseTable = ({ data }: ReleaseTableProps) => {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const filtered = useMemo(
+    () => data.filter((note) => matchesSearch(note, search)),
+    [data, search],
   );
 
-  const dataNew: Array<FeatureItem> = [
-    {
-      key: keyUpdate.U,
-      label:
-        "Enhancement Legend Conversion Armor (+4 to +7), Weapon, Accessories & WTD (+4 to +6)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "31-08-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Conversion Suggestion",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "01-09-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Gold Dragon Armor & Weapon Calculator",
-      link: {
-        key: TAB_KEY.eqGoldDragon,
-        name: TAB_KEY.eqGoldDragon,
-      },
-      date: "15-09-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Ark of Transcendence Season 1 to Season 3 [Future] rewards",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "15-09-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Compare Equipment stats",
-      link: {
-        key: TAB_KEY.mainCompare,
-        name: TAB_KEY.mainCompare,
-      },
-      date: "15-09-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Brooch Calculator (Velskud, Nerwin, Terramai)",
-      link: {
-        key: TAB_KEY.broochTerramai,
-        name: TAB_KEY.broochTerramai,
-      },
-      date: "15-09-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Lunar Jade evolve to Collapse Dragon Jade (Unique)",
-      link: {
-        key: TAB_KEY.jadeLunar,
-        name: TAB_KEY.jadeLunar,
-      },
-      date: "24-09-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Collapse Dragon Jade (Epic) enhancement levels expanded (0-15)",
-      link: {
-        key: TAB_KEY.jadeCollapse,
-        name: TAB_KEY.jadeCollapse,
-      },
-      date: "26-09-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Fission Maze Erosion rewards (Labyrinth & Ascension)",
-      link: {
-        key: TAB_KEY.stageFissionMaze,
-        name: TAB_KEY.stageFissionMaze,
-      },
-      date: "04-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Gold Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeGoldDragon,
-        name: TAB_KEY.jadeGoldDragon,
-      },
-      date: "04-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Ark of Transcendence Season 4 [Past] rewards",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "17-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Legend Conversion Accessories (+7)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "17-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "VIP Accessories renamed to Iona Accessories",
-      link: {
-        key: TAB_KEY.eqIonaAcc,
-        name: TAB_KEY.eqIonaAcc,
-      },
-      date: "17-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label:
-        "Iona Accessories evolution to White Dragon Accessories (+15 to +20)",
-      link: {
-        key: TAB_KEY.eqIonaAcc,
-        name: TAB_KEY.eqIonaAcc,
-      },
-      date: "17-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Rubinart Accessories Calculator",
-      link: {
-        key: TAB_KEY.eqRubinartAcc,
-        name: TAB_KEY.eqRubinartAcc,
-      },
-      date: "17-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label:
-        "General dashboard with customizable widgets (Characters, IDs, Tasks, Release Notes)",
-      link: {
-        key: TAB_KEY.mainGeneral,
-        name: TAB_KEY.mainGeneral,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label:
-        "Character list moved to the Character tab, Details opens the character in a popup",
-      link: {
-        key: TAB_KEY.mainCharacter,
-        name: TAB_KEY.mainCharacter,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label:
-        "Task tab: Weekly [Account] & Weekly [Character] checklists with Fission Maze & Ark of Transcendence floors",
-      link: {
-        key: TAB_KEY.mainTask,
-        name: TAB_KEY.mainTask,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Weekly reward summary from the picked floors",
-      link: {
-        key: TAB_KEY.mainTask,
-        name: TAB_KEY.mainTask,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label:
-        "Server time (UTC+8) and automatic weekly reset every Saturday 09:00, with a Last Week summary",
-      link: {
-        key: TAB_KEY.mainTask,
-        name: TAB_KEY.mainTask,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label:
-        "Backup & Transfer: export / import your data to another browser or device",
-      link: {
-        key: TAB_KEY.setting,
-        name: TAB_KEY.setting,
-      },
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Phone friendly layout for the Character & Task tables and widgets",
-      date: "18-10-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label:
-        "Class icon next to character names for every class, 2nd job & specialization",
-      link: {
-        key: TAB_KEY.mainCharacter,
-        name: TAB_KEY.mainCharacter,
-      },
-      date: "01-11-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label:
-        "Cleaner character name layout, the Main tag no longer breaks the row",
-      link: {
-        key: TAB_KEY.mainCharacter,
-        name: TAB_KEY.mainCharacter,
-      },
-      date: "01-11-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Paradox Talisman stats, mats & enhancement calculator",
-      link: {
-        key: TAB_KEY.talismanParadox,
-        name: TAB_KEY.talismanParadox,
-      },
-      date: "03-11-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Night Shadow Training Ground chest & Resonance rewards",
-      link: {
-        key: TAB_KEY.stageNSTG,
-        name: TAB_KEY.stageNSTG,
-      },
-      date: "03-11-2026",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Golden Enhancement Heraldry stats, mats & crafting calculator",
-      link: {
-        key: TAB_KEY.heraldryGolden,
-        name: TAB_KEY.heraldryGolden,
-      },
-      date: "07-11-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Paradox Warrior class & skills",
-      link: {
-        key: TAB_KEY.mainCharacter,
-        name: TAB_KEY.mainCharacter,
-      },
-      date: "07-11-2026",
-    },
-  ];
+  const typeFilters = useMemo(
+    () =>
+      Array.from(new Set(data.map((note) => note.type))).map((type) => ({
+        text: type,
+        value: type,
+      })),
+    [data],
+  );
 
-  const dataSoon: Array<FeatureItem> = [
+  const columns: ColumnsType<ReleaseNote> = [
+    // Phones: one stacked column instead of a sideways-scrolling table.
     {
-      key: keyUpdate.P,
-      label: "To Do List",
+      title: "Release",
+      key: "compact",
+      responsive: ["xs"],
+      render: (_, note) => <NoteRow note={note} />,
     },
     {
-      key: keyUpdate.P,
-      label: "Future feature (beta)",
+      title: "Type",
+      dataIndex: "type",
+      width: 110,
+      responsive: ["sm"],
+      filters: typeFilters,
+      onFilter: (value, note) => note.type === value,
+      render: (type: ReleaseType) => <TypeTag type={type} />,
     },
     {
-      key: keyUpdate.P,
-      label: "Gear Info",
-    },
-  ];
-
-  const dataPastFunc: Array<FeatureItem> = [
-    {
-      key: keyUpdate.D,
-      label:
-        "Equipment (Ancient, Kilos, Named EOD), Jade (Lunar, Skill, Erosion), Heraldry (Ancient Goddess), Talisman (Black Dragon, Eternal).",
-      date: "Not Recorded",
+      title: "Description",
+      dataIndex: "label",
+      responsive: ["sm"],
+      render: (_, note) => <NoteLabel note={note} />,
     },
     {
-      key: keyUpdate.D,
-      label: "Dimensional Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeSkill,
-        name: TAB_KEY.jadeSkill,
-        payload: {
-          skillJadeScreen: {
-            tabOpen: ["7"],
-          },
-        },
-      },
-      date: "03-02-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Ancient Lunar Jade Enhancement Calculator",
-      link: {
-        key: TAB_KEY.jadeLunar,
-        name: TAB_KEY.jadeLunar,
-        payload: {
-          lunarScreen: {
-            tabOpen: ["4"],
-          },
-        },
-      },
-      date: "23-02-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Conversion Costume Calculator",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "04-04-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Bone Dragon Armor & Weapon Calculator",
-      link: {
-        key: TAB_KEY.eqBoneDragon,
-        name: TAB_KEY.eqBoneDragon,
-      },
-      date: "26-05-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Conversion Costume Armor Legend Enhancement",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "28-05-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Bestie Spirit & Mount Calculator",
-      link: {
-        key: TAB_KEY.miscBestie,
-        name: TAB_KEY.miscBestie,
-      },
-      date: "04-07-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Enhancement for Ancient Goddess Heraldry",
-      link: {
-        key: TAB_KEY.heraldryAncientGoddes,
-        name: TAB_KEY.heraldryAncientGoddes,
-      },
-      date: "08-07-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "VIP accessories",
-      link: {
-        key: TAB_KEY.eqIonaAcc,
-        name: TAB_KEY.eqIonaAcc,
-      },
-      date: "07-09-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Otherworldly Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeSkill,
-        name: TAB_KEY.jadeSkill,
-        payload: {
-          skillJadeScreen: {
-            tabOpen: ["8"],
-          },
-        },
-      },
-      date: "07-09-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Ancient's Equipment Cost Changes",
-      link: {
-        key: TAB_KEY.eqAncient,
-        name: TAB_KEY.eqAncient,
-      },
-      date: "10-09-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Spun Gold Equipment",
-      link: {
-        key: TAB_KEY.eqSpunGold,
-        name: TAB_KEY.eqSpunGold,
-      },
-      date: "12-09-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Collapse Dragon Jade",
-      link: {
-        key: TAB_KEY.jadeCollapse,
-        name: TAB_KEY.jadeCollapse,
-      },
-      date: "25-09-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Spun Gold Equipment - Evolver Mats calculator",
-      link: {
-        key: TAB_KEY.eqSpunGold,
-        name: TAB_KEY.eqSpunGold,
-      },
-      date: "08-10-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Bestie Spirit & Mount v3",
-      link: {
-        key: TAB_KEY.miscBestie,
-        name: TAB_KEY.miscBestie,
-      },
-      date: "22-10-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Legend Conversion Accessories (+1 to +3)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "23-10-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Iona Accessories (+13 to +15)",
-      link: {
-        key: TAB_KEY.eqIonaAcc,
-        name: TAB_KEY.eqIonaAcc,
-      },
-      date: "30-10-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Arc of Transcendence, Season 2 [Future]",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "4-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Conversion charts",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "09-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Arc of Transcendence, Season 3 [Past]",
-      link: {
-        key: TAB_KEY.stageArcOfTranscen,
-        name: TAB_KEY.stageArcOfTranscen,
-      },
-      date: "10-11-2025",
-    },
-    {
-      key: keyUpdate.N,
-      label: "Deeply Rooted Variant Jade",
-      link: {
-        key: TAB_KEY.jadeDeepVariant,
-        name: TAB_KEY.jadeDeepVariant,
-      },
-      date: "12-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "VIP Accessories charts",
-      link: {
-        key: TAB_KEY.eqIonaAcc,
-        name: TAB_KEY.eqIonaAcc,
-      },
-      date: "17-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Enhancement Legend Conversion Weapon & WTD (+1 to +3)",
-      link: {
-        key: TAB_KEY.miscConversion,
-        name: TAB_KEY.miscConversion,
-      },
-      date: "06-02-2026",
-    },
-  ];
-  const dataPastUpdate: Array<FeatureItem> = [
-    {
-      key: keyUpdate.D,
-      label:
-        "Patch Note link for some existing item in Help bar (question mark in bottom right corner)",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Success rate note on all of the skill jade",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Make Chart Visualization",
-      date: "09-11-2025",
-    },
-    {
-      key: keyUpdate.D,
-      label: "Add preference 'Stay on last opened screen'",
-      date: "10-11-2025",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Update Chart Visualization to show data by total or step",
-      date: "18-11-2025",
-    },
-    {
-      key: keyUpdate.M,
-      label:
-        "Overall app performance improvement, bug fixes, and UI/UX enhancements.",
-      date: "31-08-2026",
-    },
-    {
-      key: keyUpdate.U,
-      label: "Update Character & ID screen to show all characters",
-      date: "05-10-2026",
+      title: "Date",
+      dataIndex: "date",
+      width: 120,
+      responsive: ["sm"],
+      sorter: byDateDesc,
+      sortDirections: ["descend", "ascend"],
+      render: (date?: string) =>
+        date ?? <Typography.Text type="secondary">-</Typography.Text>,
     },
   ];
 
   return (
+    <Space direction="vertical" style={{ width: "100%" }}>
+      <Input.Search
+        allowClear
+        placeholder="Search by description, type or date"
+        value={search}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setPage(1);
+        }}
+        style={{ maxWidth: 360 }}
+      />
+      <Table<ReleaseNote>
+        size="small"
+        bordered
+        columns={columns}
+        dataSource={filtered}
+        rowKey={noteKey}
+        pagination={{
+          current: page,
+          pageSize,
+          showSizeChanger: true,
+          pageSizeOptions: [5, 10, 20, 50],
+          showTotal: (total) => `${total} entries`,
+          onChange: (nextPage, nextSize) => {
+            setPage(nextSize !== pageSize ? 1 : nextPage);
+            setPageSize(nextSize);
+          },
+        }}
+        onChange={(_pagination, _filters, _sorter, extra) => {
+          if (extra.action !== "paginate") setPage(1);
+        }}
+      />
+    </Space>
+  );
+};
+
+const WhatsNewList = ({ data }: { data: ReleaseNote[] }) => (
+  <List
+    bordered
+    size="small"
+    dataSource={data}
+    rowKey={noteKey}
+    renderItem={(note) => (
+      <List.Item>
+        <NoteRow note={note} />
+      </List.Item>
+    )}
+  />
+);
+
+const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
+  const newNotes = useMemo(() => getWhatsNew(RELEASE_NOTES), []);
+
+  if (onlyNew) {
+    return <WhatsNewList data={newNotes} />;
+  }
+
+  return (
     <div>
       <Divider orientation="left">What's New</Divider>
-      <Space direction="horizontal">
-        <List
-          bordered
-          dataSource={dataNew}
-          renderItem={renderItem}
-          rowKey={getRowKey}
-          key={"list-new"}
-        />
+      <WhatsNewList data={newNotes} />
+
+      <Divider orientation="left">What's Next?</Divider>
+      <Space wrap>
+        {PLANNED_NOTES.map((note) => (
+          <Tag key={note.label} color={TYPE_COLOR[note.type]}>
+            [{note.type}] {note.label}
+          </Tag>
+        ))}
       </Space>
 
-      {!onlyNew && (
-        <>
-          <Divider orientation="left">What's Next?</Divider>
-          <Space direction="horizontal">
-            <List
-              bordered
-              dataSource={dataSoon}
-              renderItem={renderItem}
-              rowKey={getRowKey}
-            />
-          </Space>
-
-          <Divider orientation="left">Release History</Divider>
-          <Collapse
-            items={[
-              {
-                key: "1",
-                label: "Functionality",
-                children: (
-                  <Space direction="horizontal">
-                    <List
-                      bordered
-                      dataSource={dataPastFunc}
-                      renderItem={renderItem}
-                      rowKey={getRowKey}
-                    />
-                  </Space>
-                ),
-              },
-              {
-                key: "2",
-                label: "Update",
-                children: (
-                  <Space direction="horizontal">
-                    <List
-                      bordered
-                      dataSource={dataPastUpdate}
-                      renderItem={renderItem}
-                      rowKey={getRowKey}
-                    />
-                  </Space>
-                ),
-              },
-            ]}
-            size="small"
-          />
-        </>
-      )}
+      <Divider orientation="left">Release History</Divider>
+      <Tabs
+        items={[
+          {
+            key: "feature",
+            label: `Functionality (${featureNotes.length})`,
+            children: <ReleaseTable data={featureNotes} />,
+          },
+          {
+            key: "app",
+            label: `Update (${appNotes.length})`,
+            children: <ReleaseTable data={appNotes} />,
+          },
+        ]}
+      />
     </div>
   );
 };
