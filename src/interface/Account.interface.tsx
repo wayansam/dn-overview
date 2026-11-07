@@ -9,7 +9,8 @@ export interface ClassInfo {
   id: string;
   name: string;
   baseClass: CHARACTER_CLASS;
-  secondJob: CHARACTER_2NDJOB;
+  // Absent for classes created directly at max level (e.g. Paradox Warrior).
+  secondJob?: CHARACTER_2NDJOB;
 }
 
 export interface ClassSkill {

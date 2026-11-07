@@ -1,3 +1,4 @@
+import { PatchNoteLink } from "../../../components/PatchNoteLink";
 import { TAB_KEY } from "../../../constants/Common.constants";
 import { HelpItem } from "./helpItem.type";
 
@@ -33,7 +34,15 @@ export const mainHelpItems: HelpItem[] = [
           Names are letters and numbers only, up to 15 characters, and must be
           unique. Only one character can be main.
         </p>
+        <p>
+          Paradox Warrior is created directly at Lv.100, so it has no 2nd
+          Job.
+        </p>
         <p>Data is saved in this browser only.</p>
+        <PatchNoteLink
+          href="https://patchnote.dragonnest.com/sea/202/c/1"
+          label="New Class - Paradox Warrior"
+        />
       </div>
     ),
   },

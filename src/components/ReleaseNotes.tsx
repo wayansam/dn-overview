@@ -327,6 +327,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "07-11-2026",
     },
+    {
+      key: keyUpdate.U,
+      label: "Paradox Warrior class & skills",
+      link: {
+        key: TAB_KEY.mainCharacter,
+        name: TAB_KEY.mainCharacter,
+      },
+      date: "07-11-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

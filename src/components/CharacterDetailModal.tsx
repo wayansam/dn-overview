@@ -318,9 +318,11 @@ const CharacterDetailModal = ({
               <Descriptions.Item label="Base Class">
                 {watchedClass.baseClass}
               </Descriptions.Item>
-              <Descriptions.Item label="2nd Job">
-                {watchedClass.secondJob}
-              </Descriptions.Item>
+              {watchedClass.secondJob && (
+                <Descriptions.Item label="2nd Job">
+                  {watchedClass.secondJob}
+                </Descriptions.Item>
+              )}
               {watchedSkills.length ? (
                 watchedSkills.map((skill) => (
                   <Descriptions.Item key={skill.id} label={skill.slot}>

@@ -51,6 +51,12 @@ export const ClassData: ClassInfo[] = [
     baseClass: CHARACTER_CLASS.WARRIOR,
     secondJob: CHARACTER_2NDJOB.KNIGHT,
   },
+  // Created directly at Lv.100 with no 2nd job (SEA patch 202).
+  {
+    id: "paradox-warrior",
+    name: "Paradox Warrior",
+    baseClass: CHARACTER_CLASS.WARRIOR,
+  },
   // Archer
   {
     id: "sniper",
@@ -411,6 +417,13 @@ export const SkillData: ClassSkill[] = [
     "Crossover",
     "Assault Slash",
     "Wind Breaker",
+  ]),
+  ...classSkills("paradox-warrior", [
+    "Circle Break",
+    "Terminus Edge",
+    "Unbound Cut",
+    "Reflection Slash",
+    "Crescent Fall",
   ]),
   ...classSkills("sniper", [
     "Piercing Shot",
