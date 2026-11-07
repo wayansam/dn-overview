@@ -11,6 +11,7 @@ export interface CommonItemStats {
   crt?: number;
   crtPercent?: number;
   cdm?: number;
+  cdmPercent?: number;
   fd?: number;
 
   str?: number;

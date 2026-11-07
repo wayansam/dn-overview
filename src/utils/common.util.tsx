@@ -142,6 +142,7 @@ export const getColumnsStats = ({
   crtFlag,
   crtPercentFlag,
   cdmFlag,
+  cdmPercentFlag,
   fdFlag,
   strFlag,
   agiFlag,
@@ -171,6 +172,7 @@ export const getColumnsStats = ({
     crtDesc,
     crtPercentDesc,
     cdmDesc,
+    cdmPercentDesc,
     fdDesc,
     strDesc,
     agiDesc,
@@ -285,6 +287,19 @@ export const getColumnsStats = ({
       render: (_, { cdm }) => (
         <div>
           <Text>{getTextEmpty({ txt: cdm })}</Text>
+        </div>
+      ),
+    });
+  }
+  if (cdmPercentFlag && cdmPercentDesc) {
+    const { long, short } = cdmPercentDesc;
+    smallItemTitle.push(short);
+    temp.push({
+      title: long,
+      responsive: ["sm"],
+      render: (_, { cdmPercent }) => (
+        <div>
+          <Text>{getTextEmpty({ txt: cdmPercent, tailText: "%" })}</Text>
         </div>
       ),
     });
@@ -552,6 +567,7 @@ export const getColumnsStats = ({
           crt,
           crtPercent,
           cdm,
+          cdmPercent,
           fd,
           str,
           agi,
@@ -618,6 +634,12 @@ export const getColumnsStats = ({
             <p>
               {`${cdmDesc?.short} `}
               {getTextEmpty({ txt: cdm })}
+            </p>
+          )}
+          {cdmPercentFlag && (
+            <p>
+              {`${cdmPercentDesc?.short} `}
+              {getTextEmpty({ txt: cdmPercent, tailText: "%" })}
             </p>
           )}
           {fdFlag && (
@@ -869,6 +891,12 @@ export const getStatDif = (statDif?: CommonItemStats) => {
       format: true,
     },
     {
+      title: getStatDesc("cdmPercent").short,
+      value: statDif.cdmPercent,
+      suffix: "%",
+      format: true,
+    },
+    {
       title: getStatDesc("fd").short,
       value: statDif.fd,
       format: true,
@@ -991,6 +1019,8 @@ export const getStatDesc = (
       return { long: "CRT(%)", short: "CRT(%)" };
     case "cdm":
       return { long: "CDM", short: "CDM" };
+    case "cdmPercent":
+      return { long: "CDM(%)", short: "CDM(%)" };
     case "fd":
       return { long: "FD", short: "FD" };
     case "str":

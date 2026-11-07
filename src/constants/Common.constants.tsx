@@ -30,6 +30,7 @@ export const TAB_KEY = {
   jadeDeepVariant: "Deeply Rooted Variant Jade",
   jadeGoldDragon: "Gold Dragon's Jade",
   heraldryAncientGoddes: "Ancients' Goddess",
+  heraldryGolden: "Golden Enhancement",
   talismanBlackDragon: "Black Dragon's",
   talismanEternal: "Eternal",
   talismanParadox: "Paradox",
@@ -161,6 +162,10 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
         key: TAB_KEY.heraldryAncientGoddes,
         name: TAB_KEY.heraldryAncientGoddes,
       },
+      {
+        key: TAB_KEY.heraldryGolden,
+        name: TAB_KEY.heraldryGolden,
+      },
     ],
   },
   {
@@ -244,6 +249,7 @@ export const EmptyCommonnStat: CommonItemStats = {
   crt: 0,
   crtPercent: 0,
   cdm: 0,
+  cdmPercent: 0,
   fd: 0,
 
   str: 0,
@@ -276,6 +282,7 @@ export const EmptyCommonStatDesc: columnCommonItemDesc = {
   crtDesc: { long: "", short: "" },
   crtPercentDesc: { long: "", short: "" },
   cdmDesc: { long: "", short: "" },
+  cdmPercentDesc: { long: "", short: "" },
   fdDesc: { long: "", short: "" },
   strDesc: { long: "", short: "" },
   agiDesc: { long: "", short: "" },

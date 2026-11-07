@@ -71,7 +71,17 @@ interface RangeCalculatorPanelProps {
     customTitle?: string;
   };
   extra?: React.ReactNode;
+  // Lets the Settings card shrink to the space beside the slider (long
+  // material names wrap inside the table) instead of wrapping below it once
+  // its content gets wider, e.g. when the totals grow by a digit.
+  shrinkSettings?: boolean;
 }
+
+const shrinkSettingsStyle: React.CSSProperties = {
+  flex: "1 1 0",
+  minWidth: 240,
+  maxWidth: 420,
+};
 
 const RangeCalculatorPanel = ({
   rangeSlider,
@@ -86,6 +96,7 @@ const RangeCalculatorPanel = ({
   rateSummary,
   tradingHouse,
   extra,
+  shrinkSettings = false,
 }: RangeCalculatorPanelProps) => {
   return (
     <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
@@ -102,7 +113,7 @@ const RangeCalculatorPanel = ({
           />
         </div>
       )}
-      <CalcCard>
+      <CalcCard style={shrinkSettings ? shrinkSettingsStyle : undefined}>
         <FlagAlert show={invalid} message={invalidMessage} type="error" />
         {flags.map((flag, idx) => (
           <FlagAlert key={`extra-flag-${idx}`} {...flag} />

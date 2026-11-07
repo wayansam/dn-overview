@@ -117,6 +117,19 @@ export interface AncientGoddesHeraDisassemblyItem {
   abFrag: number;
 }
 
+// One crafting attempt of a Golden Enhancement Heraldry level. `special` is
+// the type-specific 4th material (Hand Mushroom, Demon Bone Bell, ...), 0 for
+// Bear/Wind/Intellect/Vitality which have none.
+export interface GoldenHeraldryCraftMats {
+  encLevel: string;
+  gold: number;
+  prevHeraldry: number;
+  foundationStone: number;
+  weaponCrystal: number;
+  armorCrystal: number;
+  special: number;
+}
+
 export interface BlackDragonTalismanCraftMaterial {
   rarity: ITEM_RARITY;
   bdMemories: number;

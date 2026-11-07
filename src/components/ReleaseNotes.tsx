@@ -318,6 +318,15 @@ const ReleaseNotes = ({ onlyNew }: ReleaseNotesProps) => {
       },
       date: "03-11-2026",
     },
+    {
+      key: keyUpdate.N,
+      label: "Golden Enhancement Heraldry stats, mats & crafting calculator",
+      link: {
+        key: TAB_KEY.heraldryGolden,
+        name: TAB_KEY.heraldryGolden,
+      },
+      date: "07-11-2026",
+    },
   ];
 
   const dataSoon: Array<FeatureItem> = [

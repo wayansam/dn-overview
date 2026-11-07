@@ -33,6 +33,7 @@ const STAT_KEYS: StatKey[] = [
   "crt",
   "crtPercent",
   "cdm",
+  "cdmPercent",
   "fd",
   "str",
   "agi",
