@@ -25,7 +25,8 @@ const ListingCard = ({ title, keyId, data }: ListingCardProps) => {
       return (
         <div
           key={`item-container-${title}-${idx}`}
-          style={{ width: removeWidth ? "unset" : 400 }}
+          // Up to 400px wide, but shrink to fit narrow screens.
+          style={removeWidth ? undefined : { width: "100%", maxWidth: 400 }}
         >
           <Text strong key={`item-${title}-${idx}`}>
             {title}
@@ -61,7 +62,7 @@ const ListingCard = ({ title, keyId, data }: ListingCardProps) => {
         </Divider>
       )}
       <Card key={`card-${keyId}`} size="small" style={{ marginTop: 4 }}>
-        <Space direction="vertical">
+        <Space direction="vertical" style={{ width: "100%" }}>
           {data.map((item, idx) => getStatRender(item, idx))}
         </Space>
       </Card>
