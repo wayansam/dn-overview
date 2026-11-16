@@ -74,7 +74,7 @@ test("widget is a plain list of what's new, newest first, with links", () => {
   const items = document.querySelectorAll(".ant-list-item");
   expect(items.length).toBeGreaterThanOrEqual(5);
   expect(
-    within(items[0] as HTMLElement).getByText(/Golden Enhancement Heraldry/),
+    within(items[0] as HTMLElement).getByText(/Paradox Warrior tab/),
   ).toBeInTheDocument();
 
   fireEvent.click(screen.getByText("Rubinart Accessories Calculator"));

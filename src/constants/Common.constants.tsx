@@ -37,6 +37,9 @@ export const TAB_KEY = {
   broochVelskud: "Velskud's Dimensional Brooch",
   broochNerwin: "Otherworldly Nerwin Brooch",
   broochTerramai: "Terramai Brooch of Faith",
+  paradoxEquipment: "Paradox Equipment",
+  paradoxSkillJade: "Paradox Skill Dragon Jade",
+  paradoxShop: "Paradox Shop",
   miscConversion: "Conversion",
   miscBestie: "Bestie",
 };
@@ -201,6 +204,24 @@ export const TAB_GROUP_LIST: SideBarGroupTab[] = [
       {
         key: TAB_KEY.broochTerramai,
         name: TAB_KEY.broochTerramai,
+      },
+    ],
+  },
+  {
+    key: "PARADOX",
+    name: "Paradox Warrior",
+    children: [
+      {
+        key: TAB_KEY.paradoxEquipment,
+        name: TAB_KEY.paradoxEquipment,
+      },
+      {
+        key: TAB_KEY.paradoxSkillJade,
+        name: TAB_KEY.paradoxSkillJade,
+      },
+      {
+        key: TAB_KEY.paradoxShop,
+        name: TAB_KEY.paradoxShop,
       },
     ],
   },

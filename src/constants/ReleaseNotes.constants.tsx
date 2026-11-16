@@ -444,6 +444,14 @@ export const RELEASE_NOTES: ReleaseNote[] = [
     link: tab(TAB_KEY.mainCharacter),
     date: "07-11-2026",
   },
+  {
+    type: ReleaseType.N,
+    category: "feature",
+    label:
+      "Paradox Warrior tab: exclusive equipment stats, mats & calculator, Skill Dragon Jade calculator and Paradox Shop",
+    link: tab(TAB_KEY.paradoxEquipment),
+    date: "16-11-2026",
+  },
 ];
 
 export const PLANNED_NOTES: PlannedNote[] = [

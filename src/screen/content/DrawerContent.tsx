@@ -9,6 +9,7 @@ import { heraldryHelpItems } from "./drawerHelp/heraldryHelp";
 import { jadeHelpItems } from "./drawerHelp/jadeHelp";
 import { mainHelpItems } from "./drawerHelp/mainHelp";
 import { miscHelpItems } from "./drawerHelp/miscHelp";
+import { paradoxHelpItems } from "./drawerHelp/paradoxHelp";
 import { stageHelpItems } from "./drawerHelp/stageHelp";
 import { talismanHelpItems } from "./drawerHelp/talismanHelp";
 
@@ -24,6 +25,7 @@ const listHelp = [
   ...heraldryHelpItems,
   ...talismanHelpItems,
   ...broochHelpItems,
+  ...paradoxHelpItems,
   ...miscHelpItems,
 ];
 

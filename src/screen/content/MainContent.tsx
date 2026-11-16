@@ -50,6 +50,9 @@ import StageNSTGContent from "./stage/StageNSTGContent";
 import DeeplyVarJadeContent from "./jade/DeeplyVarJadeContent";
 import GoldDragonJadeContent from "./jade/GoldDragonJadeContent";
 import BroochContent from "./brooch/BroochContent";
+import ParadoxEquipmentContent from "./paradox/ParadoxEquipmentContent";
+import ParadoxSkillJadeContent from "./paradox/ParadoxSkillJadeContent";
+import ParadoxShopContent from "./paradox/ParadoxShopContent";
 
 const { useBreakpoint } = Grid;
 const { Text } = Typography;
@@ -179,6 +182,15 @@ const MainContent = () => {
 
       case TAB_KEY.talismanParadox:
         return <ParadoxTalismanContent />;
+
+      case TAB_KEY.paradoxEquipment:
+        return <ParadoxEquipmentContent />;
+
+      case TAB_KEY.paradoxSkillJade:
+        return <ParadoxSkillJadeContent />;
+
+      case TAB_KEY.paradoxShop:
+        return <ParadoxShopContent />;
 
       case TAB_KEY.miscConversion:
         return <ConversionContent />;
