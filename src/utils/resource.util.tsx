@@ -52,6 +52,7 @@ import {
   NamedEODMainStatTable,
   NamedEODSecondStatTable,
 } from "../data/equipment/NamedEODData";
+import { getParadoxGradeStats } from "../data/paradox/ParadoxEquipmentData";
 import { CommonItemStats } from "../interface/ItemStat.interface";
 
 export const getConveRscTable = (equipment: EQUIPMENT): CommonItemStats[] => {
@@ -236,6 +237,10 @@ export const getResource = (menu: string, equipment: EQUIPMENT) => {
 
     case TAB_KEY.eqNamedEOD:
       return getNamedEODRscTable(equipment);
+
+    // One row per grade (Normal..Unique): only the +0 stats are published.
+    case TAB_KEY.paradoxEquipment:
+      return getParadoxGradeStats(equipment);
 
     default:
       return [];

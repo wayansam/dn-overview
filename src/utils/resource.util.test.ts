@@ -28,6 +28,16 @@ const supported: [string, EQUIPMENT[]][] = [
   [TAB_KEY.eqGoldDragon, ARMOR_AND_WEAPONS],
   [TAB_KEY.eqSpunGold, ARMOR_AND_WEAPONS],
   [TAB_KEY.eqNamedEOD, [EQUIPMENT.MAIN_WEAPON, EQUIPMENT.SECOND_WEAPON]],
+  [
+    TAB_KEY.paradoxEquipment,
+    [
+      ...ARMOR_AND_WEAPONS,
+      EQUIPMENT.NECKLACE,
+      EQUIPMENT.EARRING,
+      EQUIPMENT.RING1,
+      EQUIPMENT.RING2,
+    ],
+  ],
 ];
 
 describe.each(supported)("getResource(%s)", (menu, equipment) => {
@@ -41,7 +51,11 @@ describe.each(supported)("getResource(%s)", (menu, equipment) => {
   });
 });
 
-test.each([TAB_KEY.eqIonaAcc, TAB_KEY.eqRubinartAcc])(
+test.each([
+  TAB_KEY.eqIonaAcc,
+  TAB_KEY.eqRubinartAcc,
+  TAB_KEY.paradoxEquipment,
+])(
   "%s rings share one table",
   (menu) => {
     expect(getResource(menu, EQUIPMENT.RING1)).toBe(

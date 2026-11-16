@@ -19,6 +19,7 @@ const SOURCE_OPTIONS = [
   TAB_KEY.eqIonaAcc,
   TAB_KEY.eqRubinartAcc,
   TAB_KEY.miscConversion,
+  TAB_KEY.paradoxEquipment,
 ].map((source) => ({ value: source, label: source }));
 
 type StatKey = Exclude<keyof CommonItemStats, "encLevel">;
